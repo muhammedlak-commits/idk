@@ -205,9 +205,11 @@ svg.chart .tap{cursor:pointer}
 .authgrid{display:grid;gap:16px}
 @media(min-width:860px){.authgrid{grid-template-columns:1fr 1fr}}
 .authcard{background:var(--white);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-.authcard .top{height:150px;display:grid;place-items:center;background:linear-gradient(140deg,#F3F8FC,#E6EFF7);border-bottom:1px solid var(--line);padding:18px}
-.authcard .top img{max-height:100%;width:auto;object-fit:contain}
+.authcard .top{height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:linear-gradient(140deg,#F3F8FC,#E6EFF7);border-bottom:1px solid var(--line);padding:18px}
+.authcard .top img{max-height:98px;max-width:100%;width:auto;height:auto;object-fit:contain}
 .authcard .top.dark{background:linear-gradient(140deg,var(--navy),var(--navy-2))}
+.authcard .top.dark img{max-height:44px;filter:brightness(0) invert(1)}
 .authcard .b{padding:20px}
 .authcard h3{margin-bottom:8px}
 .authcard p{font-size:14.5px;color:var(--muted)}
@@ -602,7 +604,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
         </div>
       </div>
       <div class="authcard rv">
-        <div class="top dark"><img src="assets/logo-saleem.png" alt="سليم" loading="lazy" width="512" height="256" style="filter:brightness(0) invert(1);max-height:56px"></div>
+        <div class="top dark"><img src="assets/logo-saleem.png" alt="سليم" loading="lazy" width="512" height="256"></div>
         <div class="b">
           <h3 data-t="auth.2t"></h3><p data-t="auth.2p"></p>
           <span class="cred"><svg class="ic"><use href="#i-heart"/></svg> <span data-t="auth.2c"></span></span>
