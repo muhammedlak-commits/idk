@@ -1,0 +1,12 @@
+# Netlify config for the Ozempic funnel.
+#
+# publish points at a folder the build assembles, NOT at the source folder —
+# saleem-ozempic-funnel/ also holds the Apps Script (staff allowlist, access
+# key) and internal docs, none of which may be served publicly.
+#
+# Drop --staging from the command when this goes live, so the page can be
+# indexed.
+[build]
+  base    = "."
+  publish = "saleem-ozempic-funnel/dist"
+  command = "bash saleem-ozempic-funnel/build-dist.sh --staging"

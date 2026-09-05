@@ -25,8 +25,18 @@ Run it locally:
 python3 -m http.server 8000
 ```
 
-**Deploy `index.html` + `assets/`.** That's the real build — separate files the browser
-caches independently.
+**Deploy `dist/`, not this folder.** `./build-dist.sh` assembles it: `index.html`, `assets/`
+and `_headers`, nothing else. This folder also holds `apps-script/` — your staff allowlist and
+access key — which must never reach a web host.
+
+```bash
+./build-dist.sh --staging   # adds X-Robots-Tag: noindex for a test URL
+./build-dist.sh             # production
+```
+
+Netlify: drag `dist/` onto [app.netlify.com/drop](https://app.netlify.com/drop) for a throwaway
+URL, or connect the repo and let the root `netlify.toml` run the build. Drop `--staging` from
+its command when you go live.
 
 For a preview you can email or open with no server, `python3 build-standalone.py` inlines the
 images as base64 into a single ~590 KB HTML file. It works over `file://` (the history calls
