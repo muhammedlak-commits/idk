@@ -7,9 +7,10 @@ Currently in **demo mode** — the form validates and shows the thank-you page, 
 log to the browser console.
 
 ```
-index.html      the whole funnel: landing page + quiz + result + thank-you view
-assets/         4 images (logos + product shots), 141 KB total
-_headers        cache + security headers (Netlify / Cloudflare Pages format)
+index.html            the whole funnel: landing page + quiz + result + thank-you view
+assets/               4 images (logos + product shots), 141 KB total
+_headers              cache + security headers (Netlify / Cloudflare Pages format)
+build-standalone.py   bundles the above into one shareable file
 ```
 
 Run it locally:
@@ -18,7 +19,13 @@ Run it locally:
 python3 -m http.server 8000
 ```
 
-> Must be served over HTTP, not opened as `file://` — the quiz uses `history.pushState`.
+**Deploy `index.html` + `assets/`.** That's the real build — separate files the browser
+caches independently.
+
+For a preview you can email or open with no server, `python3 build-standalone.py` inlines the
+images as base64 into a single ~590 KB HTML file. It works over `file://` (the history calls
+are guarded, so the back button simply switches off there). Don't deploy that one — base64
+costs about a third more bytes and can't be cached per-asset.
 
 ---
 

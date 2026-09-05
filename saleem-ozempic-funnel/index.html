@@ -1554,6 +1554,14 @@ const QCOUNT = 6;                       // questions shown in the counter
 const answers = {};
 let idx = 0, hot = false, busy = false, lastBand = null;
 
+// history is a nicety, not a dependency: pushState throws on file:// URLs, and the
+// funnel has to keep working when the standalone build is opened straight off disk.
+const HISTORY_OK = (() => {
+  try{ history.replaceState(history.state, '', location.href); return true; }
+  catch(e){ console.warn('⚠️ history API unavailable (file:// ?) — back button disabled'); return false; }
+})();
+const push = (state, hash) => { if(HISTORY_OK){ try{ history.pushState(state, '', hash); }catch(e){} } };
+
 function showView(v){
   [quiz,thanks].forEach(n => n.classList.remove('on'));
   document.body.classList.toggle('locked', !!v);
@@ -1574,10 +1582,10 @@ function paint(){
 
 function openQuiz(src){
   idx = 0; paint(); showView(quiz);
-  history.pushState({v:'quiz'}, '', '#quiz');
+  push({v:'quiz'}, '#quiz');
   track('InitiateCheckout', {content_name:'ozempic_quiz_start', source:src});
 }
-function closeQuiz(){ showView(null); if(location.hash) history.back(); }
+function closeQuiz(){ showView(null); if(HISTORY_OK && location.hash) history.back(); }
 
 $$('[data-quiz]').forEach(b => b.addEventListener('click', () => openQuiz(b.dataset.quiz)));
 
@@ -1803,7 +1811,7 @@ function goThanks(dig){
     encodeURIComponent(CONFIG.shareText[lang].replace('{link}', link));
 
   showView(thanks);
-  history.pushState({v:'thanks'}, '', '#thanks');
+  push({v:'thanks'}, '#thanks');
 }
 $('#sharebtn').addEventListener('click', () => track('Share', {method:'whatsapp', content_name:'ozempic_program'}));
 
