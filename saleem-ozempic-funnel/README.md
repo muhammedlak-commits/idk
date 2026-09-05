@@ -35,11 +35,19 @@ Three things are deliberately different, and they matter:
 1. **It's bilingual.** The breast cancer funnel is Arabic-only. This one carries the AR/EN
    toggle the original Ozempic page had, so every string lives in the `T` dictionary rather
    than in the markup. See *Adding or changing copy* below.
-2. **There is no price on the page.** Ozempic is prescription-only and the cost depends on
-   the dose a clinician sets, so hammering a single number the way the breast cancer funnel
-   hammers ٤٥٠,٠٠٠ would be wrong here. The value stack says "you only pay for the
-   medication, your doctor sets the dose." If that changes, set `CONFIG.priceIqd` and the
-   real number renders everywhere automatically — nothing else to edit.
+2. **The offer is a free front end onto a paid program, not a single price.** The breast
+   cancer funnel hammers ٤٥٠,٠٠٠ in six places; that shape doesn't fit here. What's free is
+   the **online assessment** and the **call from Saleem's trained team** (pharmacists and
+   junior doctors). Everything else — the full medical assessment and prescription, dose
+   titration, in-home nurse injection training, monthly follow-up, the nutrition consult, and
+   the medication itself — is **inside the paid program**. The value stack is split into
+   those two groups on purpose, and the page's whole promise is "free to find out, you only
+   pay if you decide to start."
+
+   Because Ozempic is prescription-only and cost follows the dose a clinician sets, the total
+   line reads *"price set after your call"* rather than a number. When there is a number to
+   publish, set `CONFIG.priceIqd` and it renders in the total automatically — nothing else to
+   edit. **Do not** move any paid item into the free group to make the offer look better.
 3. **The quiz has a safety screener.** Q4 asks about the real contraindications (MTC/MEN2,
    pregnancy, type-1 diabetes, pancreatitis). Selecting any of them does **not** kill the
    lead — it sets `safety` on the payload and routes the result to a `Review` band that says
@@ -64,7 +72,7 @@ Top of the `<script>` block at the bottom of `index.html`. Nothing else in the f
 | `tyVideo` | the 45-second thank-you video |
 | `endpoint` | **POST url for leads.** Empty = demo mode |
 | `pixelId` | Meta pixel id |
-| `priceIqd` | `0` = "price set by dose". A number renders that price in the value stack |
+| `priceIqd` | `0` = "price set after your call". A number renders that program price in the value stack |
 | `shareUrl` | link recipients get from the share button. Empty = this page's url + referral UTMs |
 | `shareText` | WhatsApp share message, **per language**; `{link}` is substituted |
 
@@ -182,6 +190,14 @@ PY
 
 ## Please don't break these
 
+- **Don't blur the free/paid line.** Only the assessment and the team call are free. The
+  value stack, the hero line, the VSL note, the 4-step section, the timeline, the FAQ, the
+  result bands and the thank-you page all say the same thing; if the commercial model
+  changes, they all have to change together. Search for `stack.freeH` / `stack.paidH` and
+  `hero.free` as the starting points.
+- **The first call is the trained call centre, not the prescriber.** Copy says "الفريق الطبي /
+  the medical team" (pharmacists and junior doctors), never "a Saleem doctor calls you". The
+  prescribing physician appears later, at the paid step where the prescription is written.
 - **The safety screener is not a decline.** Q4's contraindication chips route to the `Review`
   band and still capture the lead. Do not turn it into a hard stop, and do not let the
   `Review` copy imply the patient is approved.
