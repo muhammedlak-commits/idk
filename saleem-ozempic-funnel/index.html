@@ -7,12 +7,12 @@
 <meta name="description" content="برنامج Ozempic® بإشراف طبي كامل من سليم: تقييم أونلاين بدقيقتين، مكالمة طبيب خلال ٢٤ ساعة، الدواء الأصلي يوصلك للبيت، ومتابعة شهرية.">
 <meta property="og:title" content="الوزن مو مسألة إرادة بس.">
 <meta property="og:description" content="برنامج Ozempic® بإشراف طبي كامل — شوف إذا إنت مؤهل خلال دقيقتين.">
-<meta property="og:image" content="assets/ozempic-hero.jpg">
+<meta property="og:image" content="assets/ozempic-hero.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="assets/logo-saleem.png">
-<link rel="preload" as="image" href="assets/ozempic-hero.jpg">
+<link rel="preload" as="image" href="assets/ozempic-hero.webp">
 <style>
 :root{
   --navy:#0E3A66; --navy-2:#0A2540; --teal:#0E9E8E; --teal-dk:#0A7A6D; --tdeep:#0A5A50;
@@ -24,7 +24,7 @@
   --r:18px; --r-lg:26px;
   --shadow:0 4px 24px rgba(10,46,87,.08);
   --shadow-lg:0 18px 50px rgba(10,46,87,.16);
-  --bar-h:76px; --max:1120px;
+  --bar-h:84px; --max:1120px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -68,11 +68,12 @@ h3{font-size:clamp(18px,3.4vw,22px)}
 .btn[disabled]{opacity:.55;pointer-events:none}
 
 /* ---------- co-brand ---------- */
-.cobrand{background:var(--white);border-bottom:1px solid var(--line);padding:10px 0;position:sticky;top:0;z-index:40}
-.cobrand .wrap{display:flex;align-items:center;justify-content:center;gap:14px;position:relative}
-.lg{width:auto;object-fit:contain}
-.lg-saleem{height:26px}
-.lg-novo{height:30px}
+.cobrand{background:var(--white);border-bottom:1px solid var(--line);padding:11px 0;position:sticky;top:0;z-index:40}
+.cobrand .wrap{display:flex;align-items:center;justify-content:center;gap:18px;position:relative;min-height:46px}
+.lg{width:auto;object-fit:contain;flex:none}
+.lg-saleem{height:24px}
+.lg-novo{height:40px}
+@media(max-width:430px){.cobrand .wrap{gap:12px}.lg-saleem{height:21px}.lg-novo{height:34px}}
 .cobrand .x{color:var(--muted);font-size:12px;font-weight:600}
 .lang{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:5px 13px;
   font-family:'Manrope',sans-serif;font-weight:800;font-size:12px;color:var(--navy);line-height:1.4;min-width:38px}
@@ -177,13 +178,6 @@ svg.chart .tap{cursor:pointer}
 
 /* ---------- what you get + stack ---------- */
 .get{background:var(--white)}
-.getgrid{display:grid;gap:12px;margin-bottom:34px}
-@media(min-width:760px){.getgrid{grid-template-columns:1fr 1fr}}
-.getcard{display:flex;gap:14px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:18px}
-.getcard .gi{width:48px;height:48px;flex:none;border-radius:14px;background:#fff;border:1px solid var(--tline);display:grid;place-items:center;color:var(--teal-dk)}
-.getcard .gi .ic{width:24px;height:24px}
-.getcard h3{font-size:16.5px;margin-bottom:4px}
-.getcard p{font-size:13.5px;color:var(--muted);line-height:1.55}
 .stack{max-width:520px;margin:0 auto;background:linear-gradient(140deg,var(--navy),#0C2F55);color:#fff;border-radius:var(--r-lg);
   padding:26px 22px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
 .stack::before{content:"";position:absolute;top:-60px;inset-inline-start:-60px;width:220px;height:220px;
@@ -220,20 +214,6 @@ svg.chart .tap{cursor:pointer}
 .cred{display:inline-flex;gap:9px;align-items:flex-start;margin-top:12px;background:var(--tsoft);border:1px solid var(--tline);color:var(--navy);
   border-radius:12px;padding:10px 13px;font-size:12.5px;font-weight:600;line-height:1.55}
 .cred .ic{width:16px;height:16px;margin-top:2px;color:var(--teal-dk)}
-
-/* ---------- timeline ---------- */
-.proc{background:var(--white)}
-.tl{max-width:660px;margin:0 auto;position:relative}
-.tl::before{content:"";position:absolute;inset-inline-start:31px;top:34px;bottom:34px;width:2px;background:linear-gradient(180deg,var(--teal),var(--tline))}
-.tli{display:flex;gap:16px;padding:11px 0;position:relative}
-.tli .c{width:64px;height:64px;flex:none;border-radius:50%;background:var(--white);border:2px solid var(--tline);
-  display:grid;place-items:center;position:relative;z-index:2;box-shadow:var(--shadow);color:var(--teal-dk)}
-.tli .c .ic{width:28px;height:28px}
-.tli .c .n{position:absolute;top:-4px;inset-inline-end:-4px;width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;
-  font-size:12.5px;font-weight:800;display:grid;place-items:center;border:2px solid #fff}
-.tli .t{padding-top:9px}
-.tli .t b{display:block;font-size:16px;margin-bottom:2px;font-family:var(--disp);font-weight:800}
-.tli .t span{font-size:13.5px;color:var(--muted)}
 
 /* ---------- fit ---------- */
 .fit{background:var(--bg)}
@@ -280,11 +260,12 @@ svg.chart .tap{cursor:pointer}
 
 /* ---------- footer ---------- */
 footer{background:var(--navy-2);color:#8FA8C2;padding:34px 0 26px;font-size:12.5px;text-align:center}
-footer .lgs{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:16px;opacity:.8}
+footer .lgs{display:flex;justify-content:center;align-items:center;gap:18px;margin-bottom:18px;opacity:.85}
+footer .lg-saleem{height:22px}
+footer .lg-novo{height:38px}
 footer .lgs img{filter:brightness(0) invert(1)}
 footer .dis{max-width:64ch;margin:0 auto 16px;line-height:1.8;opacity:.85}
-footer .contact{margin-bottom:12px;line-height:1.9}
-footer .contact b{color:#D6E3F0}
+footer .contact{margin-bottom:14px;line-height:1.9;font-variant-numeric:tabular-nums}
 
 /* ---------- sticky ---------- */
 .sticky{position:fixed;inset-inline:0;bottom:0;z-index:60;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);
@@ -479,7 +460,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
   <div class="wrap">
     <img class="lg lg-saleem" src="assets/logo-saleem.png" alt="سليم — Saleem" width="512" height="256">
     <span class="x" data-t="cobrand"></span>
-    <img class="lg lg-novo" src="assets/logo-novo.png" alt="Novo Nordisk" width="520" height="381">
+    <img class="lg lg-novo" src="assets/logo-novo.png" alt="Novo Nordisk" width="420" height="299">
     <button class="lang" id="lang" type="button"></button>
   </div>
 </div>
@@ -501,8 +482,8 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
       </div>
     </div>
     <div class="hero-art">
-      <div class="prodcard hero-shot"><img src="assets/ozempic-hero.jpg" alt="Ozempic®" fetchpriority="high"></div>
-      <div class="prodcard hero-hand"><img src="assets/ozempic-hand.jpg" alt="" fetchpriority="high"></div>
+      <div class="prodcard hero-shot"><img src="assets/ozempic-hero.webp" alt="Ozempic®" width="900" height="506" fetchpriority="high"></div>
+      <div class="prodcard hero-hand"><img src="assets/ozempic-hand.webp" alt="" width="600" height="638" fetchpriority="high"></div>
     </div>
   </div>
 </header>
@@ -516,7 +497,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
       <p class="lead" data-t="dose.lead"></p>
     </div>
     <figure class="dosefig rv">
-      <img src="assets/ozempic-doses.jpg" alt="" loading="lazy">
+      <img src="assets/ozempic-doses.webp" alt="" width="1200" height="714" loading="lazy">
       <figcaption data-t="dose.cap"></figcaption>
     </figure>
     <div class="dosecta rv">
@@ -585,12 +566,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
       <p class="eyebrow" data-t="get.eyebrow"></p>
       <h2 data-th="get.h2"></h2>
     </div>
-    <div class="getgrid">
-      <div class="getcard rv"><div class="gi"><svg class="ic"><use href="#i-doctor"/></svg></div><div><h3 data-t="get.1t"></h3><p data-t="get.1p"></p></div></div>
-      <div class="getcard rv"><div class="gi"><svg class="ic"><use href="#i-chart"/></svg></div><div><h3 data-t="get.2t"></h3><p data-t="get.2p"></p></div></div>
-      <div class="getcard rv"><div class="gi"><svg class="ic"><use href="#i-nurse"/></svg></div><div><h3 data-t="get.3t"></h3><p data-t="get.3p"></p></div></div>
-      <div class="getcard rv"><div class="gi"><svg class="ic"><use href="#i-leaf"/></svg></div><div><h3 data-t="get.4t"></h3><p data-t="get.4p"></p></div></div>
-    </div>
     <div class="stack rv">
       <p class="sgrp free" data-t="stack.freeH"></p>
       <div class="r free"><span data-t="stack.f1"></span><span data-t="stack.free"></span></div>
@@ -620,7 +595,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
     </div>
     <div class="authgrid">
       <div class="authcard rv">
-        <div class="top"><img src="assets/logo-novo.png" alt="Novo Nordisk" loading="lazy" width="520" height="381"></div>
+        <div class="top"><img src="assets/logo-novo.png" alt="Novo Nordisk" loading="lazy" width="420" height="299"></div>
         <div class="b">
           <h3 data-t="auth.1t"></h3><p data-t="auth.1p"></p>
           <span class="cred"><svg class="ic"><use href="#i-badge"/></svg> <span data-t="auth.1c"></span></span>
@@ -633,24 +608,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
           <span class="cred"><svg class="ic"><use href="#i-heart"/></svg> <span data-t="auth.2c"></span></span>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════ PROCESS TIMELINE ══════════ -->
-<section class="proc sec">
-  <div class="wrap">
-    <div class="head rv">
-      <p class="eyebrow" data-t="proc.eyebrow"></p>
-      <h2 data-th="proc.h2"></h2>
-    </div>
-    <div class="tl">
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-clipboard"/></svg><span class="n num">1</span></div><div class="t"><b data-t="proc.1t"></b><span data-t="proc.1s"></span></div></div>
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-phone"/></svg><span class="n num">2</span></div><div class="t"><b data-t="proc.2t"></b><span data-t="proc.2s"></span></div></div>
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-doctor"/></svg><span class="n num">3</span></div><div class="t"><b data-t="proc.3t"></b><span data-t="proc.3s"></span></div></div>
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-box"/></svg><span class="n num">4</span></div><div class="t"><b data-t="proc.4t"></b><span data-t="proc.4s"></span></div></div>
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-nurse"/></svg><span class="n num">5</span></div><div class="t"><b data-t="proc.5t"></b><span data-t="proc.5s"></span></div></div>
-      <div class="tli rv"><div class="c"><svg class="ic"><use href="#i-calendar"/></svg><span class="n num">6</span></div><div class="t"><b data-t="proc.6t"></b><span data-t="proc.6s"></span></div></div>
     </div>
   </div>
 </section>
@@ -715,9 +672,9 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xm
     <div class="lgs">
       <img class="lg lg-saleem" src="assets/logo-saleem.png" alt="سليم" loading="lazy" width="512" height="256">
       <span style="opacity:.5">×</span>
-      <img class="lg lg-novo" src="assets/logo-novo.png" alt="Novo Nordisk" loading="lazy" width="520" height="381">
+      <img class="lg lg-novo" src="assets/logo-novo.png" alt="Novo Nordisk" loading="lazy" width="420" height="299">
     </div>
-    <p class="contact" id="footContact"></p>
+    <p class="contact" id="footContact" dir="ltr"></p>
     <p class="dis" data-t="foot.dis"></p>
     <p data-t="foot.copy"></p>
   </div>
@@ -959,7 +916,6 @@ T.ar = {
   'hero.m2':'توصيل للبيت',
   'hero.m3':'تدريب على الحقن',
   'hero.m4':'متابعة شهرية',
-
   'dose.eyebrow':'الجرعة',
   'dose.h2':'ما نبدي بأعلى جرعة.<br>نبدي بأوطاها.',
   'dose.lead':'الطبيب يبدي بيك من ٠.٢٥ ملغم بالأسبوع، ويرفعها تدريجياً حسب استجابتك. هذا التدرّج هو اللي يقلل الغثيان والأعراض — مو صدفة.',
@@ -982,10 +938,9 @@ T.ar = {
   'steps.no1':'بدون حميات قاسية','steps.no2':'بدون مراجعة عيادات','steps.no3':'بدون التزام سنوي','steps.no4':'بدون رسوم خفية',
   'get.eyebrow':'شنو تاخذ بالضبط',
   'get.h2':'مو مجرد دواء —<br>برنامج كامل',
-  'get.1t':'تقييم طبي كامل','get.1p':'طبيب مختص يراجع تاريخك المرضي وأدويتك قبل أي وصفة.',
-  'get.2t':'خطة رفع الجرعة','get.2p':'نبدي بأقل جرعة ونرفعها تدريجياً — هذا اللي يقلل الأعراض الجانبية.',
-  'get.3t':'تدريب على الحقن','get.3p':'ممرض يجيك للبيت ويعلمك شلون تحقن نفسك بالشكل الصح.',
-  'get.4t':'استشارة تغذية','get.4p':'الدواء يقلل الشهية — والتغذية الصح هي اللي تخلي النتيجة تدوم.',
+
+
+
   'stack.freeH':'مجاناً وبدون أي التزام',
   'stack.f1':'التقييم الأونلاين','stack.f2':'مكالمة الفريق الطبي (صيدلي أو طبيب)',
   'stack.paidH':'ضمن برنامج سليم — مدفوع',
@@ -1001,14 +956,13 @@ T.ar = {
   'auth.1c':'المادة الفعالة نفسها المعتمدة عالمياً لعلاج السكري النوع الثاني وإدارة الوزن',
   'auth.2t':'سليم — الرعاية تجيك للبيت','auth.2p':'أكثر من ١٠٠ طبيب مرخّص و٣٠ ممرض، نوصل لكل مناطق بغداد تقريباً على مدار الساعة.',
   'auth.2c':'ما ننطي دواء بدون تقييم. كل حالة يراجعها طبيب مرخّص قبل أي وصفة.',
-  'proc.eyebrow':'الرحلة كاملة',
-  'proc.h2':'٦ خطوات — من التقييم<br>لحد أول نتيجة',
-  'proc.1t':'تجاوب على استمارة التقييم — مجاناً','proc.1s':'أرقامك وسؤالين — أقل من دقيقتين',
-  'proc.2t':'الفريق الطبي يتصل بيك — مجاناً','proc.2s':'صيدلي أو طبيب مدرّب، خلال ٢٤ ساعة، يجاوب على كل أسئلتك',
-  'proc.3t':'تشترك بالبرنامج ويتم تقييمك طبياً','proc.3s':'تاريخك المرضي، أدويتك الحالية، وأي موانع',
-  'proc.4t':'الطبيب يكتب الوصفة','proc.4s':'ويحدد جرعة البداية وخطة رفعها',
-  'proc.5t':'الدواء يوصلك + تدريب','proc.5s':'ممرض يوصّل ويعلمك على الحقن بالبيت',
-  'proc.6t':'متابعة شهرية','proc.6s':'نتابع وزنك والأعراض، ونعدّل الجرعة حسب استجابتك',
+
+
+
+
+
+
+
   'fit.eyebrow':'قبل ما تكمل',
   'fit.h2':'هذا البرنامج مو لكل واحد',
   'fit.lead':'Ozempic® دواء بوصفة طبية، وله موانع حقيقية. نقبل بس الحالات اللي الطبيب يشوفها آمنة ومناسبة.',
@@ -1095,14 +1049,10 @@ T.ar.faq = [
    'الأكثر شيوعاً: <b>غثيان، استفراغ، إسهال أو إمساك</b>. غالباً تصير بالأسابيع الأولى وبعد كل رفع جرعة، وتخف مع الوقت. عشان هيك نبدي بأقل جرعة (٠.٢٥ ملغم) ونرفعها تدريجياً — هذا اللي يقلل الأعراض. إذا صار عندك ألم بطن شديد ومستمر، وقّف الدواء وراجع طبيبك فوراً.'],
   ['شكد أنزل وبأي وكت؟',
    'يختلف من شخص لشخص. بالمعدل، المرضى على البرنامج ينزلون حوالي <b>١٠٪ من وزنهم خلال ٦ أشهر</b> مع الالتزام بالجرعة والتغذية. أول شهر عادة يكون النزول بسيط لأن الجرعة لسه واطية — الفرق يبان أكثر من الشهر الثاني والثالث.'],
-  ['شيصير إذا وقفت الدواء؟',
-   'أغلب الناس ترجع شهيتهم لطبيعتها، ويمكن يرجع جزء من الوزن. عشان هيك البرنامج مو دواء بس — بيه <b>استشارة تغذية ومتابعة</b>، حتى تبني عادات تدوم وياك بعد ما توقف. الطبيب يقرر وياك شوكت ينخفض التدرج وشوكت توقف.'],
   ['الإبرة مؤلمة؟',
    'إبرة رفيعة جداً تحت الجلد (بالبطن أو الفخذ أو أعلى الذراع)، <b>مرة وحدة بالأسبوع</b> بنفس اليوم. أغلب الناس يوصفونها إنها بالكاد تنحس. وممرض من سليم يجيك للبيت أول مرة ويعلمك شلون تسويها بنفسك.'],
   ['شنو المجاني وشنو المدفوع؟',
-   'المجاني: <b>التقييم الأونلاين ومكالمة الفريق الطبي</b> — صيدلي أو طبيب مدرّب يتصل بيك، يجاوب على أسئلتك، ويشوف إذا البرنامج يناسبك. بدون أي التزام. المدفوع: <b>برنامج سليم نفسه</b> — ويشمل التقييم الطبي الكامل، الوصفة، خطة رفع الجرعة، تدريب الممرض على الحقن بالبيت، المتابعة الشهرية، واستشارة التغذية، بالإضافة لدواء Ozempic® الأصلي والتوصيل. سعره يعتمد على الجرعة اللي يحددها طبيبك، وتعرفه بالضبط بالمكالمة قبل ما تدفع أي شي.'],
-  ['منين تجيبون الدواء؟',
-   'Ozempic® الأصلي من <b>Novo Nordisk</b>، الشركة المصنّعة. مو بديل، ومو تركيبة محلية، ومو أقلام معاد تعبئتها. الدواء يوصل بنقل مبرّد ويوصلك بالسلسلة الباردة المطلوبة.']
+   'المجاني: <b>التقييم الأونلاين ومكالمة الفريق الطبي</b> — صيدلي أو طبيب مدرّب يتصل بيك، يجاوب على أسئلتك، ويشوف إذا البرنامج يناسبك. بدون أي التزام. المدفوع: <b>برنامج سليم نفسه</b> — ويشمل التقييم الطبي الكامل، الوصفة، خطة رفع الجرعة، تدريب الممرض على الحقن بالبيت، المتابعة الشهرية، واستشارة التغذية، بالإضافة لدواء Ozempic® الأصلي والتوصيل. سعره يعتمد على الجرعة اللي يحددها طبيبك، وتعرفه بالضبط بالمكالمة قبل ما تدفع أي شي.']
 ];
 
 T.en = {
@@ -1123,7 +1073,6 @@ T.en = {
   'hero.m2':'Delivered home',
   'hero.m3':'Injection training',
   'hero.m4':'Monthly follow-up',
-
   'dose.eyebrow':'Dosing',
   'dose.h2':'We don’t start at the top dose.<br>We start at the bottom.',
   'dose.lead':'Your doctor starts you at 0.25 mg a week and steps up gradually as you respond. That titration is exactly what keeps nausea and side effects down — it isn’t incidental.',
@@ -1146,10 +1095,9 @@ T.en = {
   'steps.no1':'No crash diets','steps.no2':'No clinic queues','steps.no3':'No yearly contract','steps.no4':'No hidden fees',
   'get.eyebrow':'What you actually get',
   'get.h2':'Not just a medication —<br>a whole program',
-  'get.1t':'Full medical assessment','get.1p':'A licensed doctor reviews your history and current medications before any prescription.',
-  'get.2t':'Dose titration plan','get.2p':'We start at the lowest dose and step up gradually — that’s what keeps side effects down.',
-  'get.3t':'Injection training','get.3p':'A nurse comes to your home and shows you exactly how to inject safely.',
-  'get.4t':'Nutrition consult','get.4p':'The medication cuts appetite — good nutrition is what makes the result last.',
+
+
+
   'stack.freeH':'Free, no obligation',
   'stack.f1':'The online assessment','stack.f2':'The medical team call (pharmacist or doctor)',
   'stack.paidH':'Inside the Saleem program — paid',
@@ -1165,14 +1113,13 @@ T.en = {
   'auth.1c':'The same active ingredient approved worldwide for type-2 diabetes and weight management',
   'auth.2t':'Saleem — care that comes to you','auth.2p':'Over 100 licensed doctors and 30 nurses, covering nearly all of Baghdad, close to around the clock.',
   'auth.2c':'We never dispense without an assessment. Every case is reviewed by a licensed doctor before any prescription.',
-  'proc.eyebrow':'The full journey',
-  'proc.h2':'6 steps — from assessment<br>to your first result',
-  'proc.1t':'Complete the assessment — free','proc.1s':'Your numbers and two questions — under two minutes',
-  'proc.2t':'The medical team calls you — free','proc.2s':'A trained pharmacist or doctor, within 24 hours, answering everything',
-  'proc.3t':'You join the program and get assessed','proc.3s':'Your history, your current medications, any contraindications',
-  'proc.4t':'The doctor writes the prescription','proc.4s':'And sets your starting dose and titration plan',
-  'proc.5t':'Delivery + training','proc.5s':'A nurse delivers and teaches you to inject at home',
-  'proc.6t':'Monthly follow-up','proc.6s':'We track weight and side effects and adjust your dose',
+
+
+
+
+
+
+
   'fit.eyebrow':'Before you continue',
   'fit.h2':'This program isn’t for everyone',
   'fit.lead':'Ozempic® is a prescription medication with real contraindications. We only accept cases a doctor judges safe and appropriate.',
@@ -1208,9 +1155,9 @@ T.en = {
   'q4.s1':'Medullary thyroid cancer (me or family)','q4.s2':'MEN2 syndrome','q4.s3':'Pregnant, breastfeeding, or planning',
   'q4.s4':'Type-1 diabetes','q4.s5':'History of pancreatitis',
   'res.n':'Preliminary assessment result','res.sLow':'Unlikely','res.sMid':'Possible','res.sHigh':'Likely',
-  'res.chartH':'From <b>{w} kg</b>, you could reach <b>~{m} kg</b> by {mon} — about <b>{k} kg</b> lighter.',
+  'res.chartH':'From <b>{w} kg</b>, you could reach <b>about {m} kg</b> by {mon} — roughly <b>{k} kg</b> lighter.',
   'res.note':'An estimate based on average results across 1,000 patients on the program, applied to your weight. Individual results vary, and your clinician sets your plan.',
-  'res.pick':'Tap any month to see your projected weight','res.kg':'kg','res.now':'Now','res.bmi':'BMI','res.approx':'~',
+  'res.pick':'Tap any month to see your projected weight','res.kg':'kg','res.now':'Now','res.bmi':'BMI','res.approx':'about ',
   'q7.n':'Last step','q7.h':'Where should we call you?','q7.hint':'Saleem’s medical team will call you within 24 hours — the call is free, with no obligation.',
 
   /* ── fields ── */
@@ -1259,14 +1206,10 @@ T.en.faq = [
    'The most common are <b>nausea, vomiting, diarrhoea or constipation</b>. They usually show up in the first weeks and after each dose increase, and ease with time. That’s why we start at the lowest dose (0.25 mg) and step up gradually — it’s what keeps side effects manageable. If you get severe, persistent abdominal pain, stop and contact your doctor immediately.'],
   ['How much will I lose, and how fast?',
    'It varies. On average, patients on the program lose around <b>10% of their body weight over six months</b> when they stay on the dose plan and the nutrition guidance. Month one is usually modest because the dose is still low — the difference shows more from months two and three.'],
-  ['What happens if I stop?',
-   'For most people appetite returns to normal, and some of the weight can come back. That’s why the program isn’t only a medication — it includes <b>nutrition guidance and follow-up</b> so you build habits that stay with you afterwards. Your doctor decides with you when to taper and when to stop.'],
   ['Does the injection hurt?',
    'It’s a very fine needle just under the skin (abdomen, thigh, or upper arm), <b>once a week</b> on the same day. Most people say they barely feel it. A Saleem nurse comes to your home the first time and teaches you to do it yourself.'],
   ['What’s free and what’s paid?',
-   'Free: <b>the online assessment and the medical team call</b> — a trained pharmacist or doctor calls you, answers your questions, and checks whether the program suits you. No obligation. Paid: <b>the Saleem program itself</b> — covering the full medical assessment, the prescription, the dose titration plan, in-home nurse injection training, monthly follow-up, and the nutrition consultation, plus genuine Ozempic® and delivery. Its price depends on the dose your doctor sets, and you’ll know it exactly on the call before you pay anything.'],
-  ['Where does the medication come from?',
-   'Genuine Ozempic® from <b>Novo Nordisk</b>, the manufacturer. Not a substitute, not a compounded formula, not refilled pens. It ships cold and reaches you within the required cold chain.']
+   'Free: <b>the online assessment and the medical team call</b> — a trained pharmacist or doctor calls you, answers your questions, and checks whether the program suits you. No obligation. Paid: <b>the Saleem program itself</b> — covering the full medical assessment, the prescription, the dose titration plan, in-home nurse injection training, monthly follow-up, and the nutrition consultation, plus genuine Ozempic® and delivery. Its price depends on the dose your doctor sets, and you’ll know it exactly on the call before you pay anything.']
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -1302,7 +1245,7 @@ function applyLang(){
   $('#qlang').textContent  = T0._langBtn;
   if(!lastBand) $('#resCta').textContent = t('cta.resNext');
   $('#qchip').textContent  = t('quiz.chip');
-    $('#footContact').innerHTML = 'Saleem — Baghdad, Iraq · info@saleemapp.com · <b dir="ltr">'+CONFIG.bizPhone+'</b>';
+    $('#footContact').textContent = 'Saleem — Baghdad, Iraq · info@saleemapp.com · ' + CONFIG.bizPhone;
   $('#bizphone').textContent  = CONFIG.bizPhone;
 
   // numbered chips
@@ -1368,18 +1311,21 @@ function drawChart(svg, start, headEl, pickEl, noteEl, noteKey){
   });
   s += '<line class="selLine" x1="0" y1="0" x2="0" y2="0" stroke="#0E9E8E" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>';
   s += '<circle class="selDot" cx="0" cy="0" r="4.5" fill="#0E9E8E" style="display:none"/>';
+  s += '<g class="selPill" style="display:none"><rect rx="5" ry="5" height="16" fill="#0A5A50"/>'
+     + '<text text-anchor="middle" font-family="Cairo,Arial" font-size="10.5" font-weight="800" fill="#fff"></text></g>';
   s += '<circle cx="'+P[0].x.toFixed(1)+'" cy="'+P[0].y.toFixed(1)+'" r="4" fill="#0E3A66"/>';
   s += '<text x="'+P[0].x.toFixed(1)+'" y="'+(P[0].y-9).toFixed(1)+'" text-anchor="middle" font-family="Cairo,Arial" '
      + 'font-size="10" font-weight="800" fill="#0E3A66">'+Math.round(w[0])+'</text>';
   s += '<circle cx="'+P[6].x.toFixed(1)+'" cy="'+P[6].y.toFixed(1)+'" r="6" fill="#fff" stroke="#0E9E8E" stroke-width="2.5"/>'
      + '<circle cx="'+P[6].x.toFixed(1)+'" cy="'+P[6].y.toFixed(1)+'" r="2.6" fill="#0E9E8E"/>';
   s += '<text x="'+P[6].x.toFixed(1)+'" y="'+(P[6].y-11).toFixed(1)+'" text-anchor="end" font-family="Cairo,Arial" '
-     + 'font-size="10.5" font-weight="800" fill="#0A5A50">~'+Math.round(w[6])+'</text>';
+     + 'font-size="10.5" font-weight="800" fill="#0A5A50">'+Math.round(w[6])+'</text>';
   s += '<g class="head" style="display:none"><path d="M-4,-4 L5,0 L-4,4 L-1.5,0 Z" fill="#0A5A50"/></g>';
-  P.forEach((p,i) => { s += '<circle class="tap" data-i="'+i+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="16" fill="transparent" pointer-events="all"/>'; });
+  // one hit area over the whole plot — a tap anywhere snaps to the nearest month
+  s += '<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'" fill="transparent" pointer-events="all"/>';
 
   svg.innerHTML = s;
-  svg._ch = {P, w, labels, bottom, pickEl};
+  svg._ch = {P, w, labels, bottom, pickEl, padL, plotW, W};
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ln = svg.querySelector('.ln');
@@ -1407,8 +1353,19 @@ function drawChart(svg, start, headEl, pickEl, noteEl, noteKey){
     requestAnimationFrame(stepA);
   }
 
-  svg.querySelectorAll('.tap').forEach(c =>
-    c.addEventListener('click', () => selectMonth(svg, +c.dataset.i)));
+  const hit = svg.querySelector('.hit');
+  const nearest = ev => {
+    const r = svg.getBoundingClientRect();
+    const x = (ev.clientX - r.left) / r.width * W;          // client px -> viewBox units
+    return Math.max(0, Math.min(6, Math.round((x - padL) / plotW * 6)));
+  };
+  hit.addEventListener('pointerdown', ev => {
+    hit.setPointerCapture(ev.pointerId);
+    selectMonth(svg, nearest(ev));
+  });
+  hit.addEventListener('pointermove', ev => {                // drag to scrub across months
+    if(ev.buttons) selectMonth(svg, nearest(ev));
+  });
 
   headEl.innerHTML = t('res.chartH')
     .replace('{w}',   fmtNum(Math.round(start)))
@@ -1421,14 +1378,32 @@ function drawChart(svg, start, headEl, pickEl, noteEl, noteKey){
 
 function selectMonth(svg, i){
   const ch = svg._ch; if(!ch) return;
-  const {P, w, labels, bottom, pickEl} = ch;
+  const {P, w, labels, bottom, pickEl, W} = ch;
+  if(ch.sel === i) return;                                   // same month, nothing to redraw
+  ch.sel = i;
+
   const ln = svg.querySelector('.selLine'), dot = svg.querySelector('.selDot');
   ln.setAttribute('x1', P[i].x.toFixed(1)); ln.setAttribute('x2', P[i].x.toFixed(1));
   ln.setAttribute('y1', P[i].y.toFixed(1)); ln.setAttribute('y2', bottom);
   ln.style.display = '';
   dot.setAttribute('cx', P[i].x.toFixed(1)); dot.setAttribute('cy', P[i].y.toFixed(1));
   dot.style.display = '';
+
   const wt = Math.round(w[i]), k = Math.round(w[0]) - wt;
+
+  // the weight itself, on the chart, above the point
+  const pill = svg.querySelector('.selPill');
+  const rect = pill.querySelector('rect'), txt = pill.querySelector('text');
+  const label = String(wt);
+  const pw = label.length * 6.6 + 12;
+  let px = P[i].x - pw/2;
+  px = Math.max(2, Math.min(W - pw - 2, px));               // keep it inside the frame
+  const py = Math.max(2, P[i].y - 24);
+  rect.setAttribute('x', px.toFixed(1)); rect.setAttribute('y', py.toFixed(1));
+  rect.setAttribute('width', pw.toFixed(1));
+  txt.setAttribute('x', (px + pw/2).toFixed(1)); txt.setAttribute('y', (py + 11.6).toFixed(1));
+  txt.textContent = label;
+  pill.style.display = '';
   pickEl.innerHTML = '<b>'+labels[i]+'</b> · '+t('res.approx')+fmtNum(wt)+' '+t('res.kg')
     + (i===0 ? ' · '+t('res.now') : ' · <span class="dn">↓'+fmtNum(k)+' '+t('res.kg')+'</span>');
 }

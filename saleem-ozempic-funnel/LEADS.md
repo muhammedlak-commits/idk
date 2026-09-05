@@ -43,19 +43,53 @@ The two fields that decide what happens next:
 
 ---
 
-## Option A — Google Sheet (fastest, free, no server)
+## Option A — Google Sheet + the call-centre console (fastest, free, no server)
 
-Good for launch and for the call centre: a shared sheet the team can work top-to-bottom,
-filter by `band`, and mark up.
+This is the recommended setup. It gives you a Sheet holding every lead **and** a phone-friendly
+console the call centre works from — see [The console](#the-console) below.
 
 1. Create a Google Sheet → **Extensions → Apps Script**.
-2. Paste `apps-script/Code.gs` from this repo, Save.
-3. **Deploy → New deployment → Web app**, *Execute as: Me*, *Who has access: **Anyone***.
-4. Copy the `/exec` URL into `CONFIG.endpoint`.
-5. Submit a test lead; a row appears.
+2. Paste `apps-script/Code.gs` over the placeholder code, Save.
+3. **File → +  → HTML**, name it exactly `Admin` (Apps Script adds the `.html`), paste
+   `apps-script/Admin.html`, Save.
+4. At the top of `Code.gs`, add your staff to `ALLOWED_EMAILS` and optionally set `NOTIFY`.
+5. Deploy **twice** — same code, two URLs with different access:
 
-Set `NOTIFY` at the bottom of `Code.gs` to an email address and it also mails you on hot and
-safety-flagged leads. Leave it empty and it stays quiet.
+   | deployment | Execute as | Who has access | used by |
+   |---|---|---|---|
+   | **Intake** | Me | **Anyone** | the landing page |
+   | **Console** | Me | **Anyone with a Google Account** | the call centre |
+
+   *Deploy → New deployment → Web app*, once for each.
+6. Put the **Intake** `/exec` URL into `CONFIG.endpoint` in `index.html`.
+7. Give the **Console** `/exec` URL to the team. Submit a test lead and check both.
+
+Why two: the landing page is public, so its endpoint must accept anonymous posts. The console
+shows patient names, phone numbers and medical answers, so it must not. `doGet` refuses anyone
+who isn't on `ALLOWED_EMAILS`, so even someone who finds the public Intake URL gets nothing.
+
+> If Apps Script can't see your staff's email (common outside Google Workspace, where
+> `Session.getActiveUser()` returns empty), set `ACCESS_KEY` in `Code.gs` and open the console
+> as `<console-url>?key=YOUR-SECRET`. That's a shared secret in a URL, not real authentication
+> — treat the link as a password, and prefer `ALLOWED_EMAILS` whenever it works.
+
+## The console
+
+`apps-script/Admin.html`, served from the Console deployment. Arabic, works on a phone.
+
+- **Counters** — total, today, strong candidates not yet called, needs medical review, booked.
+- **Tabs** — all / new / strong candidate / needs review / called / no answer / booked.
+- **Search** by name or any part of the phone number.
+- **One tap to call** (`tel:`), **one to WhatsApp**, one to copy the number.
+- **Status** per lead (new → called → no answer → booked → not eligible → declined) and a
+  **notes** box; both save straight back to the Sheet, notes after a short pause.
+- Leads that declared a contraindication carry a red banner saying to route them to a
+  clinician rather than close them.
+- Refreshes itself every minute, and won't interrupt someone mid-note.
+
+Everything the console writes lands in the same Sheet, so the Sheet stays the source of truth
+and anyone can still work in it directly. Only `status` and `notes` are writable from the
+browser — what the patient submitted can't be edited from the console.
 
 **Why `endpointType` is `text/plain`:** Apps Script doesn't answer the CORS preflight that an
 `application/json` POST triggers, so a JSON POST fails in the browser with no useful error.

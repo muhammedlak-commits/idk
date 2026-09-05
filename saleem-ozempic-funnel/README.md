@@ -11,7 +11,8 @@ index.html            the whole funnel: landing page + quiz + result + thank-you
 assets/               2 logos + 3 product shots
 _headers              cache + security headers (Netlify / Cloudflare Pages format)
 build-standalone.py   bundles the above into one shareable file
-apps-script/Code.gs   drop-in Google Sheets lead receiver
+apps-script/Code.gs   Google Sheets lead receiver + console backend
+apps-script/Admin.html the call-centre console (Arabic, phone-friendly)
 LEADS.md              where submitted leads go — read this before launch
 ```
 
@@ -37,7 +38,7 @@ costs about a third more bytes and can't be cached per-asset.
 ## Where this came from
 
 Built to the same architecture as the **breast cancer NGS funnel**: co-brand bar → hero →
-dosing → trust badges → proof section → how it works → value stack → authority → timeline →
+dosing → trust badges → proof section → how it works → value stack → authority →
 fit/not-fit → FAQ → final CTA → sticky bar, with a full-screen quiz overlay and a thank-you
 view carrying a WhatsApp share loop. Same `CONFIG` block, same pixel event names, same
 demo-mode behaviour, so both funnels can share one lead endpoint and one analytics setup.
@@ -247,16 +248,32 @@ PY
 Five files in `assets/`, referenced by name — replace a file and the page picks it up, no
 markup change needed.
 
-| file | what it should be |
+| file | what it is |
 |---|---|
-| `logo-saleem.png` | Saleem wordmark, transparent PNG |
-| `logo-novo.png` | Novo Nordisk logo, transparent PNG |
-| `ozempic-hero.jpg` | the hero product shot — a single pen, clean surface |
-| `ozempic-hand.jpg` | a hand holding a pen, dose window visible (desktop hero only) |
-| `ozempic-doses.jpg` | the three pens side by side with 0.25 / 0.5 / 1 mg labels |
+| `logo-saleem.png` | Saleem wordmark, transparent |
+| `logo-novo.png` | Novo Nordisk lockup, transparent, quantised to ~10 KB |
+| `ozempic-hero.webp` | hero product shot — a single pen on a clean surface |
+| `ozempic-hand.webp` | a hand holding a pen, dose window visible (desktop hero only) |
+| `ozempic-doses.webp` | the three pens with 0.25 / 0.5 / 1 mg labels (dosing section) |
+
+The Novo file supplied was opaque RGB. The footer whites the logo out with
+`filter:brightness(0) invert(1)`, which turns an opaque logo into a solid white block — so its
+white background was lifted to alpha (with a soft edge so the antialiasing survives) and the
+empty margin trimmed. **Keep any replacement transparent**, or drop the footer filter.
 
 Everything else on the page is an inline SVG sprite, so there is no other photography to
 source and no icon requests.
+
+## The call-centre console
+
+`apps-script/Admin.html` — a second face on the same Sheet, for the team making the calls.
+Counters, filter tabs, search by name or phone, one-tap call/WhatsApp/copy, a status per lead
+and a notes box that saves back to the Sheet. Leads that declared a contraindication carry a
+banner telling the agent to route them to a clinician rather than close them.
+
+It is served by the same Apps Script project as the intake endpoint but from a **separate
+deployment** with different access, so the public endpoint can stay anonymous while the
+console stays staff-only. Full setup in [LEADS.md](LEADS.md).
 
 ## Known cosmetic notes
 
