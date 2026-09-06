@@ -13,11 +13,13 @@ _headers              cache + security headers (Netlify / Cloudflare Pages forma
 build-standalone.py   bundles the above into one shareable file
 apps-script/Code.gs   Google Sheets lead receiver + console backend
 apps-script/Admin.html the call-centre console (Arabic, phone-friendly)
+SETUP.md              first-time setup walkthrough — start here
 LEADS.md              where submitted leads go — read this before launch
 ```
 
 > **Leads are not stored yet.** `CONFIG.endpoint` is empty, so the funnel runs in demo mode.
-> **[LEADS.md](LEADS.md)** explains what's sent and how to point it at a Sheet or your CRM.
+> **[SETUP.md](SETUP.md)** is the click-by-click walkthrough for wiring it up;
+> **[LEADS.md](LEADS.md)** covers what gets sent and the other destination options.
 
 Run it locally:
 

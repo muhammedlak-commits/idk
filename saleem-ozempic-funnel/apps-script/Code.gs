@@ -28,8 +28,9 @@
 /* ═══════════════ SETTINGS ═══════════════ */
 
 // Staff who may open the console. Lower-case. Leave empty and nobody gets in.
+// Add the rest of the call centre here, one per line.
 var ALLOWED_EMAILS = [
-  // 'muhammed.lak@saleemapp.com',
+  'muhammed.lak@saleemapp.com',
 ];
 
 // Fallback for accounts Apps Script can't identify (common outside Workspace):
@@ -38,7 +39,15 @@ var ALLOWED_EMAILS = [
 var ACCESS_KEY = '';
 
 // Email address for new-lead alerts. Empty = no alerts.
-var NOTIFY = '';
+// Only fires for hot leads and for anyone who declared a contraindication,
+// so it won't flood you. Set to '' to switch off.
+var NOTIFY = 'muhammed.lak@saleemapp.com';
+
+// Where the landing page lives. Used in alert emails, and to spot leads that
+// arrived from somewhere unexpected. NOT a security control — the value comes
+// from the browser, so anyone can send anything. It only surfaces surprises in
+// the execution log.
+var SITE_URL = 'https://saleem-novo.netlify.app/';
 
 var SHEET_NAME = 'Leads';
 
@@ -69,6 +78,10 @@ function doPost(e) {
     lead.id = Utilities.getUuid().slice(0, 8);
     lead.status = 'new';
     lead.notes = '';
+
+    if (SITE_URL && lead.url && lead.url.indexOf(SITE_URL.replace(/\/$/, '')) !== 0) {
+      console.warn('lead arrived from an unexpected page: ' + lead.url);
+    }
 
     sheet.appendRow(COLUMNS.map(function (key) { return flatten_(lead[key]); }));
     notify_(lead);
@@ -226,7 +239,9 @@ function notify_(lead) {
     'Band:      ' + lead.band + '\n' +
     'Condition: ' + lead.condition + '\n' +
     'Safety:    ' + (flagged ? lead.safety.join(', ') : 'none declared') + '\n\n' +
-    (flagged ? 'This lead declared a contraindication. Route to a clinician, not a sales close.\n' : ''));
+    (flagged ? 'This lead declared a contraindication. Route to a clinician, not a sales close.\n\n' : '') +
+    'From: ' + SITE_URL + '\n' +
+    'Open the console to call them back.\n');
 }
 
 function json_(obj) {
