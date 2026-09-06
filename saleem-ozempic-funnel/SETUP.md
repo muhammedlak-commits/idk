@@ -47,6 +47,12 @@ Your email is already in it, in two places: `ALLOWED_EMAILS` (who can open the c
 `NOTIFY` (who gets alerted about hot leads). To add teammates later, add their addresses to
 `ALLOWED_EMAILS`, one per line, each in quotes with a comma after.
 
+> **Don't press the ▶ Run button yet.** Running `doPost` by hand gives
+> *"Cannot read properties of undefined (reading 'postData')"* — that's the script looking for
+> a form submission that isn't there, because Run doesn't send one. Nothing is broken. Once
+> you've done step 4 you can select **`testSetup`** in the function dropdown and press Run;
+> that one is built to be run by hand.
+
 ## Step 4 — Add the console page
 
 1. In the file list on the left, click the **+** next to *Files* → **HTML**.
@@ -57,6 +63,24 @@ Your email is already in it, in two places: `ALLOWED_EMAILS` (who can open the c
 4. Save.
 
 You should now have two files: `Code.gs` and `Admin.html`.
+
+> **`Admin.html` is not your landing page.** It's a separate file I sent you — the console
+> your team uses. Your landing page (`index.html`) stays on your laptop and on Netlify, and
+> never goes into Apps Script. Nothing gets renamed. Two different pages, two different homes:
+>
+> | page | lives | who opens it |
+> |---|---|---|
+> | `index.html` | your laptop → Netlify | patients, publicly |
+> | `Admin.html` | inside Apps Script | your call centre, signed in |
+
+### Check it works before deploying
+
+In the toolbar, the dropdown next to ▶ Run lists the functions. Choose **`testSetup`** and
+press **Run**. First time, it asks for permissions — see the authorisation notes in step 5a.
+
+It writes one dummy row to your Sheet (named `TEST — احذف هذا الصف`) so you can confirm the
+connection, and prints a summary in the log at the bottom. Delete that row from the Sheet
+afterwards.
 
 ## Step 5 — Deploy it twice
 

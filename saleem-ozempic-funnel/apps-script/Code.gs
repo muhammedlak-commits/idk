@@ -68,6 +68,14 @@ var STATUSES = ['new', 'called', 'no_answer', 'booked', 'not_eligible', 'decline
 /* ═══════════════ INTAKE (public) ═══════════════ */
 
 function doPost(e) {
+  // Pressing Run in the editor calls this with no request, so there's no form
+  // data to read. That's not a fault — doPost only ever runs when the landing
+  // page submits. Use testSetup() below to check the script by hand.
+  if (!e || !e.postData) {
+    return json_({ ok: false, error: 'doPost runs when the landing page submits a form. ' +
+                                     'To test from the editor, run testSetup instead.' });
+  }
+
   var lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
@@ -199,6 +207,39 @@ function assertStaff_(key) {
 function setIfPresent_(sheet, head, r, key, value) {
   var c = head.indexOf(key);
   if (c !== -1) sheet.getRange(r + 1, c + 1).setValue(value);
+}
+
+/* ═══════════════ CHECK YOUR SETUP ═══════════════ */
+
+/**
+ * Safe to run from the editor. Pick "testSetup" in the function dropdown and
+ * press Run. It creates the sheet headers, writes a dummy lead so you can see
+ * a row appear, and prints who the console will let in.
+ *
+ * Delete the test row from the Sheet afterwards — it's marked TEST.
+ */
+function testSetup() {
+  var sheet = getSheet_();
+  Logger.log('Sheet ready: "%s" (%s columns)', sheet.getName(), COLUMNS.length);
+
+  var lead = {
+    id: 'TEST-' + Utilities.getUuid().slice(0, 4),
+    ts: new Date().toISOString(), lang: 'ar',
+    name: 'TEST — احذف هذا الصف', phone: '07700000000', whatsapp: true,
+    area: 'baghdad_karkh', age: 40, sex: 'male',
+    height_cm: 175, weight_kg: 95, bmi: 31.0,
+    condition: 'yes', safety: [], band: 'Likely', hot: true,
+    program: 'ozempic', price_iqd: '', url: SITE_URL,
+    status: 'new', notes: ''
+  };
+  sheet.appendRow(COLUMNS.map(function (key) { return flatten_(lead[key]); }));
+  Logger.log('Test row written — check the Sheet, then delete that row.');
+
+  Logger.log('Console access: %s', ALLOWED_EMAILS.join(', ') || '(nobody — ALLOWED_EMAILS is empty)');
+  Logger.log('You are: %s', currentEmail_() || '(Apps Script cannot see your address — use ACCESS_KEY)');
+  Logger.log('Alerts to: %s', NOTIFY || '(off)');
+  Logger.log('Site: %s', SITE_URL);
+  Logger.log('All good. Now deploy: Deploy > New deployment > Web app.');
 }
 
 /* ═══════════════ SHARED ═══════════════ */
