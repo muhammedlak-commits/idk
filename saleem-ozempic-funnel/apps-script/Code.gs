@@ -116,7 +116,26 @@ function doGet(e) {
       'Google accounts and open the link again. Otherwise ask an admin to add you.</p></div>'
     ).setTitle('Saleem — not authorised');
   }
-  var page = HtmlService.createTemplateFromFile('Admin');
+  var page;
+  try {
+    page = HtmlService.createTemplateFromFile('Admin');
+  } catch (err) {
+    // Raw message is "No HTML file named Admin was found", which doesn't say
+    // what to do about it. The usual cause is typing "Admin.html" when adding
+    // the file — Apps Script appends the extension, giving Admin.html.html.
+    return HtmlService.createHtmlOutput(
+      '<div style="font:16px/1.7 system-ui;padding:40px;max-width:36em;margin:auto;color:#0F2438">' +
+      '<h2 style="font-size:20px;margin-bottom:12px">The console page is missing</h2>' +
+      '<p>This script has no HTML file called <b>Admin</b>. In the Apps Script editor:</p>' +
+      '<ol><li>In the file list on the left, click <b>+</b> → <b>HTML</b></li>' +
+      '<li>Name it <b>Admin</b> — no <code>.html</code>, the editor adds that itself. ' +
+      'The file list should end up showing <code>Admin.html</code>, not <code>Admin.html.html</code>.</li>' +
+      '<li>Delete the placeholder content, paste in Admin.html, and Save</li>' +
+      '<li><b>Deploy → Manage deployments → pencil → Version: New version → Deploy</b><br>' +
+      '<span style="color:#5E7488;font-size:14px">Saving alone does not update a live deployment.</span></li>' +
+      '</ol></div>'
+    ).setTitle('سليم — setup incomplete');
+  }
   page.accessKey = (!isAllowlisted_() && e && e.parameter) ? (e.parameter.key || '') : '';
   return page.evaluate()
     .setTitle('سليم — لوحة المتابعة')
