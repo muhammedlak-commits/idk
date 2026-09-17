@@ -258,6 +258,8 @@
   .done-card svg{width:42px;height:42px;color:#2E9E5B;margin-bottom:10px;}
   .done-card h3{margin:0 0 7px;font-size:17px;color:var(--navy);}
   .done-card p{margin:0;font-size:14px;color:var(--text-muted);}
+  .done-card .restart{margin:16px 0 0;font-size:13px;}
+  .done-card .restart a{color:var(--blue);font-weight:600;}
   .thanks{font-size:13.5px;color:var(--navy);text-align:center;font-weight:600;margin-top:22px;}
   .help-line{font-size:13px;color:var(--text-muted);text-align:center;margin:10px 0 0;}
   .help-line a{color:var(--blue);font-weight:600;}
@@ -463,6 +465,7 @@
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <h3>وصلنا عقدك</h3>
         <p>راح يتواصل وياك فريق سليم قريباً لإكمال باقي الخطوات.</p>
+        <p class="restart"><a href="#" onclick="resetFlow();return false;">تسجيل طبيب آخر</a></p>
       </div>
 
       <p class="thanks">شكراً لاختيارك سليم 🤍</p>
@@ -731,7 +734,34 @@ const CONFIG = {
     reader.readAsDataURL(upload);
   };
 
+  /* ---------- starting over ---------- */
+  // Without this the finished state is a dead end: anyone who completes the
+  // flow — or shares a phone with someone who did — sees the done card
+  // forever with no way back. Also how you re-test a live link.
+  window.resetFlow = function(){
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    state = { id:'', step:0, name:'' };
+    pdf = null; upload = null; openIdx = 1;
+    var form = document.getElementById('reg-form');
+    if(form){ form.reset();
+      ['name','phone','specialty','workplace','city'].forEach(function(k){
+        form.elements[k].setAttribute('aria-invalid','false'); }); }
+    var file = document.getElementById('signed-file');
+    if(file) file.value = '';
+    document.getElementById('file-name').hidden = true;
+    document.getElementById('up-btn').disabled = true;
+    err('reg-err',''); err('up-err','');
+    render();
+    document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
+  };
+
   /* ---------- boot ---------- */
+  // ?reset on the URL clears a finished run — handy for testing a live link
+  // without digging through browser settings.
+  if(/[?&]reset\b/.test(location.search)){
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    if(history.replaceState) history.replaceState(null, '', location.pathname);
+  }
   load();
   openIdx = (state.step < TOTAL) ? state.step + 1 : 0;
   var wa = document.getElementById('help-wa');
