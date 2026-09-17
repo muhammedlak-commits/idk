@@ -96,6 +96,16 @@ function register_(req) {
   var name = String(req.name || '').trim();
   if (!name)      return { ok: false, error: 'الاسم مطلوب' };
   if (!req.phone) return { ok: false, error: 'رقم الهاتف مطلوب' };
+
+  // The contract is an Arabic legal document. The page checks this too, but a
+  // Latin name reaching the template puts the wrong script into الطرف الثاني,
+  // so it is refused here as well rather than trusted from the browser.
+  if (!/[\u0600-\u06FF]/.test(name) || /[A-Za-z]/.test(name)) {
+    return { ok: false, error: 'اكتب الاسم بالحروف العربية.' };
+  }
+  if (name.length > 60) {
+    return { ok: false, error: 'الاسم طويل جداً.' };
+  }
   if (!TEMPLATE_DOC_ID) {
     return { ok: false, error: 'العقد غير مهيأ بعد. راجع فريق سليم.' };
   }

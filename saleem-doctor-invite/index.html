@@ -238,6 +238,7 @@
   .fld input::placeholder{color:#A7B4C2;}
   .fld input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,117,188,.14);}
   .fld input[aria-invalid="true"]{border-color:#C0392B;}
+  .fld-hint{display:block;font-size:12px;color:var(--text-muted);font-style:normal;margin-top:5px;}
   .fld-err{font-size:13px;color:#C0392B;margin:0 0 12px;}
   .file-name{font-size:13px;color:var(--navy);background:var(--blue-soft);border-radius:8px;
     padding:9px 12px;margin:0 0 12px;word-break:break-all;}
@@ -409,8 +410,9 @@
           <div class="step-body">
             <p>عبّي بياناتك وراح نجهّز لك العقد باسمك وينزل عندك مباشرة.</p>
             <form id="reg-form" novalidate>
-              <label class="fld"><span>الاسم الكامل <b>*</b></span>
-                <input name="name" type="text" autocomplete="name" placeholder="د. محمد علي حسين"></label>
+              <label class="fld"><span>الاسم الكامل بالعربي <b>*</b></span>
+                <input name="name" type="text" autocomplete="name" maxlength="60" placeholder="د. محمد علي حسين">
+                <em class="fld-hint">هذا الاسم راح ينكتب بالعقد، فاكتبه مثل ما بهويتك.</em></label>
               <label class="fld"><span>رقم الهاتف <b>*</b></span>
                 <input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXXX"></label>
               <label class="fld"><span>الاختصاص</span>
@@ -660,6 +662,12 @@ const CONFIG = {
       ['name','phone'].forEach(function(k){
         if(!data[k]) f.elements[k].setAttribute('aria-invalid','true'); });
       return err('reg-err', 'الاسم ورقم الهاتف مطلوبين.');
+    }
+    // The contract is an Arabic legal document — a Latin name in the الطرف
+    // الثاني field reads wrong and sits badly in a right-to-left paragraph.
+    if(!/[\u0600-\u06FF]/.test(data.name) || /[A-Za-z]/.test(data.name)){
+      f.elements.name.setAttribute('aria-invalid','true');
+      return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
     err('reg-err', ''); busy(btn, true);
 

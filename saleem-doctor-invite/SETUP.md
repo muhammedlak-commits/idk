@@ -43,6 +43,40 @@ never fills them. If you want a visible "sign here" marker, add a bordered
 table cell or an underline in the Doc at the end of each page and next to
 `التوقيع:` on the last page.
 
+### ⚠️ The signature block must be a table
+
+The signature block at the end currently fakes two columns with runs of spaces:
+
+```
+الطرف الأول                              الطرف الثاني
+شركة المستقبل السليم ...                 السيد: {{name}}
+التوقيع:                                 التوقيع:
+```
+
+That only lines up while the text is exactly as long as the placeholder. Swap
+`{{name}}` for a real name and the line gets longer, wraps, and the whole block
+collapses into the page header. Most real names are longer than `{{name}}`, so
+this breaks for nearly everybody.
+
+**Fix it before going live:**
+
+1. Delete those three lines.
+2. **Insert → Table → 2 × 3.**
+3. Fill it in — right column is الطرف الأول, left column is الطرف الثاني:
+
+   | (left cell) | (right cell) |
+   |---|---|
+   | `الطرف الثاني` | `الطرف الأول` |
+   | `السيد: {{name}}` | `شركة المستقبل السليم للخدمات العامة المحدودة المسؤولية` |
+   | `التوقيع:` | `التوقيع:` |
+
+4. Select the table → **Format → Table → Table properties → Border width → 0pt**
+   so the grid is invisible and it still looks like a plain signature block.
+
+Now each column has its own width, a long name wraps inside its own cell, and
+nothing can push into the header. This is also where you add a "sign here"
+marker: an underline or an empty bordered cell next to `التوقيع:`.
+
 Then copy the doc id out of the URL:
 
     docs.google.com/document/d/  1a2B3c4D...  /edit
