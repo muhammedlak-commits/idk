@@ -11,11 +11,15 @@ Script deployment.
     exports PDF, files it in Drive, appends a row to the Sheet
         │
         ▼  PDF comes back inside the JSON response
-    the page saves it to the doctor's phone
+    the page saves it so the doctor can read it
         │
-        ▼  doctor signs by hand (Acrobat Fill & Sign, or print + photograph)
+        ▼  doctor ticks "I read it", signs with a finger on the page
         ▼  POST action:"signed"
-    Apps Script files the signed copy next to the original and emails the team
+    Apps Script rebuilds the contract from the template with the signature
+    stamped into every {{sig}}, files the signed PDF, emails the team
+        │
+        ▼  the signed copy comes back too, so the doctor keeps one
+        ▼  doctor fills the Google registration form
 
 No Drive link is ever made public — the PDF travels inside the response.
 
@@ -34,14 +38,19 @@ Open it and put these three placeholders where the blanks are:
 | `{{name}}` | the blank after `الطرف الثاني: السيدة/السيد` on page 1, **and** after `السيد:` in the signature block on the last page |
 | `{{day}}`  | the blank after `في يوم` on page 1 |
 | `{{date}}` | the blank after `الموافق` on page 1 |
+| `{{sig}}`  | where the signature belongs — in the الطرف الثاني column next to `التوقيع:`, and at the end of each page if you want it signed throughout |
 
 Type them exactly, including the double braces. A placeholder may appear more
 than once — every occurrence is replaced.
 
-**Leave the signature lines empty.** Signatures are handwritten; the script
-never fills them. If you want a visible "sign here" marker, add a bordered
-table cell or an underline in the Doc at the end of each page and next to
-`التوقيع:` on the last page.
+**`{{sig}}` is where the doctor's signature gets stamped.** They draw it with a
+finger on the page, and the script drops the image in at every `{{sig}}` it
+finds — so put one next to `التوقيع:` in the الطرف الثاني column, and one at the
+foot of each page if the contract should be signed throughout.
+
+The unsigned copy the doctor reads has those placeholders blanked out, so they
+never see `{{sig}}` printed. Nothing is stamped into the الطرف الأول column —
+that signature is yours to add.
 
 ### ⚠️ The signature block must be a table
 
@@ -91,12 +100,18 @@ Then copy the doc id out of the URL:
    ```js
    var TEMPLATE_DOC_ID  = '1a2B3c4D...';   // the doc id from step 1
    var OUTPUT_FOLDER_ID = '';              // Drive folder for contracts; empty = root
-   var NOTIFY           = 'you@saleemapp.com';
+   var NOTIFY           = [
+     'first@saleemapp.com',                // both inboxes get every alert
+     'second@saleemapp.com'
+   ];
    var SITE_URL         = 'https://...';   // where the page is hosted
    ```
 
+   Leave a `NOTIFY` line empty and it is skipped; leave both empty and nobody
+   is told about new doctors — `testSetup` says so rather than failing quietly.
+
 4. Run **testSetup** once from the function dropdown. Grant the permissions it
-   asks for. It creates the sheet headers and checks that all three
+   asks for. It creates the sheet headers and checks that all four
    placeholders are present in the Doc — read the log before going further.
 5. **Deploy → New deployment → Web app**
    - Execute as: **Me**
@@ -129,6 +144,14 @@ converts noticeably better than a random tiiny.host URL in an SMS.
 
 ---
 
+## When the columns change
+
+`getSheet_` only writes headers into an empty sheet, so adding a column to
+`COLUMNS` leaves an existing sheet one short and every new row lands shifted.
+While the data is still test data the fix is to delete the `Doctors` tab and
+let the script rebuild it. With real rows in it, insert the new column by hand
+in the same position it holds in `COLUMNS`.
+
 ## After editing Code.gs
 
 Apps Script keeps serving the old code until you publish a new version:
@@ -142,5 +165,6 @@ The `/exec` URL stays the same.
 | `العقد غير مهيأ بعد` | `TEMPLATE_DOC_ID` is empty |
 | Contract arrives with `{{name}}` still in it | placeholder typed differently in the Doc — run `testSetup` |
 | `الصفحة بوضع التجربة` | `CONFIG.endpoint` is still empty |
+| Signature missing from the signed copy | no `{{sig}}` in the Doc — run `testSetup` |
 | Doctors hit a Google login screen | the deployment is not set to "Anyone" |
 | Nothing reaches the Sheet | you edited `Code.gs` but did not deploy a **new version** |

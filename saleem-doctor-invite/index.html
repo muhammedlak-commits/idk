@@ -149,14 +149,11 @@ h1 .hl::after{content:"";position:absolute;inset-inline:-2px;bottom:.06em;height
 
 /* ---------- faq ---------- */
 .faq{background:var(--white)}
-.acc{max-width:680px;margin:0 auto}
-.qa{border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden;background:var(--white);transition:box-shadow .2s}
-.qa[open]{box-shadow:var(--shadow);border-color:#CDE2F3}
-.qa summary{padding:17px 20px;font-weight:600;font-size:15.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;list-style:none}
-.qa summary::-webkit-details-marker{display:none}
-.qa summary::after{content:"+";font-size:22px;color:var(--blue);font-weight:400;flex:none;transition:transform .25s}
-.qa[open] summary::after{transform:rotate(45deg)}
-.qa .a{padding:0 20px 18px;font-size:14.5px;color:var(--muted);line-height:1.75}
+.acc{max-width:680px;margin:0 auto;display:grid;gap:30px}
+.qa{border-top:1px solid var(--line);padding-top:24px}
+.qa:first-child{border-top:0;padding-top:0}
+.qa h3{font-size:clamp(20px,4.8vw,27px);line-height:1.3;margin-bottom:10px;color:var(--navy)}
+.qa p{font-size:clamp(15px,3.6vw,17px);color:var(--muted);line-height:1.8}
 
 /* ---------- final ---------- */
 .final{background:linear-gradient(160deg,var(--navy),var(--navy-2));color:#fff}
@@ -325,12 +322,17 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
       <p class="eyebrow">أسئلة شائعة</p>
       <h2>قبل ما توقّع</h2>
     </div>
-    <div class="acc rv">
-      <details class="qa"><summary>شكد العمولة؟</summary><div class="a">العلاقة المالية قائمة على نسبة من سعر كل استشارة ناجحة — بدون راتب ثابت وبدون اشتراك. النسبة تتحدد وياك قبل التوقيع وتنكتب بالعقد، وتقدر تقراها كاملة قبل ما توقّع.</div></details>
-      <details class="qa"><summary>شلون ومتى أستلم مستحقاتي؟</summary><div class="a">الدفع يتم عبر التطبيق، والشركة تحصّل المبلغ من المريض وتودع مستحقاتك بعد اقتطاع النسبة المتفق عليها، بشكل دوري شهري. ويوصلك كشف حساب شهري تراجعه وتشعرنا بأي ملاحظة.</div></details>
-      <details class="qa"><summary>هل أكدر أستمر بعيادتي أو بالمستشفى؟</summary><div class="a">نعم. العقد ما يمنعك من مزاولة مهنتك أو العمل بأي مؤسسة صحية عامة أو خاصة. الشي الوحيد الممنوع هو تقديم خدمات لتطبيق منافس لسليم خلال مدة العقد.</div></details>
-      <details class="qa"><summary>شكد مدة العقد؟ وأكدر أوقف؟</summary><div class="a">سنة قابلة للتجديد تلقائياً. وأي طرف يكدر ينهي العقد بإشعار خطي أو إلكتروني قبل ٣٠ يوم.</div></details>
-      <details class="qa"><summary>أحتاج أجهزة خاصة؟</summary><div class="a">لا. تحتاج بس موبايل أو حاسبة وإنترنت مستقر، والاستشارة تنطي عبر التطبيق نفسه.</div></details>
+    <div class="acc">
+      <div class="qa rv"><h3>شكد العمولة؟</h3>
+        <p>العلاقة المالية قائمة على نسبة من سعر كل استشارة ناجحة — بدون راتب ثابت وبدون اشتراك. النسبة تتحدد وياك قبل التوقيع وتنكتب بالعقد، وتكدر تقرا العقد كامل قبل ما توقّع.</p></div>
+      <div class="qa rv"><h3>شلون ومتى أستلم مستحقاتي؟</h3>
+        <p>الدفع يتم عبر التطبيق، والشركة تحصّل المبلغ من المريض وتودع مستحقاتك بعد اقتطاع النسبة المتفق عليها، بشكل دوري شهري. ويوصلك كشف حساب شهري تراجعه وتشعرنا بأي ملاحظة.</p></div>
+      <div class="qa rv"><h3>هل أكدر أستمر بعيادتي أو بالمستشفى؟</h3>
+        <p>نعم. العقد ما يمنعك من مزاولة مهنتك أو العمل بأي مؤسسة صحية عامة أو خاصة. الشي الوحيد الممنوع هو تقديم خدمات لتطبيق منافس لسليم خلال مدة العقد.</p></div>
+      <div class="qa rv"><h3>شكد مدة العقد؟ وأكدر أوقف؟</h3>
+        <p>سنة قابلة للتجديد تلقائياً. وأي طرف يكدر ينهي العقد بإشعار خطي أو إلكتروني قبل ٣٠ يوم.</p></div>
+      <div class="qa rv"><h3>أحتاج أجهزة خاصة؟</h3>
+        <p>لا. تحتاج بس موبايل أو حاسبة وإنترنت مستقر، والاستشارة تنطي عبر التطبيق نفسه.</p></div>
     </div>
   </div>
 </section>
@@ -372,31 +374,39 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
         <div class="step" id="step-2">
           <div class="step-head" onclick="toggleStep(2)">
-            <span class="step-num">٢</span><h3>وقّع العقد</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="step-num">٢</span><h3>اقرأ العقد ووقّع</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp">العقد نزل عندك باسمك جاهز. التوقيع لازم يكون <b>بخط يدك</b> — وقّع بنهاية كل صفحة، وبخانة "التوقيع" بالصفحة الأخيرة.</p>
-            <div class="ways">
-              <div class="way"><i>📱</i><div><b>من الموبايل</b><span>افتح الملف بتطبيق Adobe Acrobat Reader، بعدين اختار "Fill &amp; Sign"، ووقّع بإصبعك.</span></div></div>
-              <div class="way"><i>🖨️</i><div><b>أو بالورق</b><span>اطبع العقد، وقّع بالقلم، وبعدين صوّره أو اسكنه.</span></div></div>
-            </div>
-            <p class="note">مهم: احفظ الملف بعد التوقيع.</p>
+            <p class="sp">العقد نزل عندك باسمك. اقراه أول، وبعدين وقّع هنا بإصبعك — ما تحتاج تطبع ولا ترفع ملف.</p>
             <button type="button" class="btn btn-ghost" id="redl-btn" onclick="redownload()">ما نزل العقد؟ نزّله مرة ثانية</button>
-            <button type="button" class="btn" onclick="completeStep(2)">وقّعت العقد <span class="arw">➜</span></button>
+
+            <label class="agree"><input type="checkbox" id="agree">
+              <span>قرأت العقد كاملاً وأوافق على شروطه.</span></label>
+
+            <div class="sigbox">
+              <div class="sighead"><b>توقيعك</b><button type="button" class="sigclear" onclick="clearSig()">امسح</button></div>
+              <div class="sigwrap">
+                <canvas id="sig-pad"></canvas>
+                <span class="sigph" id="sig-ph">وقّع هنا بإصبعك</span>
+                <img id="sig-img" alt="" hidden>
+              </div>
+              <input type="file" id="sig-file" accept="image/*" hidden>
+              <button type="button" class="siglink" onclick="pickSig()">أو ارفع صورة توقيعك</button>
+            </div>
+
+            <p class="fld-err" id="sig-err" hidden></p>
+            <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">وقّع وأرسل العقد <span class="arw">➜</span></button>
           </div>
         </div>
 
         <div class="step" id="step-3">
           <div class="step-head" onclick="toggleStep(3)">
-            <span class="step-num">٣</span><h3>ارفع العقد الموقّع</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="step-num">٣</span><h3>أكمل التسجيل</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp">ارفع نسخة العقد الموقّعة — ملف PDF أو صورة واضحة لكل الصفحات.</p>
-            <input type="file" id="signed-file" accept="application/pdf,image/*" hidden>
-            <button type="button" class="btn btn-ghost" onclick="pickFile()">اختر الملف</button>
-            <p class="file-name" id="file-name" hidden></p>
-            <p class="fld-err" id="up-err" hidden></p>
-            <button type="button" class="btn" id="up-btn" onclick="uploadSigned()" disabled>أرسل العقد الموقّع <span class="arw">➜</span></button>
+            <p class="sp">خطوة أخيرة — املأ استمارة التسجيل حتى نفعّل حسابك بالتطبيق.</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw">➜</span></a>
+            <p class="note" style="margin:12px 0 0">تنفتح بتبويب جديد. ارجع لهنا بعد ما تخلصها.</p>
           </div>
         </div>
 
@@ -404,8 +414,8 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
       <div class="done" id="done-card" hidden>
         <div class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h3>وصلنا عقدك</h3>
-        <p>راح يتواصل وياك فريق سليم قريباً لتفعيل حسابك وإكمال باقي الخطوات.</p>
+        <h3>خلصنا — أهلاً بيك بسليم</h3>
+        <p>وصلنا عقدك الموقّع وبياناتك. راح يتواصل وياك فريق سليم قريباً لتفعيل حسابك.</p>
         <p class="restart"><a href="#" onclick="resetFlow();return false;">تسجيل طبيب آخر</a></p>
       </div>
 
@@ -479,6 +489,27 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .file-name{font-size:13px;color:var(--navy);background:var(--blue-soft);border-radius:10px;
   padding:10px 13px;margin:9px 0 0;word-break:break-all;font-weight:600}
 
+.agree{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:13px 15px;margin:14px 0 12px;cursor:pointer}
+.agree input{width:19px;height:19px;flex:none;margin-top:1px;accent-color:var(--blue)}
+.agree span{font-size:14px;line-height:1.6;font-weight:600}
+
+.sigbox{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:var(--white)}
+.sighead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.sighead b{font-size:14px;font-weight:700}
+.sigclear{background:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:4px 8px;
+  border-radius:8px;text-decoration:underline}
+.sigwrap{position:relative;border:2px dashed #C7D3E0;border-radius:12px;background:#FCFDFE;
+  aspect-ratio:3/1;overflow:hidden}
+.sigwrap.inked{border-style:solid;border-color:var(--blue);background:var(--white)}
+.sigwrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
+.sigwrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;background:var(--white)}
+.sigph{position:absolute;inset:0;display:grid;place-items:center;color:#9FB0C2;font-size:14px;
+  font-weight:600;pointer-events:none;transition:opacity .2s}
+.sigwrap.inked .sigph{opacity:0}
+.siglink{display:block;width:100%;margin-top:10px;background:none;color:var(--blue);
+  font-size:13.5px;font-weight:700;padding:8px;text-decoration:underline}
+
 .done{text-align:center;padding:10px 4px}
 .done .tick{width:54px;height:54px;border-radius:50%;background:#EAF7EF;color:var(--green);
   display:grid;place-items:center;margin:0 auto 14px}
@@ -544,17 +575,16 @@ const CONFIG = {
   // the body is still JSON and the script parses it the same way.
   endpointType: "text/plain;charset=utf-8",
   whatsapp    : "9647710335500",   // digits only, no +, for the wa.me help link
-  maxUploadMb : 10
+  maxUploadMb : 8
 };
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
   var state = { id:'', step:0, name:'' };
-  var pdf   = null;          // {bytes, fileName} for the current session
-  var upload = null;         // File chosen in step 3
+  var pdf = null;          // unsigned contract for this session
   var openIdx = 1;
 
-  /* ---------- persistence: they leave to sign, they come back ---------- */
+  /* ---------- persistence: they leave to read the contract, they come back ---------- */
   function load(){
     try{ var raw = localStorage.getItem(KEY);
          if(raw){ var v = JSON.parse(raw);
@@ -576,9 +606,10 @@ const CONFIG = {
     var all = state.step >= TOTAL;
     document.getElementById('done-card').hidden = !all;
     document.getElementById('steps').hidden = all;
-    // re-downloading only works once the contract exists on the server
     var redl = document.getElementById('redl-btn');
     if(redl) redl.hidden = !state.id;
+    // the pad has no size while its step is collapsed, so measure it on open
+    if(openIdx === 2) setTimeout(sizePad, 30);
   }
 
   window.toggleStep = function(i){
@@ -651,7 +682,7 @@ const CONFIG = {
     }
     // The contract is an Arabic legal document — a Latin name in the الطرف
     // الثاني field reads wrong and sits badly in a right-to-left paragraph.
-    if(!/[\u0600-\u06FF]/.test(data.name) || /[A-Za-z]/.test(data.name)){
+    if(!/[؀-ۿ]/.test(data.name) || /[A-Za-z]/.test(data.name)){
       f.elements.name.setAttribute('aria-invalid','true');
       return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
@@ -669,7 +700,7 @@ const CONFIG = {
     });
   });
 
-  /* ---------- step 2: fetch the contract again if it never landed ---------- */
+  /* ---------- fetch the contract again if it never landed ---------- */
   window.redownload = function(){
     var btn = document.getElementById('redl-btn');
     if(pdf){ return saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName); }
@@ -681,40 +712,103 @@ const CONFIG = {
     }).catch(function(e){ busy(btn, false); alert(e.message); });
   };
 
-  /* ---------- step 3: upload the signed copy ---------- */
-  window.pickFile = function(){ document.getElementById('signed-file').click(); };
+  /* ---------- step 2: sign on the page ---------- */
+  var pad   = document.getElementById('sig-pad');
+  var wrap  = pad.parentNode;
+  var shot  = document.getElementById('sig-img');
+  var ctx, drawing = false, inked = false, photo = null;
 
-  document.getElementById('signed-file').addEventListener('change', function(ev){
-    var f = ev.target.files && ev.target.files[0];
-    var label = document.getElementById('file-name');
-    err('up-err', '');
-    if(!f){ upload = null; label.hidden = true;
-            document.getElementById('up-btn').disabled = true; return; }
-    if(f.size > CONFIG.maxUploadMb * 1024 * 1024){
-      upload = null; label.hidden = true;
-      document.getElementById('up-btn').disabled = true;
-      return err('up-err', 'حجم الملف كبير. الحد الأقصى ' + CONFIG.maxUploadMb + ' ميغابايت.');
+  function sizePad(){
+    var r = pad.getBoundingClientRect();
+    if(!r.width || !r.height) return;                 // still collapsed
+    var keep = inked && !photo ? pad.toDataURL() : null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    pad.width  = Math.round(r.width  * dpr);
+    pad.height = Math.round(r.height * dpr);
+    ctx = pad.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0F2438';
+    if(keep){                                          // survive an orientation flip
+      var im = new Image();
+      im.onload = function(){ ctx.drawImage(im, 0, 0, r.width, r.height); };
+      im.src = keep;
     }
-    upload = f;
-    label.textContent = f.name;
-    label.hidden = false;
-    document.getElementById('up-btn').disabled = false;
+  }
+  addEventListener('resize', function(){ if(openIdx === 2) sizePad(); });
+
+  function ink(on){
+    inked = on;
+    wrap.classList.toggle('inked', on);
+    if(on) err('sig-err','');
+  }
+  function at(e){
+    var r = pad.getBoundingClientRect();
+    return {x: e.clientX - r.left, y: e.clientY - r.top};
+  }
+  pad.addEventListener('pointerdown', function(e){
+    if(photo || !ctx) return;
+    drawing = true;
+    try{ pad.setPointerCapture(e.pointerId); }catch(_){}
+    var p = at(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x + .1, p.y);  ctx.stroke();          // a tap leaves a dot
+    ink(true);
+  });
+  pad.addEventListener('pointermove', function(e){
+    if(!drawing) return;
+    var p = at(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){
+    pad.addEventListener(t, function(){ drawing = false; });
   });
 
-  window.uploadSigned = function(){
-    if(!upload) return;
-    var btn = document.getElementById('up-btn');
-    err('up-err', ''); busy(btn, true);
+  window.clearSig = function(){
+    if(ctx) ctx.clearRect(0, 0, pad.width, pad.height);
+    photo = null; shot.hidden = true; shot.removeAttribute('src');
+    document.getElementById('sig-file').value = '';
+    ink(false); err('sig-err','');
+  };
+
+  window.pickSig = function(){ document.getElementById('sig-file').click(); };
+
+  document.getElementById('sig-file').addEventListener('change', function(ev){
+    var f = ev.target.files && ev.target.files[0];
+    if(!f) return;
+    if(f.size > CONFIG.maxUploadMb * 1024 * 1024){
+      ev.target.value = '';
+      return err('sig-err', 'حجم الصورة كبير. الحد الأقصى ' + CONFIG.maxUploadMb + ' ميغابايت.');
+    }
     var reader = new FileReader();
-    reader.onerror = function(){ busy(btn, false); err('up-err','ما كدرنا نقرأ الملف. جرّب ملف ثاني.'); };
+    reader.onerror = function(){ err('sig-err','ما كدرنا نقرا الصورة. جرّب صورة ثانية.'); };
     reader.onload = function(){
-      var b64 = String(reader.result).split(',')[1];
-      post({action:'signed', id: state.id, fileB64: b64,
-            mimeType: upload.type || 'application/pdf'})
-        .then(function(){ busy(btn, false); completeStep(3); })
-        .catch(function(e){ busy(btn, false); err('up-err', e.message); });
+      var url = String(reader.result);
+      photo = {b64: url.split(',')[1], type: f.type || 'image/png'};
+      shot.src = url; shot.hidden = false;
+      ink(true);
     };
-    reader.readAsDataURL(upload);
+    reader.readAsDataURL(f);
+  });
+
+  window.submitSignature = function(){
+    var btn = document.getElementById('sig-btn');
+    if(!document.getElementById('agree').checked){
+      return err('sig-err', 'أكّد قراءتك للعقد قبل التوقيع.');
+    }
+    if(!inked){
+      return err('sig-err', 'وقّع بالمربع أعلاه، أو ارفع صورة توقيعك.');
+    }
+    var sig = photo || {b64: pad.toDataURL('image/png').split(',')[1], type: 'image/png'};
+    err('sig-err',''); busy(btn, true);
+
+    post({action:'signed', id: state.id, agreed:true,
+          sigB64: sig.b64, mimeType: sig.type})
+      .then(function(res){
+        // hand the doctor their own signed copy
+        if(res.pdfBase64) saveFile(b64ToBlob(res.pdfBase64,'application/pdf'), res.fileName);
+        busy(btn, false);
+        completeStep(2);
+      })
+      .catch(function(e){ busy(btn, false); err('sig-err', e.message); });
   };
 
   /* ---------- starting over ---------- */
@@ -724,16 +818,14 @@ const CONFIG = {
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
     state = { id:'', step:0, name:'' };
-    pdf = null; upload = null; openIdx = 1;
+    pdf = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
         form.elements[k].setAttribute('aria-invalid','false'); }); }
-    var file = document.getElementById('signed-file');
-    if(file) file.value = '';
-    document.getElementById('file-name').hidden = true;
-    document.getElementById('up-btn').disabled = true;
-    err('reg-err',''); err('up-err','');
+    document.getElementById('agree').checked = false;
+    clearSig();
+    err('reg-err',''); err('sig-err','');
     render();
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
   };

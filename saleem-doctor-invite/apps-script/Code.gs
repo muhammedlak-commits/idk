@@ -37,9 +37,13 @@ var TEMPLATE_DOC_ID = '';
 // Empty = the script's own root Drive folder.
 var OUTPUT_FOLDER_ID = '';
 
-// Who gets told when a doctor registers or returns a signed contract.
-// Empty = no email.
-var NOTIFY = 'muhammed.lak@saleemapp.com';
+// Who gets told when a doctor registers or signs. One address per line.
+// Leave a line empty and it is skipped; leave both empty and no mail is sent
+// at all (testSetup says so out loud rather than failing quietly).
+var NOTIFY = [
+  '',    // ← first inbox
+  ''     // ← second inbox
+];
 
 // Where the landing page lives. Only used in alert emails and to flag
 // submissions arriving from an unexpected page in the execution log.
@@ -49,14 +53,19 @@ var SHEET_NAME = 'Doctors';
 
 var COLUMNS = [
   'id', 'ts', 'name', 'phone', 'specialty', 'workplace', 'city',
-  'contract_file', 'contract_id', 'signed_file', 'signed_at', 'status', 'notes', 'url'
+  'contract_file', 'contract_id', 'signed_file', 'signed_id',
+  'signed_at', 'status', 'notes', 'url'
 ];
 
-// Biggest signed upload we accept, in megabytes. A phone photo of four pages
-// is comfortably under this; the limit stops a stray video killing the script.
-var MAX_UPLOAD_MB = 10;
+// Biggest signature image we accept, in megabytes. A drawn signature is a few
+// KB; the allowance is for a photographed one straight off a phone camera.
+var MAX_UPLOAD_MB = 8;
 
-var ALLOWED_UPLOAD_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic'];
+// Printed size of the signature in the contract, in points (3:1, matching
+// the signature pad on the page).
+var SIG_W = 165, SIG_H = 55;
+
+var ALLOWED_UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/webp'];
 
 /* ═══════════════ INTAKE (public) ═══════════════ */
 
@@ -122,6 +131,7 @@ function register_(req) {
     contract_file: '',
     contract_id: '',
     signed_file: '',
+    signed_id: '',
     signed_at: '',
     status: 'registered',
     notes: '',
@@ -164,39 +174,59 @@ function resend_(req) {
   };
 }
 
-/* ═══════════════ SIGNED UPLOAD ═══════════════ */
+/* ═══════════════ SIGNATURE ═══════════════ */
 
-/** Doctor uploaded the signed contract → file it and tell the team. */
+/**
+ * Doctor signed on the page. Rebuild their contract from the template with the
+ * signature stamped in, file it, and tell the team.
+ *
+ * The contract is regenerated rather than edited: the copy made at registration
+ * was exported to PDF and trashed, so there is no editable contract sitting in
+ * Drive for anyone to alter after the fact. Name and date come from the row, so
+ * the signed copy carries exactly what the doctor was shown.
+ */
 function signed_(req) {
   var id = String(req.id || '').trim();
-  if (!id)          return { ok: false, error: 'معرّف الطلب مفقود' };
-  if (!req.fileB64) return { ok: false, error: 'الملف مفقود' };
+  if (!id)         return { ok: false, error: 'معرّف الطلب مفقود' };
+  if (!req.sigB64) return { ok: false, error: 'التوقيع مفقود' };
+  if (!req.agreed) return { ok: false, error: 'لازم تأكد قراءتك للعقد قبل التوقيع' };
 
-  var type = String(req.mimeType || 'application/pdf');
+  var type = String(req.mimeType || 'image/png');
   if (ALLOWED_UPLOAD_TYPES.indexOf(type) === -1) {
-    return { ok: false, error: 'نوع الملف غير مدعوم. أرسل PDF أو صورة.' };
+    return { ok: false, error: 'صيغة التوقيع غير مدعومة.' };
   }
 
-  var bytes = Utilities.base64Decode(req.fileB64);
+  var bytes = Utilities.base64Decode(req.sigB64);
   if (bytes.length > MAX_UPLOAD_MB * 1024 * 1024) {
-    return { ok: false, error: 'حجم الملف كبير. الحد الأقصى ' + MAX_UPLOAD_MB + ' ميغابايت.' };
+    return { ok: false, error: 'حجم الصورة كبير. الحد الأقصى ' + MAX_UPLOAD_MB + ' ميغابايت.' };
   }
 
   var sheet = getSheet_(), head = headers_(sheet);
   var row = findRow_(sheet, head, id);
   if (row === -1) return { ok: false, error: 'لم نلگه الطلب. حدّث الصفحة وحاول مرة ثانية.' };
 
-  var name = String(sheet.getRange(row, head.indexOf('name') + 1).getValue() || 'doctor');
-  var ext  = type === 'application/pdf' ? 'pdf' : type.split('/')[1];
-  var blob = Utilities.newBlob(bytes, type, 'عقد موقّع - ' + name + ' - ' + id + '.' + ext);
-  var file = folder_().createFile(blob);
+  var cell = function (key) {
+    var c = head.indexOf(key);
+    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+  };
+  if (cell('signed_at')) return { ok: false, error: 'هذا العقد موقّع مسبقاً.' };
 
-  setCell_(sheet, head, row, 'signed_file', file.getName());
-  setCell_(sheet, head, row, 'signed_at', new Date().toISOString());
-  setCell_(sheet, head, row, 'status', 'signed');
-  notifySigned_(name, id, file);
+  var doctor = { id: id, name: cell('name') };
+  var when   = new Date(cell('ts') || Date.now());
+  var sig    = Utilities.newBlob(bytes, type, 'signature');
 
-  return { ok: true, id: id };
+  var built = buildContract_(doctor, when, sig);
+  setCell_(sheet, head, row, 'signed_file', built.file.getName());
+  setCell_(sheet, head, row, 'signed_id',   built.file.getId());
+  setCell_(sheet, head, row, 'signed_at',   new Date().toISOString());
+  setCell_(sheet, head, row, 'status',      'signed');
+  notifySigned_(doctor.name, id, built.file);
+
+  return {
+    ok: true, id: id,
+    fileName: built.file.getName(),
+    pdfBase64: Utilities.base64Encode(built.bytes)
+  };
 }
 
 /* ═══════════════ CONTRACT BUILDING ═══════════════ */
@@ -206,7 +236,7 @@ function signed_(req) {
  * The intermediate Doc is trashed — only the PDF is kept, so nobody can
  * later edit a contract that has already gone out.
  */
-function buildContract_(doctor, when) {
+function buildContract_(doctor, when, sigBlob) {
   var folder = folder_();
   var copy = DriveApp.getFileById(TEMPLATE_DOC_ID)
                      .makeCopy('__building ' + doctor.id, folder);
@@ -216,15 +246,40 @@ function buildContract_(doctor, when) {
     body.replaceText('\\{\\{name\\}\\}', doctor.name);
     body.replaceText('\\{\\{day\\}\\}',  arabicDay_(when));
     body.replaceText('\\{\\{date\\}\\}', Utilities.formatDate(when, tz_(), 'yyyy/MM/dd'));
+
+    // Unsigned copy: leave the signature slots blank rather than printing the
+    // placeholder, so the doctor reads a clean contract.
+    if (sigBlob) { stampSignature_(body, sigBlob); }
+    else         { body.replaceText('\\{\\{sig\\}\\}', ''); }
+
     doc.saveAndClose();
 
     var pdf = DriveApp.getFileById(copy.getId()).getAs('application/pdf');
-    pdf.setName('عقد سليم - ' + doctor.name + ' - ' + doctor.id + '.pdf');
+    pdf.setName('عقد سليم' + (sigBlob ? ' موقّع' : '') +
+                ' - ' + doctor.name + ' - ' + doctor.id + '.pdf');
     var stored = folder.createFile(pdf);
     return { file: stored, bytes: pdf.getBytes() };
   } finally {
     try { DriveApp.getFileById(copy.getId()).setTrashed(true); } catch (ignored) {}
   }
+}
+
+/** Replace every {{sig}} in the document with the signature image.
+ *  Each pass deletes the placeholder it just handled, so the loop drains. */
+function stampSignature_(body, blob) {
+  var placed = 0, found;
+  while ((found = body.findText('\\{\\{sig\\}\\}')) !== null && placed < 20) {
+    var text  = found.getElement().asText();
+    text.deleteText(found.getStartOffset(), found.getEndOffsetInclusive());
+    var parent = text.getParent();
+    if (parent.getType() === DocumentApp.ElementType.PARAGRAPH) {
+      var img = parent.asParagraph().appendInlineImage(blob);
+      img.setWidth(SIG_W).setHeight(SIG_H);
+    }
+    placed++;
+  }
+  if (!placed) console.warn('no {{sig}} placeholder in the template — nothing stamped');
+  return placed;
 }
 
 var ARABIC_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
@@ -239,24 +294,35 @@ function tz_() {
 
 /* ═══════════════ NOTIFICATIONS ═══════════════ */
 
+/** Everyone on NOTIFY who is actually filled in. */
+function recipients_() {
+  return (NOTIFY || []).map(function (a) { return String(a || '').trim(); })
+                       .filter(function (a) { return a.length > 0; });
+}
+
+function mail_(subject, body) {
+  recipients_().forEach(function (to) {
+    try { MailApp.sendEmail(to, subject, body); }
+    catch (err) { console.error('could not mail ' + to + ': ' + err); }
+  });
+}
+
 function notifyRegistered_(d) {
-  if (!NOTIFY) return;
-  MailApp.sendEmail(NOTIFY, '🩺 طبيب جديد سجّل — ' + d.name,
+  mail_('🩺 طبيب جديد سجّل — ' + d.name,
     'الاسم:       ' + d.name + '\n' +
     'الهاتف:      ' + d.phone + '\n' +
     'الاختصاص:    ' + (d.specialty || '—') + '\n' +
     'مكان العمل:  ' + (d.workplace || '—') + '\n' +
     'المدينة:     ' + (d.city || '—') + '\n' +
     'المعرّف:     ' + d.id + '\n\n' +
-    'انبعث له العقد. بانتظار النسخة الموقّعة.\n');
+    'انبعث له العقد. بانتظار التوقيع.\n');
 }
 
 function notifySigned_(name, id, file) {
-  if (!NOTIFY) return;
-  MailApp.sendEmail(NOTIFY, '✅ عقد موقّع وصل — ' + name,
+  mail_('✅ عقد موقّع — ' + name,
     'الطبيب: ' + name + '\n' +
     'المعرّف: ' + id + '\n' +
-    'الملف:  ' + file.getUrl() + '\n');
+    'العقد الموقّع: ' + file.getUrl() + '\n');
 }
 
 /* ═══════════════ CHECK YOUR SETUP ═══════════════ */
@@ -277,7 +343,7 @@ function testSetup() {
       var doc = DocumentApp.openById(TEMPLATE_DOC_ID);
       var text = doc.getBody().getText();
       Logger.log('✓ Template: "%s"', doc.getName());
-      ['{{name}}', '{{day}}', '{{date}}'].forEach(function (p) {
+      ['{{name}}', '{{day}}', '{{date}}', '{{sig}}'].forEach(function (p) {
         Logger.log('   %s %s', text.indexOf(p) !== -1 ? '✓ found' : '✗ MISSING', p);
       });
     } catch (err) {
@@ -286,8 +352,10 @@ function testSetup() {
   }
 
   Logger.log('Contracts filed in: %s', folder_().getName());
-  Logger.log('Alerts to: %s', NOTIFY || '(off)');
-  Logger.log('Max upload: %s MB', MAX_UPLOAD_MB);
+  var to = recipients_();
+  Logger.log(to.length ? 'Alerts to: ' + to.join(', ')
+                       : '✗ NOTIFY is empty — nobody will be told about new doctors.');
+  Logger.log('Max signature image: %s MB', MAX_UPLOAD_MB);
   Logger.log('Now deploy: Deploy > New deployment > Web app (Anyone).');
 }
 
