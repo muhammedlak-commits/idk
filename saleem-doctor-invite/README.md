@@ -22,9 +22,10 @@ nothing.
 - **The contract is generated per doctor**, from a Google Doc template, so the
   name and date are real text rather than something typed into a PDF form —
   which is unreliable across mobile PDF viewers, especially in Arabic.
-- **The doctor signs on the page**, drawing with a finger (or uploading a photo
-  of their signature). The script stamps that image into every `{{sig}}` in the
-  template and returns a signed PDF — no printing, no file upload, no app switch.
+- **Three ways to sign**, chosen by the doctor: draw with a finger on the page,
+  upload a photo of a signature, or sign the downloaded PDF by hand and send it
+  back. The first two never re-upload the contract — only the signature image
+  goes up and the script stamps it into every `{{sig}}`, returning a signed PDF.
 - **Consent is explicit.** The signature cannot be submitted until the doctor
   ticks that they read the contract, and the server refuses it too.
 - **No public Drive links.** The PDF is returned inside the JSON response and

@@ -54,18 +54,23 @@ var SHEET_NAME = 'Doctors';
 var COLUMNS = [
   'id', 'ts', 'name', 'phone', 'specialty', 'workplace', 'city',
   'contract_file', 'contract_id', 'signed_file', 'signed_id',
-  'signed_at', 'status', 'notes', 'url'
+  'signed_at', 'sign_method', 'status', 'notes', 'url'
 ];
 
 // Biggest signature image we accept, in megabytes. A drawn signature is a few
 // KB; the allowance is for a photographed one straight off a phone camera.
-var MAX_UPLOAD_MB = 8;
+var MAX_SIG_MB = 8;
+
+// Biggest signed contract we accept. A scan or four phone photos of the pages
+// run bigger than a signature, so this is roomier.
+var MAX_DOC_MB = 15;
 
 // Printed size of the signature in the contract, in points (3:1, matching
 // the signature pad on the page).
 var SIG_W = 165, SIG_H = 55;
 
-var ALLOWED_UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/webp'];
+var ALLOWED_SIG_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/webp'];
+var ALLOWED_DOC_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/heic', 'image/webp'];
 
 /* ═══════════════ INTAKE (public) ═══════════════ */
 
@@ -132,6 +137,7 @@ function register_(req) {
     contract_id: '',
     signed_file: '',
     signed_id: '',
+    sign_method: '',
     signed_at: '',
     status: 'registered',
     notes: '',
@@ -177,28 +183,31 @@ function resend_(req) {
 /* ═══════════════ SIGNATURE ═══════════════ */
 
 /**
- * Doctor signed on the page. Rebuild their contract from the template with the
- * signature stamped in, file it, and tell the team.
+ * Doctor signed. Three routes arrive here and all end in one signed PDF on the
+ * row:
  *
- * The contract is regenerated rather than edited: the copy made at registration
- * was exported to PDF and trashed, so there is no editable contract sitting in
- * Drive for anyone to alter after the fact. Name and date come from the row, so
- * the signed copy carries exactly what the doctor was shown.
+ *   mode "draw"  — signature drawn on the page
+ *   mode "photo" — photograph of a signature
+ *       both send an image, and the contract is rebuilt from the template with
+ *       that image stamped into every {{sig}}. The doctor never re-uploads the
+ *       contract, because the script already has everything needed to make it.
+ *
+ *   mode "pdf"   — doctor signed the downloaded contract by hand and sends it
+ *       back. Nothing is stamped; their file is filed as the signed copy.
+ *
+ * The contract is regenerated rather than edited: the copy made at
+ * registration was exported to PDF and trashed, so there is no editable
+ * contract in Drive for anyone to alter afterwards. Name and date come from
+ * the row, so the signed copy carries exactly what the doctor was shown.
  */
 function signed_(req) {
   var id = String(req.id || '').trim();
   if (!id)         return { ok: false, error: 'معرّف الطلب مفقود' };
-  if (!req.sigB64) return { ok: false, error: 'التوقيع مفقود' };
   if (!req.agreed) return { ok: false, error: 'لازم تأكد قراءتك للعقد قبل التوقيع' };
 
-  var type = String(req.mimeType || 'image/png');
-  if (ALLOWED_UPLOAD_TYPES.indexOf(type) === -1) {
-    return { ok: false, error: 'صيغة التوقيع غير مدعومة.' };
-  }
-
-  var bytes = Utilities.base64Decode(req.sigB64);
-  if (bytes.length > MAX_UPLOAD_MB * 1024 * 1024) {
-    return { ok: false, error: 'حجم الصورة كبير. الحد الأقصى ' + MAX_UPLOAD_MB + ' ميغابايت.' };
+  var mode = String(req.mode || 'draw');
+  if (['draw', 'photo', 'pdf'].indexOf(mode) === -1) {
+    return { ok: false, error: 'طريقة توقيع غير معروفة.' };
   }
 
   var sheet = getSheet_(), head = headers_(sheet);
@@ -211,22 +220,63 @@ function signed_(req) {
   };
   if (cell('signed_at')) return { ok: false, error: 'هذا العقد موقّع مسبقاً.' };
 
-  var doctor = { id: id, name: cell('name') };
-  var when   = new Date(cell('ts') || Date.now());
-  var sig    = Utilities.newBlob(bytes, type, 'signature');
+  var out = (mode === 'pdf') ? fileSignedUpload_(req, cell)
+                             : stampSignedCopy_(req, cell, id);
+  if (!out.ok) return out;
 
-  var built = buildContract_(doctor, when, sig);
-  setCell_(sheet, head, row, 'signed_file', built.file.getName());
-  setCell_(sheet, head, row, 'signed_id',   built.file.getId());
+  setCell_(sheet, head, row, 'signed_file', out.file.getName());
+  setCell_(sheet, head, row, 'signed_id',   out.file.getId());
   setCell_(sheet, head, row, 'signed_at',   new Date().toISOString());
+  setCell_(sheet, head, row, 'sign_method', mode);
   setCell_(sheet, head, row, 'status',      'signed');
-  notifySigned_(doctor.name, id, built.file);
+  notifySigned_(cell('name'), id, out.file, mode);
 
-  return {
-    ok: true, id: id,
-    fileName: built.file.getName(),
-    pdfBase64: Utilities.base64Encode(built.bytes)
-  };
+  // Only the stamped routes can hand back a contract; on the pdf route the
+  // doctor already has the file they just sent.
+  var res = { ok: true, id: id, mode: mode };
+  if (out.bytes) {
+    res.fileName  = out.file.getName();
+    res.pdfBase64 = Utilities.base64Encode(out.bytes);
+  }
+  return res;
+}
+
+/** "draw" / "photo" — rebuild the contract with the signature stamped in. */
+function stampSignedCopy_(req, cell, id) {
+  if (!req.sigB64) return { ok: false, error: 'التوقيع مفقود' };
+
+  var type = String(req.mimeType || 'image/png');
+  if (ALLOWED_SIG_TYPES.indexOf(type) === -1) {
+    return { ok: false, error: 'صيغة التوقيع غير مدعومة.' };
+  }
+  var bytes = Utilities.base64Decode(req.sigB64);
+  if (bytes.length > MAX_SIG_MB * 1024 * 1024) {
+    return { ok: false, error: 'حجم الصورة كبير. الحد الأقصى ' + MAX_SIG_MB + ' ميغابايت.' };
+  }
+
+  var built = buildContract_({ id: id, name: cell('name') },
+                             new Date(cell('ts') || Date.now()),
+                             Utilities.newBlob(bytes, type, 'signature'));
+  return { ok: true, file: built.file, bytes: built.bytes };
+}
+
+/** "pdf" — the doctor signed the contract by hand and sent it back. */
+function fileSignedUpload_(req, cell) {
+  if (!req.fileB64) return { ok: false, error: 'الملف مفقود' };
+
+  var type = String(req.mimeType || 'application/pdf');
+  if (ALLOWED_DOC_TYPES.indexOf(type) === -1) {
+    return { ok: false, error: 'نوع الملف غير مدعوم. أرسل PDF أو صورة واضحة.' };
+  }
+  var bytes = Utilities.base64Decode(req.fileB64);
+  if (bytes.length > MAX_DOC_MB * 1024 * 1024) {
+    return { ok: false, error: 'حجم الملف كبير. الحد الأقصى ' + MAX_DOC_MB + ' ميغابايت.' };
+  }
+
+  var ext  = type === 'application/pdf' ? 'pdf' : type.split('/')[1];
+  var name = 'عقد سليم موقّع - ' + (cell('name') || 'طبيب') + ' - ' + cell('id') + '.' + ext;
+  var file = folder_().createFile(Utilities.newBlob(bytes, type, name));
+  return { ok: true, file: file, bytes: null };
 }
 
 /* ═══════════════ CONTRACT BUILDING ═══════════════ */
@@ -318,10 +368,17 @@ function notifyRegistered_(d) {
     'انبعث له العقد. بانتظار التوقيع.\n');
 }
 
-function notifySigned_(name, id, file) {
+var SIGN_METHOD_AR = {
+  draw : 'وقّع بإصبعه داخل الصفحة',
+  photo: 'رفع صورة توقيعه',
+  pdf  : 'وقّع العقد بخط اليد ورفعه'
+};
+
+function notifySigned_(name, id, file, mode) {
   mail_('✅ عقد موقّع — ' + name,
     'الطبيب: ' + name + '\n' +
     'المعرّف: ' + id + '\n' +
+    'الطريقة: ' + (SIGN_METHOD_AR[mode] || mode) + '\n' +
     'العقد الموقّع: ' + file.getUrl() + '\n');
 }
 
@@ -355,7 +412,8 @@ function testSetup() {
   var to = recipients_();
   Logger.log(to.length ? 'Alerts to: ' + to.join(', ')
                        : '✗ NOTIFY is empty — nobody will be told about new doctors.');
-  Logger.log('Max signature image: %s MB', MAX_UPLOAD_MB);
+  Logger.log('Max signature image: %s MB | max signed contract: %s MB',
+             MAX_SIG_MB, MAX_DOC_MB);
   Logger.log('Now deploy: Deploy > New deployment > Web app (Anyone).');
 }
 

@@ -13,12 +13,15 @@ Script deployment.
         ▼  PDF comes back inside the JSON response
     the page saves it so the doctor can read it
         │
-        ▼  doctor ticks "I read it", signs with a finger on the page
+        ▼  doctor ticks "I read it" and picks one of three ways to sign
         ▼  POST action:"signed"
-    Apps Script rebuilds the contract from the template with the signature
-    stamped into every {{sig}}, files the signed PDF, emails the team
+    draw / photo — an image arrives, and the contract is rebuilt from the
+        template with that signature stamped into every {{sig}}. The doctor
+        never re-uploads the contract; the script can already make it.
+    pdf — the doctor signed the downloaded contract by hand and sends it
+        back. Nothing is stamped; their file is filed as the signed copy.
         │
-        ▼  the signed copy comes back too, so the doctor keeps one
+        ▼  on the stamped routes the signed copy comes back, so they keep one
         ▼  doctor fills the Google registration form
 
 No Drive link is ever made public — the PDF travels inside the response.
@@ -43,10 +46,14 @@ Open it and put these three placeholders where the blanks are:
 Type them exactly, including the double braces. A placeholder may appear more
 than once — every occurrence is replaced.
 
-**`{{sig}}` is where the doctor's signature gets stamped.** They draw it with a
-finger on the page, and the script drops the image in at every `{{sig}}` it
-finds — so put one next to `التوقيع:` in the الطرف الثاني column, and one at the
-foot of each page if the contract should be signed throughout.
+**`{{sig}}` is where a drawn or photographed signature gets stamped.** It is
+ignored on the third route, where the doctor signs the PDF themselves — so
+leave a visible line or empty cell next to `التوقيع:` for them to sign on.
+
+They draw it with a finger on the page, and the script drops the image in at
+every `{{sig}}` it finds — so put one next to `التوقيع:` in the الطرف الثاني
+column, and one at the foot of each page if the contract should be signed
+throughout.
 
 The unsigned copy the doctor reads has those placeholders blanked out, so they
 never see `{{sig}}` printed. Nothing is stamped into the الطرف الأول column —
@@ -165,6 +172,6 @@ The `/exec` URL stays the same.
 | `العقد غير مهيأ بعد` | `TEMPLATE_DOC_ID` is empty |
 | Contract arrives with `{{name}}` still in it | placeholder typed differently in the Doc — run `testSetup` |
 | `الصفحة بوضع التجربة` | `CONFIG.endpoint` is still empty |
-| Signature missing from the signed copy | no `{{sig}}` in the Doc — run `testSetup` |
+| Signature missing from the signed copy | no `{{sig}}` in the Doc — run `testSetup` (does not apply to the pdf route) |
 | Doctors hit a Google login screen | the deployment is not set to "Anyone" |
 | Nothing reaches the Sheet | you edited `Code.gs` but did not deploy a **new version** |

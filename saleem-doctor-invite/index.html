@@ -377,25 +377,54 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
             <span class="step-num">٢</span><h3>اقرأ العقد ووقّع</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp">العقد نزل عندك باسمك. اقراه أول، وبعدين وقّع هنا بإصبعك — ما تحتاج تطبع ولا ترفع ملف.</p>
+            <p class="sp">العقد نزل عندك باسمك. اقراه أول، وبعدين اختار شلون تحب توقّع.</p>
             <button type="button" class="btn btn-ghost" id="redl-btn" onclick="redownload()">ما نزل العقد؟ نزّله مرة ثانية</button>
 
             <label class="agree"><input type="checkbox" id="agree">
               <span>قرأت العقد كاملاً وأوافق على شروطه.</span></label>
 
-            <div class="sigbox">
-              <div class="sighead"><b>توقيعك</b><button type="button" class="sigclear" onclick="clearSig()">امسح</button></div>
-              <div class="sigwrap">
-                <canvas id="sig-pad"></canvas>
-                <span class="sigph" id="sig-ph">وقّع هنا بإصبعك</span>
-                <img id="sig-img" alt="" hidden>
+            <div class="modes" role="radiogroup" aria-label="طريقة التوقيع">
+              <button type="button" class="mode on" data-mode="draw" role="radio" aria-checked="true">
+                <i>✍️</i><span><b>وقّع بإصبعك هنا</b><em>أسرع طريقة — ما تحتاج تنزّل ولا ترفع شي</em></span></button>
+              <button type="button" class="mode" data-mode="photo" role="radio" aria-checked="false">
+                <i>🖼️</i><span><b>ارفع صورة توقيعك</b><em>وقّع على ورقة بيضاء، صوّرها، وارفع الصورة</em></span></button>
+              <button type="button" class="mode" data-mode="pdf" role="radio" aria-checked="false">
+                <i>📄</i><span><b>وقّع العقد نفسه وارفعه</b><em>اطبعه أو وقّعه بتطبيق PDF، وبعدين ارفع النسخة الموقّعة</em></span></button>
+            </div>
+
+            <div class="pane" data-pane="draw">
+              <div class="sigbox">
+                <div class="sighead"><b>توقيعك</b><button type="button" class="sigclear" onclick="clearSig()">امسح</button></div>
+                <div class="sigwrap">
+                  <canvas id="sig-pad"></canvas>
+                  <span class="sigph" id="sig-ph">وقّع هنا بإصبعك</span>
+                </div>
               </div>
-              <input type="file" id="sig-file" accept="image/*" hidden>
-              <button type="button" class="siglink" onclick="pickSig()">أو ارفع صورة توقيعك</button>
+            </div>
+
+            <div class="pane" data-pane="photo" hidden>
+              <div class="sigbox">
+                <div class="sighead"><b>صورة توقيعك</b><button type="button" class="sigclear" onclick="clearSig()">امسح</button></div>
+                <div class="sigwrap shot">
+                  <img id="sig-img" alt="" hidden>
+                  <span class="sigph" id="shot-ph">ماكو صورة بعد</span>
+                </div>
+                <input type="file" id="sig-file" accept="image/*" hidden>
+                <button type="button" class="siglink" onclick="pickSig()">اختر صورة التوقيع</button>
+              </div>
+            </div>
+
+            <div class="pane" data-pane="pdf" hidden>
+              <div class="sigbox">
+                <p class="panehint">وقّع بنهاية كل صفحة وبخانة "التوقيع" بالصفحة الأخيرة، <b>احفظ الملف</b>، وبعدين ارفعه هنا. تكدر ترفع PDF أو صورة واضحة.</p>
+                <input type="file" id="doc-file" accept="application/pdf,image/*" hidden>
+                <button type="button" class="siglink" onclick="pickDoc()">اختر العقد الموقّع</button>
+                <p class="file-name" id="doc-name" hidden></p>
+              </div>
             </div>
 
             <p class="fld-err" id="sig-err" hidden></p>
-            <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">وقّع وأرسل العقد <span class="arw">➜</span></button>
+            <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">أرسل العقد الموقّع <span class="arw">➜</span></button>
           </div>
         </div>
 
@@ -494,6 +523,21 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .agree input{width:19px;height:19px;flex:none;margin-top:1px;accent-color:var(--blue)}
 .agree span{font-size:14px;line-height:1.6;font-weight:600}
 
+.modes{display:grid;gap:9px;margin-bottom:13px}
+.mode{display:flex;gap:12px;align-items:flex-start;text-align:start;width:100%;
+  background:var(--white);border:2px solid var(--line);border-radius:14px;padding:13px 15px;
+  transition:border-color .16s,background .16s,transform .12s}
+.mode:active{transform:scale(.99)}
+.mode.on{border-color:var(--blue);background:#F5FAFE}
+.mode i{font-style:normal;font-size:19px;flex:none;line-height:1.3}
+.mode b{display:block;font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.mode em{display:block;font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.55}
+.mode.on b{color:var(--navy)}
+.panehint{font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:11px}
+.panehint b{color:var(--ink)}
+.sigwrap.shot{border-style:solid;border-color:var(--line);background:var(--bg)}
+.sigwrap.shot.inked{border-color:var(--blue)}
+
 .sigbox{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:var(--white)}
 .sighead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
 .sighead b{font-size:14px;font-weight:700}
@@ -575,7 +619,8 @@ const CONFIG = {
   // the body is still JSON and the script parses it the same way.
   endpointType: "text/plain;charset=utf-8",
   whatsapp    : "9647710335500",   // digits only, no +, for the wa.me help link
-  maxUploadMb : 8
+  maxSigMb    : 8,    // signature image
+  maxDocMb    : 15    // a signed contract, scanned or photographed
 };
 
 (function(){
@@ -712,16 +757,36 @@ const CONFIG = {
     }).catch(function(e){ busy(btn, false); alert(e.message); });
   };
 
-  /* ---------- step 2: sign on the page ---------- */
+  /* ---------- step 2: three ways to sign ---------- */
   var pad   = document.getElementById('sig-pad');
   var wrap  = pad.parentNode;
   var shot  = document.getElementById('sig-img');
-  var ctx, drawing = false, inked = false, photo = null;
+  var ctx, drawing = false, inked = false, photo = null, doc = null;
+  var mode  = 'draw';
 
+  /* -- which route the doctor picked -- */
+  function setMode(m){
+    mode = m;
+    document.querySelectorAll('.mode').forEach(function(b){
+      var on = b.dataset.mode === m;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    document.querySelectorAll('.pane').forEach(function(p){
+      p.hidden = p.dataset.pane !== m;
+    });
+    err('sig-err','');
+    if(m === 'draw') setTimeout(sizePad, 30);
+  }
+  document.querySelectorAll('.mode').forEach(function(b){
+    b.addEventListener('click', function(){ setMode(b.dataset.mode); });
+  });
+
+  /* -- route 1: draw -- */
   function sizePad(){
     var r = pad.getBoundingClientRect();
     if(!r.width || !r.height) return;                 // still collapsed
-    var keep = inked && !photo ? pad.toDataURL() : null;
+    var keep = inked && mode === 'draw' ? pad.toDataURL() : null;
     var dpr = Math.min(window.devicePixelRatio || 1, 3);
     pad.width  = Math.round(r.width  * dpr);
     pad.height = Math.round(r.height * dpr);
@@ -735,11 +800,11 @@ const CONFIG = {
       im.src = keep;
     }
   }
-  addEventListener('resize', function(){ if(openIdx === 2) sizePad(); });
+  addEventListener('resize', function(){ if(openIdx === 2 && mode === 'draw') sizePad(); });
 
-  function ink(on){
+  function ink(on, el){
     inked = on;
-    wrap.classList.toggle('inked', on);
+    (el || wrap).classList.toggle('inked', on);
     if(on) err('sig-err','');
   }
   function at(e){
@@ -747,11 +812,11 @@ const CONFIG = {
     return {x: e.clientX - r.left, y: e.clientY - r.top};
   }
   pad.addEventListener('pointerdown', function(e){
-    if(photo || !ctx) return;
+    if(!ctx) return;
     drawing = true;
     try{ pad.setPointerCapture(e.pointerId); }catch(_){}
     var p = at(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
-    ctx.lineTo(p.x + .1, p.y);  ctx.stroke();          // a tap leaves a dot
+    ctx.lineTo(p.x + .1, p.y); ctx.stroke();           // a tap leaves a dot
     ink(true);
   });
   pad.addEventListener('pointermove', function(e){
@@ -762,53 +827,88 @@ const CONFIG = {
     pad.addEventListener(t, function(){ drawing = false; });
   });
 
-  window.clearSig = function(){
-    if(ctx) ctx.clearRect(0, 0, pad.width, pad.height);
-    photo = null; shot.hidden = true; shot.removeAttribute('src');
-    document.getElementById('sig-file').value = '';
-    ink(false); err('sig-err','');
-  };
-
+  /* -- route 2: a photo of a signature -- */
   window.pickSig = function(){ document.getElementById('sig-file').click(); };
 
   document.getElementById('sig-file').addEventListener('change', function(ev){
     var f = ev.target.files && ev.target.files[0];
     if(!f) return;
-    if(f.size > CONFIG.maxUploadMb * 1024 * 1024){
+    if(f.size > CONFIG.maxSigMb * 1024 * 1024){
       ev.target.value = '';
-      return err('sig-err', 'حجم الصورة كبير. الحد الأقصى ' + CONFIG.maxUploadMb + ' ميغابايت.');
+      return err('sig-err', 'حجم الصورة كبير. الحد الأقصى ' + CONFIG.maxSigMb + ' ميغابايت.');
     }
     var reader = new FileReader();
     reader.onerror = function(){ err('sig-err','ما كدرنا نقرا الصورة. جرّب صورة ثانية.'); };
     reader.onload = function(){
-      var url = String(reader.result);
-      photo = {b64: url.split(',')[1], type: f.type || 'image/png'};
-      shot.src = url; shot.hidden = false;
-      ink(true);
+      var u = String(reader.result);
+      photo = {b64: u.split(',')[1], type: f.type || 'image/png'};
+      shot.src = u; shot.hidden = false;
+      ink(true, shot.parentNode);
     };
     reader.readAsDataURL(f);
   });
+
+  /* -- route 3: the signed contract itself -- */
+  window.pickDoc = function(){ document.getElementById('doc-file').click(); };
+
+  document.getElementById('doc-file').addEventListener('change', function(ev){
+    var f = ev.target.files && ev.target.files[0];
+    var label = document.getElementById('doc-name');
+    if(!f){ doc = null; label.hidden = true; return; }
+    if(f.size > CONFIG.maxDocMb * 1024 * 1024){
+      ev.target.value = ''; doc = null; label.hidden = true;
+      return err('sig-err', 'حجم الملف كبير. الحد الأقصى ' + CONFIG.maxDocMb + ' ميغابايت.');
+    }
+    var reader = new FileReader();
+    reader.onerror = function(){ err('sig-err','ما كدرنا نقرا الملف. جرّب ملف ثاني.'); };
+    reader.onload = function(){
+      doc = {b64: String(reader.result).split(',')[1], type: f.type || 'application/pdf'};
+      label.textContent = f.name; label.hidden = false;
+      err('sig-err','');
+    };
+    reader.readAsDataURL(f);
+  });
+
+  /* -- clearing, whichever route is showing -- */
+  window.clearSig = function(){
+    if(mode === 'draw'){
+      if(ctx) ctx.clearRect(0, 0, pad.width, pad.height);
+      ink(false);
+    } else if(mode === 'photo'){
+      photo = null; shot.hidden = true; shot.removeAttribute('src');
+      document.getElementById('sig-file').value = '';
+      ink(false, shot.parentNode);
+    }
+    err('sig-err','');
+  };
 
   window.submitSignature = function(){
     var btn = document.getElementById('sig-btn');
     if(!document.getElementById('agree').checked){
       return err('sig-err', 'أكّد قراءتك للعقد قبل التوقيع.');
     }
-    if(!inked){
-      return err('sig-err', 'وقّع بالمربع أعلاه، أو ارفع صورة توقيعك.');
-    }
-    var sig = photo || {b64: pad.toDataURL('image/png').split(',')[1], type: 'image/png'};
-    err('sig-err',''); busy(btn, true);
 
-    post({action:'signed', id: state.id, agreed:true,
-          sigB64: sig.b64, mimeType: sig.type})
-      .then(function(res){
-        // hand the doctor their own signed copy
-        if(res.pdfBase64) saveFile(b64ToBlob(res.pdfBase64,'application/pdf'), res.fileName);
-        busy(btn, false);
-        completeStep(2);
-      })
-      .catch(function(e){ busy(btn, false); err('sig-err', e.message); });
+    var payload = {action:'signed', id: state.id, agreed:true, mode: mode};
+    if(mode === 'pdf'){
+      if(!doc) return err('sig-err', 'اختر ملف العقد الموقّع.');
+      payload.fileB64 = doc.b64; payload.mimeType = doc.type;
+    } else if(mode === 'photo'){
+      if(!photo) return err('sig-err', 'اختر صورة توقيعك.');
+      payload.sigB64 = photo.b64; payload.mimeType = photo.type;
+    } else {
+      if(!inked) return err('sig-err', 'وقّع بالمربع أعلاه.');
+      payload.sigB64 = pad.toDataURL('image/png').split(',')[1];
+      payload.mimeType = 'image/png';
+    }
+
+    err('sig-err',''); busy(btn, true);
+    post(payload).then(function(res){
+      // the stamped routes hand back a signed copy; the pdf route does not,
+      // because the doctor already has the file they just sent
+      if(res.pdfBase64) saveFile(b64ToBlob(res.pdfBase64,'application/pdf'), res.fileName);
+      busy(btn, false);
+      completeStep(2);
+    }).catch(function(e){ busy(btn, false); err('sig-err', e.message); });
   };
 
   /* ---------- starting over ---------- */
@@ -824,7 +924,14 @@ const CONFIG = {
       ['name','phone','specialty','workplace','city'].forEach(function(k){
         form.elements[k].setAttribute('aria-invalid','false'); }); }
     document.getElementById('agree').checked = false;
-    clearSig();
+    if(ctx) ctx.clearRect(0, 0, pad.width, pad.height);
+    photo = null; doc = null;
+    shot.hidden = true; shot.removeAttribute('src');
+    document.getElementById('sig-file').value = '';
+    document.getElementById('doc-file').value = '';
+    document.getElementById('doc-name').hidden = true;
+    ink(false); ink(false, shot.parentNode);
+    setMode('draw');
     err('reg-err',''); err('sig-err','');
     render();
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
