@@ -1,8 +1,9 @@
 # Saleem — doctor invite
 
 SMS landing page recruiting doctors to offer online consultations through
-Saleem. Five swipeable screens in Arabic (RTL), ending in a three-step
-contract flow: fill in details → sign the generated contract by hand → upload it.
+Saleem. A single-scroll Arabic (RTL) page — hero, trust strip, why-online,
+why-Saleem, what-you-get, how-it-works, FAQ — ending in a three-step contract
+flow: fill in details → sign the generated contract by hand → upload it.
 
 ```
 index.html              the whole page, self-contained, 54 KB
@@ -24,4 +25,7 @@ nothing.
 - **No public Drive links.** The PDF is returned inside the JSON response and
   the signed copy is posted back the same way.
 - Progress is kept in `localStorage`, so a doctor who leaves to sign and comes
-  back lands on the step they left rather than at the beginning.
+  back lands on the step they left rather than at the beginning. The finished
+  state has a way out — a "تسجيل طبيب آخر" link, or `?reset` on the URL.
+- **No image assets.** The page is one file with the logo inlined once and the
+  hero as inline SVG, so it stays drag-and-drop deployable.
