@@ -11,9 +11,14 @@
  *                       travels inside the JSON, so there is no Drive link
  *                       anyone could guess.
  *
- *   action "signed"   — the doctor uploads the signed copy. It lands in the
- *                       Drive folder next to their generated contract, the
- *                       Sheet row is updated, and the team gets an email.
+ *   action "resend"   — they lost the download; serves the same PDF again
+ *                       rather than making a second contract.
+ *
+ *   action "signed"   — the doctor signs. Drawing on the page or sending a
+ *                       photo of a signature rebuilds the contract with that
+ *                       image stamped into every {{sig}}; signing the PDF by
+ *                       hand and sending it back files their file as-is.
+ *                       Either way the row is updated and the team emailed.
  *
  * Deploy ONCE, as the public intake:
  *   Deploy → New deployment → Web app
