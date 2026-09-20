@@ -649,6 +649,17 @@ const CONFIG = {
   }
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
+  /** The stored request no longer exists server-side. Keeping the doctor on a
+   *  step they can never pass is worse than sending them round again. */
+  function orphaned(msg){
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    state = { id:'', step:0, name:'' };
+    pdf = null; openIdx = 1;
+    render();
+    err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
+    document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
   /* ---------- step chrome ---------- */
   function render(){
     for(var i = 1; i <= TOTAL; i++){
@@ -710,7 +721,11 @@ const CONFIG = {
       }
       return r.json();
     }).then(function(res){
-      if(!res.ok) throw new Error(res.error || 'صار خطأ. حاول مرة ثانية.');
+      if(!res.ok){
+        var e = new Error(res.error || 'صار خطأ. حاول مرة ثانية.');
+        e.code = res.code;                 // the page reacts to these, not to wording
+        throw e;
+      }
       return res;
     });
   }
@@ -769,7 +784,13 @@ const CONFIG = {
       pdf = {b64: res.pdfBase64, fileName: res.fileName};
       saveFile(b64ToBlob(res.pdfBase64, 'application/pdf'), res.fileName);
       busy(btn, false);
-    }).catch(function(e){ busy(btn, false); alert(e.message); });
+    }).catch(function(e){
+      busy(btn, false);
+      if(e.code === 'not_found'){
+        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+      }
+      alert(e.message);
+    });
   };
 
   /* ---------- step 2: three ways to sign ---------- */
@@ -923,7 +944,18 @@ const CONFIG = {
       if(res.pdfBase64) saveFile(b64ToBlob(res.pdfBase64,'application/pdf'), res.fileName);
       busy(btn, false);
       completeStep(2);
-    }).catch(function(e){ busy(btn, false); err('sig-err', e.message); });
+    }).catch(function(e){
+      busy(btn, false);
+      if(e.code === 'already_signed'){
+        // the goal state is reached — someone double-submitted, or an earlier
+        // attempt landed before the response came back
+        return completeStep(2);
+      }
+      if(e.code === 'not_found'){
+        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+      }
+      err('sig-err', e.message);
+    });
   };
 
   /* ---------- starting over ---------- */

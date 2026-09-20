@@ -167,7 +167,7 @@ function resend_(req) {
 
   var sheet = getSheet_(), head = headers_(sheet);
   var row = findRow_(sheet, head, id);
-  if (row === -1) return { ok: false, error: 'لم نلگه الطلب.' };
+  if (row === -1) return { ok: false, code: 'not_found', error: 'لم نلگه الطلب.' };
 
   var fileId = String(sheet.getRange(row, head.indexOf('contract_id') + 1).getValue() || '');
   if (!fileId) return { ok: false, error: 'العقد غير متوفر. راجع فريق سليم.' };
@@ -212,13 +212,15 @@ function signed_(req) {
 
   var sheet = getSheet_(), head = headers_(sheet);
   var row = findRow_(sheet, head, id);
-  if (row === -1) return { ok: false, error: 'لم نلگه الطلب. حدّث الصفحة وحاول مرة ثانية.' };
+  if (row === -1) return { ok: false, code: 'not_found',
+                           error: 'لم نلگه الطلب. حدّث الصفحة وحاول مرة ثانية.' };
 
   var cell = function (key) {
     var c = head.indexOf(key);
     return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
   };
-  if (cell('signed_at')) return { ok: false, error: 'هذا العقد موقّع مسبقاً.' };
+  if (cell('signed_at')) return { ok: false, code: 'already_signed',
+                                  error: 'هذا العقد موقّع مسبقاً.' };
 
   var out = (mode === 'pdf') ? fileSignedUpload_(req, cell)
                              : stampSignedCopy_(req, cell, id);
