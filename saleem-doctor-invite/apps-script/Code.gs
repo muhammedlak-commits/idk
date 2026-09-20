@@ -57,7 +57,7 @@ var SITE_URL = '';
 var SHEET_NAME = 'Doctors';
 
 var COLUMNS = [
-  'id', 'ts', 'name', 'phone', 'specialty', 'workplace', 'city',
+  'id', 'req_key', 'ts', 'name', 'phone', 'specialty', 'workplace', 'city',
   'contract_file', 'contract_id', 'signed_file', 'signed_id',
   'signed_at', 'sign_method', 'status', 'notes', 'url'
 ];
@@ -99,6 +99,7 @@ function doPost(e) {
 
     if (req.action === 'register') return json_(register_(req));
     if (req.action === 'resend')   return json_(resend_(req));
+    if (req.action === 'status')   return json_(status_(req));
     if (req.action === 'signed')   return json_(signed_(req));
     return json_({ ok: false, error: 'unknown action: ' + req.action });
 
@@ -129,9 +130,19 @@ function register_(req) {
     return { ok: false, error: 'العقد غير مهيأ بعد. راجع فريق سليم.' };
   }
 
+  // A dropped response is not a failed write. If the doctor's browser retries
+  // with the same key, hand back the contract that already exists rather than
+  // minting a second row and a second contract.
+  var reqKey = String(req.reqKey || '').trim();
+  if (reqKey) {
+    var prior = byReqKey_(reqKey);
+    if (prior) return prior;
+  }
+
   var now = new Date();
   var doctor = {
     id: Utilities.getUuid().slice(0, 8),
+    req_key: reqKey,
     ts: now.toISOString(),
     name: name,
     phone: String(req.phone).trim(),
@@ -153,7 +164,7 @@ function register_(req) {
   doctor.contract_file = built.file.getName();
   doctor.contract_id   = built.file.getId();
 
-  getSheet_().appendRow(COLUMNS.map(function (k) { return flatten_(doctor[k]); }));
+  appendByHeader_(getSheet_(), doctor);
   notifyRegistered_(doctor);
 
   return {
@@ -162,6 +173,57 @@ function register_(req) {
     fileName: built.file.getName(),
     pdfBase64: Utilities.base64Encode(built.bytes)
   };
+}
+
+/** An earlier register with this key, replayed. */
+function byReqKey_(reqKey) {
+  var sheet = getSheet_(), head = headers_(sheet);
+  var col = head.indexOf('req_key');
+  if (col === -1 || sheet.getLastRow() < 2) return null;
+
+  var keys = sheet.getRange(2, col + 1, sheet.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < keys.length; i++) {
+    if (String(keys[i][0]) !== reqKey) continue;
+    var row = i + 2;
+    var get = function (k) {
+      var c = head.indexOf(k);
+      return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+    };
+    var fileId = get('contract_id');
+    if (!fileId) return null;                     // half-written; let it retry
+    var file = DriveApp.getFileById(fileId);
+    console.info('replayed register for req_key ' + reqKey);
+    return {
+      ok: true, id: get('id'), replayed: true,
+      fileName: file.getName(),
+      pdfBase64: Utilities.base64Encode(file.getBlob().getBytes())
+    };
+  }
+  return null;
+}
+
+/**
+ * Did my request actually land? Asked by the page when a response never
+ * arrived, so a dropped connection is not mistaken for a failed write.
+ * Reads only — safe to call as often as needed.
+ */
+function status_(req) {
+  var sheet = getSheet_(), head = headers_(sheet);
+  var id = String(req.id || '').trim();
+  var reqKey = String(req.reqKey || '').trim();
+
+  if (!id && reqKey) {
+    var prior = byReqKey_(reqKey);
+    if (!prior) return { ok: true, exists: false };
+    return { ok: true, exists: true, signed: false, id: prior.id,
+             fileName: prior.fileName, pdfBase64: prior.pdfBase64 };
+  }
+
+  var row = id ? findRow_(sheet, head, id) : -1;
+  if (row === -1) return { ok: true, exists: false };
+  var c = head.indexOf('signed_at');
+  var signedAt = c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+  return { ok: true, exists: true, signed: !!signedAt, id: id };
 }
 
 /** Doctor came back and needs their contract again. Serves the PDF that was
@@ -429,12 +491,31 @@ function testSetup() {
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(COLUMNS);
     sheet.getRange(1, 1, 1, COLUMNS.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
+    return sheet;
+  }
+
+  // A sheet written by an older version is short a column or two. Appending
+  // what is missing beats asking anyone to delete the tab and lose the rows —
+  // and rows are written by header name below, so column order never matters.
+  var head = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var missing = COLUMNS.filter(function (c) { return head.indexOf(c) === -1; });
+  if (missing.length) {
+    sheet.getRange(1, head.length + 1, 1, missing.length)
+         .setValues([missing]).setFontWeight('bold');
+    console.info('added columns: ' + missing.join(', '));
   }
   return sheet;
+}
+
+/** Write a record under whatever headers the sheet actually has. */
+function appendByHeader_(sheet, record) {
+  var head = headers_(sheet);
+  sheet.appendRow(head.map(function (k) { return flatten_(record[k]); }));
 }
 
 function headers_(sheet) {

@@ -644,7 +644,7 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'', ts:0 };
+  var state = { id:'', step:0, name:'', ts:0, reqKey:'' };
   // A half-finished run is worth resuming for a day or two while the doctor
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
@@ -664,6 +664,7 @@ const CONFIG = {
         return;
       }
       state.id = v.id || ''; state.name = v.name || '';
+      state.reqKey = v.reqKey || '';
       state.step = Math.max(0, Math.min(v.step|0, TOTAL));
       state.ts = v.ts;
     }catch(e){}
@@ -673,11 +674,23 @@ const CONFIG = {
     try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
   }
 
+  function newKey(){
+    try{ if(crypto && crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
+    return 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+
+  /** Ask the server what actually happened. Used only after a lost connection,
+   *  where "it failed" and "the reply went missing" look identical here. */
+  function probe(query){
+    return post(Object.assign({action:'status'}, query))
+             .catch(function(){ return null; });      // still offline; give up quietly
+  }
+
   /** The stored request no longer exists server-side. Keeping the doctor on a
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0 };
+    state = { id:'', step:0, name:'', ts:0, reqKey:'' };
     pdf = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
@@ -736,8 +749,12 @@ const CONFIG = {
       body   : JSON.stringify(Object.assign({url: location.href}, payload))
     }).catch(function(){
       // fetch only rejects on a network-level failure — the doctor is offline,
-      // on a dropping connection, or the endpoint is unreachable.
-      throw new Error('ما كدرنا نتصل بالسيرفر. تأكد من الإنترنت وحاول مرة ثانية.');
+      // on a dropping connection, or the endpoint is unreachable. Crucially it
+      // says nothing about whether the server ran the request: the write may
+      // well have landed and only the reply been lost.
+      var e = new Error('ما كدرنا نتصل بالسيرفر. تأكد من الإنترنت وحاول مرة ثانية.');
+      e.network = true;
+      throw e;
     }).then(function(r){
       if(!r.ok){
         // "HTTP 404" is not something to put in front of a doctor. The code is
@@ -788,17 +805,27 @@ const CONFIG = {
       return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
     err('reg-err', ''); busy(btn, true);
+    if(!state.reqKey){ state.reqKey = newKey(); save(); }
 
-    post(Object.assign({action:'register'}, data)).then(function(res){
+    function landed(res){
       state.id = res.id; state.name = data.name; save();
       pdf = {b64: res.pdfBase64, fileName: res.fileName};
       saveFile(b64ToBlob(res.pdfBase64, 'application/pdf'), res.fileName);
       busy(btn, false);
       completeStep(1);
-    }).catch(function(e){
-      busy(btn, false);
-      err('reg-err', e.message);
-    });
+    }
+
+    post(Object.assign({action:'register', reqKey: state.reqKey}, data))
+      .then(landed)
+      .catch(function(e){
+        if(!e.network){ busy(btn, false); return err('reg-err', e.message); }
+        // the contract may well have been made — ask before sending them round again
+        probe({reqKey: state.reqKey}).then(function(st){
+          busy(btn, false);
+          if(st && st.exists && st.pdfBase64) return landed(st);
+          err('reg-err', e.message);
+        });
+      });
   });
 
   /* ---------- fetch the contract again if it never landed ---------- */
@@ -971,6 +998,15 @@ const CONFIG = {
       busy(btn, false);
       completeStep(2);
     }).catch(function(e){
+      if(e.network){
+        // the row may already say signed — this is exactly the case where the
+        // email goes out and the doctor is told it failed
+        return probe({id: state.id}).then(function(st){
+          busy(btn, false);
+          if(st && st.signed) return completeStep(2);
+          err('sig-err', e.message);
+        });
+      }
       busy(btn, false);
       if(e.code === 'already_signed'){
         // the goal state is reached — someone double-submitted, or an earlier
@@ -990,7 +1026,7 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0 };
+    state = { id:'', step:0, name:'', ts:0, reqKey:'' };
     pdf = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();

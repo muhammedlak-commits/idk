@@ -160,11 +160,9 @@ converts noticeably better than a random tiiny.host URL in an SMS.
 
 ## When the columns change
 
-`getSheet_` only writes headers into an empty sheet, so adding a column to
-`COLUMNS` leaves an existing sheet one short and every new row lands shifted.
-While the data is still test data the fix is to delete the `Doctors` tab and
-let the script rebuild it. With real rows in it, insert the new column by hand
-in the same position it holds in `COLUMNS`.
+Nothing to do. `getSheet_` appends any column the sheet is missing, and rows
+are written by header name rather than position, so a new version can add
+fields without the tab being deleted or the order mattering.
 
 ## After editing Code.gs
 
@@ -182,3 +180,4 @@ The `/exec` URL stays the same.
 | Signature missing from the signed copy | no `{{sig}}` in the Doc — run `testSetup` (does not apply to the pdf route) |
 | Doctors hit a Google login screen | the deployment is not set to "Anyone" |
 | Nothing reaches the Sheet | you edited `Code.gs` but did not deploy a **new version** |
+| Doctor saw a connection error but the email arrived | the write landed and only the reply was lost; the page now asks the script what happened and carries on |
