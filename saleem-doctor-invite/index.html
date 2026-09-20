@@ -346,6 +346,11 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
       <p class="lead" style="margin-top:12px">ثلاث خطوات — عبّي بياناتك، وقّع العقد، وارفعه.</p>
     </div>
     <div class="panel rv">
+      <div class="resume" id="resume" hidden>
+        <span>رجعت لطلب ما خلصته. كمّل من وين وقفت، أو
+          <a href="#" onclick="resetFlow();return false;">ابدأ من جديد</a>.</span>
+      </div>
+
       <div class="steps" id="steps">
 
         <div class="step" id="step-1">
@@ -475,6 +480,10 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 /* ══════════ CONTRACT FLOW ══════════ */
 /* the hidden attribute has to beat display:flex/grid on these containers */
 [hidden]{display:none!important}
+.resume{background:#FFF8E6;border:1px solid #F0DFB0;border-radius:12px;padding:11px 14px;margin-bottom:11px}
+.resume span{font-size:13px;color:#7A5B00;line-height:1.65}
+.resume a{color:var(--blue-dk);font-weight:700}
+
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{border:1.5px solid var(--line);border-radius:var(--r);background:var(--white);
   transition:border-color .2s,background .2s,opacity .2s}
@@ -635,25 +644,40 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'' };
+  var state = { id:'', step:0, name:'', ts:0 };
+  // A half-finished run is worth resuming for a day or two while the doctor
+  // reads the contract. Weeks later it is just confusing, and the row behind
+  // it may be long gone, so it lapses.
+  var RESUME_DAYS = 7;
   var pdf = null;          // unsigned contract for this session
   var openIdx = 1;
 
   /* ---------- persistence: they leave to read the contract, they come back ---------- */
   function load(){
-    try{ var raw = localStorage.getItem(KEY);
-         if(raw){ var v = JSON.parse(raw);
-           state.id = v.id || ''; state.name = v.name || '';
-           state.step = Math.max(0, Math.min(v.step|0, TOTAL)); } }
-    catch(e){}
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(!raw) return;
+      var v = JSON.parse(raw);
+      var age = Date.now() - (v.ts || 0);
+      if(!v.ts || age > RESUME_DAYS * 864e5){    // lapsed — start clean
+        localStorage.removeItem(KEY);
+        return;
+      }
+      state.id = v.id || ''; state.name = v.name || '';
+      state.step = Math.max(0, Math.min(v.step|0, TOTAL));
+      state.ts = v.ts;
+    }catch(e){}
   }
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function save(){
+    state.ts = Date.now();
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
 
   /** The stored request no longer exists server-side. Keeping the doctor on a
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'' };
+    state = { id:'', step:0, name:'', ts:0 };
     pdf = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
@@ -674,6 +698,8 @@ const CONFIG = {
     document.getElementById('steps').hidden = all;
     var redl = document.getElementById('redl-btn');
     if(redl) redl.hidden = !state.id;
+    // mid-flow, the only escape used to be a URL parameter nobody knows about
+    document.getElementById('resume').hidden = !(state.step > 0 && state.step < TOTAL);
     // the pad has no size while its step is collapsed, so measure it on open
     if(openIdx === 2) setTimeout(sizePad, 30);
   }
@@ -964,7 +990,7 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'' };
+    state = { id:'', step:0, name:'', ts:0 };
     pdf = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
