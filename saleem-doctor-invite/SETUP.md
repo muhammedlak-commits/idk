@@ -117,6 +117,13 @@ Then copy the doc id out of the URL:
    Leave a `NOTIFY` line empty and it is skipped; leave both empty and nobody
    is told about new doctors — `testSetup` says so rather than failing quietly.
 
+   **The recipients do not authorise anything.** They only receive mail. The
+   one account that grants permission is the one that deploys the script, in
+   step 2 below — which also means alerts are *sent from* that account and
+   copies land in its Sent folder, even though they never hit its inbox. If the
+   alerts should come from somewhere else, build the Sheet and the script under
+   that account instead and deploy from there.
+
 4. Run **testSetup** once from the function dropdown. Grant the permissions it
    asks for. It creates the sheet headers and checks that all four
    placeholders are present in the Doc — read the log before going further.

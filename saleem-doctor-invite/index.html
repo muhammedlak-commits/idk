@@ -428,12 +428,16 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
           </div>
         </div>
 
-        <div class="step" id="step-3">
+        <div class="step final-step" id="step-3">
           <div class="step-head" onclick="toggleStep(3)">
-            <span class="step-num">٣</span><h3>أكمل التسجيل</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="step-num">٣</span><h3>آخر خطوة — استمارة التسجيل</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp">خطوة أخيرة — املأ استمارة التسجيل حتى نفعّل حسابك بالتطبيق.</p>
+            <p class="sp">عقدك وصلنا وانحفظ. باقي بس تملأ استمارة التسجيل حتى نكمل بياناتك المهنية.</p>
+            <div class="after">
+              <b>وشنو بعدها؟</b>
+              <span>فريق سليم راح يراجع بياناتك وعقدك داخلياً، وبعدها نتواصل وياك لتفعيل حسابك بالتطبيق وضبط أوقاتك وأسعارك.</span>
+            </div>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw">➜</span></a>
             <p class="note" style="margin:12px 0 0">تنفتح بتبويب جديد. ارجع لهنا بعد ما تخلصها.</p>
           </div>
@@ -444,7 +448,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
       <div class="done" id="done-card" hidden>
         <div class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>خلصنا — أهلاً بيك بسليم</h3>
-        <p>وصلنا عقدك الموقّع وبياناتك. راح يتواصل وياك فريق سليم قريباً لتفعيل حسابك.</p>
+        <p>وصلنا عقدك الموقّع وبياناتك. فريق سليم راح يراجعها داخلياً ويتواصل وياك لتفعيل حسابك بالتطبيق.</p>
         <p class="restart"><a href="#" onclick="resetFlow();return false;">تسجيل طبيب آخر</a></p>
       </div>
 
@@ -553,6 +557,12 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .sigwrap.inked .sigph{opacity:0}
 .siglink{display:block;width:100%;margin-top:10px;background:none;color:var(--blue);
   font-size:13.5px;font-weight:700;padding:8px;text-decoration:underline}
+
+.step.final-step.is-open{border-color:var(--green);background:#F6FCF8}
+.step.final-step.is-open .step-num{background:var(--green)}
+.after{background:var(--blue-soft);border-radius:12px;padding:13px 15px;margin-bottom:14px}
+.after b{display:block;font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.after span{display:block;font-size:13.5px;color:var(--muted);line-height:1.7}
 
 .done{text-align:center;padding:10px 4px}
 .done .tick{width:54px;height:54px;border-radius:50%;background:#EAF7EF;color:var(--green);
