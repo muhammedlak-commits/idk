@@ -70,9 +70,9 @@ var MAX_SIG_MB = 8;
 // run bigger than a signature, so this is roomier.
 var MAX_DOC_MB = 15;
 
-// Printed size of the signature in the contract, in points (3:1, matching
-// the signature pad on the page).
-var SIG_W = 165, SIG_H = 55;
+// Printed size of the signature in the contract, in points. Must keep the
+// signature pad's aspect ratio (2:1) or the stamped image comes out squashed.
+var SIG_W = 160, SIG_H = 80;
 
 var ALLOWED_SIG_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/webp'];
 var ALLOWED_DOC_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/heic', 'image/webp'];
