@@ -903,29 +903,38 @@ const CONFIG = {
         // the contract may well have been made — ask before sending them round again
         probe({reqKey: state.reqKey}).then(function(st){
           busy(btn, false);
-          if(st && st.exists && st.pdfBase64) return landed(st);
-          err('reg-err', e.message);
+          if(!st || !st.exists) return err('reg-err', e.message);
+          // registered after all. Move on, then fetch the contract on its own
+          // request — a failure there is recoverable from step 2 and does not
+          // cost the registration.
+          state.id = st.id; state.name = data.name; save();
+          completeStep(1);
+          if(st.hasContract) fetchContract(true);
         });
       });
   });
 
   /* ---------- fetch the contract again if it never landed ---------- */
-  window.redownload = function(){
+  /** Pull the contract down. quiet = recovered in the background, so a failure
+   *  just leaves the re-download link in step 2 rather than raising an alarm. */
+  function fetchContract(quiet){
     var btn = document.getElementById('redl-btn');
-    if(pdf){ return saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName); }
-    busy(btn, true);
-    post({action:'resend', id: state.id}).then(function(res){
+    if(pdf){ saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName); return; }
+    if(!quiet) busy(btn, true);
+    return post({action:'resend', id: state.id}).then(function(res){
       pdf = {b64: res.pdfBase64, fileName: res.fileName};
       saveFile(b64ToBlob(res.pdfBase64, 'application/pdf'), res.fileName);
-      busy(btn, false);
+      if(!quiet) busy(btn, false);
     }).catch(function(e){
-      busy(btn, false);
+      if(!quiet) busy(btn, false);
       if(e.code === 'not_found'){
         return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
       }
+      if(quiet){ console.warn('contract fetch failed, the link in step 2 still works:', e.message); return; }
       alert(e.message);
     });
-  };
+  }
+  window.redownload = function(){ fetchContract(false); };
 
   /* ---------- step 2: three ways to sign ---------- */
   var pad   = document.getElementById('sig-pad');

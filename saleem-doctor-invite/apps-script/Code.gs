@@ -193,6 +193,9 @@ function register_(req) {
       row = sheet.getLastRow();
       fresh = true;
     }
+  } catch (err) {
+    console.error('could not claim a row: ' + err);
+    return { ok: false, error: 'السيرفر مشغول حالياً. حاول مرة ثانية بعد لحظات.' };
   } finally {
     try { lock.releaseLock(); } catch (ignored) {}
   }
@@ -238,49 +241,37 @@ function rowByReqKey_(sheet, head, reqKey) {
   return -1;
 }
 
-/** An earlier register with this key, replayed. */
-function byReqKey_(reqKey) {
+/**
+ * Did my request actually land? Asked by the page when a response never
+ * arrived, so a dropped connection is not mistaken for a failed write.
+ *
+ * Deliberately tiny: it reports what exists and nothing more. An earlier
+ * version returned the generated contract with it, which meant the probe read
+ * a PDF out of Drive and pushed ~370KB back through the same slow redirect
+ * that had just failed — so the check failed exactly when it was needed. The
+ * page fetches the contract separately, where a failure is harmless.
+ */
+function status_(req) {
   var sheet = getSheet_(), head = headers_(sheet);
-  var row = rowByReqKey_(sheet, head, reqKey);
-  if (row === -1) return null;
+  var id = String(req.id || '').trim();
+  var reqKey = String(req.reqKey || '').trim();
+
+  var row = id ? findRow_(sheet, head, id)
+               : (reqKey ? rowByReqKey_(sheet, head, reqKey) : -1);
+  if (row === -1) return { ok: true, version: VERSION, exists: false };
 
   var get = function (k) {
     var c = head.indexOf(k);
     return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
   };
-  var fileId = get('contract_id');
-  if (!fileId) return null;                       // claimed but not built yet
-  var file = DriveApp.getFileById(fileId);
   return {
-    ok: true, id: get('id'), replayed: true,
-    fileName: file.getName(),
-    pdfBase64: Utilities.base64Encode(file.getBlob().getBytes())
+    ok: true,
+    version: VERSION,
+    exists: true,
+    id: get('id'),
+    signed: !!get('signed_at'),
+    hasContract: !!get('contract_id')
   };
-}
-
-/**
- * Did my request actually land? Asked by the page when a response never
- * arrived, so a dropped connection is not mistaken for a failed write.
- * Reads only — safe to call as often as needed.
- */
-function status_(req) {
-  var sheet = getSheet_(), head = headers_(sheet);
-  // version travels with every probe so a stale deployment announces itself
-  var id = String(req.id || '').trim();
-  var reqKey = String(req.reqKey || '').trim();
-
-  if (!id && reqKey) {
-    var prior = byReqKey_(reqKey);
-    if (!prior) return { ok: true, exists: false };
-    return { ok: true, exists: true, signed: false, id: prior.id,
-             fileName: prior.fileName, pdfBase64: prior.pdfBase64 };
-  }
-
-  var row = id ? findRow_(sheet, head, id) : -1;
-  if (row === -1) return { ok: true, exists: false };
-  var c = head.indexOf('signed_at');
-  var signedAt = c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
-  return { ok: true, exists: true, signed: !!signedAt, id: id };
 }
 
 /** Doctor came back and needs their contract again. Serves the PDF that was
