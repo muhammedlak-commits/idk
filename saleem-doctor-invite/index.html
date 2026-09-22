@@ -373,6 +373,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
                 <input name="city" type="text" placeholder="بغداد"></label>
               <p class="fld-err" id="reg-err" hidden></p>
               <button type="submit" class="btn" id="reg-btn">جهّز العقد <span class="arw">➜</span></button>
+              <p class="wait-note" id="wait-note" hidden></p>
             </form>
           </div>
         </div>
@@ -527,6 +528,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .fld input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,117,188,.14)}
 .fld input[aria-invalid="true"]{border-color:#C0392B}
 .fld-hint{display:block;font-size:12px;color:var(--muted);font-style:normal;margin-top:5px}
+.wait-note{font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 0;line-height:1.6}
 .fld-err{font-size:13px;color:#C0392B;margin:0 0 12px;font-weight:600}
 .file-name{font-size:13px;color:var(--navy);background:var(--blue-soft);border-radius:10px;
   padding:10px 13px;margin:9px 0 0;word-break:break-all;font-weight:600}
@@ -733,7 +735,12 @@ const CONFIG = {
   };
 
   /* ---------- helpers ---------- */
-  function busy(btn, on){ btn.disabled = on; btn.classList.toggle('is-busy', on); }
+  function busy(btn, on, note){
+    btn.disabled = on;
+    btn.classList.toggle('is-busy', on);
+    var el = document.getElementById('wait-note');
+    if(el){ el.textContent = on && note ? note : ''; el.hidden = !(on && note); }
+  }
   function err(el, msg){
     var p = document.getElementById(el);
     p.textContent = msg || ''; p.hidden = !msg;
@@ -757,10 +764,14 @@ const CONFIG = {
       throw e;
     }).then(function(r){
       if(!r.ok){
-        // "HTTP 404" is not something to put in front of a doctor. The code is
-        // kept short and visible so support can triage it, and logged in full.
+        // Apps Script answers a POST with a redirect to a second host that
+        // serves the result. When the script runs long, that fetch 404s even
+        // though the work completed — so an HTTP error is as ambiguous as a
+        // dropped socket and gets the same treatment.
         console.error('endpoint returned ' + r.status + ' ' + r.statusText, CONFIG.endpoint);
-        throw new Error('الخدمة مو متوفرة حالياً. تواصل وينا على واتساب ونكملها وياك. (خطأ ' + r.status + ')');
+        var he = new Error('الخدمة مو متوفرة حالياً. تواصل وينا على واتساب ونكملها وياك. (خطأ ' + r.status + ')');
+        he.network = true;
+        throw he;
       }
       return r.json();
     }).then(function(res){
@@ -804,7 +815,7 @@ const CONFIG = {
       f.elements.name.setAttribute('aria-invalid','true');
       return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
-    err('reg-err', ''); busy(btn, true);
+    err('reg-err', ''); busy(btn, true, 'جاري تجهيز عقدك… ممكن ياخذ شوية، لا تسكّر الصفحة.');
     if(!state.reqKey){ state.reqKey = newKey(); save(); }
 
     function landed(res){
@@ -990,7 +1001,7 @@ const CONFIG = {
       payload.mimeType = 'image/png';
     }
 
-    err('sig-err',''); busy(btn, true);
+    err('sig-err',''); busy(btn, true, 'جاري حفظ توقيعك…');
     post(payload).then(function(res){
       // the stamped routes hand back a signed copy; the pdf route does not,
       // because the doctor already has the file they just sent

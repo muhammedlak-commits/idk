@@ -88,15 +88,17 @@ function doPost(e) {
                                      'To test from the editor, run testSetup instead.' });
   }
 
-  var lock = LockService.getScriptLock();
   try {
-    lock.waitLock(30000);
     var req = JSON.parse(e.postData.contents);
 
     if (SITE_URL && req.url && req.url.indexOf(SITE_URL.replace(/\/$/, '')) !== 0) {
       console.warn('submission arrived from an unexpected page: ' + req.url);
     }
 
+    // No lock out here. Building a contract takes the best part of ten
+    // seconds, and holding a script-wide lock across it means an SMS burst
+    // queues every doctor behind the one in front until the web app gives up.
+    // Each action takes a short lock only where it actually needs one.
     if (req.action === 'register') return json_(register_(req));
     if (req.action === 'resend')   return json_(resend_(req));
     if (req.action === 'status')   return json_(status_(req));
@@ -106,12 +108,18 @@ function doPost(e) {
   } catch (err) {
     console.error(err);
     return json_({ ok: false, error: String(err && err.message || err) });
-  } finally {
-    try { lock.releaseLock(); } catch (ignored) {}
   }
 }
 
-/** Doctor submitted their details → build their contract and hand it back. */
+/**
+ * Doctor submitted their details → build their contract and hand it back.
+ *
+ * The row is claimed under a short lock; the contract — a Doc copy, a PDF
+ * export and a Drive write, the best part of ten seconds — is built after the
+ * lock is released, so concurrent registrations do not queue behind each other.
+ * A retry finds the claimed row by its request key and either replays the
+ * finished contract or resumes building one, never appending a second row.
+ */
 function register_(req) {
   var name = String(req.name || '').trim();
   if (!name)      return { ok: false, error: 'الاسم مطلوب' };
@@ -130,76 +138,97 @@ function register_(req) {
     return { ok: false, error: 'العقد غير مهيأ بعد. راجع فريق سليم.' };
   }
 
-  // A dropped response is not a failed write. If the doctor's browser retries
-  // with the same key, hand back the contract that already exists rather than
-  // minting a second row and a second contract.
   var reqKey = String(req.reqKey || '').trim();
-  if (reqKey) {
-    var prior = byReqKey_(reqKey);
-    if (prior) return prior;
+  var sheet, head, row, fresh = false;
+
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    sheet = getSheet_();
+    head  = headers_(sheet);
+    row   = reqKey ? rowByReqKey_(sheet, head, reqKey) : -1;
+
+    if (row === -1) {
+      appendByHeader_(sheet, {
+        id: Utilities.getUuid().slice(0, 8),
+        req_key: reqKey,
+        ts: new Date().toISOString(),
+        name: name,
+        phone: String(req.phone).trim(),
+        specialty: String(req.specialty || '').trim(),
+        workplace: String(req.workplace || '').trim(),
+        city: String(req.city || '').trim(),
+        contract_file: '', contract_id: '',
+        signed_file: '', signed_id: '', sign_method: '', signed_at: '',
+        status: 'registered', notes: '',
+        url: String(req.url || '')
+      });
+      row = sheet.getLastRow();
+      fresh = true;
+    }
+  } finally {
+    try { lock.releaseLock(); } catch (ignored) {}
   }
 
-  var now = new Date();
-  var doctor = {
-    id: Utilities.getUuid().slice(0, 8),
-    req_key: reqKey,
-    ts: now.toISOString(),
-    name: name,
-    phone: String(req.phone).trim(),
-    specialty: String(req.specialty || '').trim(),
-    workplace: String(req.workplace || '').trim(),
-    city: String(req.city || '').trim(),
-    contract_file: '',
-    contract_id: '',
-    signed_file: '',
-    signed_id: '',
-    sign_method: '',
-    signed_at: '',
-    status: 'registered',
-    notes: '',
-    url: String(req.url || '')
+  var get = function (k) {
+    var c = head.indexOf(k);
+    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
   };
+  var id = get('id');
 
-  var built = buildContract_(doctor, now);
-  doctor.contract_file = built.file.getName();
-  doctor.contract_id   = built.file.getId();
+  // Already built on an earlier attempt whose reply never arrived.
+  var priorFile = get('contract_id');
+  if (priorFile) {
+    var f = DriveApp.getFileById(priorFile);
+    console.info('replayed register for req_key ' + reqKey);
+    return { ok: true, id: id, replayed: true, fileName: f.getName(),
+             pdfBase64: Utilities.base64Encode(f.getBlob().getBytes()) };
+  }
 
-  appendByHeader_(getSheet_(), doctor);
-  notifyRegistered_(doctor);
+  var built = buildContract_({ id: id, name: get('name') },
+                             new Date(get('ts') || Date.now()));
+  setCell_(sheet, head, row, 'contract_file', built.file.getName());
+  setCell_(sheet, head, row, 'contract_id',   built.file.getId());
 
-  return {
-    ok: true,
-    id: doctor.id,
-    fileName: built.file.getName(),
-    pdfBase64: Utilities.base64Encode(built.bytes)
-  };
+  if (fresh) {
+    notifyRegistered_({ name: get('name'), phone: get('phone'),
+                        specialty: get('specialty'), workplace: get('workplace'),
+                        city: get('city'), id: id });
+  }
+
+  return { ok: true, id: id, fileName: built.file.getName(),
+           pdfBase64: Utilities.base64Encode(built.bytes) };
+}
+
+/** Row index for a request key, or -1. */
+function rowByReqKey_(sheet, head, reqKey) {
+  var col = head.indexOf('req_key');
+  if (col === -1 || sheet.getLastRow() < 2) return -1;
+  var keys = sheet.getRange(2, col + 1, sheet.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < keys.length; i++) {
+    if (String(keys[i][0]) === reqKey) return i + 2;
+  }
+  return -1;
 }
 
 /** An earlier register with this key, replayed. */
 function byReqKey_(reqKey) {
   var sheet = getSheet_(), head = headers_(sheet);
-  var col = head.indexOf('req_key');
-  if (col === -1 || sheet.getLastRow() < 2) return null;
+  var row = rowByReqKey_(sheet, head, reqKey);
+  if (row === -1) return null;
 
-  var keys = sheet.getRange(2, col + 1, sheet.getLastRow() - 1, 1).getValues();
-  for (var i = 0; i < keys.length; i++) {
-    if (String(keys[i][0]) !== reqKey) continue;
-    var row = i + 2;
-    var get = function (k) {
-      var c = head.indexOf(k);
-      return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
-    };
-    var fileId = get('contract_id');
-    if (!fileId) return null;                     // half-written; let it retry
-    var file = DriveApp.getFileById(fileId);
-    console.info('replayed register for req_key ' + reqKey);
-    return {
-      ok: true, id: get('id'), replayed: true,
-      fileName: file.getName(),
-      pdfBase64: Utilities.base64Encode(file.getBlob().getBytes())
-    };
-  }
-  return null;
+  var get = function (k) {
+    var c = head.indexOf(k);
+    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+  };
+  var fileId = get('contract_id');
+  if (!fileId) return null;                       // claimed but not built yet
+  var file = DriveApp.getFileById(fileId);
+  return {
+    ok: true, id: get('id'), replayed: true,
+    fileName: file.getName(),
+    pdfBase64: Utilities.base64Encode(file.getBlob().getBytes())
+  };
 }
 
 /**
@@ -268,6 +297,12 @@ function resend_(req) {
  * the row, so the signed copy carries exactly what the doctor was shown.
  */
 function signed_(req) {
+  var lock = LockService.getScriptLock();
+  try { lock.waitLock(30000); return signedLocked_(req); }
+  finally { try { lock.releaseLock(); } catch (ignored) {} }
+}
+
+function signedLocked_(req) {
   var id = String(req.id || '').trim();
   if (!id)         return { ok: false, error: 'معرّف الطلب مفقود' };
   if (!req.agreed) return { ok: false, error: 'لازم تأكد قراءتك للعقد قبل التوقيع' };
@@ -373,6 +408,9 @@ function buildContract_(doctor, when, sigBlob) {
 
     doc.saveAndClose();
 
+    // Re-fetch rather than reuse the handle from makeCopy: exporting through
+    // a stale File reference has been known to miss the edits just made,
+    // which would ship a contract with {{name}} still in it.
     var pdf = DriveApp.getFileById(copy.getId()).getAs('application/pdf');
     pdf.setName('عقد سليم' + (sigBlob ? ' موقّع' : '') +
                 ' - ' + doctor.name + ' - ' + doctor.id + '.pdf');
@@ -420,10 +458,11 @@ function recipients_() {
 }
 
 function mail_(subject, body) {
-  recipients_().forEach(function (to) {
-    try { MailApp.sendEmail(to, subject, body); }
-    catch (err) { console.error('could not mail ' + to + ': ' + err); }
-  });
+  var to = recipients_();
+  if (!to.length) return;
+  // One call, not one per inbox — each round trip is a second the doctor waits.
+  try { MailApp.sendEmail(to.join(','), subject, body); }
+  catch (err) { console.error('could not mail ' + to.join(',') + ': ' + err); }
 }
 
 function notifyRegistered_(d) {
