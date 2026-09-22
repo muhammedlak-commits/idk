@@ -31,6 +31,12 @@
 
 /* ═══════════════ SETTINGS ═══════════════ */
 
+// Bumped whenever this file changes in a way the page depends on. Open the
+// /exec URL in a browser to see which version is actually deployed — a
+// deployment still serving an older one is the usual reason the page reports
+// a failure the script has in fact handled.
+var VERSION = '2026-09-22-a';
+
 // The contract, as a Google Doc (not a PDF). Copy the doc id out of its URL:
 // docs.google.com/document/d/<THIS BIT>/edit
 // The doc must contain the placeholders {{name}}, {{day}} and {{date}} —
@@ -76,6 +82,27 @@ var SIG_W = 160, SIG_H = 80;
 
 var ALLOWED_SIG_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/webp'];
 var ALLOWED_DOC_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/heic', 'image/webp'];
+
+/* ═══════════════ HEALTH CHECK ═══════════════ */
+
+/**
+ * Open the /exec URL in any browser and this answers. It exists so that
+ * "is the new code deployed?" can be settled in two seconds instead of
+ * inferred from the page's behaviour.
+ *
+ * Deliberately says nothing sensitive: no addresses, no document ids — only
+ * whether each thing is configured.
+ */
+function doGet() {
+  return json_({
+    ok: true,
+    version: VERSION,
+    actions: ['register', 'resend', 'status', 'signed'],
+    templateConfigured: !!TEMPLATE_DOC_ID,
+    notifyCount: recipients_().length,
+    sheet: SHEET_NAME
+  });
+}
 
 /* ═══════════════ INTAKE (public) ═══════════════ */
 
@@ -196,7 +223,7 @@ function register_(req) {
                         city: get('city'), id: id });
   }
 
-  return { ok: true, id: id, fileName: built.file.getName(),
+  return { ok: true, id: id, version: VERSION, fileName: built.file.getName(),
            pdfBase64: Utilities.base64Encode(built.bytes) };
 }
 
@@ -238,6 +265,7 @@ function byReqKey_(reqKey) {
  */
 function status_(req) {
   var sheet = getSheet_(), head = headers_(sheet);
+  // version travels with every probe so a stale deployment announces itself
   var id = String(req.id || '').trim();
   var reqKey = String(req.reqKey || '').trim();
 

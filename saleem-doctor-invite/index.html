@@ -735,8 +735,19 @@ const CONFIG = {
   /** Ask the server what actually happened. Used only after a lost connection,
    *  where "it failed" and "the reply went missing" look identical here. */
   function probe(query){
-    return post(Object.assign({action:'status'}, query))
-             .catch(function(){ return null; });      // still offline; give up quietly
+    return post(Object.assign({action:'status'}, query)).catch(function(e){
+      // A probe that cannot run leaves the doctor with the original error, so
+      // say why in the console — by far the commonest cause is a deployment
+      // still serving an older script that has never heard of this action.
+      if(/unknown action/i.test(e.message || '')){
+        console.error('The deployed Apps Script is out of date: it does not ' +
+                      'support the "status" action. Deploy > Manage deployments ' +
+                      '> edit > New version.');
+      } else {
+        console.error('status probe failed:', e.message);
+      }
+      return null;
+    });
   }
 
   /** The stored request no longer exists server-side. Keeping the doctor on a
