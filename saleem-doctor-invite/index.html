@@ -63,7 +63,8 @@ h3{font-size:clamp(17px,3.2vw,21px)}
 @media(hover:hover){.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(28,117,188,.4)}}
 .btn::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.3) 50%,transparent 70%);transform:translateX(-120%);animation:sheen 4.5s ease-in-out infinite}
 @keyframes sheen{0%,72%{transform:translateX(-120%)}88%,100%{transform:translateX(120%)}}
-.btn .arw{font-size:.85em;transform:scaleX(-1)}
+.btn .arw{display:inline-flex;align-items:center}
+  .btn .arw svg{width:16px;height:16px;display:block}
 .btn-wide{max-width:440px}
 .btn-ghost{background:var(--white);color:var(--navy);border:1.5px solid var(--line);box-shadow:none}
 .btn-ghost::after{display:none}
@@ -98,7 +99,8 @@ h1 .hl::after{content:"";position:absolute;inset-inline:-2px;bottom:.06em;height
 .hero h1{margin-bottom:14px}
 .hero .lead{margin-bottom:22px;max-width:34ch}
 .microrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.micro{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--navy)}
+.micro svg{width:14px;height:14px;flex:none;color:var(--blue-dk)}
+  .micro{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--navy)}
 .hero-art{background:linear-gradient(170deg,var(--navy-2),var(--navy));padding:26px 20px 20px;margin-top:22px}
 .hero-art svg{width:100%;max-width:360px;margin:0 auto;height:auto;display:block}
   .hero-art.photo{padding:0;background:none}
@@ -115,7 +117,8 @@ h1 .hl::after{content:"";position:absolute;inset-inline:-2px;bottom:.06em;height
 .badges{background:var(--white);border-block:1px solid var(--line)}
 .badges .row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
 .badge{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:var(--navy);line-height:1.35}
-.badge i{font-size:23px;font-style:normal}
+.badge i{display:flex;color:var(--blue)}
+  .badge i svg{width:26px;height:26px}
 
 /* ---------- section head ---------- */
 .head{text-align:center;max-width:36ch;margin:0 auto 34px}
@@ -135,7 +138,8 @@ h1 .hl::after{content:"";position:absolute;inset-inline:-2px;bottom:.06em;height
 .getrow{display:flex;gap:13px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);
   border-radius:14px;padding:15px 17px}
 .getrow i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;
-  font-style:normal;font-size:12px;display:grid;place-items:center;margin-top:2px}
+  display:grid;place-items:center;margin-top:2px}
+  .getrow i svg{width:12px;height:12px;stroke-width:2.6}
 .getrow b{display:block;font-size:15.5px;font-weight:700;margin-bottom:2px}
 .getrow span{font-size:14px;color:var(--muted);line-height:1.6}
 
@@ -227,12 +231,12 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
         <span class="pill"><i class="dot"></i> دعوة عامة للأطباء</span>
         <h1>مرضاك موجودين.<br>بس مو كلهم يكدرون <span class="hl">يوصلون</span>.</h1>
         <p class="lead">قدّم استشاراتك الأونلاين عبر تطبيق سليم — انت تحدد وقتك، وانت تحدد سعرك.</p>
-        <button class="btn btn-wide" data-go>ابدأ التسجيل — دقيقتين <span class="arw">➜</span></button>
+        <button class="btn btn-wide" data-go>ابدأ التسجيل — دقيقتين <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
         <div class="microrow">
-          <span class="micro">🗓️ جدولة مرنة</span>
-          <span class="micro">💳 عمولة واضحة</span>
-          <span class="micro">⚡ تسجيل سريع</span>
-          <span class="micro">📞 كول سنتر يسندك</span>
+          <span class="micro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v3M17 3v3M4 10h16"/><rect x="4" y="6" width="16" height="15" rx="2"/></svg> جدولة مرنة</span>
+          <span class="micro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18M6.5 14.5h3"/></svg> عمولة واضحة</span>
+          <span class="micro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3 5.5 13.5H10L9 21l7.5-10.5H12L13 3Z"/></svg> تسجيل سريع</span>
+          <span class="micro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="12.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="12.5" width="4" height="6" rx="1.6"/><path d="M19.5 18.5v.5a3 3 0 0 1-3 3H13"/></svg> كول سنتر يسندك</span>
         </div>
       </div>
     </div>
@@ -250,10 +254,10 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 <section class="badges sec-sm">
   <div class="wrap">
     <div class="row">
-      <div class="badge rv"><i>🕒</i><span>أوقاتك<br>بيدك</span></div>
-      <div class="badge rv"><i>💰</i><span>أسعارك<br>انت تحددها</span></div>
-      <div class="badge rv"><i>📱</i><span>كلشي داخل<br>التطبيق</span></div>
-      <div class="badge rv"><i>🤝</i><span>دعم مباشر<br>من سليم</span></div>
+      <div class="badge rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></i><span>أوقاتك<br>بيدك</span></div>
+      <div class="badge rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.7 3.2H20a.8.8 0 0 1 .8.8v7.3a2 2 0 0 1-.6 1.4l-7 7a2 2 0 0 1-2.8 0l-6.4-6.4a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 1.7-.3Z"/><circle cx="16.6" cy="7.4" r="1.15"/></svg></i><span>أسعارك<br>انت تحددها</span></div>
+      <div class="badge rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg></i><span>كلشي داخل<br>التطبيق</span></div>
+      <div class="badge rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-5.6A7.5 7.5 0 0 1 8 4.2h5.5A7.5 7.5 0 0 1 21 11.5Z"/></svg></i><span>دعم مباشر<br>من سليم</span></div>
     </div>
   </div>
 </section>
@@ -296,10 +300,10 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
       <h2>شغل واضح بدون مفاجآت</h2>
     </div>
     <div class="getlist">
-      <div class="getrow rv"><i>✓</i><div><b>جدولة مرنة</b><span>تستقبل الاستشارات بالأوقات اللي تناسبك.</span></div></div>
-      <div class="getrow rv"><i>✓</i><div><b>عمولة واضحة</b><span>نسبة ثابتة تنكتب بالعقد. ماكو رسوم مخفية ولا اشتراك.</span></div></div>
-      <div class="getrow rv"><i>✓</i><div><b>كشف حساب شهري</b><span>الشركة تحصّل من المريض وتودع مستحقاتك دورياً.</span></div></div>
-      <div class="getrow rv"><i>✓</i><div><b>دعم وكول سنتر</b><span>فريق سليم يسندك، والكول سنتر ينسّق بينك وبين المريض.</span></div></div>
+      <div class="getrow rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6 9.6 17.8 19.5 6.6"/></svg></i><div><b>جدولة مرنة</b><span>تستقبل الاستشارات بالأوقات اللي تناسبك.</span></div></div>
+      <div class="getrow rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6 9.6 17.8 19.5 6.6"/></svg></i><div><b>عمولة واضحة</b><span>نسبة ثابتة تنكتب بالعقد. ماكو رسوم مخفية ولا اشتراك.</span></div></div>
+      <div class="getrow rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6 9.6 17.8 19.5 6.6"/></svg></i><div><b>كشف حساب شهري</b><span>الشركة تحصّل من المريض وتودع مستحقاتك دورياً.</span></div></div>
+      <div class="getrow rv"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6 9.6 17.8 19.5 6.6"/></svg></i><div><b>دعم وكول سنتر</b><span>فريق سليم يسندك، والكول سنتر ينسّق بينك وبين المريض.</span></div></div>
     </div>
   </div>
 </section>
@@ -359,7 +363,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
               <label class="fld"><span>المدينة</span>
                 <input name="city" type="text" placeholder="بغداد"></label>
               <p class="fld-err" id="reg-err" hidden></p>
-              <button type="submit" class="btn" id="reg-btn">جهّز العقد <span class="arw">➜</span></button>
+              <button type="submit" class="btn" id="reg-btn">جهّز العقد <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
               <div class="bar" id="reg-bar" hidden><i></i></div>
               <p class="wait-note" id="wait-note" hidden></p>
             </form>
@@ -379,11 +383,11 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
             <div class="modes" role="radiogroup" aria-label="طريقة التوقيع">
               <button type="button" class="mode on" data-mode="draw" role="radio" aria-checked="true">
-                <i>✍️</i><span><b>وقّع بإصبعك هنا</b><em>أسرع طريقة — ما تحتاج تنزّل ولا ترفع شي</em></span></button>
+                <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.8 3.6 5.6 5.6L9.6 20H4v-5.6L14.8 3.6Z"/><path d="m12.4 6 5.6 5.6"/></svg></i><span><b>وقّع بإصبعك هنا</b><em>أسرع طريقة — ما تحتاج تنزّل ولا ترفع شي</em></span></button>
               <button type="button" class="mode" data-mode="photo" role="radio" aria-checked="false">
-                <i>🖼️</i><span><b>ارفع صورة توقيعك</b><em>وقّع على ورقة بيضاء، صوّرها، وارفع الصورة</em></span></button>
+                <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.6" cy="10" r="1.6"/><path d="m21 15.5-4.7-4.7L6.5 20"/></svg></i><span><b>ارفع صورة توقيعك</b><em>وقّع على ورقة بيضاء، صوّرها، وارفع الصورة</em></span></button>
               <button type="button" class="mode" data-mode="pdf" role="radio" aria-checked="false">
-                <i>📄</i><span><b>وقّع العقد نفسه وارفعه</b><em>اطبعه أو وقّعه بتطبيق PDF، وبعدين ارفع النسخة الموقّعة</em></span></button>
+                <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2.8H7.5a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7.6L14 2.8Z"/><path d="M13.7 3v4.8h4.8"/></svg></i><span><b>وقّع العقد نفسه وارفعه</b><em>اطبعه أو وقّعه بتطبيق PDF، وبعدين ارفع النسخة الموقّعة</em></span></button>
             </div>
 
             <div class="pane" data-pane="draw">
@@ -418,7 +422,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
             </div>
 
             <p class="fld-err" id="sig-err" hidden></p>
-            <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">أرسل العقد الموقّع <span class="arw">➜</span></button>
+            <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">أرسل العقد الموقّع <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
             <div class="bar" id="sig-bar" hidden><i></i></div>
             <p class="wait-note" id="sig-wait" hidden></p>
           </div>
@@ -434,7 +438,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
               <b>وشنو بعدها؟</b>
               <span>فريق سليم راح يراجع بياناتك وعقدك داخلياً، وبعدها نتواصل وياك لتفعيل حسابك بالتطبيق وضبط أوقاتك وأسعارك.</span>
             </div>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw">➜</span></a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></a>
             <p class="note" style="margin:12px 0 0">تنفتح بتبويب جديد. ارجع لهنا بعد ما تخلصها.</p>
           </div>
         </div>
@@ -464,7 +468,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 <!-- ══════════ STICKY ══════════ -->
 <div class="sticky" id="sticky">
   <div class="p"><b>دعوة للأطباء</b><span>التسجيل ياخذ دقيقتين</span></div>
-  <button class="btn" data-go>ابدأ التسجيل <span class="arw">➜</span></button>
+  <button class="btn" data-go>ابدأ التسجيل <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
 </div>
 
 <style>
@@ -544,7 +548,9 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
   transition:border-color .16s,background .16s,transform .12s}
 .mode:active{transform:scale(.99)}
 .mode.on{border-color:var(--blue);background:#F5FAFE}
-.mode i{font-style:normal;font-size:19px;flex:none;line-height:1.3}
+.mode i{flex:none;display:flex;color:var(--muted);margin-top:1px}
+.mode i svg{width:20px;height:20px}
+.mode.on i{color:var(--blue)}
 .mode b{display:block;font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:2px}
 .mode em{display:block;font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.55}
 .mode.on b{color:var(--navy)}
@@ -591,7 +597,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   🖼️  MEDIA — the hero picture and the two clips
+   MEDIA — the hero picture and the two clips
    ═══════════════════════════════════════════════════════════ */
 const MEDIA = {
   // Hero picture. Empty = keep the drawing that ships with the page.
@@ -680,7 +686,7 @@ const MEDIA = {
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   ⚙️  CONFIG — fill these in before going live
+   CONFIG — fill these in before going live
    ═══════════════════════════════════════════════════════════ */
 const CONFIG = {
   // Apps Script "Intake" deployment /exec URL — see apps-script/SETUP.md.
@@ -817,7 +823,7 @@ const CONFIG = {
   }
   function post(payload){
     if(!CONFIG.endpoint){
-      console.log('🧪 DEMO MODE — nothing sent. Payload:', payload);
+      console.log('DEMO MODE — nothing sent. Payload:', payload);
       return Promise.reject(new Error('الصفحة بوضع التجربة. ما تم ضبط الرابط بعد.'));
     }
     return fetch(CONFIG.endpoint, {
