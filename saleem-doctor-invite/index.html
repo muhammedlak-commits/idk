@@ -606,9 +606,12 @@ const MEDIA = {
   heroImage: "",
   heroAlt  : "طبيب يقدّم استشارة أونلاين",
 
-  // Up to two portrait clips, shown side by side. Each is either
-  //   { youtube: "VIDEO_ID", caption: "..." }
+  // Up to two portrait clips, shown side by side. Each is one of:
+  //   { youtube: "VIDEO_ID",  caption: "..." }   unlisted YouTube
+  //   { drive:   "FILE_ID",   caption: "..." }   a file in Drive, shared
+  //                                              "anyone with the link"
   //   { src: "clip1.mp4", poster: "clip1.jpg", caption: "..." }
+  //                                              a file uploaded beside this page
   // Leave the list empty and the whole section stays hidden.
   videos: [
     // { youtube: "xxxxxxxxxxx", caption: "شلون تستقبل الاستشارة" },
@@ -632,15 +635,26 @@ const MEDIA = {
       }
     }
 
-    var clips = (MEDIA.videos || []).filter(function(v){ return v && (v.youtube || v.src); }).slice(0, 2);
+    var clips = (MEDIA.videos || []).filter(function(v){
+      return v && (v.youtube || v.drive || v.src);
+    }).slice(0, 2);
     if(!clips.length) return;                       // nothing configured — stay hidden
     document.getElementById('vidgrid').innerHTML = clips.map(function(v){
-      var inner = v.youtube
-        ? '<iframe src="https://www.youtube.com/embed/' + esc(v.youtube) +
-          '?rel=0&playsinline=1" title="' + esc(v.caption) + '" loading="lazy" ' +
-          'allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>'
-        : '<video src="' + esc(v.src) + '"' + (v.poster ? ' poster="' + esc(v.poster) + '"' : '') +
-          ' controls playsinline preload="metadata"></video>';
+      var inner;
+      if(v.youtube){
+        inner = '<iframe src="https://www.youtube.com/embed/' + esc(v.youtube) +
+                '?rel=0&playsinline=1" title="' + esc(v.caption) + '" loading="lazy" ' +
+                'allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      } else if(v.drive){
+        // Drive will not serve a file to <video>, but it does render this
+        // player — the file has to be shared "anyone with the link".
+        inner = '<iframe src="https://drive.google.com/file/d/' + esc(v.drive) +
+                '/preview" title="' + esc(v.caption) + '" loading="lazy" allowfullscreen></iframe>';
+      } else {
+        inner = '<video src="' + esc(v.src) + '"' +
+                (v.poster ? ' poster="' + esc(v.poster) + '"' : '') +
+                ' controls playsinline preload="metadata"></video>';
+      }
       return '<div><div class="vidcard">' + inner + '</div>' +
              (v.caption ? '<p class="vidcap">' + esc(v.caption) + '</p>' : '') + '</div>';
     }).join('');

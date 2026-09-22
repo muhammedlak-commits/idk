@@ -17,6 +17,34 @@ Script `/exec` URL, and `TEMPLATE_DOC_ID` in `Code.gs` must point at the
 contract Doc. See `SETUP.md`. Until then the page runs in demo mode and stores
 nothing.
 
+## Hero picture and clips
+
+Both live in the `MEDIA` block at the top of the script section in
+`index.html`. Both ship empty, and the video section stays hidden until
+something is configured, so the page cannot go out half-built.
+
+```js
+const MEDIA = {
+  heroImage: "",            // "" keeps the drawing that ships with the page
+  heroAlt  : "...",
+  videos: []                // [] hides the whole section
+};
+```
+
+A clip is one of three shapes:
+
+| Shape | Use when |
+|---|---|
+| `{ youtube: "VIDEO_ID" }` | the clip is on YouTube, **Unlisted** (Private will not embed) |
+| `{ drive: "FILE_ID" }` | the clip is in Drive, shared **anyone with the link** |
+| `{ src: "clip.mp4", poster: "clip.jpg" }` | the file is uploaded beside `index.html` |
+
+Shoot portrait — the frames are 9:16, and landscape clips letterbox.
+
+`src` means the page is no longer one file: upload a zip of `index.html`
+plus the media instead. Watch the weight — a clip that downloads before it
+plays is worse over Iraqi mobile than an embed that streams.
+
 ## Notes
 
 - **The contract is generated per doctor**, from a Google Doc template, so the
