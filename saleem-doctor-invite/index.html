@@ -412,7 +412,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
             <span class="step-num">١</span><h3>بياناتك</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp">عبّي بياناتك وراح نجهّز لك العقد باسمك وينزل عندك مباشرة.</p>
+            <p class="sp">عبّي بياناتك وراح يطلع لك العقد باسمك مباشرة.</p>
             <form id="reg-form" novalidate>
               <label class="fld"><span>الاسم الكامل بالعربي <b>*</b></span>
                 <input name="name" type="text" autocomplete="name" maxlength="60" placeholder="د. محمد علي حسين">
@@ -426,7 +426,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
               <label class="fld"><span>المدينة</span>
                 <input name="city" type="text" placeholder="بغداد"></label>
               <p class="fld-err" id="reg-err" hidden></p>
-              <button type="submit" class="btn" id="reg-btn">جهّز العقد <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
+              <button type="submit" class="btn" id="reg-btn">اعرض العقد <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
               <div class="bar" id="reg-bar" hidden><i></i></div>
               <p class="wait-note" id="wait-note" hidden></p>
             </form>
@@ -438,8 +438,70 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
             <span class="step-num">٢</span><h3>اقرأ العقد ووقّع</h3><span class="step-icon"><svg class="ic-lock" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ic-chev" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="step-body">
-            <p class="sp lead-step">العقد نزل عندك باسمك. اقراه أول، وبعدين اختار شلون تحب توقّع.</p>
-            <button type="button" class="linkbtn" id="redl-btn" onclick="redownload()">ما نزل العقد؟ نزّله مرة ثانية</button>
+            <p class="sp lead-step">هذا عقدك باسمك. اقراه أول، وبعدين اختار شلون تحب توقّع.</p>
+            <div class="contract" id="contract" tabindex="0" role="document" aria-label="نص العقد">
+              <h4 class="c-title">عقد اتفاق و عمل</h4>
+              <p>في يوم <b class="c-day">—</b> الموافق <b class="c-date">—</b> تم تحرير هذا العقد بين كل من:</p>
+              <p><b>الطرف الأول:</b> شركة المستقبل السليم للخدمات العامة المحدودة المسؤولية، ومن يمثلها ويشار إليه فيما بعد بـ “الشركة”.</p>
+              <p><b>الطرف الثاني:</b> السيدة/السيد <b class="c-name">—</b>، طبيب مرخَّص لمزاولة المهنة في جمهورية العراق، ويُشار إليه فيما بعد بـ "الطبيب".</p>
+              <p>بعد أن اقر الطرفان بأهليتهما المعتبرة شرعا وقانونا لإبرام هذا العقد فقد ابُرم العقد واتفق الطرفان على مايلي:</p>
+
+              <h5>تمهيد</h5>
+              <p>يُعتبر التمهيد السابق جزء لا يتجزأ من العقد ومكملاً ومتمماً له.</p>
+              <p>تعد شركة المستقبل السليم للخدمات العامة المحدودة المسؤولية من الشركات الرائدة في مجال الوساطة الطبية ولها مكانتها على الصعيد المحلي وسعيا للحفاظ على ذلك والرغبة في تحقيق أعلى معدلات التقدم يستوجب ذلك الاستعانة بالكوادر المتخصصة ذات المستوى المميز ولرغبة الطرف الثاني "الطبيب" في الانضمام لفريق عمل الشركة بما يحقق الفائدة والنفع للطرفين فقد اتفق الطرفان على ما يلي:</p>
+
+              <h5>أولاً: موضوع العقد</h5>
+              <p>يهدف هذا العقد إلى تنظيم العلاقة بين التطبيق والطبيب لتقديم خدمات الاستشارة الطبية عن بُعد للمستفيدين (المرضى) وفقًا لأحكام هذا العقد وأخلاقيات المهنة.</p>
+
+              <h5>ثانياً: مدة العقد وإنهائه</h5>
+              <p>1. يبدأ العقد من تاريخ توقيعه ويستمر لمدة سنة قابلة للتجديد تلقائيًا ما لم يُخطر أحد الطرفين الآخر قبل 30 يومًا من انتهاء المدة.</p>
+              <p>2. يجوز لأي طرف إنهاء العقد بإشعار خطي أو إلكتروني قبل 30 يومًا من الإيقاف.</p>
+              <p>3. للشركة الحق في إنهاء العقد فورًا دون إشعار مسبق في حال مخالفة الطبيب لأي شرط جوهري من شروط العقد أو ورود شكاوى مثبتة من المرضى.</p>
+              <p>4. عند الإنهاء، تتم تسوية جميع الحقوق المالية بين الطرفين، وتظل أحكام السرية والمسؤولية سارية بعد انتهاء العقد.</p>
+
+              <h5>ثالثاً: المقابل المالي وآلية الدفع</h5>
+              <p>1. يلتزم الطرف الأول بصرف النسب المستحقة حسب المتفق عليه للطبيب من سعر الخدمة المقدمة من قبل الطرف الثاني للعملاء (المرضى). يتم دفع نسبة الأرباح المستحقة للطرف الثاني بشكل دوري شهريا، وفقًا للآلية المتفق عليها بين الطرفين، وبما يتماشى مع الأنظمة المالية المعمول بها لدى الطرف الأول.</p>
+              <p>2. الدفع لقاء الخدمات الطبية يتم عبر التطبيق أو بوسائل إلكترونية، تقوم الشركة بتحصيل المبالغ من المرضى وإيداع مستحقات الطبيب بعد اقتطاع النسبة المتفق عليها.</p>
+              <p>3. العلاقة المالية بين الشركة والطبيب قائمة على أساس النسبة (العمولة) مقابل كل استشارة طبية ناجحة، دون وجود راتب ثابت أو علاقة توظيف.</p>
+              <p>4. أسعار خدمات الاستشارة عن بعد ثابتة وفق ما تحدده الشركة و ما يتم الاتفاق عليه مع الطبيب.</p>
+              <p>5. يرسل مسؤول الحسابات للطبيب كشف حساب شهري، وعلى الطبيب مراجعته وإشعار الشركة بأي ملاحظات.</p>
+
+              <h5>رابعا: التزامات الطرف الأول</h5>
+              <p>يلتزم الطرف الأول بدفع المستحقات و نسبة الطرف الثاني حسب ما متفق عليه سابقا في مواعيدها التي يحددها محاسب الشركة بعد استلام كافة الواردات المالية التي تم استلامها من المريض و الذي تم توجيهه من قبل الطرف الأول.</p>
+              <p>تأمين كافة المستلزمات التي تمكنه من القيام بعمله على أكمل وجه وابداء المساعدة المطلوبة له في حال حدوث أي طارئ والسعي الدائم للحفاظ على أمن الطبيب قبل كل شيء.</p>
+              <p>تدير الشركة الجوانب التقنية اللازمة لاستمرار تشغيل الخدمة، ويوفر الدعم الفني والتوجيهي للطبيب في حال مواجهة أي مشكلات تتعلق باستخدام النظام أو الحسابات.</p>
+              <p>تتولى الشركة تنسيق عملية طلب الاستشارة بين المريض والطبيب، بما في ذلك إخطار الطبيب بطلبات الاستشارة الجديدة، وتوفير وسيلة تواصل بين الطرفين عند الحاجة ضمن نطاق العمل.</p>
+
+              <h5>خامسا: التزامات الطرف الثاني</h5>
+              <p>1. يقر الطبيب بأنه حاصل على الترخيص القانوني الساري لمزاولة مهنة الطب في جمهورية العراق، ويلتزم بالحفاظ على صلاحيته طوال مدة العقد واتباع تعليمات الجهات الصحية المختصة.</p>
+              <p>2. يلتزم الطبيب بتقديم خدماته الطبية للمستفيدين بكفاءة ومهنية عالية، وفقًا لأصول المهنة وأخلاقياتها، بما في ذلك تشخيص الحالات ووصف العلاج وطلب الفحوصات والتحاليل اللازمة أو إحالة المرضى عند الحاجة.</p>
+              <p>3. يجب على الطبيب المحافظة على سلوك مهني لائق أثناء تقديم الخدمات، بما يضمن احترام المريض وخصوصيته. ورغم عدم وجود إرشادات رسمية مفصلة حاليًا في العراق لتنظيم الاستشارات المنزلية أو الإلكترونية، يتعيّن على الطبيب الالتزام بأفضل الممارسات الطبية المتعارف عليها والتقيد بأخلاقيات المهنة، والتعاون مع التطبيق في أي ملاحظات تهدف لتحسين الأداء وجودة الخدمة.</p>
+              <p>4. يلتزم الطبيب بالمحافظة على سرية معلومات المرضى وعدم إفشائها أو مشاركتها مع أي طرف ثالث.</p>
+              <p>5. يتعهد الطبيب بعدم إجراء استشارات أو معاملات مباشرة مع المرضى الذين تعرف عليهم عن طريق التطبيق خارج نطاقه بهدف تجاوز آلية العمل أو النسبة المتفق عليها.</p>
+              <p>6. يتعهد الطبيب بعدم التعاقد أو العمل أو تقديم أي خدمات طبية أو استشارية لأي تطبيق أو شركة أخرى تُقدم خدمات مماثلة أو منافسة لتطبيق سليم، سواء بشكل مباشر أو غير مباشر، خلال مدة سريان هذا العقد وفي حال مخالفة هذا الالتزام، يحق للتطبيق إنهاء العقد فورًا دون إشعار مسبق، مع احتفاظه بحق المطالبة بالتعويض عن أي ضرر ناتج عن ذلك. ويُفهم من هذا البند أن الطبيب غير ممنوع من مزاولة مهنته أو العمل في مؤسسات صحية عامة أو خاصة طالما لا تمس المنافسة المباشرة بتطبيق سليم.</p>
+              <p>7. يتحمل الطبيب مسؤولية تجهيز نفسه بالأدوات الطبية اللازمة لتقديم الإلكترونية، وضمان جاهزية الأجهزة التقنية وخدمة الإنترنت المناسبة لأداء عمله.</p>
+              <p>8. يلتزم الطبيب باستخدام تطبيق الشركة في استقبال الطلبات وإنهائها، واستعمال جميع الخصائص المتاحة فيه، بما في ذلك توثيق الحالة الطبية للمريض، وإدخال الملاحظات، ووصف الفحوصات والتحاليل، وفق الآلية التي تعتمدها الشركة.</p>
+              <p>9. يلتزم الطبيب باستخدام خدمة الاستشارات الأونلاين عبر البرامج والأنظمة التي تحددها الشركة، وعدم استخدام أي وسيلة خارجية غير معتمدة لذلك.</p>
+              <p>10. يلتزم الطبيب بمتابعة المريض خلال فترة المتابعة المحددة بعد تقديم الخدمة، بما يضمن استمرارية الرعاية وتقييم تطور الحالة وفق تعليمات الشركة.</p>
+              <p>11. عدم تقديم أي خدمات أخرى غير المتفق عليها بين (المريض) والشركة ولو بطلب من المريض وتوجيهه للتواصل مع الشركة لاحتساب قيمة الخدمة المضافة وفي حال تبين انه تم تقديم الخدمة الإضافية دون علم الشركة فلها الحق في تقدير نسبتها دون الالتزام بالعقد</p>
+
+              <h5>سادسا: الإقرارات</h5>
+              <p>1. اقر الطرف الثاني قبل توقيعه انه اطلع على العقد وفهم أحكامه اطلاعا كافيا ينافي الجهالة</p>
+              <p>2. أقر وتعهد بصحة المعلومات والمستمسكات الثبوتية المقدمة من قبله ويتحمل التبعات القانونية خلاف ذلك</p>
+              <p>3. العلاقة بين الطبيب والتطبيق علاقة تعاقدية مستقلة، ولا تُفسر بأي حال على أنها علاقة عمل أو توظيف.</p>
+              <p>4. الالتزام بالنظام الداخلي للشركة والحفاظ عليه واتباع التعليمات الصادرة من إدارة الشركة.</p>
+              <p>5. يقتصر دور التطبيق على تسهيل التواصل وتنظيم العملية الإدارية بين الطبيب والمريض، ولا يضمن النتائج الطبية أو يتحمل مسؤولية عن قرارات الطبيب أو نتائجها.</p>
+
+              <h5>ثامنا: التواقيع</h5>
+              <p>حرر هذا العقد في مقر الشركة بغداد \ القادسية من ثمان بنود و اربع صفحات.</p>
+              <p>حرر هذا العقد من ثلاث نسخ.</p>
+              <p>جميع الاتفاقات والعقود قبل هذا العقد تكون باطلة.</p>
+              <div class="c-sign">
+                <div><b>الطرف الأول</b><span>شركة المستقبل السليم للخدمات العامة المحدودة المسؤولية</span><em>التوقيع:</em></div>
+                <div><b>الطرف الثاني</b><span>السيد: <b class="c-name">—</b></span><em>التوقيع:</em></div>
+              </div>
+            </div>
+            <button type="button" class="linkbtn copy-link" onclick="downloadCopy(this)">نزّل نسخة PDF من العقد</button>
 
             <label class="agree"><input type="checkbox" id="agree">
               <span>قرأت العقد كاملاً وأوافق على شروطه.</span></label>
@@ -477,7 +539,8 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
             <div class="pane" data-pane="pdf" hidden>
               <div class="sigbox">
-                <p class="panehint">وقّع بنهاية كل صفحة وبخانة "التوقيع" بالصفحة الأخيرة، <b>احفظ الملف</b>، وبعدين ارفعه هنا. تكدر ترفع PDF أو صورة واضحة.</p>
+                <p class="panehint">نزّل العقد، وقّع بنهاية كل صفحة وبخانة "التوقيع" بالصفحة الأخيرة، <b>احفظ الملف</b>، وبعدين ارفعه هنا. تكدر ترفع PDF أو صورة واضحة.</p>
+                <button type="button" class="btn btn-ghost copy-btn" onclick="downloadCopy(this)">نزّل العقد PDF</button>
                 <input type="file" id="doc-file" accept="application/pdf,image/*" hidden>
                 <button type="button" class="siglink" onclick="pickDoc()">اختر العقد الموقّع</button>
                 <p class="file-name" id="doc-name" hidden></p>
@@ -502,7 +565,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
               <span>فريق سليم راح يراجع بياناتك وعقدك داخلياً، وبعدها نتواصل وياك لتفعيل حسابك بالتطبيق وضبط أوقاتك وأسعارك.</span>
             </div>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></a>
-            <p class="note" style="margin:12px 0 0">تنفتح بتبويب جديد. ارجع لهنا بعد ما تخلصها.</p>
+            <button type="button" class="linkbtn copy-link" style="margin:14px 0 0" onclick="downloadCopy(this)">نزّل نسخة من العقد</button>
           </div>
         </div>
 
@@ -571,6 +634,22 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .linkbtn.is-busy{color:transparent!important}
 .linkbtn.is-busy::before{border-color:rgba(0,50,97,.25);border-top-color:var(--navy);width:14px;height:14px}
 .step-body .sp b{color:var(--ink)}
+
+/* the contract itself, readable in place instead of a PDF to wait for */
+.contract{max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--white);border:1px solid var(--line);border-radius:14px;
+  padding:16px 16px 18px;margin-bottom:10px;font-size:14.5px;line-height:1.95;color:var(--ink);
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.contract:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.contract p{margin:0 0 9px}
+.contract .c-title{font-size:17px;font-weight:800;text-align:center;color:var(--navy);margin:0 0 12px}
+.contract h5{font-size:15px;font-weight:800;color:var(--navy);margin:16px 0 6px}
+.contract .c-name,.contract .c-day,.contract .c-date{color:var(--blue);font-weight:800}
+.c-sign{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.c-sign>div{display:flex;flex-direction:column;gap:4px;font-size:13.5px;line-height:1.7}
+.c-sign em{font-style:normal;color:var(--muted);margin-top:6px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.copy-link{display:block}
+.copy-btn{margin-bottom:6px}
 .step-body .btn+.btn{margin-top:9px}
 
 .ways{display:grid;gap:10px;margin-bottom:12px}
@@ -818,12 +897,15 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'', ts:0, reqKey:'' };
+  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
   // A half-finished run is worth resuming for a day or two while the doctor
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
   var RESUME_DAYS = 7;
-  var pdf = null;          // unsigned contract for this session
+  // The doctor's copy: the contract with their details and no signature.
+  // Fetched in the background once step 1 is done, so it is ready by the time
+  // they sign; copyReq is the request in flight, shared by everyone asking.
+  var pdf = null, copyReq = null;
   var openIdx = 1;
 
   /* ---------- persistence: they leave to read the contract, they come back ---------- */
@@ -839,6 +921,7 @@ const CONFIG = {
       }
       state.id = v.id || ''; state.name = v.name || '';
       state.reqKey = v.reqKey || '';
+      state.day = v.day || ''; state.date = v.date || '';
       state.step = Math.max(0, Math.min(v.step|0, TOTAL));
       state.ts = v.ts;
     }catch(e){}
@@ -875,8 +958,8 @@ const CONFIG = {
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'' };
-    pdf = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
+    pdf = null; copyReq = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
@@ -894,8 +977,7 @@ const CONFIG = {
     var all = state.step >= TOTAL;
     document.getElementById('done-card').hidden = !all;
     document.getElementById('steps').hidden = all;
-    var redl = document.getElementById('redl-btn');
-    if(redl) redl.hidden = !state.id;
+    fillContract();
     // mid-flow, the only escape used to be a URL parameter nobody knows about
     document.getElementById('resume').hidden = !(state.step > 0 && state.step < TOTAL);
     // the pad has no size while its step is collapsed, so measure it on open
@@ -916,6 +998,15 @@ const CONFIG = {
     if(next){ setTimeout(function(){
       next.scrollIntoView({behavior:'smooth', block:'center'}); }, 90); }
   };
+
+  /** Put the doctor's name and the contract date into the text on the page.
+   *  The date comes from the server, so it matches the PDF to the day. */
+  function fillContract(){
+    var set = function(sel, v){
+      document.querySelectorAll('#contract ' + sel).forEach(function(el){ el.textContent = v || '—'; });
+    };
+    set('.c-name', state.name); set('.c-day', state.day); set('.c-date', state.date);
+  }
 
   /* ---------- helpers ---------- */
   // each submitting button owns a progress bar and a line of reassurance
@@ -1006,56 +1097,67 @@ const CONFIG = {
       f.elements.name.setAttribute('aria-invalid','true');
       return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
-    err('reg-err', ''); busy(btn, true, 'جاري تجهيز عقدك… ممكن ياخذ شوية، لا تسكّر الصفحة.');
+    err('reg-err', ''); busy(btn, true, 'جاري الحفظ…');
     if(!state.reqKey){ state.reqKey = newKey(); save(); }
 
     function landed(res){
-      state.id = res.id; state.name = data.name; save();
-      pdf = {b64: res.pdfBase64, fileName: res.fileName};
-      saveFile(b64ToBlob(res.pdfBase64, 'application/pdf'), res.fileName);
+      state.id = res.id; state.name = data.name;
+      state.day = res.day || ''; state.date = res.date || ''; save();
       busy(btn, false);
       completeStep(1);
+      warmCopy();
     }
 
     post(Object.assign({action:'register', reqKey: state.reqKey}, data))
       .then(landed)
       .catch(function(e){
         if(!e.network){ busy(btn, false); return err('reg-err', e.message); }
-        // the contract may well have been made — ask before sending them round again
+        // the row may well have been saved — ask before sending them round again
         probe({reqKey: state.reqKey}).then(function(st){
           busy(btn, false);
           if(!st || !st.exists) return err('reg-err', e.message);
-          // registered after all. Move on, then fetch the contract on its own
-          // request — a failure there is recoverable from step 2 and does not
-          // cost the registration.
-          state.id = st.id; state.name = data.name; save();
-          completeStep(1);
-          if(st.hasContract) fetchContract(true);
+          // registered after all — carry on as if the reply had arrived
+          landed({id: st.id, day: st.day, date: st.date});
         });
       });
   });
 
-  /* ---------- fetch the contract again if it never landed ---------- */
-  /** Pull the contract down. quiet = recovered in the background, so a failure
-   *  just leaves the re-download link in step 2 rather than raising an alarm. */
-  function fetchContract(quiet){
-    var btn = document.getElementById('redl-btn');
-    if(pdf){ saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName); return; }
-    if(!quiet) busy(btn, true);
-    return post({action:'resend', id: state.id}).then(function(res){
+  /* ---------- the doctor's copy: everything but the signature ---------- */
+  /** One request for the copy, however many places ask for it. A failure
+   *  clears it so the next ask tries again. */
+  function getCopy(){
+    if(pdf) return Promise.resolve(pdf);
+    if(copyReq) return copyReq;
+    copyReq = post({action:'contract', id: state.id}).then(function(res){
       pdf = {b64: res.pdfBase64, fileName: res.fileName};
-      saveFile(b64ToBlob(res.pdfBase64, 'application/pdf'), res.fileName);
-      if(!quiet) busy(btn, false);
-    }).catch(function(e){
-      if(!quiet) busy(btn, false);
+      copyReq = null;
+      return pdf;
+    }, function(e){ copyReq = null; throw e; });
+    return copyReq;
+  }
+  /** Start building the copy while the doctor reads, so no one waits for it. */
+  function warmCopy(){
+    if(!state.id || pdf || copyReq) return;
+    getCopy().catch(function(e){
       if(e.code === 'not_found'){
         return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
       }
-      if(quiet){ console.warn('contract fetch failed, the link in step 2 still works:', e.message); return; }
-      alert(e.message);
+      console.warn('copy not ready yet, the download links will retry:', e.message);
     });
   }
-  window.redownload = function(){ fetchContract(false); };
+  window.downloadCopy = function(btn){
+    if(btn.disabled) return;
+    var label = btn.textContent;
+    if(!pdf){ btn.disabled = true; btn.textContent = 'جاري تجهيز النسخة…'; }
+    getCopy().then(function(c){
+      saveFile(b64ToBlob(c.b64, 'application/pdf'), c.fileName);
+    }).catch(function(e){
+      if(e.code === 'not_found'){
+        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+      }
+      alert(e.message);
+    }).then(function(){ btn.disabled = false; btn.textContent = label; });
+  };
 
   /* ---------- step 2: three ways to sign ---------- */
   var pad   = document.getElementById('sig-pad');
@@ -1202,28 +1304,31 @@ const CONFIG = {
     }
 
     err('sig-err',''); busy(btn, true, 'جاري حفظ توقيعك…');
-    post(payload).then(function(res){
-      // the stamped routes hand back a signed copy; the pdf route does not,
-      // because the doctor already has the file they just sent
-      if(res.pdfBase64) saveFile(b64ToBlob(res.pdfBase64,'application/pdf'), res.fileName);
+    // Signed: the doctor gets their copy — the unsigned one — if it is already
+    // here. The signed contract stays with the team. Nothing waits on the
+    // copy; the link in step 3 fetches it if it was not ready yet.
+    function signedOk(){
       busy(btn, false);
       completeStep(2);
-    }).catch(function(e){
+      if(pdf) saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName);
+    }
+
+    post(payload).then(signedOk).catch(function(e){
       if(e.network){
         // the row may already say signed — this is exactly the case where the
         // email goes out and the doctor is told it failed
         return probe({id: state.id}).then(function(st){
+          if(st && st.signed) return signedOk();
           busy(btn, false);
-          if(st && st.signed) return completeStep(2);
           err('sig-err', e.message);
         });
       }
-      busy(btn, false);
       if(e.code === 'already_signed'){
         // the goal state is reached — someone double-submitted, or an earlier
         // attempt landed before the response came back
-        return completeStep(2);
+        return signedOk();
       }
+      busy(btn, false);
       if(e.code === 'not_found'){
         return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
       }
@@ -1237,8 +1342,8 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'' };
-    pdf = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
+    pdf = null; copyReq = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
@@ -1269,6 +1374,18 @@ const CONFIG = {
   var wa = document.getElementById('help-wa');
   if(wa && CONFIG.whatsapp) wa.href = 'https://wa.me/' + CONFIG.whatsapp;
   render();
+  if(state.id && state.step >= 1 && state.step < TOTAL){
+    if(state.day){ warmCopy(); }
+    else {
+      // saved by the previous build, which never kept the contract date
+      probe({id: state.id}).then(function(st){
+        if(!st) return;
+        if(!st.exists) return orphaned();
+        state.day = st.day || ''; state.date = st.date || ''; save();
+        fillContract(); warmCopy();
+      });
+    }
+  }
 })();
 </script>
 

@@ -7,7 +7,7 @@ flow: fill in details → read the contract → sign it with a finger on the pag
 → fill the registration form.
 
 ```
-index.html              the whole page, self-contained, 54 KB
+index.html              the whole page, self-contained, about 390 KB
 apps-script/Code.gs     contract generation + signed-upload intake
 SETUP.md                how to wire the two together
 ```
@@ -53,13 +53,17 @@ plays is worse over Iraqi mobile than an embed that streams.
 - **Three ways to sign**, chosen by the doctor: draw with a finger on the page,
   upload a photo of a signature, or sign the downloaded PDF by hand and send it
   back. The first two never re-upload the contract — only the signature image
-  goes up and the script stamps it into every `{{sig}}`, returning a signed PDF.
+  goes up and the script stamps it into every `{{sig}}`.
+- **The doctor reads the contract on the page**, so step 1 only saves their
+  details. Their own copy is a PDF with everything filled in but the
+  signature, built in the background while they read. The signed contract is
+  filed for the team and never sent back to the page.
 - **Consent is explicit.** The signature cannot be submitted until the doctor
   ticks that they read the contract, and the server refuses it too.
-- **No public Drive links.** The PDF is returned inside the JSON response and
-  the signed copy is posted back the same way.
+- **No public Drive links.** The doctor's copy is returned inside the JSON
+  response, and the signed upload is posted the same way.
 - Progress is kept in `localStorage`, so a doctor who leaves to sign and comes
   back lands on the step they left rather than at the beginning. The finished
   state has a way out — a "تسجيل طبيب آخر" link, or `?reset` on the URL.
-- **No image assets.** The page is one file with the logo inlined once and the
-  hero as inline SVG, so it stays drag-and-drop deployable.
+- **No separate image files.** The logo, the two call screens and the six
+  journey steps are inlined as WebP, so the page stays one drag-and-drop file.

@@ -1,27 +1,30 @@
 # Doctor invite — setup
 
-The landing page is one self-contained `index.html` (54 KB). Everything the
+The landing page is one self-contained `index.html` (about 390 KB). Everything the
 doctor does — details, contract, signature, upload — runs through one Apps
 Script deployment.
 
     doctor fills in name + phone
         │
         ▼  POST action:"register"
-    Apps Script copies the contract Doc, substitutes {{name}} {{day}} {{date}},
-    exports PDF, files it in Drive, appends a row to the Sheet
+    Apps Script appends a row to the Sheet and emails the team — nothing
+    else, so this answers in a second or two
         │
-        ▼  PDF comes back inside the JSON response
-    the page saves it so the doctor can read it
+        ▼  the page shows the contract text with their name and the date
+        ▼  meanwhile, in the background, POST action:"contract"
+    Apps Script copies the contract Doc, substitutes {{name}} {{day}} {{date}},
+    blanks {{sig}}, exports PDF and files it in Drive — the doctor's copy
         │
         ▼  doctor ticks "I read it" and picks one of three ways to sign
         ▼  POST action:"signed"
-    draw / photo — an image arrives, and the contract is rebuilt from the
+    draw / photo — an image arrives, and the contract is built from the
         template with that signature stamped into every {{sig}}. The doctor
         never re-uploads the contract; the script can already make it.
-    pdf — the doctor signed the downloaded contract by hand and sends it
+    pdf — the doctor downloads their copy, signs it by hand and sends it
         back. Nothing is stamped; their file is filed as the signed copy.
         │
-        ▼  on the stamped routes the signed copy comes back, so they keep one
+        ▼  the doctor's copy (unsigned) downloads; the signed one stays with
+        ▼  the team and is never sent back to the page
         ▼  doctor fills the Google registration form
 
 No Drive link is ever made public — the PDF travels inside the response.
@@ -55,9 +58,16 @@ every `{{sig}}` it finds — so put one next to `التوقيع:` in the الط�
 column, and one at the foot of each page if the contract should be signed
 throughout.
 
-The unsigned copy the doctor reads has those placeholders blanked out, so they
-never see `{{sig}}` printed. Nothing is stamped into the الطرف الأول column —
+The doctor's copy has those placeholders blanked out, so they never see
+`{{sig}}` printed. Nothing is stamped into the الطرف الأول column —
 that signature is yours to add.
+
+### The wording also lives in the page
+
+So that step 1 does not wait on a PDF, the page shows the contract text
+itself (`id="contract"` in `index.html`). The PDFs are still built from the
+Doc. **If you change the contract wording in the Doc, change it in the page
+too**, or the doctor reads one text and signs another.
 
 ### ⚠️ The signature block must be a table
 

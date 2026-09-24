@@ -4,21 +4,25 @@
  * One Apps Script project, bound to a Google Sheet, handling the whole
  * contract round trip for the doctor-recruitment landing page:
  *
- *   action "register" — the doctor submits their details. The script copies
- *                       the contract Google Doc, fills in their name and the
- *                       date, exports it as PDF and hands it straight back in
- *                       the response. Nothing is shared publicly: the PDF
- *                       travels inside the JSON, so there is no Drive link
- *                       anyone could guess.
+ *   action "register" — the doctor submits their details. The row is saved
+ *                       and the team emailed; nothing else. The page shows the
+ *                       contract text itself, so no document is built here and
+ *                       the doctor is not kept waiting.
  *
- *   action "resend"   — they lost the download; serves the same PDF again
- *                       rather than making a second contract.
+ *   action "contract" — the doctor's own copy: the contract with their name
+ *                       and the date filled in and the signature left blank.
+ *                       Built the first time it is asked for, then served from
+ *                       Drive. The PDF travels inside the JSON, so there is no
+ *                       Drive link anyone could guess. ("resend" is the old
+ *                       name, kept for pages still open on the previous build.)
  *
  *   action "signed"   — the doctor signs. Drawing on the page or sending a
- *                       photo of a signature rebuilds the contract with that
+ *                       photo of a signature builds the contract with that
  *                       image stamped into every {{sig}}; signing the PDF by
  *                       hand and sending it back files their file as-is.
  *                       Either way the row is updated and the team emailed.
+ *                       The signed copy stays with the team: it is never sent
+ *                       back to the page.
  *
  * Deploy ONCE, as the public intake:
  *   Deploy → New deployment → Web app
@@ -35,7 +39,7 @@
 // /exec URL in a browser to see which version is actually deployed — a
 // deployment still serving an older one is the usual reason the page reports
 // a failure the script has in fact handled.
-var VERSION = '2026-09-22-a';
+var VERSION = '2026-09-24-a';
 
 // The contract, as a Google Doc (not a PDF). Copy the doc id out of its URL:
 // docs.google.com/document/d/<THIS BIT>/edit
@@ -97,7 +101,7 @@ function doGet() {
   return json_({
     ok: true,
     version: VERSION,
-    actions: ['register', 'resend', 'status', 'signed'],
+    actions: ['register', 'contract', 'status', 'signed'],
     templateConfigured: !!TEMPLATE_DOC_ID,
     notifyCount: recipients_().length,
     sheet: SHEET_NAME
@@ -125,9 +129,10 @@ function doPost(e) {
     // No lock out here. Building a contract takes the best part of ten
     // seconds, and holding a script-wide lock across it means an SMS burst
     // queues every doctor behind the one in front until the web app gives up.
-    // Each action takes a short lock only where it actually needs one.
+    // Each action takes a lock only where it actually needs one.
     if (req.action === 'register') return json_(register_(req));
-    if (req.action === 'resend')   return json_(resend_(req));
+    if (req.action === 'contract' ||
+        req.action === 'resend')   return json_(contract_(req));
     if (req.action === 'status')   return json_(status_(req));
     if (req.action === 'signed')   return json_(signed_(req));
     return json_({ ok: false, error: 'unknown action: ' + req.action });
@@ -139,13 +144,15 @@ function doPost(e) {
 }
 
 /**
- * Doctor submitted their details → build their contract and hand it back.
+ * Doctor submitted their details → save them and tell the team.
  *
- * The row is claimed under a short lock; the contract — a Doc copy, a PDF
- * export and a Drive write, the best part of ten seconds — is built after the
- * lock is released, so concurrent registrations do not queue behind each other.
- * A retry finds the claimed row by its request key and either replays the
- * finished contract or resumes building one, never appending a second row.
+ * Deliberately does no document work. Building a PDF from the Doc took most of
+ * the ten-odd seconds this step used to take, and a reply that slow is what
+ * made the page report failures that had in fact succeeded. The page renders
+ * the contract text itself; the PDF is made later, only when it is needed.
+ *
+ * A retry finds the claimed row by its request key and replays it, never
+ * appending a second row or sending a second email.
  */
 function register_(req) {
   var name = String(req.name || '').trim();
@@ -155,7 +162,7 @@ function register_(req) {
   // The contract is an Arabic legal document. The page checks this too, but a
   // Latin name reaching the template puts the wrong script into الطرف الثاني,
   // so it is refused here as well rather than trusted from the browser.
-  if (!/[\u0600-\u06FF]/.test(name) || /[A-Za-z]/.test(name)) {
+  if (!/[؀-ۿ]/.test(name) || /[A-Za-z]/.test(name)) {
     return { ok: false, error: 'اكتب الاسم بالحروف العربية.' };
   }
   if (name.length > 60) {
@@ -166,7 +173,7 @@ function register_(req) {
   }
 
   var reqKey = String(req.reqKey || '').trim();
-  var sheet, head, row, fresh = false;
+  var sheet, head, row, fresh = false, record = null;
 
   var lock = LockService.getScriptLock();
   try {
@@ -176,7 +183,7 @@ function register_(req) {
     row   = reqKey ? rowByReqKey_(sheet, head, reqKey) : -1;
 
     if (row === -1) {
-      appendByHeader_(sheet, {
+      record = {
         id: Utilities.getUuid().slice(0, 8),
         req_key: reqKey,
         ts: new Date().toISOString(),
@@ -189,7 +196,8 @@ function register_(req) {
         signed_file: '', signed_id: '', sign_method: '', signed_at: '',
         status: 'registered', notes: '',
         url: String(req.url || '')
-      });
+      };
+      appendByHeader_(sheet, record);
       row = sheet.getLastRow();
       fresh = true;
     }
@@ -200,34 +208,24 @@ function register_(req) {
     try { lock.releaseLock(); } catch (ignored) {}
   }
 
-  var get = function (k) {
-    var c = head.indexOf(k);
-    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
-  };
-  var id = get('id');
-
-  // Already built on an earlier attempt whose reply never arrived.
-  var priorFile = get('contract_id');
-  if (priorFile) {
-    var f = DriveApp.getFileById(priorFile);
-    console.info('replayed register for req_key ' + reqKey);
-    return { ok: true, id: id, replayed: true, fileName: f.getName(),
-             pdfBase64: Utilities.base64Encode(f.getBlob().getBytes()) };
-  }
-
-  var built = buildContract_({ id: id, name: get('name') },
-                             new Date(get('ts') || Date.now()));
-  setCell_(sheet, head, row, 'contract_file', built.file.getName());
-  setCell_(sheet, head, row, 'contract_id',   built.file.getId());
+  var get = record
+    ? function (k) { return String(record[k] || ''); }
+    : function (k) {
+        var c = head.indexOf(k);
+        return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+      };
 
   if (fresh) {
     notifyRegistered_({ name: get('name'), phone: get('phone'),
                         specialty: get('specialty'), workplace: get('workplace'),
-                        city: get('city'), id: id });
+                        city: get('city'), id: get('id') });
+  } else {
+    console.info('replayed register for req_key ' + reqKey);
   }
 
-  return { ok: true, id: id, version: VERSION, fileName: built.file.getName(),
-           pdfBase64: Utilities.base64Encode(built.bytes) };
+  var when = contractDates_(new Date(get('ts') || Date.now()));
+  return { ok: true, id: get('id'), version: VERSION, replayed: !fresh,
+           day: when.day, date: when.date };
 }
 
 /** Row index for a request key, or -1. */
@@ -248,8 +246,7 @@ function rowByReqKey_(sheet, head, reqKey) {
  * Deliberately tiny: it reports what exists and nothing more. An earlier
  * version returned the generated contract with it, which meant the probe read
  * a PDF out of Drive and pushed ~370KB back through the same slow redirect
- * that had just failed — so the check failed exactly when it was needed. The
- * page fetches the contract separately, where a failure is harmless.
+ * that had just failed — so the check failed exactly when it was needed.
  */
 function status_(req) {
   var sheet = getSheet_(), head = headers_(sheet);
@@ -264,19 +261,32 @@ function status_(req) {
     var c = head.indexOf(k);
     return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
   };
+  // day and date let a page that lost the register reply still show the contract
+  var when = contractDates_(new Date(get('ts') || Date.now()));
   return {
     ok: true,
     version: VERSION,
     exists: true,
     id: get('id'),
     signed: !!get('signed_at'),
-    hasContract: !!get('contract_id')
+    hasContract: !!get('contract_id'),
+    day: when.day,
+    date: when.date
   };
 }
 
-/** Doctor came back and needs their contract again. Serves the PDF that was
- *  already generated, so no second row and no second contract. */
-function resend_(req) {
+/**
+ * The doctor's copy of the contract: their name and the date filled in, the
+ * signature left blank. This is the only PDF the page ever receives — the
+ * signed one stays with the team.
+ *
+ * Built the first time it is asked for and filed on the row, so asking again
+ * (a second download, a retry after a lost reply) is a quick read from Drive
+ * rather than another build. No lock: two first requests racing would only
+ * leave one spare file in the folder, which is cheaper than making every
+ * other doctor wait behind a ten-second build.
+ */
+function contract_(req) {
   var id = String(req.id || '').trim();
   if (!id) return { ok: false, error: 'معرّف الطلب مفقود' };
 
@@ -284,15 +294,30 @@ function resend_(req) {
   var row = findRow_(sheet, head, id);
   if (row === -1) return { ok: false, code: 'not_found', error: 'لم نلگه الطلب.' };
 
-  var fileId = String(sheet.getRange(row, head.indexOf('contract_id') + 1).getValue() || '');
-  if (!fileId) return { ok: false, error: 'العقد غير متوفر. راجع فريق سليم.' };
-
-  var file = DriveApp.getFileById(fileId);
-  return {
-    ok: true, id: id,
-    fileName: file.getName(),
-    pdfBase64: Utilities.base64Encode(file.getBlob().getBytes())
+  var get = function (k) {
+    var c = head.indexOf(k);
+    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
   };
+
+  var fileId = get('contract_id');
+  if (fileId) {
+    try {
+      var file = DriveApp.getFileById(fileId);
+      if (!file.isTrashed()) {
+        return { ok: true, id: id, fileName: file.getName(),
+                 pdfBase64: Utilities.base64Encode(file.getBlob().getBytes()) };
+      }
+    } catch (gone) {
+      console.warn('stored contract ' + fileId + ' is gone, rebuilding: ' + gone);
+    }
+  }
+
+  var built = buildContract_({ id: id, name: get('name') },
+                             new Date(get('ts') || Date.now()));
+  setCell_(sheet, head, row, 'contract_file', built.file.getName());
+  setCell_(sheet, head, row, 'contract_id',   built.file.getId());
+  return { ok: true, id: id, fileName: built.file.getName(),
+           pdfBase64: Utilities.base64Encode(built.bytes) };
 }
 
 /* ═══════════════ SIGNATURE ═══════════════ */
@@ -310,10 +335,10 @@ function resend_(req) {
  *   mode "pdf"   — doctor signed the downloaded contract by hand and sends it
  *       back. Nothing is stamped; their file is filed as the signed copy.
  *
- * The contract is regenerated rather than edited: the copy made at
- * registration was exported to PDF and trashed, so there is no editable
- * contract in Drive for anyone to alter afterwards. Name and date come from
- * the row, so the signed copy carries exactly what the doctor was shown.
+ * The contract is built from the template rather than edited: every working
+ * Doc is exported to PDF and trashed, so there is no editable contract in
+ * Drive for anyone to alter afterwards. Name and date come from the row, so
+ * the signed copy carries exactly what the doctor was shown.
  */
 function signed_(req) {
   var lock = LockService.getScriptLock();
@@ -354,14 +379,10 @@ function signedLocked_(req) {
   setCell_(sheet, head, row, 'status',      'signed');
   notifySigned_(cell('name'), id, out.file, mode);
 
-  // Only the stamped routes can hand back a contract; on the pdf route the
-  // doctor already has the file they just sent.
-  var res = { ok: true, id: id, mode: mode };
-  if (out.bytes) {
-    res.fileName  = out.file.getName();
-    res.pdfBase64 = Utilities.base64Encode(out.bytes);
-  }
-  return res;
+  // The signed copy is the team's. The doctor's copy is the unsigned one from
+  // contract_, so nothing is sent back here — which also keeps this reply
+  // small at the one moment the doctor is waiting on it.
+  return { ok: true, id: id, mode: mode };
 }
 
 /** "draw" / "photo" — rebuild the contract with the signature stamped in. */
@@ -380,7 +401,7 @@ function stampSignedCopy_(req, cell, id) {
   var built = buildContract_({ id: id, name: cell('name') },
                              new Date(cell('ts') || Date.now()),
                              Utilities.newBlob(bytes, type, 'signature'));
-  return { ok: true, file: built.file, bytes: built.bytes };
+  return { ok: true, file: built.file };
 }
 
 /** "pdf" — the doctor signed the contract by hand and sent it back. */
@@ -399,7 +420,7 @@ function fileSignedUpload_(req, cell) {
   var ext  = type === 'application/pdf' ? 'pdf' : type.split('/')[1];
   var name = 'عقد سليم موقّع - ' + (cell('name') || 'طبيب') + ' - ' + cell('id') + '.' + ext;
   var file = folder_().createFile(Utilities.newBlob(bytes, type, name));
-  return { ok: true, file: file, bytes: null };
+  return { ok: true, file: file };
 }
 
 /* ═══════════════ CONTRACT BUILDING ═══════════════ */
@@ -417,8 +438,9 @@ function buildContract_(doctor, when, sigBlob) {
     var doc = DocumentApp.openById(copy.getId());
     var body = doc.getBody();
     body.replaceText('\\{\\{name\\}\\}', doctor.name);
-    body.replaceText('\\{\\{day\\}\\}',  arabicDay_(when));
-    body.replaceText('\\{\\{date\\}\\}', Utilities.formatDate(when, tz_(), 'yyyy/MM/dd'));
+    var dates = contractDates_(when);
+    body.replaceText('\\{\\{day\\}\\}',  dates.day);
+    body.replaceText('\\{\\{date\\}\\}', dates.date);
 
     // Unsigned copy: leave the signature slots blank rather than printing the
     // placeholder, so the doctor reads a clean contract.
@@ -464,6 +486,13 @@ function arabicDay_(d) {
   return ARABIC_DAYS[Number(Utilities.formatDate(d, tz_(), 'u')) % 7];
 }
 
+/** The day and date printed in the contract. The page shows the same two
+ *  strings, so they are worked out here once rather than guessed at in the
+ *  browser, whose clock and time zone may be anything. */
+function contractDates_(when) {
+  return { day: arabicDay_(when), date: Utilities.formatDate(when, tz_(), 'yyyy/MM/dd') };
+}
+
 function tz_() {
   return Session.getScriptTimeZone() || 'Asia/Baghdad';
 }
@@ -492,7 +521,7 @@ function notifyRegistered_(d) {
     'مكان العمل:  ' + (d.workplace || '—') + '\n' +
     'المدينة:     ' + (d.city || '—') + '\n' +
     'المعرّف:     ' + d.id + '\n\n' +
-    'انبعث له العقد. بانتظار التوقيع.\n');
+    'العقد معروض له بالصفحة. بانتظار التوقيع.\n');
 }
 
 var SIGN_METHOD_AR = {
