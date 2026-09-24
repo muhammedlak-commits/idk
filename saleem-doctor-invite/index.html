@@ -885,10 +885,6 @@ const CONFIG = {
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
   var RESUME_DAYS = 7;
-  // The doctor's copy: the contract with their details and no signature.
-  // Fetched in the background once step 1 is done, so it is ready by the time
-  // they sign; copyReq is the request in flight, shared by everyone asking.
-  var pdf = null, copyReq = null;
   // Registration runs in the background: the doctor is reading the contract
   // while it saves. regReq is that request, for anything that needs the id.
   var regReq = null;
@@ -946,7 +942,7 @@ const CONFIG = {
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
     state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
-    pdf = null; copyReq = null; regReq = null; openIdx = 1;
+    regReq = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1052,18 +1048,6 @@ const CONFIG = {
       return res;
     });
   }
-  function b64ToBlob(b64, type){
-    var bin = atob(b64), len = bin.length, buf = new Uint8Array(len);
-    for(var i = 0; i < len; i++) buf[i] = bin.charCodeAt(i);
-    return new Blob([buf], {type: type});
-  }
-  function saveFile(blob, name){
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
-  }
 
   /* ---------- step 1: details -> the contract, straight away ---------- */
   var AR_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -1108,7 +1092,7 @@ const CONFIG = {
       if(res.day){ state.day = res.day; state.date = res.date; }
       state.pending = null; save();
       regReq = null;
-      fillContract(); warmCopy();
+      fillContract();
     }, function(e){ regReq = null; throw e; });
     return regReq;
   }
@@ -1160,37 +1144,11 @@ const CONFIG = {
     var today = localDates();
     state.id = ''; state.name = data.name; state.pending = data;
     state.day = today.day; state.date = today.date;
-    pdf = null; copyReq = null; regReq = null;
+    regReq = null;
     save();
     completeStep(1);
     startRegister().catch(registerFailed);
   });
-
-  /* ---------- the doctor's copy: everything but the signature ---------- */
-  /** One request for the copy, however many places ask for it. A failure
-   *  clears it so the next ask tries again. */
-  function getCopy(){
-    if(pdf) return Promise.resolve(pdf);
-    if(copyReq) return copyReq;
-    copyReq = startRegister().then(function(){
-      return post({action:'contract', id: state.id});
-    }).then(function(res){
-      pdf = {b64: res.pdfBase64, fileName: res.fileName};
-      copyReq = null;
-      return pdf;
-    }, function(e){ copyReq = null; throw e; });
-    return copyReq;
-  }
-  /** Start building the copy while the doctor reads, so no one waits for it. */
-  function warmCopy(){
-    if(!state.id || pdf || copyReq) return;
-    getCopy().catch(function(e){
-      if(e.code === 'not_found'){
-        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
-      }
-      console.warn('copy not ready yet, it is fetched again when they sign:', e.message);
-    });
-  }
 
   /* ---------- step 2: two ways to sign ---------- */
   var pad   = document.getElementById('sig-pad');
@@ -1323,13 +1281,11 @@ const CONFIG = {
       });
     }
     busy(btn, true, 'جاري حفظ توقيعك…');
-    // Signed: the doctor gets their copy — the unsigned one — if it is already
-    // here. The signed contract stays with the team. Nothing waits on the
-    // copy; the link in step 3 fetches it if it was not ready yet.
+    // Nothing is downloaded: the doctor read the contract on the page, and
+    // the signed copy stays with the team.
     function signedOk(){
       busy(btn, false);
       completeStep(2);
-      if(pdf) saveFile(b64ToBlob(pdf.b64, 'application/pdf'), pdf.fileName);
     }
 
     post(payload).then(signedOk).catch(function(e){
@@ -1362,7 +1318,7 @@ const CONFIG = {
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
     state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
-    pdf = null; copyReq = null; regReq = null; openIdx = 1;
+    regReq = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
@@ -1396,14 +1352,13 @@ const CONFIG = {
     if(state.pending) startRegister().catch(registerFailed);
     else orphaned();
   } else if(state.id && state.step >= 1 && state.step < TOTAL){
-    if(state.day){ warmCopy(); }
-    else {
+    if(!state.day){
       // saved by the previous build, which never kept the contract date
       probe({id: state.id}).then(function(st){
         if(!st) return;
         if(!st.exists) return orphaned();
         state.day = st.day || ''; state.date = st.date || ''; save();
-        fillContract(); warmCopy();
+        fillContract();
       });
     }
   }

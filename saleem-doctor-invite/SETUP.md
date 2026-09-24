@@ -10,9 +10,6 @@ Script deployment.
         ▼  name and the date; meanwhile, in the background:
         ▼  POST action:"register"
     Apps Script appends a row to the Sheet and emails the team
-        ▼  POST action:"contract"
-    Apps Script copies the contract Doc, substitutes {{name}} {{day}} {{date}},
-    blanks {{sig}}, exports PDF and files it in Drive — the doctor's copy
         │
         ▼  doctor ticks "I read it" and picks one of two ways to sign
         ▼  POST action:"signed"
@@ -21,7 +18,7 @@ Script deployment.
     (The script still accepts a third route, mode "pdf" — a contract
         signed by hand and uploaded — but the page no longer offers it.)
         │
-        ▼  the page moves on at once; the doctor's copy (unsigned) downloads
+        ▼  the page moves on at once; nothing is downloaded
         ▼  doctor fills the Google registration form
         │
         ▼  within a minute, finishPending (a time trigger) stamps the

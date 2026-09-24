@@ -54,9 +54,8 @@ plays is worse over Iraqi mobile than an embed that streams.
   or upload a photo of a signature. Neither re-uploads the contract — only the
   signature image goes up and the script stamps it into every `{{sig}}`.
 - **The doctor reads the contract on the page**, so step 1 only saves their
-  details. Their own copy is a PDF with everything filled in but the
-  signature, built in the background while they read. The signed contract is
-  filed for the team and never sent back to the page.
+  details. Nothing is downloaded at any point: the signed contract is filed
+  for the team and never sent back to the page.
 - **Consent is explicit.** The signature cannot be submitted until the doctor
   ticks that they read the contract, and the server refuses it too.
 - **No public Drive links.** The doctor's copy is returned inside the JSON
