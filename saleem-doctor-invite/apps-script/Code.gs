@@ -46,7 +46,7 @@
 // /exec URL in a browser to see which version is actually deployed — a
 // deployment still serving an older one is the usual reason the page reports
 // a failure the script has in fact handled.
-var VERSION = '2026-09-24-b';
+var VERSION = '2026-09-24-c';
 
 // The contract, as a Google Doc (not a PDF). Copy the doc id out of its URL:
 // docs.google.com/document/d/<THIS BIT>/edit
@@ -532,15 +532,25 @@ function finishRow_(sheet, head, row) {
   }
 }
 
-/** Is the every-minute trigger installed? Cached, as the check is not free. */
+/** Is the every-minute trigger installed? Cached, as the check is not free.
+ *
+ *  Never throws. Until the owner approves the trigger permission (by running
+ *  testSetup in the editor), asking about triggers is refused outright — and
+ *  that must not take the whole web app down with it. Unapproved simply
+ *  means "no trigger", so signing finishes the slow way until it is sorted. */
 function triggerReady_() {
   var cache = CacheService.getScriptCache();
   if (cache.get('finish_trigger') === 'yes') return true;
-  var ok = ScriptApp.getProjectTriggers().some(function (t) {
-    return t.getHandlerFunction() === 'finishPending';
-  });
-  if (ok) cache.put('finish_trigger', 'yes', 600);
-  return ok;
+  try {
+    var ok = ScriptApp.getProjectTriggers().some(function (t) {
+      return t.getHandlerFunction() === 'finishPending';
+    });
+    if (ok) cache.put('finish_trigger', 'yes', 600);
+    return ok;
+  } catch (err) {
+    console.warn('cannot check triggers — run testSetup in the editor and approve: ' + err);
+    return false;
+  }
 }
 
 /** Install (or reinstall) the every-minute finishPending trigger. */
@@ -701,9 +711,17 @@ function testSetup() {
   Logger.log('Max signature image: %s MB | max signed contract: %s MB',
              MAX_SIG_MB, MAX_DOC_MB);
 
-  installTrigger_();
-  Logger.log('✓ finishPending runs every minute — signed contracts are stamped ' +
-             'and emailed within about a minute of signing.');
+  try {
+    installTrigger_();
+    Logger.log('✓ finishPending runs every minute — signed contracts are stamped ' +
+               'and emailed within about a minute of signing.');
+  } catch (err) {
+    Logger.log('✗ Could not install the finishPending trigger: %s', err);
+    Logger.log('  If no approval window appeared: Project Settings > tick ' +
+               '"Show appsscript.json manifest file", open appsscript.json and ' +
+               'delete its "oauthScopes" list (or add ' +
+               '"https://www.googleapis.com/auth/script.scriptapp" to it), then run testSetup again.');
+  }
   Logger.log('Now deploy: Deploy > Manage deployments > edit > New version.');
 }
 
