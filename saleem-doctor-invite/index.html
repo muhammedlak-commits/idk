@@ -880,7 +880,7 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
+  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
   // A half-finished run is worth resuming for a day or two while the doctor
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
@@ -888,6 +888,10 @@ const CONFIG = {
   // Registration runs in the background: the doctor is reading the contract
   // while it saves. regReq is that request, for anything that needs the id.
   var regReq = null;
+  // Same for the signature: the doctor moves on as soon as they sign, and it
+  // is delivered behind them. state.sig holds it until the server has it, so
+  // a closed tab or a dead connection only delays it to their next visit.
+  var sigReq = null;
   var openIdx = 1;
 
   /* ---------- persistence: they leave to read the contract, they come back ---------- */
@@ -905,6 +909,7 @@ const CONFIG = {
       state.reqKey = v.reqKey || '';
       state.day = v.day || ''; state.date = v.date || '';
       state.pending = v.pending || null;
+      state.sig = v.sig || null;
       state.step = Math.max(0, Math.min(v.step|0, TOTAL));
       state.ts = v.ts;
     }catch(e){}
@@ -941,8 +946,8 @@ const CONFIG = {
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
-    regReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
+    regReq = null; sigReq = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1010,15 +1015,19 @@ const CONFIG = {
     var p = document.getElementById(el);
     p.textContent = msg || ''; p.hidden = !msg;
   }
-  function post(payload){
+  function post(payload, keepalive){
     if(!CONFIG.endpoint){
       console.log('DEMO MODE — nothing sent. Payload:', payload);
       return Promise.reject(new Error('الصفحة بوضع التجربة. ما تم ضبط الرابط بعد.'));
     }
+    var body = JSON.stringify(Object.assign({url: location.href}, payload));
     return fetch(CONFIG.endpoint, {
       method : 'POST',
       headers: {'Content-Type': CONFIG.endpointType},
-      body   : JSON.stringify(Object.assign({url: location.href}, payload))
+      body   : body,
+      // keepalive lets the request finish even if the doctor closes the tab
+      // or switches to the registration form — browsers allow it up to 64KB
+      keepalive: !!keepalive && body.length < 60000
     }).catch(function(){
       // fetch only rejects on a network-level failure — the doctor is offline,
       // on a dropping connection, or the endpoint is unreachable. Crucially it
@@ -1220,6 +1229,22 @@ const CONFIG = {
     pad.addEventListener(t, function(){ drawing = false; });
   });
 
+  /** Redraw an image or canvas no bigger than maxW×maxH. Null if the browser
+   *  cannot (a format it can show but not read back), and the original goes. */
+  function shrink(src, maxW, maxH, type, q){
+    try{
+      var w = src.naturalWidth || src.width, h = src.naturalHeight || src.height;
+      if(!w || !h) return null;
+      var k = Math.min(1, maxW / w, maxH / h);
+      var c = document.createElement('canvas');
+      c.width = Math.round(w * k); c.height = Math.round(h * k);
+      var g = c.getContext('2d');
+      if(type === 'image/jpeg'){ g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); }
+      g.drawImage(src, 0, 0, c.width, c.height);
+      return {b64: c.toDataURL(type, q).split(',')[1], type: type};
+    }catch(e){ return null; }
+  }
+
   /* -- route 2: a photo of a signature -- */
   window.pickSig = function(){ document.getElementById('sig-file').click(); };
 
@@ -1235,6 +1260,13 @@ const CONFIG = {
     reader.onload = function(){
       var u = String(reader.result);
       photo = {b64: u.split(',')[1], type: f.type || 'image/png'};
+      shot.onload = function(){
+        // A phone photo is megabytes; the contract prints the signature at
+        // 160pt. Shrinking it here makes sending it near-instant.
+        var small = shrink(shot, 800, 800, 'image/jpeg', 0.8);
+        if(small && small.b64.length < photo.b64.length) photo = small;
+        shot.onload = null;
+      };
       shot.src = u; shot.hidden = false;
       ink(true, shot.parentNode);
     };
@@ -1254,61 +1286,70 @@ const CONFIG = {
     err('sig-err','');
   };
 
+  /** Deliver state.sig. Retries a dropped connection, asking first whether
+   *  the last attempt landed; a signature already on the row counts as sent. */
+  function sendSignature(){
+    if(!state.sig) return Promise.resolve();
+    if(sigReq) return sigReq;
+    var s = state.sig;
+    function attempt(n){
+      return startRegister().catch(function(e){ e.fromRegister = true; throw e; }).then(function(){
+        return post({action:'signed', id: state.id, agreed:true,
+                     mode: s.mode, sigB64: s.b64, mimeType: s.type}, true);
+      }).catch(function(e){
+        if(e.code === 'already_signed') return;          // an earlier attempt landed
+        if(!retryable(e)) throw e;
+        return (e.network && state.id ? probe({id: state.id}) : Promise.resolve(null)).then(function(st){
+          if(st && st.signed) return;
+          if(n >= 3) throw e;
+          return wait(2000 * (n + 1)).then(function(){ return attempt(n + 1); });
+        });
+      });
+    }
+    sigReq = attempt(0).then(function(){
+      state.sig = null; save(); sigReq = null;
+    }, function(e){ sigReq = null; throw e; });
+    return sigReq;
+  }
+
+  /** The signature did not get through. A connection problem waits for the
+   *  next visit (or for the phone to come back online); a refusal takes the
+   *  doctor back to where they can fix it. */
+  function sigFailed(e){
+    if(retryable(e)){ console.warn('signature not delivered yet, will retry:', e.message); return; }
+    state.sig = null;
+    if(e.fromRegister) return bounce(e.message);
+    if(e.code === 'not_found'){
+      return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+    }
+    state.step = 1; save();
+    openIdx = 2; render();
+    err('sig-err', e.message);
+    document.getElementById('step-2').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
   window.submitSignature = function(){
-    var btn = document.getElementById('sig-btn');
     if(!document.getElementById('agree').checked){
       return err('sig-err', 'أكّد قراءتك للعقد قبل التوقيع.');
     }
-
-    var payload = {action:'signed', id: state.id, agreed:true, mode: mode};
+    var sig;
     if(mode === 'photo'){
       if(!photo) return err('sig-err', 'اختر صورة توقيعك.');
-      payload.sigB64 = photo.b64; payload.mimeType = photo.type;
+      sig = {mode: 'photo', b64: photo.b64, type: photo.type};
     } else {
       if(!inked) return err('sig-err', 'وقّع بالمربع أعلاه.');
-      payload.sigB64 = pad.toDataURL('image/png').split(',')[1];
-      payload.mimeType = 'image/png';
+      // the contract prints it at 160×80pt, so 640×320 is already generous
+      var small = shrink(pad, 640, 320, 'image/png');
+      sig = {mode: 'draw', b64: small ? small.b64 : pad.toDataURL('image/png').split(',')[1], type: 'image/png'};
     }
-
     err('sig-err','');
-    if(!state.id){
-      // details still saving (or the connection dropped while they read)
-      busy(btn, true, 'لحظة، جاري حفظ بياناتك…');
-      return startRegister().then(function(){ busy(btn, false); submitSignature(); }, function(e){
-        busy(btn, false);
-        if(!retryable(e)) return bounce(e.message);
-        err('sig-err', 'ما كدرنا نحفظ بياناتك. تأكد من الإنترنت وحاول مرة ثانية.');
-      });
-    }
-    busy(btn, true, 'جاري حفظ توقيعك…');
-    // Nothing is downloaded: the doctor read the contract on the page, and
-    // the signed copy stays with the team.
-    function signedOk(){
-      busy(btn, false);
-      completeStep(2);
-    }
 
-    post(payload).then(signedOk).catch(function(e){
-      if(e.network){
-        // the row may already say signed — this is exactly the case where the
-        // email goes out and the doctor is told it failed
-        return probe({id: state.id}).then(function(st){
-          if(st && st.signed) return signedOk();
-          busy(btn, false);
-          err('sig-err', e.message);
-        });
-      }
-      if(e.code === 'already_signed'){
-        // the goal state is reached — someone double-submitted, or an earlier
-        // attempt landed before the response came back
-        return signedOk();
-      }
-      busy(btn, false);
-      if(e.code === 'not_found'){
-        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
-      }
-      err('sig-err', e.message);
-    });
+    // Straight on to the last step. The signature is kept on the phone and
+    // sent behind them, so they never watch a spinner for it.
+    state.sig = sig;
+    completeStep(2);                   // saves, with the signature
+    save();
+    sendSignature().catch(sigFailed);
   };
 
   /* ---------- starting over ---------- */
@@ -1317,8 +1358,8 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
-    regReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
+    regReq = null; sigReq = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
@@ -1347,6 +1388,10 @@ const CONFIG = {
   var wa = document.getElementById('help-wa');
   if(wa && CONFIG.whatsapp) wa.href = 'https://wa.me/' + CONFIG.whatsapp;
   render();
+  // a signature from last time that never reached the server
+  if(state.sig) sendSignature().catch(sigFailed);
+  addEventListener('online', function(){ if(state.sig) sendSignature().catch(sigFailed); });
+
   if(!state.id && state.step >= 1 && state.step < TOTAL){
     // left before their details finished saving
     if(state.pending) startRegister().catch(registerFailed);
