@@ -563,7 +563,6 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
               <span>فريق سليم راح يراجع بياناتك وعقدك داخلياً، وبعدها نتواصل وياك لتفعيل حسابك بالتطبيق وضبط أوقاتك وأسعارك.</span>
             </div>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSfK2pll70FwmtUCdWSRsfmv2CshAXuW-0ecUjHe8I9KvcCA_g/viewform?usp=header" target="_blank" rel="noopener" class="btn" onclick="completeStep(3)">افتح استمارة التسجيل <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></a>
-            <button type="button" class="linkbtn copy-link" style="margin:14px 0 0" onclick="downloadCopy(this)">نزّل نسخة من العقد</button>
           </div>
         </div>
 
@@ -895,7 +894,7 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
+  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
   // A half-finished run is worth resuming for a day or two while the doctor
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
@@ -904,6 +903,9 @@ const CONFIG = {
   // Fetched in the background once step 1 is done, so it is ready by the time
   // they sign; copyReq is the request in flight, shared by everyone asking.
   var pdf = null, copyReq = null;
+  // Registration runs in the background: the doctor is reading the contract
+  // while it saves. regReq is that request, for anything that needs the id.
+  var regReq = null;
   var openIdx = 1;
 
   /* ---------- persistence: they leave to read the contract, they come back ---------- */
@@ -920,6 +922,7 @@ const CONFIG = {
       state.id = v.id || ''; state.name = v.name || '';
       state.reqKey = v.reqKey || '';
       state.day = v.day || ''; state.date = v.date || '';
+      state.pending = v.pending || null;
       state.step = Math.max(0, Math.min(v.step|0, TOTAL));
       state.ts = v.ts;
     }catch(e){}
@@ -956,8 +959,8 @@ const CONFIG = {
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
-    pdf = null; copyReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
+    pdf = null; copyReq = null; regReq = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1076,10 +1079,78 @@ const CONFIG = {
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
   }
 
-  /* ---------- step 1: details -> generated contract ---------- */
+  /* ---------- step 1: details -> the contract, straight away ---------- */
+  var AR_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  /** Today in Baghdad, to show until the server's own date arrives a moment
+   *  later. The contract PDF always uses the server's. */
+  function localDates(){
+    var d = new Date();
+    try{
+      var tz = 'Asia/Baghdad', p = {};
+      new Intl.DateTimeFormat('en-US', {timeZone:tz, year:'numeric', month:'2-digit', day:'2-digit', weekday:'short'})
+        .formatToParts(d).forEach(function(x){ p[x.type] = x.value; });
+      var wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday);
+      return {day: AR_DAYS[wd] || '', date: p.year + '/' + p.month + '/' + p.day};
+    }catch(e){
+      var pad2 = function(n){ return (n < 10 ? '0' : '') + n; };
+      return {day: AR_DAYS[d.getDay()], date: d.getFullYear() + '/' + pad2(d.getMonth()+1) + '/' + pad2(d.getDate())};
+    }
+  }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function retryable(e){ return e.network || e.code === 'busy'; }
+
+  /** Save the details. Retries a dropped connection a couple of times, asking
+   *  first whether the last attempt landed, so a retry never makes a second
+   *  row. Shared: whoever needs the id waits on the same request. */
+  function startRegister(){
+    if(state.id) return Promise.resolve();
+    if(regReq) return regReq;
+    var data = state.pending;
+    if(!data) return Promise.reject(new Error('انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.'));
+    function attempt(n){
+      return post(Object.assign({action:'register', reqKey: state.reqKey}, data)).catch(function(e){
+        if(!retryable(e)) throw e;
+        return (e.network ? probe({reqKey: state.reqKey}) : Promise.resolve(null)).then(function(st){
+          if(st && st.exists) return {id: st.id, day: st.day, date: st.date};
+          if(n >= 2) throw e;
+          return wait(1500 * (n + 1)).then(function(){ return attempt(n + 1); });
+        });
+      });
+    }
+    regReq = attempt(0).then(function(res){
+      state.id = res.id;
+      if(res.day){ state.day = res.day; state.date = res.date; }
+      state.pending = null; save();
+      regReq = null;
+      fillContract(); warmCopy();
+    }, function(e){ regReq = null; throw e; });
+    return regReq;
+  }
+
+  /** The server turned the details down (it re-checks what the page checks).
+   *  Back to step 1 with their answers still in the form. */
+  function bounce(msg){
+    var data = state.pending || {};
+    state.step = 0; state.id = ''; save();
+    openIdx = 1; render();
+    var f = document.getElementById('reg-form');
+    ['name','phone','specialty','workplace','city'].forEach(function(k){
+      if(data[k] && !f.elements[k].value) f.elements[k].value = data[k];
+    });
+    err('reg-err', msg);
+    document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /** Background registration went wrong. A refusal goes back to step 1; a
+   *  connection that stayed down is retried when they press send. */
+  function registerFailed(e){
+    if(!retryable(e)) return bounce(e.message);
+    console.warn('details not saved yet, retrying on send:', e.message);
+  }
+
   document.getElementById('reg-form').addEventListener('submit', function(ev){
     ev.preventDefault();
-    var f = ev.target, btn = document.getElementById('reg-btn');
+    var f = ev.target;
     var data = {}; ['name','phone','specialty','workplace','city'].forEach(function(k){
       data[k] = f.elements[k].value.trim();
       f.elements[k].setAttribute('aria-invalid', 'false');
@@ -1095,29 +1166,18 @@ const CONFIG = {
       f.elements.name.setAttribute('aria-invalid','true');
       return err('reg-err', 'اكتب اسمك بالحروف العربية — العقد عربي والاسم لازم يطابق هويتك.');
     }
-    err('reg-err', ''); busy(btn, true, 'جاري الحفظ…');
-    if(!state.reqKey){ state.reqKey = newKey(); save(); }
+    err('reg-err', '');
 
-    function landed(res){
-      state.id = res.id; state.name = data.name;
-      state.day = res.day || ''; state.date = res.date || ''; save();
-      busy(btn, false);
-      completeStep(1);
-      warmCopy();
-    }
-
-    post(Object.assign({action:'register', reqKey: state.reqKey}, data))
-      .then(landed)
-      .catch(function(e){
-        if(!e.network){ busy(btn, false); return err('reg-err', e.message); }
-        // the row may well have been saved — ask before sending them round again
-        probe({reqKey: state.reqKey}).then(function(st){
-          busy(btn, false);
-          if(!st || !st.exists) return err('reg-err', e.message);
-          // registered after all — carry on as if the reply had arrived
-          landed({id: st.id, day: st.day, date: st.date});
-        });
-      });
+    // Straight to the contract: nothing on it depends on the server except
+    // the id, and that is only needed once they sign.
+    if(!state.reqKey || state.pending) state.reqKey = newKey();
+    var today = localDates();
+    state.id = ''; state.name = data.name; state.pending = data;
+    state.day = today.day; state.date = today.date;
+    pdf = null; copyReq = null; regReq = null;
+    save();
+    completeStep(1);
+    startRegister().catch(registerFailed);
   });
 
   /* ---------- the doctor's copy: everything but the signature ---------- */
@@ -1126,7 +1186,9 @@ const CONFIG = {
   function getCopy(){
     if(pdf) return Promise.resolve(pdf);
     if(copyReq) return copyReq;
-    copyReq = post({action:'contract', id: state.id}).then(function(res){
+    copyReq = startRegister().then(function(){
+      return post({action:'contract', id: state.id});
+    }).then(function(res){
       pdf = {b64: res.pdfBase64, fileName: res.fileName};
       copyReq = null;
       return pdf;
@@ -1301,7 +1363,17 @@ const CONFIG = {
       payload.mimeType = 'image/png';
     }
 
-    err('sig-err',''); busy(btn, true, 'جاري حفظ توقيعك…');
+    err('sig-err','');
+    if(!state.id){
+      // details still saving (or the connection dropped while they read)
+      busy(btn, true, 'لحظة، جاري حفظ بياناتك…');
+      return startRegister().then(function(){ busy(btn, false); submitSignature(); }, function(e){
+        busy(btn, false);
+        if(!retryable(e)) return bounce(e.message);
+        err('sig-err', 'ما كدرنا نحفظ بياناتك. تأكد من الإنترنت وحاول مرة ثانية.');
+      });
+    }
+    busy(btn, true, 'جاري حفظ توقيعك…');
     // Signed: the doctor gets their copy — the unsigned one — if it is already
     // here. The signed contract stays with the team. Nothing waits on the
     // copy; the link in step 3 fetches it if it was not ready yet.
@@ -1340,8 +1412,8 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'' };
-    pdf = null; copyReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
+    pdf = null; copyReq = null; regReq = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
@@ -1372,7 +1444,11 @@ const CONFIG = {
   var wa = document.getElementById('help-wa');
   if(wa && CONFIG.whatsapp) wa.href = 'https://wa.me/' + CONFIG.whatsapp;
   render();
-  if(state.id && state.step >= 1 && state.step < TOTAL){
+  if(!state.id && state.step >= 1 && state.step < TOTAL){
+    // left before their details finished saving
+    if(state.pending) startRegister().catch(registerFailed);
+    else orphaned();
+  } else if(state.id && state.step >= 1 && state.step < TOTAL){
     if(state.day){ warmCopy(); }
     else {
       // saved by the previous build, which never kept the contract date

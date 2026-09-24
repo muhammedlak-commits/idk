@@ -16,18 +16,25 @@
  *                       Drive link anyone could guess. ("resend" is the old
  *                       name, kept for pages still open on the previous build.)
  *
- *   action "signed"   — the doctor signs. Drawing on the page or sending a
- *                       photo of a signature builds the contract with that
- *                       image stamped into every {{sig}}; signing the PDF by
- *                       hand and sending it back files their file as-is.
- *                       Either way the row is updated and the team emailed.
+ *   action "signed"   — the doctor signs. The signature (a drawing, a photo,
+ *                       or the whole contract signed by hand) is filed in
+ *                       Drive and the row marked signed, and the page moves on.
  *                       The signed copy stays with the team: it is never sent
  *                       back to the page.
+ *
+ *   finishPending     — runs by itself every minute (installed by testSetup).
+ *                       Stamps each new drawn or photographed signature into
+ *                       the contract, files the signed PDF, and emails the
+ *                       team. Doing this here rather than in "signed" is what
+ *                       keeps the doctor from waiting ten seconds on it.
  *
  * Deploy ONCE, as the public intake:
  *   Deploy → New deployment → Web app
  *   Execute as: Me   |   Who has access: Anyone
  *   Put the /exec URL in CONFIG.endpoint in index.html.
+ *
+ * Once, from the editor: run testSetup and approve the permissions it asks
+ * for. That installs the every-minute finishPending trigger.
  *
  * Redeploy note: after editing this file you must Deploy → Manage deployments
  * → edit → New version, or the live URL keeps running the old code.
@@ -39,7 +46,7 @@
 // /exec URL in a browser to see which version is actually deployed — a
 // deployment still serving an older one is the usual reason the page reports
 // a failure the script has in fact handled.
-var VERSION = '2026-09-24-a';
+var VERSION = '2026-09-24-b';
 
 // The contract, as a Google Doc (not a PDF). Copy the doc id out of its URL:
 // docs.google.com/document/d/<THIS BIT>/edit
@@ -69,7 +76,7 @@ var SHEET_NAME = 'Doctors';
 var COLUMNS = [
   'id', 'req_key', 'ts', 'name', 'phone', 'specialty', 'workplace', 'city',
   'contract_file', 'contract_id', 'signed_file', 'signed_id',
-  'signed_at', 'sign_method', 'status', 'notes', 'url'
+  'signed_at', 'sign_method', 'status', 'notes', 'url', 'signature_id'
 ];
 
 // Biggest signature image we accept, in megabytes. A drawn signature is a few
@@ -103,6 +110,10 @@ function doGet() {
     version: VERSION,
     actions: ['register', 'contract', 'status', 'signed'],
     templateConfigured: !!TEMPLATE_DOC_ID,
+    // false = testSetup has not been run since this version was pasted in;
+    // signing still works, but falls back to building the PDF while the
+    // doctor waits
+    finishTrigger: triggerReady_(),
     notifyCount: recipients_().length,
     sheet: SHEET_NAME
   });
@@ -203,7 +214,7 @@ function register_(req) {
     }
   } catch (err) {
     console.error('could not claim a row: ' + err);
-    return { ok: false, error: 'السيرفر مشغول حالياً. حاول مرة ثانية بعد لحظات.' };
+    return { ok: false, code: 'busy', error: 'السيرفر مشغول حالياً. حاول مرة ثانية بعد لحظات.' };
   } finally {
     try { lock.releaseLock(); } catch (ignored) {}
   }
@@ -323,17 +334,22 @@ function contract_(req) {
 /* ═══════════════ SIGNATURE ═══════════════ */
 
 /**
- * Doctor signed. Three routes arrive here and all end in one signed PDF on the
- * row:
+ * Doctor signed. Three routes arrive here:
  *
  *   mode "draw"  — signature drawn on the page
  *   mode "photo" — photograph of a signature
- *       both send an image, and the contract is rebuilt from the template with
- *       that image stamped into every {{sig}}. The doctor never re-uploads the
- *       contract, because the script already has everything needed to make it.
+ *       both send an image. It is filed in Drive and the row marked
+ *       "signing"; finishPending then stamps it into every {{sig}} of a fresh
+ *       copy of the contract. The doctor never re-uploads the contract,
+ *       because the script already has everything needed to make it.
  *
  *   mode "pdf"   — doctor signed the downloaded contract by hand and sends it
- *       back. Nothing is stamped; their file is filed as the signed copy.
+ *       back. Their file is filed as the signed copy and the row marked
+ *       "uploaded"; finishPending only has the email left to send.
+ *
+ * This reply used to wait for the stamped PDF to be built — the best part of
+ * ten seconds with the doctor watching a spinner. Now it only files what
+ * arrived, which is quick, and the rest happens in the background.
  *
  * The contract is built from the template rather than edited: every working
  * Doc is exported to PDF and trashed, so there is no editable contract in
@@ -341,9 +357,24 @@ function contract_(req) {
  * the signed copy carries exactly what the doctor was shown.
  */
 function signed_(req) {
-  var lock = LockService.getScriptLock();
-  try { lock.waitLock(30000); return signedLocked_(req); }
+  var res, lock = LockService.getScriptLock();
+  try { lock.waitLock(30000); res = signedLocked_(req); }
+  catch (err) {
+    console.error('signing: ' + err);
+    return { ok: false, code: 'busy', error: 'السيرفر مشغول حالياً. حاول مرة ثانية بعد لحظات.' };
+  }
   finally { try { lock.releaseLock(); } catch (ignored) {} }
+
+  var row = res._row;
+  delete res._row;
+  // No trigger to hand the work to (testSetup not run yet): finish it here,
+  // slowly, rather than leave a signed contract nobody is told about.
+  if (res.ok && row && !triggerReady_()) {
+    console.warn('finishPending trigger missing — finishing inline. Run testSetup once.');
+    var sheet = getSheet_();
+    finishRow_(sheet, headers_(sheet), row);
+  }
+  return res;
 }
 
 function signedLocked_(req) {
@@ -369,24 +400,28 @@ function signedLocked_(req) {
                                   error: 'هذا العقد موقّع مسبقاً.' };
 
   var out = (mode === 'pdf') ? fileSignedUpload_(req, cell)
-                             : stampSignedCopy_(req, cell, id);
+                             : fileSignature_(req, cell);
   if (!out.ok) return out;
 
-  setCell_(sheet, head, row, 'signed_file', out.file.getName());
-  setCell_(sheet, head, row, 'signed_id',   out.file.getId());
-  setCell_(sheet, head, row, 'signed_at',   new Date().toISOString());
+  if (mode === 'pdf') {
+    setCell_(sheet, head, row, 'signed_file', out.file.getName());
+    setCell_(sheet, head, row, 'signed_id',   out.file.getId());
+  } else {
+    setCell_(sheet, head, row, 'signature_id', out.file.getId());
+  }
   setCell_(sheet, head, row, 'sign_method', mode);
-  setCell_(sheet, head, row, 'status',      'signed');
-  notifySigned_(cell('name'), id, out.file, mode);
+  setCell_(sheet, head, row, 'signed_at',   new Date().toISOString());
+  // written last: finishPending picks the row up by this, so everything it
+  // needs must already be on the row
+  setCell_(sheet, head, row, 'status', mode === 'pdf' ? 'uploaded' : 'signing');
 
   // The signed copy is the team's. The doctor's copy is the unsigned one from
-  // contract_, so nothing is sent back here — which also keeps this reply
-  // small at the one moment the doctor is waiting on it.
-  return { ok: true, id: id, mode: mode };
+  // contract_, so nothing is sent back here.
+  return { ok: true, id: id, mode: mode, _row: row };
 }
 
-/** "draw" / "photo" — rebuild the contract with the signature stamped in. */
-function stampSignedCopy_(req, cell, id) {
+/** "draw" / "photo" — file the signature image for finishPending to stamp. */
+function fileSignature_(req, cell) {
   if (!req.sigB64) return { ok: false, error: 'التوقيع مفقود' };
 
   var type = String(req.mimeType || 'image/png');
@@ -398,10 +433,9 @@ function stampSignedCopy_(req, cell, id) {
     return { ok: false, error: 'حجم الصورة كبير. الحد الأقصى ' + MAX_SIG_MB + ' ميغابايت.' };
   }
 
-  var built = buildContract_({ id: id, name: cell('name') },
-                             new Date(cell('ts') || Date.now()),
-                             Utilities.newBlob(bytes, type, 'signature'));
-  return { ok: true, file: built.file };
+  var name = 'توقيع - ' + (cell('name') || 'طبيب') + ' - ' + cell('id') + '.' + type.split('/')[1];
+  var file = folder_().createFile(Utilities.newBlob(bytes, type, name));
+  return { ok: true, file: file };
 }
 
 /** "pdf" — the doctor signed the contract by hand and sent it back. */
@@ -421,6 +455,101 @@ function fileSignedUpload_(req, cell) {
   var name = 'عقد سليم موقّع - ' + (cell('name') || 'طبيب') + ' - ' + cell('id') + '.' + ext;
   var file = folder_().createFile(Utilities.newBlob(bytes, type, name));
   return { ok: true, file: file };
+}
+
+/* ═══════════════ BACKGROUND FINISHING ═══════════════ */
+
+/**
+ * Runs every minute from the trigger testSetup installs. Picks up every row
+ * a doctor has signed but the team has not yet been told about, stamps the
+ * signature into the contract where there is one to stamp, and emails.
+ *
+ * Holds no script lock — a ten-second build under it would stall every
+ * doctor registering meanwhile. A short-lived flag keeps two runs from
+ * working the same rows if one overruns its minute.
+ */
+function finishPending() {
+  var props = PropertiesService.getScriptProperties();
+  var busyUntil = Number(props.getProperty('finishing_until') || 0);
+  if (busyUntil > Date.now()) return;
+  props.setProperty('finishing_until', String(Date.now() + 5 * 60 * 1000));
+
+  var started = Date.now();
+  try {
+    var sheet = getSheet_(), head = headers_(sheet);
+    var col = head.indexOf('status');
+    if (col === -1 || sheet.getLastRow() < 2) return;
+    var statuses = sheet.getRange(2, col + 1, sheet.getLastRow() - 1, 1).getValues();
+    for (var i = 0; i < statuses.length; i++) {
+      var st = String(statuses[i][0]);
+      if (st !== 'signing' && st !== 'uploaded') continue;
+      if (Date.now() - started > 4 * 60 * 1000) break;      // the rest wait a minute
+      finishRow_(sheet, head, i + 2);
+    }
+  } finally {
+    props.deleteProperty('finishing_until');
+  }
+}
+
+/** Finish one signed row: stamp if needed, mark it signed, tell the team. */
+function finishRow_(sheet, head, row) {
+  var cell = function (key) {
+    var c = head.indexOf(key);
+    return c === -1 ? '' : String(sheet.getRange(row, c + 1).getValue() || '');
+  };
+  var id = cell('id'), name = cell('name'), mode = cell('sign_method');
+  var status = cell('status');
+
+  if (status === 'uploaded') {
+    setCell_(sheet, head, row, 'status', 'signed');
+    notifySigned_(name, id, DriveApp.getFileById(cell('signed_id')), mode);
+    return;
+  }
+  if (status !== 'signing') return;
+
+  var sigId = cell('signature_id');
+  try {
+    var blob  = DriveApp.getFileById(sigId).getBlob();
+    var built = buildContract_({ id: id, name: name },
+                               new Date(cell('ts') || Date.now()), blob);
+    setCell_(sheet, head, row, 'signed_file', built.file.getName());
+    setCell_(sheet, head, row, 'signed_id',   built.file.getId());
+    setCell_(sheet, head, row, 'status',      'signed');
+    notifySigned_(name, id, built.file, mode);
+  } catch (err) {
+    // Marked failed rather than retried every minute forever. The signature
+    // is safe in Drive and the email says where, so nothing is lost.
+    console.error('could not stamp ' + id + ': ' + err);
+    setCell_(sheet, head, row, 'status', 'stamp_failed');
+    setCell_(sheet, head, row, 'notes',  String(err && err.message || err));
+    var sigUrl = '';
+    try { sigUrl = DriveApp.getFileById(sigId).getUrl(); } catch (ignored) {}
+    mail_('⚠️ عقد موقّع بس ما انطبع التوقيع — ' + name,
+      'الطبيب: ' + name + '\n' +
+      'المعرّف: ' + id + '\n' +
+      'الطبيب وقّع، بس ما كدرنا نطبع التوقيع بالعقد: ' + err + '\n' +
+      'التوقيع: ' + (sigUrl || '(غير متوفر)') + '\n');
+  }
+}
+
+/** Is the every-minute trigger installed? Cached, as the check is not free. */
+function triggerReady_() {
+  var cache = CacheService.getScriptCache();
+  if (cache.get('finish_trigger') === 'yes') return true;
+  var ok = ScriptApp.getProjectTriggers().some(function (t) {
+    return t.getHandlerFunction() === 'finishPending';
+  });
+  if (ok) cache.put('finish_trigger', 'yes', 600);
+  return ok;
+}
+
+/** Install (or reinstall) the every-minute finishPending trigger. */
+function installTrigger_() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'finishPending') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('finishPending').timeBased().everyMinutes(1).create();
+  CacheService.getScriptCache().put('finish_trigger', 'yes', 600);
 }
 
 /* ═══════════════ CONTRACT BUILDING ═══════════════ */
@@ -542,8 +671,9 @@ function notifySigned_(name, id, file, mode) {
 
 /**
  * Safe to run from the editor. Pick "testSetup" in the function dropdown and
- * press Run. It creates the sheet headers, checks the contract template, and
- * prints where everything is wired. It writes no rows and emails nobody.
+ * press Run. It creates the sheet headers, checks the contract template,
+ * installs the every-minute finishPending trigger, and prints where
+ * everything is wired. It writes no rows and emails nobody.
  */
 function testSetup() {
   var sheet = getSheet_();
@@ -570,7 +700,11 @@ function testSetup() {
                        : '✗ NOTIFY is empty — nobody will be told about new doctors.');
   Logger.log('Max signature image: %s MB | max signed contract: %s MB',
              MAX_SIG_MB, MAX_DOC_MB);
-  Logger.log('Now deploy: Deploy > New deployment > Web app (Anyone).');
+
+  installTrigger_();
+  Logger.log('✓ finishPending runs every minute — signed contracts are stamped ' +
+             'and emailed within about a minute of signing.');
+  Logger.log('Now deploy: Deploy > Manage deployments > edit > New version.');
 }
 
 /* ═══════════════ SHARED ═══════════════ */
