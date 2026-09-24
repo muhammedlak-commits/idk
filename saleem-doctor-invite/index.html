@@ -397,7 +397,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
     <div class="head rv">
       <p class="eyebrow">جاهز تبدأ؟</p>
       <h2>خلّينا نجهّز عقدك</h2>
-      <p class="lead" style="margin-top:12px">ثلاث خطوات — عبّي بياناتك، وقّع العقد، وارفعه.</p>
+      <p class="lead" style="margin-top:12px">ثلاث خطوات — عبّي بياناتك، وقّع العقد، وكمّل استمارة التسجيل.</p>
     </div>
     <div class="panel rv">
       <div class="resume" id="resume" hidden>
@@ -509,8 +509,6 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
                 <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.8 3.6 5.6 5.6L9.6 20H4v-5.6L14.8 3.6Z"/><path d="m12.4 6 5.6 5.6"/></svg></i><span><b>وقّع بإصبعك هنا</b><em>أسرع طريقة — ما تحتاج تنزّل ولا ترفع شي</em></span></button>
               <button type="button" class="mode" data-mode="photo" role="radio" aria-checked="false">
                 <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.6" cy="10" r="1.6"/><path d="m21 15.5-4.7-4.7L6.5 20"/></svg></i><span><b>ارفع صورة توقيعك</b><em>وقّع على ورقة بيضاء، صوّرها، وارفع الصورة</em></span></button>
-              <button type="button" class="mode" data-mode="pdf" role="radio" aria-checked="false">
-                <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2.8H7.5a2 2 0 0 0-2 2v14.4a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7.6L14 2.8Z"/><path d="M13.7 3v4.8h4.8"/></svg></i><span><b>وقّع العقد نفسه وارفعه</b><em>اطبعه أو وقّعه بتطبيق PDF، وبعدين ارفع النسخة الموقّعة</em></span></button>
             </div>
 
             <div class="pane" data-pane="draw">
@@ -532,16 +530,6 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
                 </div>
                 <input type="file" id="sig-file" accept="image/*" hidden>
                 <button type="button" class="siglink" onclick="pickSig()">اختر صورة التوقيع</button>
-              </div>
-            </div>
-
-            <div class="pane" data-pane="pdf" hidden>
-              <div class="sigbox">
-                <p class="panehint">نزّل العقد، وقّع بنهاية كل صفحة وبخانة "التوقيع" بالصفحة الأخيرة، <b>احفظ الملف</b>، وبعدين ارفعه هنا. تكدر ترفع PDF أو صورة واضحة.</p>
-                <button type="button" class="btn btn-ghost copy-btn" onclick="downloadCopy(this)">نزّل العقد PDF</button>
-                <input type="file" id="doc-file" accept="application/pdf,image/*" hidden>
-                <button type="button" class="siglink" onclick="pickDoc()">اختر العقد الموقّع</button>
-                <p class="file-name" id="doc-name" hidden></p>
               </div>
             </div>
 
@@ -645,8 +633,7 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .c-sign{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
 .c-sign>div{display:flex;flex-direction:column;gap:4px;font-size:13.5px;line-height:1.7}
 .c-sign em{font-style:normal;color:var(--muted);margin-top:6px;padding-bottom:22px;border-bottom:1px solid var(--line)}
-.copy-link{display:block}
-.copy-btn{margin-bottom:6px}
+
 .step-body .btn+.btn{margin-top:9px}
 
 .ways{display:grid;gap:10px;margin-bottom:12px}
@@ -888,8 +875,7 @@ const CONFIG = {
   // the body is still JSON and the script parses it the same way.
   endpointType: "text/plain;charset=utf-8",
   whatsapp    : "9647710335500",   // digits only, no +, for the wa.me help link
-  maxSigMb    : 8,    // signature image
-  maxDocMb    : 15    // a signed contract, scanned or photographed
+  maxSigMb    : 8     // signature image
 };
 
 (function(){
@@ -1202,28 +1188,15 @@ const CONFIG = {
       if(e.code === 'not_found'){
         return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
       }
-      console.warn('copy not ready yet, the download links will retry:', e.message);
+      console.warn('copy not ready yet, it is fetched again when they sign:', e.message);
     });
   }
-  window.downloadCopy = function(btn){
-    if(btn.disabled) return;
-    var label = btn.textContent;
-    if(!pdf){ btn.disabled = true; btn.textContent = 'جاري تجهيز النسخة…'; }
-    getCopy().then(function(c){
-      saveFile(b64ToBlob(c.b64, 'application/pdf'), c.fileName);
-    }).catch(function(e){
-      if(e.code === 'not_found'){
-        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
-      }
-      alert(e.message);
-    }).then(function(){ btn.disabled = false; btn.textContent = label; });
-  };
 
-  /* ---------- step 2: three ways to sign ---------- */
+  /* ---------- step 2: two ways to sign ---------- */
   var pad   = document.getElementById('sig-pad');
   var wrap  = pad.parentNode;
   var shot  = document.getElementById('sig-img');
-  var ctx, drawing = false, inked = false, photo = null, doc = null;
+  var ctx, drawing = false, inked = false, photo = null;
   var mode  = 'draw';
 
   /* -- which route the doctor picked -- */
@@ -1310,27 +1283,6 @@ const CONFIG = {
     reader.readAsDataURL(f);
   });
 
-  /* -- route 3: the signed contract itself -- */
-  window.pickDoc = function(){ document.getElementById('doc-file').click(); };
-
-  document.getElementById('doc-file').addEventListener('change', function(ev){
-    var f = ev.target.files && ev.target.files[0];
-    var label = document.getElementById('doc-name');
-    if(!f){ doc = null; label.hidden = true; return; }
-    if(f.size > CONFIG.maxDocMb * 1024 * 1024){
-      ev.target.value = ''; doc = null; label.hidden = true;
-      return err('sig-err', 'حجم الملف كبير. الحد الأقصى ' + CONFIG.maxDocMb + ' ميغابايت.');
-    }
-    var reader = new FileReader();
-    reader.onerror = function(){ err('sig-err','ما كدرنا نقرا الملف. جرّب ملف ثاني.'); };
-    reader.onload = function(){
-      doc = {b64: String(reader.result).split(',')[1], type: f.type || 'application/pdf'};
-      label.textContent = f.name; label.hidden = false;
-      err('sig-err','');
-    };
-    reader.readAsDataURL(f);
-  });
-
   /* -- clearing, whichever route is showing -- */
   window.clearSig = function(){
     if(mode === 'draw'){
@@ -1351,10 +1303,7 @@ const CONFIG = {
     }
 
     var payload = {action:'signed', id: state.id, agreed:true, mode: mode};
-    if(mode === 'pdf'){
-      if(!doc) return err('sig-err', 'اختر ملف العقد الموقّع.');
-      payload.fileB64 = doc.b64; payload.mimeType = doc.type;
-    } else if(mode === 'photo'){
+    if(mode === 'photo'){
       if(!photo) return err('sig-err', 'اختر صورة توقيعك.');
       payload.sigB64 = photo.b64; payload.mimeType = photo.type;
     } else {
@@ -1420,11 +1369,9 @@ const CONFIG = {
         form.elements[k].setAttribute('aria-invalid','false'); }); }
     document.getElementById('agree').checked = false;
     if(ctx) ctx.clearRect(0, 0, pad.width, pad.height);
-    photo = null; doc = null;
+    photo = null;
     shot.hidden = true; shot.removeAttribute('src');
     document.getElementById('sig-file').value = '';
-    document.getElementById('doc-file').value = '';
-    document.getElementById('doc-name').hidden = true;
     ink(false); ink(false, shot.parentNode);
     setMode('draw');
     err('reg-err',''); err('sig-err','');

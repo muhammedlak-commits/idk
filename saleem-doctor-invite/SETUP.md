@@ -14,12 +14,12 @@ Script deployment.
     Apps Script copies the contract Doc, substitutes {{name}} {{day}} {{date}},
     blanks {{sig}}, exports PDF and files it in Drive — the doctor's copy
         │
-        ▼  doctor ticks "I read it" and picks one of three ways to sign
+        ▼  doctor ticks "I read it" and picks one of two ways to sign
         ▼  POST action:"signed"
     draw / photo — the signature image is filed in Drive and the row marked
         "signing". The doctor never re-uploads the contract.
-    pdf — the doctor downloads their copy, signs it by hand and sends it
-        back. Their file is filed as the signed copy; the row is "uploaded".
+    (The script still accepts a third route, mode "pdf" — a contract
+        signed by hand and uploaded — but the page no longer offers it.)
         │
         ▼  the page moves on at once; the doctor's copy (unsigned) downloads
         ▼  doctor fills the Google registration form

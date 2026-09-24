@@ -50,10 +50,9 @@ plays is worse over Iraqi mobile than an embed that streams.
 - **The contract is generated per doctor**, from a Google Doc template, so the
   name and date are real text rather than something typed into a PDF form —
   which is unreliable across mobile PDF viewers, especially in Arabic.
-- **Three ways to sign**, chosen by the doctor: draw with a finger on the page,
-  upload a photo of a signature, or sign the downloaded PDF by hand and send it
-  back. The first two never re-upload the contract — only the signature image
-  goes up and the script stamps it into every `{{sig}}`.
+- **Two ways to sign**, chosen by the doctor: draw with a finger on the page,
+  or upload a photo of a signature. Neither re-uploads the contract — only the
+  signature image goes up and the script stamps it into every `{{sig}}`.
 - **The doctor reads the contract on the page**, so step 1 only saves their
   details. Their own copy is a PDF with everything filled in but the
   signature, built in the background while they read. The signed contract is
