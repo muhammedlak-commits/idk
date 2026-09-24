@@ -56,6 +56,9 @@ plays is worse over Iraqi mobile than an embed that streams.
 - **The doctor reads the contract on the page**, so step 1 only saves their
   details. Nothing is downloaded at any point: the signed contract is filed
   for the team and never sent back to the page.
+- **One email per doctor**, with the signed contract attached. The doctor
+  cannot pass step 2 until it has gone; meanwhile a progress bar runs for
+  about 20 seconds with a few lines about Saleem (`FACTS` in the script).
 - **Consent is explicit.** The signature cannot be submitted until the doctor
   ticks that they read the contract, and the server refuses it too.
 - **No public Drive links.** The doctor's copy is returned inside the JSON

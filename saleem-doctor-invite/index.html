@@ -535,8 +535,13 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 
             <p class="fld-err" id="sig-err" hidden></p>
             <button type="button" class="btn" id="sig-btn" onclick="submitSignature()">أرسل العقد الموقّع <span class="arw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5.5M11 6l-6 6 6 6"/></svg></span></button>
-            <div class="bar" id="sig-bar" hidden><i></i></div>
-            <p class="wait-note" id="sig-wait" hidden></p>
+
+            <div class="sending" id="sending" hidden aria-live="polite">
+              <p class="send-title" id="send-title">جاري إرسال عقدك لفريق سليم</p>
+              <div class="sbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="sbar"><i id="sbar-fill"></i></div>
+              <div class="sbar-meta"><b id="sbar-pct">٠٪</b><span>لا تسكّر الصفحة</span></div>
+              <div class="facts"><span class="facts-k">تعرّف على سليم</span><p id="fact"></p></div>
+            </div>
           </div>
         </div>
 
@@ -719,6 +724,23 @@ footer .dis{max-width:56ch;margin:0 auto 14px;line-height:1.75;opacity:.85}
 .done .restart a{font-weight:700}
 .help-line{font-size:13px;color:var(--muted);text-align:center;margin-top:16px}
 .help-line a{font-weight:600}
+
+/* sending the signed contract: the only wait in the flow, so it says something */
+.step.is-sending .step-body>:not(.sending){display:none!important}
+.sending{padding:6px 0 4px}
+.send-title{font-size:16.5px;font-weight:800;color:var(--navy);margin:4px 0 14px;line-height:1.6}
+.sbar{height:12px;border-radius:99px;background:var(--blue-soft);overflow:hidden}
+.sbar i{display:block;height:100%;width:0;border-radius:inherit;
+  background:linear-gradient(90deg,var(--blue),var(--navy))}
+.sbar-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;
+  font-size:12.5px;color:var(--muted)}
+.sbar-meta b{font-size:14px;color:var(--navy);font-variant-numeric:tabular-nums}
+.facts{margin-top:18px;background:var(--bg);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;min-height:118px}
+.facts-k{display:block;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.facts p{font-size:15px;line-height:1.85;color:var(--ink);transition:opacity .35s}
+.facts p.out{opacity:0}
+@media (prefers-reduced-motion:reduce){.facts p{transition:none}}
 </style>
 
 <script>
@@ -880,7 +902,7 @@ const CONFIG = {
 
 (function(){
   var TOTAL = 3, KEY = 'saleem_doctor_invite';
-  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
+  var state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
   // A half-finished run is worth resuming for a day or two while the doctor
   // reads the contract. Weeks later it is just confusing, and the row behind
   // it may be long gone, so it lapses.
@@ -888,10 +910,6 @@ const CONFIG = {
   // Registration runs in the background: the doctor is reading the contract
   // while it saves. regReq is that request, for anything that needs the id.
   var regReq = null;
-  // Same for the signature: the doctor moves on as soon as they sign, and it
-  // is delivered behind them. state.sig holds it until the server has it, so
-  // a closed tab or a dead connection only delays it to their next visit.
-  var sigReq = null;
   var openIdx = 1;
 
   /* ---------- persistence: they leave to read the contract, they come back ---------- */
@@ -909,7 +927,6 @@ const CONFIG = {
       state.reqKey = v.reqKey || '';
       state.day = v.day || ''; state.date = v.date || '';
       state.pending = v.pending || null;
-      state.sig = v.sig || null;
       state.step = Math.max(0, Math.min(v.step|0, TOTAL));
       state.ts = v.ts;
     }catch(e){}
@@ -946,8 +963,8 @@ const CONFIG = {
    *  step they can never pass is worse than sending them round again. */
   function orphaned(msg){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
-    regReq = null; sigReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
+    regReq = null; openIdx = 1;
     render();
     err('reg-err', msg || 'انتهت صلاحية الطلب. عبّي بياناتك مرة ثانية.');
     document.getElementById('step-1').scrollIntoView({behavior:'smooth', block:'center'});
@@ -999,8 +1016,7 @@ const CONFIG = {
   /* ---------- helpers ---------- */
   // each submitting button owns a progress bar and a line of reassurance
   var BUSY_UI = {
-    'reg-btn': {bar:'reg-bar', note:'wait-note'},
-    'sig-btn': {bar:'sig-bar', note:'sig-wait'}
+    'reg-btn': {bar:'reg-bar', note:'wait-note'}
   };
   function busy(btn, on, note){
     btn.disabled = on;
@@ -1286,49 +1302,147 @@ const CONFIG = {
     err('sig-err','');
   };
 
-  /** Deliver state.sig. Retries a dropped connection, asking first whether
-   *  the last attempt landed; a signature already on the row counts as sent. */
-  function sendSignature(){
-    if(!state.sig) return Promise.resolve();
-    if(sigReq) return sigReq;
-    var s = state.sig;
-    function attempt(n){
-      return startRegister().catch(function(e){ e.fromRegister = true; throw e; }).then(function(){
-        return post({action:'signed', id: state.id, agreed:true,
-                     mode: s.mode, sigB64: s.b64, mimeType: s.type}, true);
-      }).catch(function(e){
-        if(e.code === 'already_signed') return;          // an earlier attempt landed
-        if(!retryable(e)) throw e;
-        return (e.network && state.id ? probe({id: state.id}) : Promise.resolve(null)).then(function(st){
-          if(st && st.signed) return;
-          if(n >= 3) throw e;
-          return wait(2000 * (n + 1)).then(function(){ return attempt(n + 1); });
-        });
-      });
+  /* -- the wait while the contract is built and emailed -- */
+  // The signature only counts once the team has the signed contract in their
+  // inbox, and the script takes several seconds to get it there. So the doctor
+  // waits — with a bar that runs about 20 seconds at an uneven pace, and a few
+  // lines about Saleem. If the email goes sooner the bar races to the end;
+  // if it takes longer, the bar holds near the end until it does.
+  var SEND_MS = 20000;
+  var FACTS = [
+    'سليم منصة صحية عراقية توصّل الخدمة الطبية للمريض وين ما يكون: بالبيت، بالشغل، أو حتى بالفندق.',
+    'بفريق سليم أكثر من ١٠٠ طبيب مرخّص، وأكثر من ٣٠ ممرض و٤٠ معالج طبيعي.',
+    'خدماتنا تشمل زيارة الطبيب والتمريض والعلاج الطبيعي والتحاليل والإيكو والسونار بالبيت.',
+    'نشتغل تقريباً ٢٤ ساعة باليوم، حتى بالعطل ونهاية الأسبوع.',
+    'بالاستشارة الأونلاين تستقبل مرضاك من مكانك، وسليم يتكفّل بالحجز والدفع والتنسيق.'
+  ];
+  function arDigits(n){ return String(n).replace(/\d/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'[d]; }); }
+
+  /** Keyframes from 0% at 0s to 100% at SEND_MS, in uneven steps: bursts
+   *  and crawls, a different pattern each time. */
+  function sendPlan(){
+    var n = 7, dur = [], inc = [], i, sd = 0, si = 0;
+    for(i = 0; i < n; i++){
+      dur.push(0.6 + Math.random());
+      // alternate quick and slow stretches so it never looks mechanical
+      inc.push(i % 2 === 0 ? 1.4 + Math.random() * 1.6 : 0.3 + Math.random() * 0.5);
+      sd += dur[i]; si += inc[i];
     }
-    sigReq = attempt(0).then(function(){
-      state.sig = null; save(); sigReq = null;
-    }, function(e){ sigReq = null; throw e; });
-    return sigReq;
+    var pts = [{t:0, p:0}], t = 0, p = 0;
+    for(i = 0; i < n; i++){
+      t += dur[i] / sd * SEND_MS; p += inc[i] / si * 100;
+      pts.push({t:t, p:p});
+    }
+    pts[n].p = 100; pts[n].t = SEND_MS;
+    return pts;
+  }
+  function planAt(pts, t){
+    for(var i = 1; i < pts.length; i++){
+      if(t <= pts[i].t){
+        var a = pts[i-1], b = pts[i], k = (t - a.t) / (b.t - a.t);
+        k = k * k * (3 - 2 * k);                       // ease within each stretch
+        return a.p + (b.p - a.p) * k;
+      }
+    }
+    return 100;
   }
 
-  /** The signature did not get through. A connection problem waits for the
-   *  next visit (or for the phone to come back online); a refusal takes the
-   *  doctor back to where they can fix it. */
-  function sigFailed(e){
-    if(retryable(e)){ console.warn('signature not delivered yet, will retry:', e.message); return; }
-    state.sig = null;
-    if(e.fromRegister) return bounce(e.message);
-    if(e.code === 'not_found'){
-      return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+  var sender = null;
+  function startSending(){
+    var step = document.getElementById('step-2'), box = document.getElementById('sending');
+    var fill = document.getElementById('sbar-fill'), pct = document.getElementById('sbar-pct');
+    var bar = document.getElementById('sbar'), fact = document.getElementById('fact');
+    var title = document.getElementById('send-title');
+    var pts = sendPlan(), t0 = performance.now(), shown = 0, doneAt = 0, from = 0, onDone = null;
+    var fi = 0, factTimer;
+
+    title.textContent = 'جاري إرسال عقدك لفريق سليم';
+    fact.textContent = FACTS[0]; fact.classList.remove('out');
+    factTimer = setInterval(function(){
+      fact.classList.add('out');
+      setTimeout(function(){ fi = (fi + 1) % FACTS.length; fact.textContent = FACTS[fi]; fact.classList.remove('out'); }, 350);
+    }, SEND_MS / FACTS.length);
+
+    step.classList.add('is-sending'); box.hidden = false;
+    box.scrollIntoView({behavior:'smooth', block:'center'});
+
+    function paint(v){
+      shown = v;
+      fill.style.width = v.toFixed(1) + '%';
+      var r = Math.floor(v);
+      pct.textContent = arDigits(r) + '٪';
+      bar.setAttribute('aria-valuenow', r);
     }
-    state.step = 1; save();
-    openIdx = 2; render();
-    err('sig-err', e.message);
-    document.getElementById('step-2').scrollIntoView({behavior:'smooth', block:'center'});
+    function frame(now){
+      if(!sender || sender.frame !== frame) return;
+      var t = now - t0, v;
+      if(doneAt){
+        // finished: close the gap fast, whatever the plan said
+        var k = Math.min(1, (now - doneAt) / 450);
+        v = from + (100 - from) * (1 - Math.pow(1 - k, 3));
+        paint(v);
+        if(k >= 1){ var cb = onDone; stop(); if(cb) cb(); return; }
+      } else if(t < SEND_MS){
+        v = Math.min(planAt(pts, t), 97);    // never 100% before it is true
+        paint(Math.max(v, shown));
+      } else {
+        // past 20s and still going: creep, never quite arriving
+        v = 97 + 2 * (1 - Math.exp(-(t - SEND_MS) / 12000));
+        if(t - SEND_MS > 1500) title.textContent = 'لحظات أخيرة…';
+        paint(Math.max(v, shown));
+      }
+      requestAnimationFrame(frame);
+    }
+    function stop(){
+      clearInterval(factTimer);
+      step.classList.remove('is-sending'); box.hidden = true;
+      paint(0); sender = null;
+    }
+    sender = {
+      frame: frame,
+      finish: function(cb){ if(doneAt) return; doneAt = performance.now(); from = shown; onDone = cb; },
+      stop: stop
+    };
+    paint(0);
+    requestAnimationFrame(frame);
+  }
+
+  /** Send the signature and resolve only once the server says the team has
+   *  been emailed. A lost reply is not taken as failure: the page asks the
+   *  script, and keeps asking while it is still working. */
+  function deliver(sig, tries){
+    tries = tries || 0;
+    return startRegister().catch(function(e){ e.fromRegister = true; throw e; }).then(function(){
+      return post({action:'signed', id: state.id, agreed:true,
+                   mode: sig.mode, sigB64: sig.b64, mimeType: sig.type});
+    }).catch(function(e){
+      if(e.fromRegister) throw e;
+      if(e.code === 'already_signed') return;             // an earlier attempt got there
+      if(e.code === 'in_progress' || e.network) return untilSigned(e);
+      if(e.code === 'busy' && tries < 2){
+        return wait(2500).then(function(){ return deliver(sig, tries + 1); });
+      }
+      throw e;
+    });
+  }
+  function untilSigned(cause){
+    var giveUp = Date.now() + 120000;
+    function check(){
+      return probe({id: state.id}).then(function(st){
+        if(st && st.signed) return;
+        var working = !st || st.status === 'signing';
+        if(working && Date.now() < giveUp) return wait(3000).then(check);
+        var e = new Error(st && st.status === 'mail_failed'
+          ? 'انحفظ توقيعك بس ما وصل لفريق سليم بعد. اضغط إرسال مرة ثانية.'
+          : (cause && cause.message) || 'ما وصل العقد لفريق سليم. اضغط إرسال مرة ثانية.');
+        throw e;
+      });
+    }
+    return wait(2500).then(check);
   }
 
   window.submitSignature = function(){
+    if(sender) return;                       // already sending
     if(!document.getElementById('agree').checked){
       return err('sig-err', 'أكّد قراءتك للعقد قبل التوقيع.');
     }
@@ -1343,13 +1457,22 @@ const CONFIG = {
       sig = {mode: 'draw', b64: small ? small.b64 : pad.toDataURL('image/png').split(',')[1], type: 'image/png'};
     }
     err('sig-err','');
+    startSending();
 
-    // Straight on to the last step. The signature is kept on the phone and
-    // sent behind them, so they never watch a spinner for it.
-    state.sig = sig;
-    completeStep(2);                   // saves, with the signature
-    save();
-    sendSignature().catch(sigFailed);
+    // The doctor stays here until the team has the signed contract by email.
+    deliver(sig).then(function(){
+      sender.finish(function(){ completeStep(2); });
+    }).catch(function(e){
+      if(sender) sender.stop();
+      if(e.fromRegister && !retryable(e)) return bounce(e.message);
+      if(e.code === 'not_found'){
+        return orphaned('ما لكينا طلبك — يمكن انحذف. عبّي بياناتك مرة ثانية ونجهّز لك عقد جديد.');
+      }
+      err('sig-err', e.fromRegister
+        ? 'ما كدرنا نحفظ بياناتك. تأكد من الإنترنت وحاول مرة ثانية.'
+        : e.message);
+      document.getElementById('sig-err').scrollIntoView({behavior:'smooth', block:'center'});
+    });
   };
 
   /* ---------- starting over ---------- */
@@ -1358,8 +1481,8 @@ const CONFIG = {
   // forever with no way back. Also how you re-test a live link.
   window.resetFlow = function(){
     try{ localStorage.removeItem(KEY); }catch(e){}
-    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null, sig:null };
-    regReq = null; sigReq = null; openIdx = 1;
+    state = { id:'', step:0, name:'', ts:0, reqKey:'', day:'', date:'', pending:null };
+    regReq = null; openIdx = 1;
     var form = document.getElementById('reg-form');
     if(form){ form.reset();
       ['name','phone','specialty','workplace','city'].forEach(function(k){
@@ -1388,10 +1511,6 @@ const CONFIG = {
   var wa = document.getElementById('help-wa');
   if(wa && CONFIG.whatsapp) wa.href = 'https://wa.me/' + CONFIG.whatsapp;
   render();
-  // a signature from last time that never reached the server
-  if(state.sig) sendSignature().catch(sigFailed);
-  addEventListener('online', function(){ if(state.sig) sendSignature().catch(sigFailed); });
-
   if(!state.id && state.step >= 1 && state.step < TOTAL){
     // left before their details finished saving
     if(state.pending) startRegister().catch(registerFailed);

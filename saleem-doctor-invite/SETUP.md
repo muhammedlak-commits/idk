@@ -9,22 +9,21 @@ Script deployment.
         ▼  the page moves straight on and shows the contract text with their
         ▼  name and the date; meanwhile, in the background:
         ▼  POST action:"register"
-    Apps Script appends a row to the Sheet and emails the team
+    Apps Script appends a row to the Sheet (no email)
         │
-        ▼  doctor ticks "I read it" and picks one of two ways to sign
-        ▼  POST action:"signed"
-    draw / photo — the signature image is filed in Drive and the row marked
-        "signing". The doctor never re-uploads the contract.
-    (The script still accepts a third route, mode "pdf" — a contract
-        signed by hand and uploaded — but the page no longer offers it.)
+        ▼  doctor ticks "I read it" and signs: draws, or uploads a photo
+        ▼  POST action:"signed" — the page shows a ~20 s progress bar with a
+        ▼  few lines about Saleem, and waits
+    Apps Script files the signature, builds the contract with it stamped
+    into every {{sig}}, files the PDF, and emails the team with it attached.
+    Only then does it answer ok.
         │
-        ▼  the page moves on at once; nothing is downloaded
+        ▼  the bar finishes and the last step opens; nothing is downloaded
         ▼  doctor fills the Google registration form
-        │
-        ▼  within a minute, finishPending (a time trigger) stamps the
-        ▼  signature into every {{sig}}, files the signed PDF, marks the row
-        ▼  "signed" and emails the team. The signed copy never goes back to
-        ▼  the page.
+
+The team gets **one email per doctor**: the signed contract, with the
+doctor's details. If that email fails, the doctor is told to press send
+again, and the retry resends the email without rebuilding the contract.
 
 No Drive link is ever made public — the PDF travels inside the response.
 
@@ -134,11 +133,8 @@ Then copy the doc id out of the URL:
    that account instead and deploy from there.
 
 4. Run **testSetup** once from the function dropdown. Grant the permissions it
-   asks for. It creates the sheet headers, checks that all four placeholders
-   are present in the Doc, and installs the every-minute `finishPending`
-   trigger that builds signed contracts and emails the team — read the log
-   before going further. Opening the `/exec` URL shows `"finishTrigger": true`
-   once it is in place.
+   asks for. It creates the sheet headers and checks that all four
+   placeholders are present in the Doc — read the log before going further.
 5. **Deploy → New deployment → Web app**
    - Execute as: **Me**
    - Who has access: **Anyone**  ← must be Anyone, or doctors get a login wall
@@ -182,9 +178,8 @@ Apps Script keeps serving the old code until you publish a new version:
 **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy.**
 The `/exec` URL stays the same.
 
-If the new version asks for a permission the old one did not (the
-`finishPending` trigger does), run **testSetup** once from the editor and
-approve it. Until then the web app cannot run.
+If you installed the `finishPending` trigger with an earlier version, delete
+it under **Triggers** (the clock icon) — it is no longer used.
 
 ## Troubleshooting
 
@@ -196,6 +191,5 @@ approve it. Until then the web app cannot run.
 | Signature missing from the signed copy | no `{{sig}}` in the Doc — run `testSetup` (does not apply to the pdf route) |
 | Doctors hit a Google login screen | the deployment is not set to "Anyone" |
 | Nothing reaches the Sheet | you edited `Code.gs` but did not deploy a **new version** |
-| Signed, but no "عقد موقّع" email | `finishPending` trigger not installed — run `testSetup`. Without it signing still works but builds the PDF while the doctor waits |
-| Row stuck at `stamp_failed` | the signature could not be stamped; `notes` says why, and the team email links the signature file |
+| Row at `mail_failed` | the contract was built but the email did not go; the doctor was asked to press send again, which resends it |
 | Doctor saw a connection error but the email arrived | the write landed and only the reply was lost; the page now asks the script what happened and carries on |
