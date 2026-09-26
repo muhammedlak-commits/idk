@@ -148,7 +148,7 @@ footer{font-size:12px;color:var(--muted);padding-top:8px}
       </div>
       <span class="sep"></span>
       <span class="flabel" style="min-width:0">Measure</span>
-      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat">Patients</button></div>
+      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served">Patient-days</button></div>
       <span class="flabel" style="min-width:0">By</span>
       <div class="seg" id="gran"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
     </div>
@@ -390,7 +390,7 @@ function loadEvents(){
 
 /* ---------- state ---------- */
 const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:''};
-const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patients'};
+const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days'};
 
 /* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */
 function series(a,b,m,cats,stats){
@@ -498,7 +498,7 @@ function renderKpis(){
   const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
   const tiles=[
     {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' per day · '+len+' days'},
-    ...(m!=='pat'?[{lab:'Patients',val:fmtInt(pat),d:[deltaChip(pat,patP,'vs prev'),deltaChip(pat,patY,'vs LY')],sub:pat? (ord/pat).toFixed(2)+' orders per patient':''}]:[]),
+    ...(m!=='pat'?[{lab:'Patient-days',val:fmtInt(pat),d:[deltaChip(pat,patP,'vs prev'),deltaChip(pat,patY,'vs LY')],sub:'A patient seen on 10 days counts 10 times, not unique patients'}]:[]),
     {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled orders ÷ all orders'},
     {lab:'Ad spend',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:groups.length===A.groups.length?'All campaigns':'Campaigns for selected services'},
     {lab:'Ad cost per order',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:'Spend ÷ orders, same dates'},
@@ -669,7 +669,7 @@ function renderSvcTable(){
   });
   const k=st.svcSort.k, dir=st.svcSort.dir;
   rows.sort((x,y)=>{const a1=x[k], b1=y[k]; if(a1==null) return 1; if(b1==null) return -1; return (a1<b1?-1:a1>b1?1:0)*dir;});
-  const cols=[['c','Service'],['cur',MLABEL[st.measure]],['share','Share'],['prevP','vs prev period'],['lyP','vs last year'],['canc','Cancel rate'],['pat','Patients'],['spend','Ad spend'],['cpo','Ad cost / order']];
+  const cols=[['c','Service'],['cur',MLABEL[st.measure]],['share','Share'],['prevP','vs prev period'],['lyP','vs last year'],['canc','Cancel rate'],['pat','Patient-days'],['spend','Ad spend'],['cpo','Ad cost / order']];
   const cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';
   const tot={cur:grand, prev:hasP?total(a-len,a-1,m,cats,stats):null, ly:hasY?total(a-364,b-364,m,cats,stats):null};
   const html='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
@@ -821,7 +821,7 @@ function boot(reload){
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
   } else { buildChips(); st.to=Math.min(Math.max(st.to,S.min),S.max); }
   document.getElementById('dataMeta').textContent='Orders to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);
-  document.getElementById('foot').textContent='Service data: Metabase export, '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
+  document.getElementById('foot').textContent='Service data: Metabase export, '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Patient-days are distinct patients per service per day added up, so they are not unique patients; that needs a separate export. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
   render();
 }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());
