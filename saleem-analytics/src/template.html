@@ -1,0 +1,831 @@
+<title>Saleem Performance Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --page:#f4f6f9; --surface:#ffffff; --surface-2:#f0f3f7; --ink:#0b1a2b; --ink-2:#46546a; --muted:#7c8799;
+  --grid:#e4e8ee; --axis:#c5ccd6; --border:rgba(11,26,43,.10); --navy:#003260; --navy-ink:#ffffff;
+  --accent:#1C75BC; --accent-wash:rgba(28,117,188,.10); --spend:#F98C41; --ghost:#aab3c0;
+  --good:#0a7d0a; --good-bg:rgba(12,163,12,.10); --bad:#c02f2f; --bad-bg:rgba(208,59,59,.09);
+  --hol:rgba(28,117,188,.07); --ram:rgba(249,140,65,.10); --evt:#7c8799;
+  --s1:#1C75BC; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948; --s-other:#9aa3b0;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --page:#0a1019; --surface:#111a26; --surface-2:#172232; --ink:#f3f6fa; --ink-2:#b8c2d0; --muted:#8490a2;
+    --grid:#1f2b3b; --axis:#34425a; --border:rgba(255,255,255,.09); --navy:#0c2744; --navy-ink:#ffffff;
+    --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --spend:#f08a45; --ghost:#5d6a7d;
+    --good:#2fbf4a; --good-bg:rgba(47,191,74,.13); --bad:#ef6b6b; --bad-bg:rgba(239,107,107,.13);
+    --hol:rgba(61,143,214,.10); --ram:rgba(240,138,69,.12); --evt:#8490a2;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s-other:#6b7686;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0a1019; --surface:#111a26; --surface-2:#172232; --ink:#f3f6fa; --ink-2:#b8c2d0; --muted:#8490a2;
+  --grid:#1f2b3b; --axis:#34425a; --border:rgba(255,255,255,.09); --navy:#0c2744; --navy-ink:#ffffff;
+  --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --spend:#f08a45; --ghost:#5d6a7d;
+  --good:#2fbf4a; --good-bg:rgba(47,191,74,.13); --bad:#ef6b6b; --bad-bg:rgba(239,107,107,.13);
+  --hol:rgba(61,143,214,.10); --ram:rgba(240,138,69,.12); --evt:#8490a2;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s-other:#6b7686;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:14px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0}
+h1,h2,h3{font-family:Montserrat,"Public Sans",system-ui,sans-serif;margin:0;text-wrap:balance;letter-spacing:-.01em}
+button,select,input{font:inherit;color:inherit}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
+header.top{background:var(--navy);color:var(--navy-ink)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:16px}
+.brand h1{font-size:19px;font-weight:700}
+.brand p{margin:2px 0 0;font-size:12.5px;opacity:.78}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500}
+.btn:hover{background:var(--surface-2)}
+.btn:focus-visible,.chip:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff}
+header .btn:hover{background:rgba(255,255,255,.18)}
+.meta{font-size:12px;opacity:.8}
+/* filters */
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+@media (max-width:700px){.filters{position:static}}
+.filters .wrap{display:flex;flex-direction:column;gap:8px;padding-block:10px}
+.frow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.flabel{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;min-width:64px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:5px 10px;cursor:pointer;font-size:12.5px;color:var(--ink-2);border-right:1px solid var(--border)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent-wash);color:var(--ink);font-weight:600}
+input[type=date],select{border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;background:var(--surface);color:var(--ink-2);user-select:none}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--s-other)}
+.chip.on{border-color:var(--accent);color:var(--ink);background:var(--accent-wash)}
+.chip.off .dot{opacity:.35}
+.linkbtn{border:0;background:none;color:var(--accent);cursor:pointer;font-size:12.5px;padding:2px 4px}
+.linkbtn:hover{text-decoration:underline}
+.sep{width:1px;height:18px;background:var(--border);margin-inline:4px}
+/* layout */
+main .wrap{display:flex;flex-direction:column;gap:18px;padding-top:18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.kpi .lab{font-size:12px;color:var(--ink-2);font-weight:500}
+.kpi .val{font-size:24px;font-weight:600;font-family:Montserrat,"Public Sans",sans-serif;letter-spacing:-.01em}
+.kpi.hero .val{font-size:34px}
+.kpi .deltas{display:flex;gap:6px;flex-wrap:wrap}
+.delta{font-size:11.5px;border-radius:6px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.delta.up{color:var(--good);background:var(--good-bg)}
+.delta.down{color:var(--bad);background:var(--bad-bg)}
+.delta.flat{color:var(--ink-2);background:var(--surface-2)}
+.kpi .sub{font-size:11.5px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.phead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.phead h2{font-size:16px;font-weight:600}
+.phead .desc{font-size:12.5px;color:var(--ink-2);margin-top:2px;max-width:75ch}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chart{position:relative;height:320px}
+.chart.sm{height:170px}
+.chart.md{height:260px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.legend i.box{width:12px;height:12px;border-radius:3px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.grid2>*{min-width:0}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.note{font-size:12px;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;font-variant-numeric:tabular-nums}
+th{font-weight:600;color:var(--ink-2);font-size:11.5px;background:var(--surface);position:sticky;top:0;cursor:pointer}
+th.nosort{cursor:default}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+tr.total td{font-weight:600;background:var(--surface-2)}
+tr.total td:first-child{background:var(--surface-2)}
+td .sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+td.pos{color:var(--good)} td.neg{color:var(--bad)}
+td.heat{font-weight:500}
+.badge{display:inline-block;font-size:10.5px;border-radius:4px;padding:0 5px;margin-left:4px;background:var(--ram);color:var(--ink-2);font-weight:600}
+.mhead{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.evlist{display:flex;flex-direction:column;gap:0;max-height:360px;overflow:auto}
+.ev{display:grid;grid-template-columns:110px 110px 1fr auto;gap:10px;padding:7px 4px;border-bottom:1px solid var(--grid);font-size:12.5px;align-items:baseline}
+.ev .d{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ev .c{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.ev .t{color:var(--ink)} .ev .t small{display:block;color:var(--muted);font-size:11.5px}
+@media (max-width:640px){.ev{grid-template-columns:1fr;gap:2px}}
+.evform{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.evform input[type=text]{border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px;min-width:0;flex:1 1 200px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:8px;font-size:13px;z-index:50}
+.callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:8px 12px;border-radius:0 8px 8px 0;font-size:12.5px;color:var(--ink-2)}
+footer{font-size:12px;color:var(--muted);padding-top:8px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Saleem Performance Lab</h1>
+      <p>Orders by service · MoM and YoY · Meta ads · holidays and events</p>
+    </div>
+    <div class="top-actions">
+      <span class="meta" id="dataMeta"></span>
+      <button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button>
+      <input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden>
+    </div>
+  </div>
+</header>
+
+<section class="filters" aria-label="Filters">
+  <div class="wrap">
+    <div class="frow">
+      <span class="flabel">Range</span>
+      <input type="date" id="dFrom" aria-label="From date"><span>–</span><input type="date" id="dTo" aria-label="To date">
+      <div class="seg" id="presets">
+        <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
+      </div>
+      <span class="sep"></span>
+      <span class="flabel" style="min-width:0">Measure</span>
+      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat">Patients</button></div>
+      <span class="flabel" style="min-width:0">By</span>
+      <div class="seg" id="gran"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
+    </div>
+    <div class="frow">
+      <span class="flabel">Services</span>
+      <div class="chips" id="svcChips"></div>
+    </div>
+    <div class="frow">
+      <span class="flabel">Quick</span>
+      <button class="linkbtn" data-q="all">All</button><button class="linkbtn" data-q="core">Core 4</button><button class="linkbtn" data-q="clinical">Clinical only</button><button class="linkbtn" data-q="imaging">Imaging</button><button class="linkbtn" data-q="b2b">B2B</button><button class="linkbtn" data-q="none">None</button>
+      <span class="sep"></span>
+      <span class="flabel" style="min-width:0">Status</span>
+      <div class="chips" id="stChips"></div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+
+    <section class="panel" aria-labelledby="trendH">
+      <div class="phead">
+        <div><h2 id="trendH">Orders over time</h2><div class="desc" id="trendDesc"></div></div>
+        <div class="ctrls">
+          <div class="seg" id="trendMode"><button data-t="total" class="on">Total</button><button data-t="split">By service</button></div>
+          <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
+          <label class="chip on" id="holToggle"><input type="checkbox" id="holChk" checked hidden>Holidays</label>
+          <label class="chip on" id="evtToggle"><input type="checkbox" id="evtChk" checked hidden>Events</label>
+        </div>
+      </div>
+      <div class="chart"><canvas id="trendChart" aria-label="Trend chart"></canvas></div>
+      <div class="legend" id="trendLegend"></div>
+      <div style="margin-top:14px">
+        <div class="phead" style="margin-bottom:4px"><div><h3 style="font-size:13.5px;font-weight:600">Meta ad spend (USD)</h3><div class="desc" id="spendDesc"></div></div></div>
+        <div class="chart sm"><canvas id="spendChart" aria-label="Ad spend chart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="momH">
+      <div class="phead">
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY.</div></div>
+        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="yoy">YoY %</button></div></div>
+      </div>
+      <div class="tablewrap"><table id="momTable"></table></div>
+    </section>
+
+    <section class="panel" aria-labelledby="svcH">
+      <div class="phead">
+        <div><h2 id="svcH">Service breakdown</h2><div class="desc" id="svcDesc"></div></div>
+      </div>
+      <div class="tablewrap"><table id="svcTable"></table></div>
+      <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Ad spend here is spend on campaigns for that service only; general, brand and app campaigns are shown in the ads section.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="adsH">
+      <div class="phead">
+        <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
+        <div class="ctrls"><select id="adGroupSel" aria-label="Ad group"></select></div>
+      </div>
+      <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
+      <div class="legend" id="adLegend"></div>
+      <div class="tablewrap" style="margin-top:14px;max-height:420px;overflow:auto"><table id="campTable"></table></div>
+      <p class="note" style="margin:8px 0 0">Campaigns are matched to services by name. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p>
+    </section>
+
+    <div class="grid2">
+      <section class="panel" aria-labelledby="holH">
+        <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</div></div></div>
+        <div class="tablewrap"><table id="holTable"></table></div>
+      </section>
+      <section class="panel" aria-labelledby="evH">
+        <div class="phead">
+          <div><h2 id="evH">Events log</h2><div class="desc">Political, economic and marketing events shown on the trend chart. Add Saleem's own events such as price changes, launches, contracts or outages.</div></div>
+          <div class="ctrls"><select id="evCat" aria-label="Event category"><option value="">All categories</option></select></div>
+        </div>
+        <div class="evlist" id="evList"></div>
+        <form class="evform" id="evForm">
+          <input type="date" id="evStart" required aria-label="Event date">
+          <select id="evNewCat" aria-label="New event category"><option>Internal</option><option>Marketing</option><option>Political</option><option>Economic</option><option>Health</option></select>
+          <input type="text" id="evTitle" placeholder="What happened, e.g. physio price change" required aria-label="Event title">
+          <button class="btn" type="submit">Add event</button>
+          <button class="btn" type="button" id="evCopy">Copy as CSV</button>
+        </form>
+        <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
+      </section>
+    </div>
+
+    <footer id="foot"></footer>
+  </div>
+</main>
+
+<script id="payload" type="application/json">/*DATA*/</script>
+<script>
+(function(){
+'use strict';
+const P = JSON.parse(document.getElementById('payload').textContent);
+
+/* ---------- storage (per-viewer conveniences only) ---------- */
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+
+/* ---------- dates: integer day numbers in UTC ---------- */
+const DAY=86400000;
+const toN = s => Math.round(Date.UTC(+s.slice(0,4), +s.slice(5,7)-1, +s.slice(8,10))/DAY);
+const toS = n => new Date(n*DAY).toISOString().slice(0,10);
+const dow = n => new Date(n*DAY).getUTCDay();        // 0 Sun .. 5 Fri, 6 Sat
+const monthKey = n => toS(n).slice(0,7);
+const weekStart = n => n - ((dow(n)+1)%7);           // Iraqi week starts Saturday
+const monthStart = n => toN(toS(n).slice(0,7)+'-01');
+const daysInMonth = mk => new Date(Date.UTC(+mk.slice(0,4), +mk.slice(5,7), 0)).getUTCDate();
+const addMonths = (mk,k)=>{const y=+mk.slice(0,4), m=+mk.slice(5,7)-1+k; const d=new Date(Date.UTC(y,m,1)); return d.toISOString().slice(0,7)};
+const fmtD = n => new Date(n*DAY).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+const fmtDs = n => new Date(n*DAY).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'});
+const fmtM = mk => new Date(Date.UTC(+mk.slice(0,4), +mk.slice(5,7)-1, 1)).toLocaleDateString('en-GB',{month:'short',year:'2-digit',timeZone:'UTC'});
+const fmtInt = v => Math.round(v||0).toLocaleString('en-US');
+const fmtUsd = v => '$'+(Math.abs(v)>=10000? Math.round(v).toLocaleString('en-US') : (v||0).toLocaleString('en-US',{maximumFractionDigits: v<100?2:0, minimumFractionDigits: v<100&&v>0?2:0}));
+const fmtPct = (v,d=0) => v==null||!isFinite(v) ? '–' : (v>0?'+':'')+v.toFixed(d)+'%';
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+/* ---------- services ---------- */
+const SVC_LABEL = {physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',xRay:'X-ray',ultrasound:'Ultrasound',woundCare:'Wound care',echocardiogram:'Echo',onlineConsultation:'Online consultation',doppler:'Doppler',productPurchase:'Product purchase',eyeExam:'Eye exam',psychiatristVisit:'Psychiatrist visit',ambulance:'Ambulance',surgeries:'Surgeries',booking:'Booking',b2b:'B2B (other)'};
+const label = c => SVC_LABEL[c] || c.replace(/([A-Z])/g,' $1').replace(/^./,x=>x.toUpperCase());
+const QUICK = {
+  core:['physiotherapy','nursing','doctorVisit','labTest'],
+  imaging:['xRay','ultrasound','echocardiogram','doppler'],
+  b2b:['physiotherapy (b2b)','b2b'],
+  nonclinical:['productPurchase','booking','b2b','physiotherapy (b2b)']
+};
+/* ad group -> service categories it promotes */
+const GROUP_SVCS = {'Physiotherapy':['physiotherapy'],'Nursing':['nursing'],'Doctor visit':['doctorVisit'],'Lab tests':['labTest'],
+  'Imaging':['xRay','ultrasound','echocardiogram','doppler'],'Wound care':['woundCare'],'Eye exam':['eyeExam'],'Surgery':['surgeries'],
+  'Telemedicine':['onlineConsultation','psychiatristVisit'],'B2B':['physiotherapy (b2b)','b2b'],'Products':['productPurchase']};
+const SHARED_GROUPS = ['All services (general)','Brand & awareness','App','International referral','Recruitment'];
+
+/* ---------- data model ---------- */
+let S = null;   // services model
+function buildServices(csvText){
+  const lines = csvText.trim().split(/\r?\n/);
+  const hdr = lines[0].split(',').map(h=>h.trim());
+  const ix = n => hdr.indexOf(n);
+  const iDay=ix('day'), iCat=ix('service_category'), iSt=ix('visit_status'), iS=ix('services_delivered'), iO=ix('distinct_orders'), iP=ix('distinct_patients');
+  if(iDay<0||iCat<0||iO<0) throw new Error('This CSV needs day, service_category and distinct_orders columns.');
+  const cats=new Map(), sts=new Map(), rows=[];
+  let min=Infinity, max=-Infinity;
+  for(let k=1;k<lines.length;k++){
+    const f=splitCsv(lines[k]); if(f.length<hdr.length-1) continue;
+    const n=toN(f[iDay].slice(0,10)); if(!isFinite(n)) continue;
+    const c=f[iCat].trim(), st=iSt>=0?f[iSt].trim():'finished';
+    if(!cats.has(c)) cats.set(c,cats.size); if(!sts.has(st)) sts.set(st,sts.size);
+    rows.push([n,cats.get(c),sts.get(st), +f[iS]||0, +f[iO]||0, iP>=0?(+f[iP]||0):0]);
+    if(n<min)min=n; if(n>max)max=n;
+  }
+  const catList=[...cats.keys()], stList=[...sts.keys()];
+  const N=max-min+1, C=catList.length, T=stList.length;
+  // cube[m][ (d*C + c)*T + t ]
+  const cube=[new Float64Array(N*C*T),new Float64Array(N*C*T),new Float64Array(N*C*T)];
+  for(const r of rows){const o=((r[0]-min)*C+r[1])*T+r[2]; cube[0][o]+=r[3]; cube[1][o]+=r[4]; cube[2][o]+=r[5];}
+  // colour order fixed by all-time non-cancelled orders, so a filter never repaints a service
+  const tot=catList.map((c,ci)=>{let s=0; for(let d=0;d<N;d++) for(let t=0;t<T;t++) if(stList[t]!=='cancelled') s+=cube[1][(d*C+ci)*T+t]; return s;});
+  const order=catList.map((c,i)=>i).sort((a,b)=>tot[b]-tot[a]);
+  const colorOf={}; order.forEach((ci,rank)=>{colorOf[catList[ci]] = rank<8? 'var(--s'+(rank+1)+')' : 'var(--s-other)';});
+  return {min,max,N,C,T,catList,stList,cube,order,tot,colorOf,rowCount:rows.length};
+}
+function splitCsv(line){
+  if(line.indexOf('"')<0) return line.split(',');
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<line.length;i++){const ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){cur+='"';i++} else q=false } else cur+=ch }
+    else if(ch==='"') q=true; else if(ch===','){out.push(cur);cur=''} else cur+=ch;}
+  out.push(cur); return out;
+}
+function parseCsvObjects(text){
+  const lines=text.trim().split(/\r?\n/); const hdr=splitCsv(lines[0]).map(h=>h.trim());
+  return lines.slice(1).filter(l=>l.trim()).map(l=>{const f=splitCsv(l); const o={}; hdr.forEach((h,i)=>o[h]=(f[i]||'').trim()); return o;});
+}
+
+/* ---------- ads model ---------- */
+let A = null;
+function buildAds(dailyText, monthlyText, mapText){
+  const daily=parseCsvObjects(dailyText), monthly=parseCsvObjects(monthlyText), map=parseCsvObjects(mapText);
+  const groupOf={}; map.forEach(r=>groupOf[r.campaign_id]=r.ad_group||'All services (general)');
+  const dSpend=new Map(); daily.forEach(r=>dSpend.set(toN(r.day), +r.spend_usd||0));
+  const mTot={}; for(const [n,v] of dSpend){const mk=monthKey(n); mTot[mk]=(mTot[mk]||0)+v;}
+  const camps={}; const gm={};  // gm[group][month] = {spend, conv}
+  monthly.forEach(r=>{
+    const g=groupOf[r.campaign_id]||'All services (general)';
+    const c=camps[r.campaign_id] || (camps[r.campaign_id]={id:r.campaign_id,name:r.campaign_name,objective:r.objective,group:g,months:{}});
+    const isConv=/messaging_conversation_started/.test(r.result_type);
+    c.months[r.month]={spend:+r.spend_usd||0,impr:+r.impressions||0,clicks:+r.clicks||0,link:+r.link_clicks||0,res:+r.results||0,rtype:r.result_type,conv:isConv?(+r.results||0):0};
+    const gg=gm[g]||(gm[g]={}); const x=gg[r.month]||(gg[r.month]={spend:0,conv:0});
+    x.spend+=+r.spend_usd||0; if(isConv) x.conv+=+r.results||0;
+  });
+  const groups=Object.keys(gm).sort((a,b)=>sumG(gm[b])-sumG(gm[a]));
+  function sumG(o){return Object.values(o).reduce((s,x)=>s+x.spend,0)}
+  // weight of each day inside its month, from daily account spend (falls back to even split)
+  function w(n){const mk=monthKey(n), t=mTot[mk]; return t>0 ? (dSpend.get(n)||0)/t : 1/daysInMonth(mk);}
+  return {dSpend,mTot,camps,gm,groups,w,
+    minDay:Math.min(...dSpend.keys()), maxDay:Math.max(...dSpend.keys())};
+}
+
+/* ---------- holidays (Umm al-Qura Hijri calendar via Intl) ---------- */
+let HIJ=null;
+try{ HIJ=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',timeZone:'UTC'}); }catch(e){}
+const hijCache=new Map();
+function hijri(n){ if(hijCache.has(n)) return hijCache.get(n); let r=null;
+  if(HIJ){ try{ const p=HIJ.formatToParts(new Date(n*DAY+12*3600000)); r={m:+p.find(x=>x.type==='month').value,d:+p.find(x=>x.type==='day').value}; }catch(e){} }
+  hijCache.set(n,r); return r; }
+const HOLS=[
+  {k:'ramadan',  name:'Ramadan',             long:true, t:h=>h&&h.m===9},
+  {k:'fitr',     name:'Eid al-Fitr',         t:h=>h&&h.m===10&&h.d<=3},
+  {k:'adha',     name:'Eid al-Adha',         t:h=>h&&h.m===12&&h.d>=9&&h.d<=13},
+  {k:'ghadir',   name:'Eid al-Ghadir',       t:h=>h&&h.m===12&&h.d===18},
+  {k:'hnewyear', name:'Islamic New Year',    t:h=>h&&h.m===1&&h.d===1},
+  {k:'ashura',   name:'Ashura',              t:h=>h&&h.m===1&&h.d>=9&&h.d<=10},
+  {k:'arbaeen',  name:'Arbaeen pilgrimage',  t:h=>h&&h.m===2&&h.d>=13&&h.d<=20},
+  {k:'mawlid',   name:'Prophet’s Birthday', t:h=>h&&h.m===3&&(h.d===12||h.d===17)},
+  {k:'fixed',    name:'Public holiday',      g:true, t:(h,n)=>!!FIXED[toS(n).slice(5)]}
+];
+const FIXED={'01-01':'New Year’s Day','01-06':'Army Day','03-21':'Nowruz','05-01':'Labour Day','07-14':'Republic Day','10-03':'National Day','12-10':'Victory Day','12-25':'Christmas'};
+function holsOn(n){const h=hijri(n); const out=[]; for(const H of HOLS){ if(H.t(h,n)) out.push(H.k==='fixed'?FIXED[toS(n).slice(5)]:H.name); } return out;}
+function holKeysOn(n){const h=hijri(n); return HOLS.filter(H=>H.t(h,n)).map(H=>H.k);}
+function holidayWindows(from,to){ // contiguous windows per holiday type
+  const res=[];
+  for(const H of HOLS){ let s=null;
+    for(let n=from;n<=to+1;n++){ const on = n<=to && H.t(hijri(n),n);
+      if(on&&s===null) s=n; if(!on&&s!==null){ res.push({k:H.k,name:H.k==='fixed'?FIXED[toS(s).slice(5)]:H.name,s,e:n-1,long:!!H.long}); s=null; } } }
+  return res.sort((a,b)=>a.s-b.s);
+}
+
+/* ---------- events ---------- */
+let EVENTS=[];
+function loadEvents(){
+  const base=parseCsvObjects(P.events).map(r=>({s:toN(r.start),e:r.end?toN(r.end):toN(r.start),cat:r.category,title:r.title,note:r.note,own:false}));
+  let mine=[]; try{ mine=JSON.parse(lsGet('spl.events')||'[]'); }catch(e){}
+  EVENTS=base.concat(mine.map(m=>({...m,own:true}))).sort((a,b)=>a.s-b.s);
+}
+
+/* ---------- state ---------- */
+const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:''};
+const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patients'};
+
+/* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */
+function series(a,b,m,cats,stats){
+  const out=new Float64Array(b-a+1); const cube=S.cube[MI[m]], C=S.C, T=S.T;
+  const ci=cats.map(c=>S.catList.indexOf(c)).filter(i=>i>=0), ti=stats.map(s=>S.stList.indexOf(s)).filter(i=>i>=0);
+  for(let n=Math.max(a,S.min);n<=Math.min(b,S.max);n++){ const d=n-S.min; let s=0;
+    for(const c of ci){ const base=(d*C+c)*T; for(const t of ti) s+=cube[base+t]; } out[n-a]=s; }
+  return out;
+}
+const sum = arr => { let s=0; for(const v of arr) s+=v; return s; };
+function total(a,b,m,cats,stats){ return sum(series(a,b,m,cats,stats)); }
+function covered(a,b){ return a>=S.min && b<=S.max; }
+const selCats = () => S.catList.filter(c=>st.svc.has(c));
+const selStats = () => S.stList.filter(s=>st.status.has(s));
+
+/* ad spend per day for a set of groups */
+function adDaily(a,b,groups,field){
+  const out=new Float64Array(b-a+1);
+  for(let n=a;n<=b;n++){ const mk=monthKey(n), w=A.w(n); let s=0;
+    for(const g of groups){ const x=A.gm[g]&&A.gm[g][mk]; if(x) s+=x[field||'spend']*w; } out[n-a]=s; }
+  return out;
+}
+function groupsForCats(cats){
+  const set=new Set(cats); const allSel = S.catList.every(c=>st.svc.has(c));
+  if(allSel) return A.groups.slice();
+  return A.groups.filter(g=>GROUP_SVCS[g] && GROUP_SVCS[g].some(c=>set.has(c)));
+}
+
+/* ---------- UI: filters ---------- */
+function buildChips(){
+  const box=document.getElementById('svcChips'); box.innerHTML='';
+  S.order.map(i=>S.catList[i]).forEach(c=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.c=c;
+    b.innerHTML='<span class="dot" style="background:'+S.colorOf[c]+'"></span>'+esc(label(c));
+    b.title='Click to toggle. Double-click to show only this service.';
+    b.addEventListener('click',()=>{ st.svc.has(c)?st.svc.delete(c):st.svc.add(c); render(); });
+    b.addEventListener('dblclick',()=>{ st.svc=new Set([c]); render(); });
+    box.appendChild(b);
+  });
+  const sb=document.getElementById('stChips'); sb.innerHTML='';
+  S.stList.forEach(s=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.s=s; b.textContent=s.charAt(0).toUpperCase()+s.slice(1);
+    b.addEventListener('click',()=>{ st.status.has(s)?st.status.delete(s):st.status.add(s); render(); });
+    sb.appendChild(b);
+  });
+}
+function syncChips(){
+  document.querySelectorAll('#svcChips .chip').forEach(b=>{const on=st.svc.has(b.dataset.c); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
+  document.querySelectorAll('#stChips .chip').forEach(b=>{const on=st.status.has(b.dataset.s); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
+  const seg=(id,attr,val)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===val));
+  seg('measure','m',st.measure); seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
+  document.getElementById('dFrom').value=toS(st.from); document.getElementById('dTo').value=toS(st.to);
+  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
+}
+function preset(p){
+  const end=S.max; let a=S.min, b=end;
+  if(p==='30d') a=end-29; else if(p==='90d') a=end-89; else if(p==='mtd') a=monthStart(end);
+  else if(p==='lastm'){ b=monthStart(end)-1; a=monthStart(b); }
+  else if(p==='ytd') a=toN(toS(end).slice(0,4)+'-01-01'); else if(p==='12m') a=toN(addMonths(monthKey(end),-11)+'-01');
+  st.from=Math.max(a,S.min); st.to=b;
+  if(p==='30d'||p==='mtd'||p==='lastm') st.gran='day'; else if(p==='all'||p==='12m') st.gran= p==='all'?'month':'week'; else st.gran='week';
+  render();
+}
+function wireFilters(){
+  document.querySelectorAll('#presets button').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.p)));
+  document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{st.measure=b.dataset.m;render();}));
+  document.querySelectorAll('#gran button').forEach(b=>b.addEventListener('click',()=>{st.gran=b.dataset.g;render();}));
+  document.querySelectorAll('#trendMode button').forEach(b=>b.addEventListener('click',()=>{st.trend=b.dataset.t;render();}));
+  document.querySelectorAll('#momMode button').forEach(b=>b.addEventListener('click',()=>{st.mom=b.dataset.v;renderMom();syncChips();}));
+  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).addEventListener('click',e=>{e.preventDefault(); st[k]=!st[k]; render();}));
+  document.getElementById('dFrom').addEventListener('change',e=>{const n=toN(e.target.value); if(isFinite(n)){st.from=Math.max(S.min,Math.min(n,st.to)); render();}});
+  document.getElementById('dTo').addEventListener('change',e=>{const n=toN(e.target.value); if(isFinite(n)){st.to=Math.min(S.max,Math.max(n,st.from)); render();}});
+  document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{
+    const q=b.dataset.q;
+    if(q==='all') st.svc=new Set(S.catList);
+    else if(q==='none') st.svc=new Set();
+    else if(q==='clinical') st.svc=new Set(S.catList.filter(c=>!QUICK.nonclinical.includes(c)));
+    else st.svc=new Set(S.catList.filter(c=>QUICK[q].includes(c)));
+    render();
+  }));
+  document.getElementById('adGroupSel').addEventListener('change',e=>{st.adGroup=e.target.value; renderAds();});
+  document.getElementById('evCat').addEventListener('change',e=>{st.evCat=e.target.value; renderEvents();});
+}
+
+/* ---------- KPIs ---------- */
+function deltaChip(cur,prev,label,upGood=true){
+  if(!prev||!isFinite(prev)) return '<span class="delta flat">'+label+' –</span>';
+  const p=(cur-prev)/prev*100, cls=Math.abs(p)<1?'flat':((p>0)===upGood?'up':'down'), arrow=p>0?'▲':p<0?'▼':'';
+  return '<span class="delta '+cls+'" title="'+label+'">'+arrow+' '+fmtPct(p)+' '+label+'</span>';
+}
+function renderKpis(){
+  const cats=selCats(), stats=selStats(), a=st.from, b=st.to, len=b-a+1;
+  const pa=a-len, pb=a-1, ya=a-364, yb=b-364;
+  const hasP=covered(pa,pb), hasY=covered(ya,yb);
+  const m=st.measure;
+  const cur=total(a,b,m,cats,stats), prev=hasP?total(pa,pb,m,cats,stats):null, ly=hasY?total(ya,yb,m,cats,stats):null;
+  const allStats=S.stList; const canc=S.stList.filter(s=>s==='cancelled');
+  const cRate=(x,y)=>{const all=total(x,y,'ord',cats,allStats); return all? total(x,y,'ord',cats,canc)/all*100 : null;};
+  const cr=cRate(a,b), crp=hasP?cRate(pa,pb):null, cry=hasY?cRate(ya,yb):null;
+  const groups=groupsForCats(cats);
+  const spend=sum(adDaily(a,b,groups)), spendP=hasP?sum(adDaily(pa,pb,groups)):null, spendY=hasY?sum(adDaily(ya,yb,groups)):null;
+  const conv=sum(adDaily(a,b,groups,'conv'));
+  const ord=total(a,b,'ord',cats,stats), ordP=hasP?total(pa,pb,'ord',cats,stats):null, ordY=hasY?total(ya,yb,'ord',cats,stats):null;
+  const cpo=ord?spend/ord:null, cpoP=ordP?spendP/ordP:null, cpoY=ordY?spendY/ordY:null;
+  const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
+  const tiles=[
+    {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' per day · '+len+' days'},
+    ...(m!=='pat'?[{lab:'Patients',val:fmtInt(pat),d:[deltaChip(pat,patP,'vs prev'),deltaChip(pat,patY,'vs LY')],sub:pat? (ord/pat).toFixed(2)+' orders per patient':''}]:[]),
+    {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled orders ÷ all orders'},
+    {lab:'Ad spend',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:groups.length===A.groups.length?'All campaigns':'Campaigns for selected services'},
+    {lab:'Ad cost per order',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:'Spend ÷ orders, same dates'},
+    {lab:'WhatsApp conversations',val:fmtInt(conv),d:[],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation, message campaigns only':'From message campaigns'}
+  ];
+  document.getElementById('kpis').innerHTML=tiles.map(t=>'<div class="kpi'+(t.hero?' hero':'')+'"><span class="lab">'+t.lab+'</span><span class="val">'+t.val+'</span><div class="deltas">'+t.d.join('')+'</div><span class="sub">'+t.sub+'</span></div>').join('');
+}
+function ptsChip(cur,prev,label){
+  if(cur==null||prev==null) return '<span class="delta flat">'+label+' –</span>';
+  const d=cur-prev, cls=Math.abs(d)<0.3?'flat':(d<0?'up':'down');
+  return '<span class="delta '+cls+'">'+(d>0?'▲ +':d<0?'▼ ':'')+d.toFixed(1)+' pts '+label+'</span>';
+}
+/* spend of message campaigns only, so cost per conversation is not diluted by sales or install campaigns */
+function sumConvSpend(a,b,groups){
+  let s=0; const gs=new Set(groups);
+  for(const c of Object.values(A.camps)){ if(!gs.has(c.group)) continue;
+    for(const [mk,x] of Object.entries(c.months)){ if(!x.conv) continue;
+      const m0=toN(mk+'-01'), m1=m0+daysInMonth(mk)-1, lo=Math.max(a,m0), hi=Math.min(b,m1); if(lo>hi) continue;
+      let w=0; for(let n=lo;n<=hi;n++) w+=A.w(n); s+=x.spend*w; } }
+  return s;
+}
+
+/* ---------- bucketing ---------- */
+function buckets(a,b,g){
+  const keys=[], idx=new Map();
+  for(let n=a;n<=b;n++){ const k= g==='day'?n : g==='week'?weekStart(n) : monthStart(n);
+    if(!idx.has(k)){ idx.set(k,keys.length); keys.push({k,days:0}); } keys[idx.get(k)].days++; }
+  return {keys, at:n=>idx.get(g==='day'?n : g==='week'?weekStart(n) : monthStart(n))};
+}
+function bucketLabel(k,g){ return g==='month'? fmtM(monthKey(k)) : fmtDs(k)+(g==='week'?'':''); }
+function aggregate(arr,a,B){ const out=new Float64Array(B.keys.length); for(let i=0;i<arr.length;i++) out[B.at(a+i)]+=arr[i]; return out; }
+
+/* ---------- chart plumbing ---------- */
+let trendChart=null, spendChart=null, adChart=null;
+function baseOpts(){
+  const tick=css('--muted'), grid=css('--grid');
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:css('--surface'),titleColor:css('--ink'),bodyColor:css('--ink-2'),footerColor:css('--muted'),borderColor:css('--axis'),borderWidth:1,padding:10,boxPadding:4,usePointStyle:true,footerFont:{weight:'normal',size:11}}},
+    scales:{x:{grid:{display:false},border:{color:css('--axis')},ticks:{color:tick,maxRotation:0,autoSkip:true,autoSkipPadding:18,font:{size:11}}},
+            y:{beginAtZero:true,grid:{color:grid},border:{display:false},ticks:{color:tick,font:{size:11},callback:v=>Number(v).toLocaleString('en-US')}}}};
+}
+/* shaded holiday bands + event ticks, drawn behind the data */
+const bandPlugin={id:'bands',beforeDatasetsDraw(chart,args,opts){
+  const bands=opts.bands||[]; if(!bands.length) return;
+  const {ctx,chartArea:ca,scales:{x}}=chart; ctx.save();
+  for(const b of bands){
+    const x0=x.getPixelForValue(b.i0)-(b.half||0), x1=x.getPixelForValue(b.i1)+(b.half||0);
+    if(b.type==='event'){ ctx.strokeStyle=opts.evtColor; ctx.lineWidth=1; ctx.beginPath(); const xm=(x0+x1)/2; ctx.moveTo(xm,ca.top); ctx.lineTo(xm,ca.bottom); ctx.stroke();
+      ctx.fillStyle=opts.evtColor; ctx.beginPath(); ctx.arc(xm,ca.top+4,3.5,0,Math.PI*2); ctx.fill(); }
+    else { ctx.fillStyle=b.type==='ramadan'?opts.ramColor:opts.holColor; ctx.fillRect(Math.max(ca.left,x0),ca.top,Math.min(ca.right,x1)-Math.max(ca.left,x0),ca.bottom-ca.top); }
+  }
+  ctx.restore();
+}};
+Chart.register(bandPlugin);
+
+function bandsFor(a,b,B,g){
+  const out=[]; const half = g==='day'? 0.5 : 0.5;
+  const px=(i)=>i; // category index
+  if(st.hol){ for(const w of holidayWindows(a,b)){ if(w.k==='fixed'&&g!=='day') continue;
+      out.push({type:w.k==='ramadan'?'ramadan':'hol',i0:B.at(w.s),i1:B.at(w.e),half:0}); } }
+  if(st.evt){ for(const e of EVENTS){ if(e.s<a||e.s>b) continue; out.push({type:'event',i0:B.at(e.s),i1:B.at(e.s)}); } }
+  return out;
+}
+function hoverNotes(B,a,b,g){
+  // per bucket: holidays and events inside it
+  return B.keys.map(({k,days})=>{
+    const end = g==='day'?k : g==='week'?k+6 : k+daysInMonth(monthKey(k))-1;
+    const lo=Math.max(k,a), hi=Math.min(end,b), hol=new Set(), ev=[];
+    for(let n=lo;n<=hi;n++) holsOn(n).forEach(h=>hol.add(h));
+    EVENTS.forEach(e=>{ if(e.s>=lo&&e.s<=hi) ev.push(e.title); });
+    return {hol:[...hol], ev};
+  });
+}
+
+/* ---------- trend ---------- */
+function renderTrend(){
+  const cats=selCats(), stats=selStats(), a=st.from, b=st.to, g=st.gran, m=st.measure;
+  const B=buckets(a,b,g), labels=B.keys.map(x=>bucketLabel(x.k,g));
+  const ds=[];
+  const partial = B.keys.map((x,i)=>{ const full = g==='day'?1 : g==='week'?7 : daysInMonth(monthKey(x.k)); return x.days<full; });
+  if(st.trend==='total' || cats.length<=1){
+    const cur=aggregate(series(a,b,m,cats,stats),a,B);
+    ds.push({label:MLABEL[m],data:[...cur],borderColor:css('--accent'),backgroundColor:css('--accent-wash'),fill:true,borderWidth:2,pointRadius:g==='month'?3:0,pointHoverRadius:5,tension:.25,order:1});
+    if(st.ly && covered(a-364,b-364)){
+      const ly=aggregate(series(a-364,b-364,m,cats,stats),a,B);
+      ds.push({label:'Same period last year',data:[...ly],borderColor:css('--ghost'),borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.25,fill:false,order:2});
+    }
+  } else {
+    const ranked=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
+    const top=ranked.slice(0,7), rest=ranked.slice(7);
+    top.forEach(c=>{ const v=aggregate(series(a,b,m,[c],stats),a,B); const col=css(S.colorOf[c].slice(4,-1));
+      ds.push({label:label(c),data:[...v],borderColor:col,backgroundColor:col,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}); });
+    if(rest.length){ const v=aggregate(series(a,b,m,rest,stats),a,B); ds.push({label:'Other ('+rest.length+')',data:[...v],borderColor:css('--s-other'),borderWidth:2,pointRadius:0,tension:.25}); }
+  }
+  const notes=hoverNotes(B,a,b,g);
+  const opts=baseOpts();
+  opts.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt')};
+  opts.plugins.tooltip.callbacks={
+    title:items=>{const i=items[0].dataIndex, k=B.keys[i].k; return g==='week'? 'Week of '+fmtD(k)+(partial[i]?' (partial)':'') : g==='month'? fmtM(monthKey(k))+(partial[i]?' (partial)':'') : new Date(k*DAY).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});},
+    label:it=>' '+it.dataset.label+': '+fmtInt(it.parsed.y),
+    footer:items=>{const n=notes[items[0].dataIndex]; const out=[]; if(n.hol.length) out.push('Holidays: '+n.hol.join(', ')); n.ev.slice(0,4).forEach(e=>out.push('• '+e)); return out;}
+  };
+  if(trendChart) trendChart.destroy();
+  trendChart=new Chart(document.getElementById('trendChart'),{type:'line',data:{labels,datasets:ds},options:opts});
+  const leg=document.getElementById('trendLegend');
+  const items=ds.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>');
+  if(st.hol) items.push('<span><i class="box" style="background:'+css('--ram')+'"></i>Ramadan</span><span><i class="box" style="background:'+css('--hol')+'"></i>Other holidays</span>');
+  if(st.evt) items.push('<span><i style="background:'+css('--evt')+';width:2px;height:12px"></i>Event (hover for details)</span>');
+  leg.innerHTML=items.join('');
+  const total_=total(a,b,m,cats,stats);
+  document.getElementById('trendH').textContent=MLABEL[m]+' over time';
+  document.getElementById('trendDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
+
+  // spend chart on the same buckets (separate axis, separate chart: never dual-axis)
+  const groups=groupsForCats(cats);
+  const sp=aggregate(adDaily(a,b,groups),a,B);
+  const o2=baseOpts(); o2.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt')};
+  o2.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US'); o2.scales.y.ticks.maxTicksLimit=4;
+  o2.plugins.tooltip.callbacks={title:opts.plugins.tooltip.callbacks.title,label:it=>' Spend: '+fmtUsd(it.parsed.y),
+    afterLabel:it=>{const o=aggregate(series(a,b,'ord',cats,stats),a,B)[it.dataIndex]; return o? ' Cost per order: '+fmtUsd(it.parsed.y/o):'';},footer:opts.plugins.tooltip.callbacks.footer};
+  if(spendChart) spendChart.destroy();
+  spendChart=new Chart(document.getElementById('spendChart'),{type:'bar',data:{labels,datasets:[{label:'Ad spend',data:[...sp],backgroundColor:css('--spend'),borderRadius:{topLeft:3,topRight:3},borderSkipped:'bottom',maxBarThickness:24,categoryPercentage:.8,barPercentage:.9}]},options:o2});
+  document.getElementById('spendDesc').textContent= groups.length===A.groups.length ? 'All campaigns · '+fmtUsd(sum(sp))+' in range' : 'Campaigns promoting the selected services · '+fmtUsd(sum(sp))+' in range (general and brand campaigns excluded)';
+}
+
+/* ---------- month table ---------- */
+function ramadanDays(mk){ const s=toN(mk+'-01'), n=daysInMonth(mk); let c=0; for(let i=0;i<n;i++){const h=hijri(s+i); if(h&&h.m===9) c++;} return c; }
+function renderMom(){
+  const cats=selCats(), stats=selStats(), m=st.measure;
+  const endMk=monthKey(st.to); const months=[]; for(let k=12;k>=0;k--){ const mk=addMonths(endMk,-k); const s=toN(mk+'-01'); if(s+daysInMonth(mk)-1>=S.min) months.push(mk); }
+  const span=mk=>{const s=toN(mk+'-01'), e=Math.min(s+daysInMonth(mk)-1,S.max); return [Math.max(s,S.min),e];};
+  const val=(mk,cs)=>{const [s,e]=span(mk); if(e<s) return null; const t=total(s,e,m,cs,stats); return {t,pd:t/(e-s+1),days:e-s+1,full:daysInMonth(mk)};};
+  const rows=[{name:'All selected',cats,total:true}].concat(S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c)).map(c=>({name:label(c),cats:[c],color:S.colorOf[c]})));
+  const head='<thead><tr><th class="nosort">Service</th>'+months.map(mk=>{const r=ramadanDays(mk), v=val(mk,cats); return '<th class="nosort"><div class="mhead"><span>'+fmtM(mk)+(v&&v.days<v.full?'*':'')+'</span>'+(r?'<span class="badge" title="'+r+' Ramadan days">R '+r+'d</span>':'')+'</div></th>';}).join('')+'</tr></thead>';
+  const body=rows.map(r=>{
+    const cells=months.map(mk=>{
+      const v=val(mk,r.cats); if(!v) return '<td>–</td>';
+      if(st.mom==='val') return '<td>'+fmtInt(v.t)+'</td>';
+      if(st.mom==='perday') return '<td>'+v.pd.toFixed(v.pd<10?1:0)+'</td>';
+      const ref= st.mom==='mom'? val(addMonths(mk,-1),r.cats) : (toN(addMonths(mk,-12)+'-01')>=S.min? val(addMonths(mk,-12),r.cats):null);
+      if(!ref||!ref.pd) return '<td>–</td>';
+      const p=(v.pd-ref.pd)/ref.pd*100; const a=Math.min(Math.abs(p),60)/60;
+      const bg = p>=0? 'rgba(12,163,12,'+(0.05+a*0.22)+')' : 'rgba(208,59,59,'+(0.05+a*0.22)+')';
+      return '<td class="heat" style="background:'+bg+'" title="'+v.pd.toFixed(1)+' vs '+ref.pd.toFixed(1)+' per day">'+fmtPct(p)+'</td>';
+    }).join('');
+    return '<tr'+(r.total?' class="total"':'')+'><td>'+(r.color?'<span class="sw" style="background:'+r.color+'"></span>':'')+esc(r.name)+'</td>'+cells+'</tr>';
+  }).join('');
+  document.getElementById('momTable').innerHTML=head+'<tbody>'+body+'</tbody>';
+}
+
+/* ---------- service table ---------- */
+function renderSvcTable(){
+  const stats=selStats(), a=st.from, b=st.to, len=b-a+1, m=st.measure;
+  const hasP=covered(a-len,a-1), hasY=covered(a-364,b-364);
+  const canc=S.stList.filter(s=>s==='cancelled');
+  const cats=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
+  const grand=total(a,b,m,cats,stats);
+  const rows=cats.map(c=>{
+    const cur=total(a,b,m,[c],stats), prev=hasP?total(a-len,a-1,m,[c],stats):null, ly=hasY?total(a-364,b-364,m,[c],stats):null;
+    const all=total(a,b,'ord',[c],S.stList), cn=total(a,b,'ord',[c],canc);
+    const groups=A.groups.filter(g=>GROUP_SVCS[g]&&GROUP_SVCS[g].includes(c));
+    const spend=groups.length? sum(adDaily(a,b,groups)) : null;
+    // when a group covers several services (imaging), split its spend by their order share
+    let own=spend;
+    if(spend&&groups.length){ own=0; groups.forEach(g=>{ const gs=GROUP_SVCS[g]; const tot=total(a,b,'ord',gs,stats); const mine=total(a,b,'ord',[c],stats); own+= sum(adDaily(a,b,[g]))*(tot? mine/tot : 1/gs.length); }); }
+    const ord=total(a,b,'ord',[c],stats);
+    return {c,cur,share:grand?cur/grand*100:0,prevP:prev>=10?(cur-prev)/prev*100:null,lyP:ly>=10?(cur-ly)/ly*100:null,canc:all?cn/all*100:null,pat:total(a,b,'pat',[c],stats),spend:own,cpo:own&&ord?own/ord:null};
+  });
+  const k=st.svcSort.k, dir=st.svcSort.dir;
+  rows.sort((x,y)=>{const a1=x[k], b1=y[k]; if(a1==null) return 1; if(b1==null) return -1; return (a1<b1?-1:a1>b1?1:0)*dir;});
+  const cols=[['c','Service'],['cur',MLABEL[st.measure]],['share','Share'],['prevP','vs prev period'],['lyP','vs last year'],['canc','Cancel rate'],['pat','Patients'],['spend','Ad spend'],['cpo','Ad cost / order']];
+  const cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';
+  const tot={cur:grand, prev:hasP?total(a-len,a-1,m,cats,stats):null, ly:hasY?total(a-364,b-364,m,cats,stats):null};
+  const html='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
+    '<tr class="total"><td>All selected</td><td>'+fmtInt(tot.cur)+'</td><td>100%</td><td class="'+cls(tot.prev&&(tot.cur-tot.prev)/tot.prev*100)+'">'+fmtPct(tot.prev?(tot.cur-tot.prev)/tot.prev*100:null,1)+'</td><td class="'+cls(tot.ly&&(tot.cur-tot.ly)/tot.ly*100)+'">'+fmtPct(tot.ly?(tot.cur-tot.ly)/tot.ly*100:null,1)+'</td><td colspan="4"></td></tr>'+
+    rows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td><td>'+fmtInt(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td class="'+cls(r.prevP)+'">'+fmtPct(r.prevP,1)+'</td><td class="'+cls(r.lyP)+'">'+fmtPct(r.lyP,1)+'</td><td>'+(r.canc==null?'–':r.canc.toFixed(1)+'%')+'</td><td>'+fmtInt(r.pat)+'</td><td>'+(r.spend?fmtUsd(r.spend):'–')+'</td><td>'+(r.cpo?fmtUsd(r.cpo):'–')+'</td></tr>').join('')+'</tbody>';
+  const t=document.getElementById('svcTable'); t.innerHTML=html;
+  t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.svcSort = st.svcSort.k===key? {k:key,dir:-st.svcSort.dir} : {k:key,dir:key==='c'?1:-1}; renderSvcTable();}));
+  document.getElementById('svcDesc').textContent=fmtD(a)+' – '+fmtD(b)+(hasY?'':' · last-year comparison needs data from '+fmtD(a-364));
+}
+
+/* ---------- ads ---------- */
+function renderAds(){
+  const a=st.from, b=st.to;
+  const sel=document.getElementById('adGroupSel');
+  if(!sel.options.length){ sel.innerHTML='<option value="">All ad groups</option>'+A.groups.map(g=>'<option>'+esc(g)+'</option>').join(''); }
+  sel.value=st.adGroup;
+  // monthly stacked spend by group within the range (top 7 + Other, fixed colour by all-time spend rank)
+  const m0=monthKey(a), m1=monthKey(b); const months=[]; for(let mk=m0; mk<=m1; mk=addMonths(mk,1)) months.push(mk);
+  const top=A.groups.slice(0,7), rest=A.groups.slice(7);
+  const seriesFor=gs=>months.map(mk=>{const s=toN(mk+'-01'), e=s+daysInMonth(mk)-1, lo=Math.max(s,a), hi=Math.min(e,b); return sum(adDaily(lo,hi,gs));});
+  const ds=top.map((g,i)=>({label:g,data:seriesFor([g]),backgroundColor:css('--s'+(i+1))}));
+  if(rest.length) ds.push({label:'Other',data:seriesFor(rest),backgroundColor:css('--s-other')});
+  ds.forEach(d=>{d.borderColor=css('--surface'); d.borderWidth={top:2,bottom:0,left:0,right:0}; d.borderSkipped=false; d.maxBarThickness=28;});
+  const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US');
+  o.plugins.tooltip.callbacks={label:it=> it.parsed.y? ' '+it.dataset.label+': '+fmtUsd(it.parsed.y):null, footer:items=>' Total: '+fmtUsd(items.reduce((s,x)=>s+x.parsed.y,0))};
+  o.plugins.tooltip.filter=it=>it.parsed.y>0;
+  if(adChart) adChart.destroy();
+  adChart=new Chart(document.getElementById('adGroupChart'),{type:'bar',data:{labels:months.map(fmtM),datasets:ds},options:o});
+  document.getElementById('adLegend').innerHTML=ds.map(d=>'<span><i class="box" style="background:'+d.backgroundColor+'"></i>'+esc(d.label)+'</span>').join('');
+  // campaign table
+  const rows=[];
+  for(const c of Object.values(A.camps)){
+    if(st.adGroup && c.group!==st.adGroup) continue;
+    let sp=0,res=0,conv=0,impr=0,clicks=0,rtype='';
+    for(const [mk,x] of Object.entries(c.months)){ const s=toN(mk+'-01'), e=s+daysInMonth(mk)-1, lo=Math.max(s,a), hi=Math.min(e,b); if(lo>hi) continue;
+      let w=0; for(let n=lo;n<=hi;n++) w+=A.w(n); sp+=x.spend*w; res+=x.res*w; conv+=x.conv*w; impr+=x.impr*w; clicks+=x.clicks*w; if(x.rtype) rtype=x.rtype; }
+    if(sp<0.5) continue;
+    rows.push({name:c.name,group:c.group,obj:c.objective.replace('OUTCOME_','').replace('_',' ').toLowerCase(),spend:sp,impr,clicks,res,rtype:prettyRes(rtype),cpr:res?sp/res:null});
+  }
+  const k=st.campSort.k, dir=st.campSort.dir;
+  rows.sort((x,y)=>{const a1=x[k], b1=y[k]; if(a1==null) return 1; if(b1==null) return -1; return (a1<b1?-1:a1>b1?1:0)*dir;});
+  const cols=[['name','Campaign'],['group','Service'],['obj','Objective'],['spend','Spend'],['impr','Impressions'],['clicks','Clicks'],['res','Results'],['rtype','Result type'],['cpr','Cost / result']];
+  const tot=rows.reduce((s,r)=>s+r.spend,0);
+  const t=document.getElementById('campTable');
+  t.innerHTML='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
+    '<tr class="total"><td>'+rows.length+' campaigns</td><td></td><td></td><td>'+fmtUsd(tot)+'</td><td colspan="5"></td></tr>'+
+    rows.map(r=>'<tr><td style="max-width:360px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.name)+'">'+esc(r.name)+'</td><td style="text-align:left">'+esc(r.group)+'</td><td style="text-align:left">'+esc(r.obj)+'</td><td>'+fmtUsd(r.spend)+'</td><td>'+fmtInt(r.impr)+'</td><td>'+fmtInt(r.clicks)+'</td><td>'+fmtInt(r.res)+'</td><td style="text-align:left">'+esc(r.rtype)+'</td><td>'+(r.cpr?fmtUsd(r.cpr):'–')+'</td></tr>').join('')+'</tbody>';
+  t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.campSort= st.campSort.k===key?{k:key,dir:-st.campSort.dir}:{k:key,dir:(key==='name'||key==='group'||key==='obj'||key==='rtype')?1:-1}; renderAds();}));
+  const allSpend=sum(adDaily(a,b,A.groups)), conv=sum(adDaily(a,b,A.groups,'conv'));
+  document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+' total spend · '+fmtInt(conv)+' WhatsApp conversations from message campaigns';
+}
+function prettyRes(t){ if(!t) return ''; return ({'onsite_conversion.messaging_conversation_started_7d':'WhatsApp conversations','mobile_app_install':'App installs','onsite_conversion.purchase':'Purchases (messaging)','offsite_conversion.fb_pixel_purchase':'Website purchases','leadgen.other':'Leads','reach':'Reach','link_click':'Link clicks','post_engagement':'Post engagement','click_to_call_native_call_placed':'Calls','mixed':'Mixed','profile_visit_view':'Profile visits'})[t] || t.replace(/_/g,' ').replace(/.*\./,''); }
+
+/* ---------- holiday effects ---------- */
+function renderHolidays(){
+  const cats=selCats(), stats=selStats(), m=st.measure;
+  const y=series(S.min,S.max,m,cats,stats);
+  const at=n=>y[n-S.min];
+  const isHol=n=>holKeysOn(n).length>0;
+  const wins=holidayWindows(S.min+28,S.max-7).filter(w=>w.k!=='fixed' || true);
+  const byType={};
+  for(const w of wins){
+    // weekday-matched baseline from the four weeks either side, skipping holiday days
+    const base={}; const cnt={};
+    const pad=w.long?35:28;
+    for(let n=w.s-pad;n<=w.e+pad;n++){ if(n>=w.s&&n<=w.e) continue; if(n<S.min||n>S.max) continue; if(isHol(n)) continue; const d=dow(n); base[d]=(base[d]||0)+at(n); cnt[d]=(cnt[d]||0)+1; }
+    let act=0, exp=0, ok=true;
+    for(let n=w.s;n<=w.e;n++){ const d=dow(n); if(!cnt[d]){ok=false;break;} act+=at(n); exp+=base[d]/cnt[d]; }
+    if(!ok||exp<=0) continue;
+    const key = w.k==='fixed'? 'fixed:'+w.name : w.k;
+    const t=byType[key]||(byType[key]={name:w.name,occ:[]}); t.occ.push({s:w.s,e:w.e,eff:(act/exp-1)*100,days:w.e-w.s+1,act,exp,thin:exp/(w.e-w.s+1)<15});
+  }
+  /* average weights each year by its volume and leaves out years with under 15 expected per day, which are mostly noise */
+  const rows=Object.values(byType).map(t=>{const ok=t.occ.filter(o=>!o.thin); const A_=ok.reduce((s,o)=>s+o.act,0), E_=ok.reduce((s,o)=>s+o.exp,0); return {...t,avg:E_?(A_/E_-1)*100:null};}).filter(r=>r.avg!=null).sort((a,b)=>a.avg-b.avg);
+  const cell=v=>{const a=Math.min(Math.abs(v),50)/50; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'">'+fmtPct(v)+'</td>';};
+  const maxOcc=Math.max(1,...rows.map(r=>r.occ.length));
+  const years=[...new Set(rows.flatMap(r=>r.occ.map(o=>toS(o.s).slice(0,4))))].sort();
+  document.getElementById('holTable').innerHTML='<thead><tr><th class="nosort">Holiday</th><th class="nosort">Average</th>'+years.map(yy=>'<th class="nosort">'+yy+'</th>').join('')+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr><td>'+esc(r.name)+'</td>'+cell(r.avg)+years.map(yy=>{const o=r.occ.filter(o=>toS(o.s).slice(0,4)===yy); if(!o.length) return '<td>–</td>'; const v=o.reduce((s,x)=>s+x.eff,0)/o.length; return '<td'+(o.every(x=>x.thin)?' style="color:var(--muted)"':'')+' title="'+o.map(x=>fmtD(x.s)+(x.days>1?' – '+fmtD(x.e):'')).join(', ')+(o.every(x=>x.thin)?' · low volume, left out of the average':'')+'">'+fmtPct(v)+'</td>';}).join('')+'</tr>').join('')+'</tbody>';
+}
+
+/* ---------- events ---------- */
+function renderEvents(){
+  const cats=[...new Set(EVENTS.map(e=>e.cat))].sort();
+  const sel=document.getElementById('evCat'); const cur=sel.value;
+  sel.innerHTML='<option value="">All categories</option>'+cats.map(c=>'<option>'+esc(c)+'</option>').join(''); sel.value=cur;
+  const list=EVENTS.filter(e=>!st.evCat||e.cat===st.evCat).slice().reverse();
+  document.getElementById('evList').innerHTML=list.map(e=>'<div class="ev"><span class="d">'+fmtD(e.s)+(e.e>e.s?'<br>– '+fmtD(e.e):'')+'</span><span class="c">'+esc(e.cat)+(e.own?' · yours':'')+'</span><span class="t">'+esc(e.title)+(e.note?'<small>'+esc(e.note)+'</small>':'')+'</span><span>'+(e.own?'<button class="linkbtn" data-del="'+e.id+'">Remove</button>':'')+'</span></div>').join('') || '<p class="note">No events in this category.</p>';
+  document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{ let mine=[]; try{mine=JSON.parse(lsGet('spl.events')||'[]')}catch(e){} mine=mine.filter(x=>String(x.id)!==b.dataset.del); lsSet('spl.events',JSON.stringify(mine)); loadEvents(); render(); toast('Event removed'); }));
+}
+function wireEvents(){
+  document.getElementById('evForm').addEventListener('submit',e=>{ e.preventDefault();
+    const s=toN(document.getElementById('evStart').value), title=document.getElementById('evTitle').value.trim(); if(!isFinite(s)||!title) return;
+    let mine=[]; try{mine=JSON.parse(lsGet('spl.events')||'[]')}catch(err){}
+    mine.push({id:Date.now(),s,e:s,cat:document.getElementById('evNewCat').value,title,note:''}); lsSet('spl.events',JSON.stringify(mine));
+    document.getElementById('evTitle').value=''; loadEvents(); render(); toast('Event added');
+  });
+  document.getElementById('evCopy').addEventListener('click',()=>{
+    const q=v=>/[",]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v;
+    const txt='start,end,category,title,note\n'+EVENTS.map(e=>[toS(e.s),e.e>e.s?toS(e.e):'',e.cat,e.title,e.note||''].map(q).join(',')).join('\n');
+    navigator.clipboard.writeText(txt).then(()=>toast('Events copied as CSV')).catch(()=>toast('Copy was blocked by this browser'));
+  });
+}
+
+/* ---------- file loading ---------- */
+function wireFiles(){
+  const inp=document.getElementById('fileInput');
+  document.getElementById('loadBtn').addEventListener('click',()=>inp.click());
+  inp.addEventListener('change',async()=>{
+    for(const f of inp.files){ const text=await f.text(); const hdr=text.slice(0,300).split(/\r?\n/)[0];
+      try{
+        if(/service_category/.test(hdr)){ P.services=mergeServices(P.services,text); lsSet('spl.services',P.services); }
+        else if(/campaign_id/.test(hdr)&&/ad_group/.test(hdr)){ P.map=text; lsSet('spl.map',text); }
+        else if(/campaign_id/.test(hdr)&&/month/.test(hdr)){ P.adsMonthly=text; lsSet('spl.adsMonthly',text); }
+        else if(/spend_usd/.test(hdr)){ P.adsDaily=text; lsSet('spl.adsDaily',text); }
+        else if(/category/.test(hdr)&&/title/.test(hdr)){ P.events=text; }
+        else throw new Error(f.name+' was not recognised. Expected a Metabase service export or one of the ads CSVs.');
+        toast('Loaded '+f.name);
+      }catch(err){ toast(err.message); }
+    }
+    inp.value=''; lsSet('spl.build',P.built); boot(true);
+  });
+}
+/* newer file wins for any day it contains */
+function mergeServices(oldText,newText){
+  const days=new Set(); const nl=newText.trim().split(/\r?\n/); const hdrN=nl[0].split(','); const di=hdrN.indexOf('day');
+  nl.slice(1).forEach(l=>days.add(l.split(',')[di].slice(0,10)));
+  const ol=oldText.trim().split(/\r?\n/); const hdrO=ol[0].split(','); const doi=hdrO.indexOf('day');
+  if(hdrO.join(',')!==hdrN.join(',')) return newText;
+  return [ol[0]].concat(ol.slice(1).filter(l=>!days.has(l.split(',')[doi].slice(0,10))), nl.slice(1)).join('\n');
+}
+
+let toastT=null;
+function toast(msg){ let el=document.querySelector('.toast'); if(!el){el=document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el);} el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,2600); }
+
+/* ---------- render ---------- */
+function render(){
+  syncChips(); renderKpis(); renderTrend(); renderMom(); renderSvcTable(); renderAds(); renderHolidays(); renderEvents();
+  lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend}));
+}
+function boot(reload){
+  // files loaded in this browser are reused until a newer build of the page replaces them
+  if(!reload && lsGet('spl.build')===P.built){ ['services','adsDaily','adsMonthly','map'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  S=buildServices(P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); loadEvents();
+  if(!reload){
+    st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
+    try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; }catch(e){}
+    buildChips(); wireFilters(); wireEvents(); wireFiles();
+    st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
+  } else { buildChips(); st.to=Math.min(Math.max(st.to,S.min),S.max); }
+  document.getElementById('dataMeta').textContent='Orders to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);
+  document.getElementById('foot').textContent='Service data: Metabase export, '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
+  render();
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());
+new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+boot(false);
+})();
+</script>
