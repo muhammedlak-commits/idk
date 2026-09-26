@@ -148,7 +148,7 @@ footer{font-size:12px;color:var(--muted);padding-top:8px}
       </div>
       <span class="sep"></span>
       <span class="flabel" style="min-width:0">Measure</span>
-      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served">Patient-days</button></div>
+      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Unique patients section.">Patient-days</button></div>
       <span class="flabel" style="min-width:0">By</span>
       <div class="seg" id="gran"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
     </div>
@@ -202,6 +202,28 @@ footer{font-size:12px;color:var(--muted);padding-top:8px}
       </div>
       <div class="tablewrap"><table id="svcTable"></table></div>
       <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Ad spend here is spend on campaigns for that service only; general, brand and app campaigns are shown in the ads section.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="upH">
+      <div class="phead">
+        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month. New = the month of their first-ever service with Saleem; returning = everyone else served that month. The service chips above don't apply here; pick a category on the right.</div></div>
+        <div class="ctrls"><select id="upCat" aria-label="Patient category"></select></div>
+      </div>
+      <div id="upEmpty" class="callout">
+        <p style="margin:0 0 6px"><strong>This section needs one extra Metabase export.</strong> The main export counts patients per day, so unique patients can't be worked out from it.</p>
+        <ol style="margin:0 0 8px;padding-left:18px">
+          <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+          <li>Run it with no date filter, then download the results as CSV.</li>
+          <li>Click <strong>Load CSV</strong> at the top of this page and pick that file.</li>
+        </ol>
+        <button class="btn" type="button" id="copySql">Copy SQL</button>
+      </div>
+      <div id="upBody" hidden>
+        <div class="chart md"><canvas id="upChart" aria-label="New and returning patients by month"></canvas></div>
+        <div class="legend" id="upLegend"></div>
+        <div class="tablewrap" style="margin-top:12px"><table id="upTable"></table></div>
+        <p class="note" style="margin:8px 0 0">Unique patients can't be added across months or categories: someone treated in both March and April counts once in each month. For a longer period, compare month by month.</p>
+      </div>
     </section>
 
     <section class="panel" aria-labelledby="adsH">
@@ -389,7 +411,7 @@ function loadEvents(){
 }
 
 /* ---------- state ---------- */
-const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:''};
+const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:''};
 const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days'};
 
 /* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */
@@ -751,6 +773,45 @@ function renderHolidays(){
     rows.map(r=>'<tr><td>'+esc(r.name)+'</td>'+cell(r.avg)+years.map(yy=>{const o=r.occ.filter(o=>toS(o.s).slice(0,4)===yy); if(!o.length) return '<td>–</td>'; const v=o.reduce((s,x)=>s+x.eff,0)/o.length; return '<td'+(o.every(x=>x.thin)?' style="color:var(--muted)"':'')+' title="'+o.map(x=>fmtD(x.s)+(x.days>1?' – '+fmtD(x.e):'')).join(', ')+(o.every(x=>x.thin)?' · low volume, left out of the average':'')+'">'+fmtPct(v)+'</td>';}).join('')+'</tr>').join('')+'</tbody>';
 }
 
+
+/* ---------- unique patients (separate monthly export) ---------- */
+const UP_LABEL={all:'All services (each patient once)',physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',radiology:'Radiology (X-ray, ultrasound, echo, doppler)',surgeries:'Surgeries',booking:'Booking',eyeExam:'Eye exam',ambulance:'Ambulance',vendor:'Products'};
+let U=null, upChart=null;
+function buildUnique(text){
+  if(!text||!text.trim()) return null;
+  const rows=parseCsvObjects(text); if(!rows.length||!('unique_patients' in rows[0])) return null;
+  const by={};
+  rows.forEach(r=>{ const m=(r.month||'').match(/(\d{4})-(\d{2})/); const mk=m? m[1]+'-'+m[2] : (isFinite(Date.parse(r.month))? new Date(Date.parse(r.month)).toISOString().slice(0,7):null); if(!mk) return;
+    const c=r.category||'all'; (by[c]||(by[c]={}))[mk]={u:+r.unique_patients||0,n:+r.new_patients||0,r:+r.returning_patients||0,s:+r.services||0}; });
+  const cats=Object.keys(by).sort((a,b)=> a==='all'?-1: b==='all'?1 : sumU(by[b])-sumU(by[a]));
+  function sumU(o){return Object.values(o).reduce((s,x)=>s+x.u,0)}
+  return {by,cats};
+}
+function renderUnique(){
+  const empty=document.getElementById('upEmpty'), body=document.getElementById('upBody'), sel=document.getElementById('upCat');
+  if(!U){ empty.hidden=false; body.hidden=true; sel.hidden=true; return; }
+  empty.hidden=true; body.hidden=false; sel.hidden=false;
+  if(!sel.options.length){ sel.innerHTML=U.cats.map(c=>'<option value="'+esc(c)+'">'+esc(UP_LABEL[c]||label(c))+'</option>').join(''); }
+  if(!st.upCat||!U.by[st.upCat]) st.upCat=U.cats[0]; sel.value=st.upCat;
+  const d=U.by[st.upCat]; const months=[]; for(let mk=monthKey(st.from); mk<=monthKey(st.to); mk=addMonths(mk,1)) if(d[mk]) months.push(mk);
+  const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true;
+  o.plugins.tooltip.callbacks={label:it=>' '+it.dataset.label+': '+fmtInt(it.parsed.y),footer:items=>' Unique patients: '+fmtInt(items.reduce((s,x)=>s+x.parsed.y,0))};
+  const ds=[{label:'Returning',data:months.map(m=>d[m].r),backgroundColor:css('--s1')},{label:'New',data:months.map(m=>d[m].n),backgroundColor:css('--s3')}];
+  ds.forEach(x=>{x.borderColor=css('--surface'); x.borderWidth={top:2,bottom:0,left:0,right:0}; x.borderSkipped=false; x.maxBarThickness=28;});
+  if(upChart) upChart.destroy();
+  upChart=new Chart(document.getElementById('upChart'),{type:'bar',data:{labels:months.map(fmtM),datasets:ds},options:o});
+  document.getElementById('upLegend').innerHTML=ds.map(x=>'<span><i class="box" style="background:'+x.backgroundColor+'"></i>'+x.label+'</span>').join('');
+  const pc=(a,b)=>a!=null&&b? (a-b)/b*100 : null, cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';
+  const rows=months.slice().reverse().map(mk=>{const x=d[mk], pm=d[addMonths(mk,-1)], py=d[addMonths(mk,-12)];
+    const partial = mk===monthKey(S.max) && S.max < toN(mk+'-01')+daysInMonth(mk)-1;
+    const mom=pc(x.u,pm&&pm.u), yoy=pc(x.u,py&&py.u);
+    return '<tr><td>'+fmtM(mk)+(partial?' (partial)':'')+'</td><td>'+fmtInt(x.u)+'</td><td>'+fmtInt(x.n)+'</td><td>'+fmtInt(x.r)+'</td><td>'+(x.u?(x.n/x.u*100).toFixed(0)+'%':'–')+'</td><td class="'+cls(mom)+'">'+fmtPct(mom,1)+'</td><td class="'+cls(yoy)+'">'+fmtPct(yoy,1)+'</td><td>'+(x.u?(x.s/x.u).toFixed(1):'–')+'</td></tr>';}).join('');
+  document.getElementById('upTable').innerHTML='<thead><tr><th class="nosort">Month</th><th class="nosort">Unique patients</th><th class="nosort">New</th><th class="nosort">Returning</th><th class="nosort">New share</th><th class="nosort">MoM</th><th class="nosort">YoY</th><th class="nosort">Services per patient</th></tr></thead><tbody>'+rows+'</tbody>';
+}
+function wireUnique(){
+  document.getElementById('upCat').addEventListener('change',e=>{st.upCat=e.target.value; renderUnique();});
+  document.getElementById('copySql').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));
+}
 /* ---------- events ---------- */
 function renderEvents(){
   const cats=[...new Set(EVENTS.map(e=>e.cat))].sort();
@@ -781,7 +842,8 @@ function wireFiles(){
   inp.addEventListener('change',async()=>{
     for(const f of inp.files){ const text=await f.text(); const hdr=text.slice(0,300).split(/\r?\n/)[0];
       try{
-        if(/service_category/.test(hdr)){ P.services=mergeServices(P.services,text); lsSet('spl.services',P.services); }
+        if(/unique_patients/.test(hdr)){ P.uniquePatients=text; lsSet('spl.uniquePatients',text); }
+        else if(/service_category/.test(hdr)){ P.services=mergeServices(P.services,text); lsSet('spl.services',P.services); }
         else if(/campaign_id/.test(hdr)&&/ad_group/.test(hdr)){ P.map=text; lsSet('spl.map',text); }
         else if(/campaign_id/.test(hdr)&&/month/.test(hdr)){ P.adsMonthly=text; lsSet('spl.adsMonthly',text); }
         else if(/spend_usd/.test(hdr)){ P.adsDaily=text; lsSet('spl.adsDaily',text); }
@@ -807,17 +869,17 @@ function toast(msg){ let el=document.querySelector('.toast'); if(!el){el=documen
 
 /* ---------- render ---------- */
 function render(){
-  syncChips(); renderKpis(); renderTrend(); renderMom(); renderSvcTable(); renderAds(); renderHolidays(); renderEvents();
+  syncChips(); renderKpis(); renderTrend(); renderMom(); renderSvcTable(); renderAds(); renderUnique(); renderHolidays(); renderEvents();
   lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend}));
 }
 function boot(reload){
   // files loaded in this browser are reused until a newer build of the page replaces them
-  if(!reload && lsGet('spl.build')===P.built){ ['services','adsDaily','adsMonthly','map'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
-  S=buildServices(P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); loadEvents();
+  if(!reload && lsGet('spl.build')===P.built){ ['services','adsDaily','adsMonthly','map','uniquePatients'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  S=buildServices(P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); U=buildUnique(P.uniquePatients); loadEvents();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; }catch(e){}
-    buildChips(); wireFilters(); wireEvents(); wireFiles();
+    buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique();
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
   } else { buildChips(); st.to=Math.min(Math.max(st.to,S.min),S.max); }
   document.getElementById('dataMeta').textContent='Orders to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);

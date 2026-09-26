@@ -8,6 +8,8 @@ payload = {
     'adsMonthly': (d / 'meta_ads_campaign_monthly.csv').read_text(),
     'map': (d / 'campaign_service_map.csv').read_text(),
     'events': (d / 'events.csv').read_text(),
+    'uniquePatients': (d / 'unique_patients_monthly.csv').read_text() if (d / 'unique_patients_monthly.csv').exists() else '',
+    'uniqueSql': (root / 'sql' / 'unique_patients_monthly.sql').read_text(),
     'built': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
 }
 blob = json.dumps(payload, separators=(',', ':')).replace('</', '<\\/')
