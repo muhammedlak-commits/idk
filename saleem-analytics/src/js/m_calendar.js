@@ -1,11 +1,11 @@
 /* ---------- holiday effects ---------- */
 /* per holiday type: measured effect vs. same weekdays in the surrounding four weeks */
-function holidayEffects(cats,stats,m,upTo){
+function holidayEffects(cats,stats,m,upTo,since){
   const end=Math.min(upTo==null?S.max:upTo, S.max);
   const y=series(S.min,end,m,cats,stats);
   const at=n=>y[n-S.min];
   const isHol=n=>holKeysOn(n).length>0;
-  const wins=holidayWindows(S.min+28,end-7);
+  const wins=holidayWindows(Math.max(S.min+28,since==null?-Infinity:since),end-7);
   const byType={};
   for(const w of wins){
     // weekday-matched baseline from the four weeks either side, skipping holiday days
@@ -59,8 +59,7 @@ function wireEvents(){
    Same method as holidays: each event window against the same weekdays in the four weeks around it,
    leaving out holiday days and other event days. Campaign launches are left out (they start
    something rather than mark a window), and so are events longer than two weeks. */
-function renderFactorEffects(){
-  const cats=selCats(), stats=selStats(), m=st.measure;
+function factorEffects(cats,stats,m){
   const y=series(S.min,S.max,m,cats,stats), at=n=>y[n-S.min];
   const evs=EVENTS.filter(e=>e.cat!=='Marketing' && e.e-e.s<=14 && e.s>=S.min+28 && e.e<=S.max-7);
   const busy=new Set(); EVENTS.forEach(e=>{ if(e.cat!=='Marketing') for(let n=e.s;n<=e.e;n++) busy.add(n); });
@@ -74,8 +73,12 @@ function renderFactorEffects(){
     if(ok&&exp>0) res.push({ev,act,exp,eff:(act/exp-1)*100,thin:exp/(ev.e-ev.s+1)<15});
   }
   const byCat={}; res.forEach(r=>{ (byCat[r.ev.cat]||(byCat[r.ev.cat]=[])).push(r); });
-  const cell=v=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),50)/50; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'">'+fmtPct(v)+'</td>'; };
   const catRows=Object.entries(byCat).map(([c,rs])=>{ const ok=rs.filter(r=>!r.thin); const A_=ok.reduce((s,r)=>s+r.act,0), E_=ok.reduce((s,r)=>s+r.exp,0); return {c,n:rs.length,avg:E_?(A_/E_-1)*100:null}; }).sort((a,b)=>(a.avg??0)-(b.avg??0));
+  return {res,catRows};
+}
+function renderFactorEffects(){
+  const {res,catRows}=factorEffects(selCats(),selStats(),st.measure);
+  const cell=v=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),50)/50; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'">'+fmtPct(v)+'</td>'; };
   document.getElementById('fxTable').innerHTML= res.length?
     '<thead><tr><th class="nosort">Category</th><th class="nosort">Events measured</th><th class="nosort">Average effect</th></tr></thead><tbody>'+catRows.map(r=>'<tr><td>'+esc(r.c)+'</td><td>'+r.n+'</td>'+cell(r.avg)+'</tr>').join('')+'</tbody>'
     : '<tbody><tr><td class="note" style="text-align:left">No measurable events yet. Add sudden holidays, salary windows or security events to the Google Sheet.</td></tr></tbody>';

@@ -20,12 +20,10 @@ function renderKpis(){
   const cpo=ord?spend/ord:null, cpoP=ordP?spendP/ordP:null, cpoY=ordY?spendY/ordY:null;
   const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
   const tiles=[
-    {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' per day · '+len+' days'},
-    ...(m!=='pat'?[{lab:'Patient-days',val:fmtInt(pat),d:[deltaChip(pat,patP,'vs prev'),deltaChip(pat,patY,'vs LY')],sub:'A patient seen on 10 days counts 10 times, not unique patients'}]:[]),
-    {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled orders ÷ all orders'},
-    {lab:'Ad spend · '+adModeLabel(),val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:st.adMode==='all'?'Every ad, whatever service it promotes':st.adMode==='pick'?groups.length+' ad group'+(groups.length===1?'':'s')+' picked in the filter bar':'Ads matched to the selected services'},
-    {lab:'Ad cost per order ('+adModeLabel()+')',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:'Spend on '+adModeLabel()+' ÷ orders for the selected services'},
-    {lab:'WhatsApp conversations',val:fmtInt(conv),d:[],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation, message campaigns only':'From message campaigns'}
+    {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' a day · '+len+' days'},
+    {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled ÷ all orders'},
+    {lab:'Ad spend <span class="note">· '+adModeLabel()+'</span>',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:conv? fmtInt(conv)+' WhatsApp conversations':''},
+    {lab:'Ad cost per order <span class="note">· '+adModeLabel()+'</span>',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation':''}
   ];
   document.getElementById('kpis').innerHTML=tiles.map(t=>'<div class="kpi'+(t.hero?' hero':'')+'"><span class="lab">'+t.lab+'</span><span class="val">'+t.val+'</span><div class="deltas">'+t.d.join('')+'</div><span class="sub">'+t.sub+'</span></div>').join('');
 }

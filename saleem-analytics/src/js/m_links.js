@@ -52,8 +52,11 @@ function renderLinks(){
   const a=st.from, b=st.to;
   const chosen=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
   const msg=document.getElementById('lkMsg'), detail=document.getElementById('lkDetail'), matrix=document.getElementById('lkMatrix');
-  renderAdLink(chosen,a,b);
-  renderDrivers(chosen,a,b);
+  // one sub-tab at a time: only the visible test is computed
+  document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.lk===st.lkTab)));
+  document.querySelectorAll('[data-lkpane]').forEach(p=>p.hidden=p.dataset.lkpane!==st.lkTab);
+  if(st.lkTab==='ad') return renderAdLink(chosen,a,b);
+  if(st.lkTab==='drv') return renderDrivers(chosen,a,b);
   const all=S.catList.every(c=>st.svc.has(c));
   if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
   if(chosen.length>3){
@@ -134,7 +137,7 @@ function renderAdLink(chosen,a,b){
   const groups=spendGroups();
   const setMsg=t=>{ msg.innerHTML=t; msg.hidden=false; box.hidden=true; };
   if(!chosen.length) return setMsg('Pick at least one service in the filter bar.');
-  if(!groups.length) return setMsg('No ad groups picked. Choose them in the filter bar under <strong>Ad spend → Pick ad groups</strong>.');
+  if(!groups.length) return setMsg('No ad groups picked. Choose them under <strong>More filters › Ad spend counts › Pick ad groups</strong>.');
   const w0=weekStart(a)+(weekStart(a)<a?7:0), keys=[]; for(let w=w0; w+6<=b; w+=7) keys.push(w);
   if(keys.length<14) return setMsg('Pick a date range of at least 14 weeks to test ad spend against orders.');
   msg.hidden=true; box.hidden=false;
@@ -171,6 +174,10 @@ function renderAdLink(chosen,a,b){
     lags.map(l=>'<tr><td>'+(l.k===0?'Same week':l.k+' week'+(l.k>1?'s':'')+' later')+'</td><td>'+(l.r==null?'–':l.r.toFixed(2))+'</td><td>'+l.n+'</td><td>±'+(1.96/Math.sqrt(l.ne)).toFixed(2)+' / ±'+(2.58/Math.sqrt(l.ne)).toFixed(2)+'</td><td>'+vt[l.verdict]+'</td></tr>').join('')+'</tbody>';
   const best=lags.filter(l=>l.r!=null).reduce((m,l)=>Math.abs(l.r)>Math.abs(m.r)?l:m, {r:0,k:0,verdict:'noise',n:0});
   const when=best.k===0?'in the same week':best.k+' week'+(best.k>1?'s':'')+' later';
+  document.getElementById('alAnswer').innerHTML='<div class="txt"><div class="kicker">'+esc(spendTitle)+' → '+esc(ordTitle)+' · '+keys.length+' weeks</div>'+
+    '<div class="head">'+(best.verdict==='noise'? 'No sign that this spend moves these orders' : (best.r>0?'More spend lines up with more orders ':'More spend lines up with fewer orders ')+when)+'</div>'+
+    '<p>'+(best.verdict==='noise'? 'Week-to-week changes in spend don’t line up with changes in orders at any lag from 0 to 4 weeks beyond what chance gives. The closest is '+when+'.' : (best.verdict==='strong'?'Strong: passes the strict bar.':'Possible: passes the usual bar but not the strict one, so treat it as a lead.')+(best.k===0?' A same-week link can also come from shared causes like holidays.':''))+'</p></div>'+
+    '<div class="lagchips" aria-label="Correlation by lag">'+lags.map(l=>'<div class="lagchip'+(l.verdict!=='noise'?' pass':'')+(l===best?' best':'')+'" title="'+({strong:'Strong',possible:'Possible',noise:'Could be chance'})[l.verdict]+'"><small>'+(l.k===0?'Same wk':'+'+l.k+' wk')+'</small><b>'+(l.r==null?'–':l.r.toFixed(2))+'</b></div>').join('')+'</div>';
   document.getElementById('alFinding').innerHTML= best.verdict==='noise'
     ? 'No lag passes the bar: week-to-week changes in this spend don’t line up with changes in '+esc(ordTitle)+' beyond what chance would give. The strongest is '+when+' (r = '+best.r.toFixed(2)+').'
     : 'Changes in this spend line up with changes in '+esc(ordTitle)+' <strong>'+when+'</strong> (r = '+best.r.toFixed(2)+', '+(best.verdict==='strong'?'strong':'possible')+'). '+(best.r>0?'More spend goes with more orders.':'More spend goes with fewer orders, which usually means both follow something else, such as budget cuts during busy weeks.')+(best.k===0?' A same-week link can also come from shared causes like holidays.':'');

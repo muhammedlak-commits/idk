@@ -1,67 +1,64 @@
 <header class="top">
-  <div class="wrap">
-    <div class="brand">
-      <h1>Saleem Performance Lab</h1>
-      <p>Orders by service · MoM and YoY · Meta ads · projections</p>
-    </div>
+  <div class="wrap bar">
+    <div class="brand"><h1>Saleem Performance Lab</h1></div>
+    <nav class="tabs" aria-label="Modules" role="tablist">
+      <button role="tab" data-mod="overview">Overview</button>
+      <button role="tab" data-mod="monthly">Month by month</button>
+      <button role="tab" data-mod="services">Services</button>
+      <button role="tab" data-mod="patients">Patients</button>
+      <button role="tab" data-mod="providers">Providers</button>
+      <span class="tsep" aria-hidden="true"></span>
+      <button role="tab" data-mod="links">Service links</button>
+      <button role="tab" data-mod="ads">Meta ads</button>
+      <button role="tab" data-mod="calendar" title="Holidays and events">Calendar</button>
+      <span class="tsep" aria-hidden="true"></span>
+      <button role="tab" data-mod="projections">Projections</button>
+    </nav>
     <div class="top-actions">
       <span class="meta" id="dataMeta"></span>
-      <button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button>
-      <input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden>
+      <button class="btn" type="button" id="dataBtn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Data</button>
     </div>
   </div>
-  <nav class="tabs wrap" aria-label="Modules" role="tablist">
-    <button role="tab" data-mod="overview">Overview</button>
-    <button role="tab" data-mod="monthly">Month by month</button>
-    <button role="tab" data-mod="services">Services</button>
-    <button role="tab" data-mod="providers">Providers</button>
-    <button role="tab" data-mod="links">Service links</button>
-    <button role="tab" data-mod="patients">Patients</button>
-    <button role="tab" data-mod="ads">Meta ads</button>
-    <button role="tab" data-mod="projections">Projections</button>
-    <button role="tab" data-mod="calendar">Holidays &amp; events</button>
-    <button role="tab" data-mod="data">Data</button>
-  </nav>
 </header>
 
 <section class="filters" aria-label="Filters">
-  <div class="wrap">
-    <div class="frow">
-      <span class="flabel">Dates by</span>
-      <div class="seg" id="basis" title="Which date each order counts on"><button data-b="scheduled" class="on" title="The day the visit is scheduled for">Scheduled time</button><button data-b="booked" title="The day the order was booked">Booking time</button></div>
-      <span class="sep"></span>
-      <span class="flabel" style="min-width:0">Range</span>
-      <input type="date" id="dFrom" aria-label="From date"><span>–</span><input type="date" id="dTo" aria-label="To date">
-      <div class="seg" id="presets">
-        <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
+  <div class="wrap ctx">
+    <div class="pop">
+      <button class="pill" type="button" id="datePill" aria-expanded="false" aria-controls="datePop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span id="datePillTxt"></span></button>
+      <div class="popover" id="datePop" hidden>
+        <div class="seg wrapseg" id="presets">
+          <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
+        </div>
+        <div class="frow" style="margin-top:10px"><label class="flabel" for="dFrom" style="min-width:0">From</label><input type="date" id="dFrom"><label class="flabel" for="dTo" style="min-width:0">to</label><input type="date" id="dTo"></div>
       </div>
-      <span class="sep"></span>
-      <span class="flabel" style="min-width:0">Measure</span>
-      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Unique patients section.">Patient-days</button></div>
-      <span class="flabel" style="min-width:0">By</span>
-      <div class="seg" id="gran"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
     </div>
-    <div class="frow">
-      <span class="flabel">Services</span>
-      <div class="chips" id="svcChips"></div>
+    <div class="pop">
+      <button class="pill" type="button" id="svcPill" aria-expanded="false" aria-controls="svcPop"><span id="svcPillTxt"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="popover wide" id="svcPop" hidden>
+        <div class="frow"><span class="flabel" style="min-width:0">Quick</span>
+          <button class="linkbtn" data-q="all">All</button><button class="linkbtn" data-q="core">Core 4</button><button class="linkbtn" data-q="clinical">Clinical only</button><button class="linkbtn" data-q="imaging">Imaging</button><button class="linkbtn" data-q="b2b">B2B</button><button class="linkbtn" data-q="none">None</button></div>
+        <div class="chips" id="svcChips" style="margin-top:10px"></div>
+        <p class="note" style="margin:10px 0 0">Click to add or remove a service. Double-click to keep only that one.</p>
+      </div>
     </div>
-    <div class="frow">
-      <span class="flabel">Quick</span>
-      <button class="linkbtn" data-q="all">All</button><button class="linkbtn" data-q="core">Core 4</button><button class="linkbtn" data-q="clinical">Clinical only</button><button class="linkbtn" data-q="imaging">Imaging</button><button class="linkbtn" data-q="b2b">B2B</button><button class="linkbtn" data-q="none">None</button>
-      <span class="sep"></span>
-      <span class="flabel" style="min-width:0">Status</span>
-      <div class="chips" id="stChips"></div>
-      <span class="sep"></span>
-      <span class="flabel" style="min-width:0">New patient =</span>
-      <div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div>
-    </div>
-    <div class="frow">
-      <span class="flabel">Ad spend</span>
-      <div class="seg" id="adMode" title="Which ads count as ad spend in every module"><button data-a="match" class="on" title="Only ads matched to the services selected above">Matching ads</button><button data-a="all" title="Every ad, whatever service it promotes; orders still follow the services above">All ads</button><button data-a="pick" title="Only the ad groups you pick; use this to test one ad group against another service's orders">Pick ad groups</button></div>
-      <div class="chips" id="agChips" hidden></div>
-    </div>
+    <div class="seg" id="measure" aria-label="Measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Patients tab.">Patient-days</button></div>
+    <div class="seg" id="gran" aria-label="Group by"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
+    <span class="grow"></span>
+    <button class="pill" type="button" id="moreBtn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>More filters<span class="count" id="moreCount" hidden></span></button>
   </div>
 </section>
+<div class="drawer-back" id="drawerBack" hidden></div>
+<aside class="drawer" id="drawer" aria-label="More filters" hidden>
+  <div class="dhead"><h2>More filters</h2><button class="iconbtn" type="button" id="drawerClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dbody">
+    <div class="dsec"><h3>Dates by</h3><div class="seg" id="basis" title="Which date each order counts on"><button data-b="scheduled" class="on" title="The day the visit is scheduled for">Scheduled time</button><button data-b="booked" title="The day the order was booked">Booking time</button></div></div>
+    <div class="dsec"><h3>Visit status</h3><div class="chips" id="stChips"></div></div>
+    <div class="dsec"><h3>New patient means</h3><div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div></div>
+    <div class="dsec"><h3>Ad spend counts</h3><div class="seg" id="adMode" title="Which ads count as ad spend in every module"><button data-a="match" class="on" title="Only ads matched to the selected services">Matching ads</button><button data-a="all" title="Every ad, whatever service it promotes; orders still follow the selected services">All ads</button><button data-a="pick" title="Only the ad groups you pick">Pick ad groups</button></div>
+      <div class="chips" id="agChips" hidden style="margin-top:10px"></div></div>
+  </div>
+  <div class="dfoot"><button class="btn" type="button" id="drawerReset">Reset to defaults</button><span class="grow"></span><button class="btn primary" type="button" id="drawerDone">Done</button></div>
+</aside>
 
 <main>
   <div class="wrap">
@@ -151,25 +148,38 @@
     </section>
 
     <section class="module" data-mod="links" id="links" hidden>
+      <div class="subtabs" role="tablist" aria-label="Link tests" id="lkTabs">
+        <button type="button" role="tab" data-lk="ad" aria-selected="true">Ad spend → orders</button>
+        <button type="button" role="tab" data-lk="svc" aria-selected="false">Service ↔ service</button>
+        <button type="button" role="tab" data-lk="drv" aria-selected="false">Specialties &amp; providers</button>
+      </div>
+      <div data-lkpane="ad">
       <section class="panel" aria-labelledby="alH">
-        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">Tests the ads chosen by the <strong>Ad spend</strong> switch in the filter bar against the orders of the services chosen by the chips. To test whether physio ads affect lab test orders: set Ad spend to <strong>Pick ad groups</strong>, pick Physiotherapy, and double-click the Lab tests service chip.</div><div class="desc" id="alDesc"></div></div></div>
+        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">The ads counted under <strong>More filters › Ad spend counts</strong>, against orders for the services picked above. To test physio ads against lab tests: pick the Physiotherapy ad group there and choose only Lab tests in Services.</div></div></div>
         <p class="callout" id="alMsg" hidden></p>
         <div id="alBody">
+          <div class="answer" id="alAnswer"></div>
           <div class="grid2">
             <div><h3 class="h3sm" id="alSpendH">Weekly ad spend</h3><div class="chart sm"><canvas id="alSpendChart" aria-label="Weekly ad spend"></canvas></div></div>
             <div><h3 class="h3sm" id="alOrdH">Weekly orders</h3><div class="chart sm"><canvas id="alOrdChart" aria-label="Weekly orders"></canvas></div></div>
           </div>
-          <div class="grid2" style="margin-top:14px">
-            <div><h3 class="h3sm">Change in spend vs change in orders, 0 to 4 weeks later</h3><div class="chart sm"><canvas id="alLagChart" aria-label="Correlation by lag"></canvas></div>
-              <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Passes the bar</span><span><i class="box" style="background:var(--ghost)"></i>Could be chance</span></div></div>
-            <div><div class="tablewrap"><table id="alLagTable"></table></div><p class="callout" id="alFinding" style="margin-top:10px"></p></div>
-          </div>
-          <h3 class="h3sm" style="margin-top:16px" id="alAdsH">Ads with the most spend in the weeks where the effect shows up</h3>
-          <p class="note" id="alWeeks" style="margin:2px 0 6px"></p>
-          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="alAds"></table></div>
-          <p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p>
+          <details class="more"><summary id="alAdsH">Ads with the most spend in the weeks where the effect shows up</summary>
+            <p class="note" id="alWeeks" style="margin:2px 0 6px"></p>
+            <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="alAds"></table></div>
+          </details>
+          <details class="more"><summary>Statistics and method <span class="note">· correlation by lag, the bars used</span></summary>
+            <div class="grid2">
+              <div><h3 class="h3sm">Change in spend vs change in orders, 0 to 4 weeks later</h3><div class="chart sm"><canvas id="alLagChart" aria-label="Correlation by lag"></canvas></div>
+                <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Passes the bar</span><span><i class="box" style="background:var(--ghost)"></i>Could be chance</span></div></div>
+              <div><div class="tablewrap"><table id="alLagTable"></table></div><p class="callout" id="alFinding" style="margin-top:10px"></p></div>
+            </div>
+            <p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Both bars are corrected for week-to-week swings (Bartlett). Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p>
+            <p class="note" id="alDesc" style="margin:4px 0 0"></p>
+          </details>
         </div>
       </section>
+      </div>
+      <div data-lkpane="drv" hidden>
       <section class="panel" id="pdPanel" aria-labelledby="pdH">
         <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? Click a row to see both series.</div><div class="desc" id="pdDesc"></div></div></div>
         <p class="callout" id="pdMsg" hidden></p>
@@ -183,6 +193,8 @@
           <p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "possible" passes the usual 5% bar for a single test, and with many pairs some will pass by chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p>
         </div>
       </section>
+      </div>
+      <div data-lkpane="svc" hidden>
       <p class="callout" id="lkMsg"></p>
       <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
         <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</div></div></div>
@@ -218,6 +230,7 @@
             <div class="tablewrap" style="margin-top:12px"><table id="lkFollowTable"></table></div>
           </div>
         </section>
+      </div>
       </div>
     </section>
 
@@ -259,41 +272,42 @@
     </section>
 
     <section class="module" data-mod="projections" id="projections" hidden>
-      <div class="callout" id="pjScope"></div>
+      <p class="note" id="pjScope" style="margin:0"></p>
+      <p class="callout" id="pjEmpty" hidden>Select at least one service and status.</p>
+      <div id="pjBody" class="module">
       <div class="kpis" id="pjKpis"></div>
       <section class="panel" aria-labelledby="pjH">
         <div class="phead">
           <div><h2 id="pjH">Projected orders</h2><div class="desc" id="pjDesc"></div></div>
           <div class="ctrls">
-            <div class="seg" id="pjHorizon"><button data-h="30">30 days</button><button data-h="60">60 days</button><button data-h="90" class="on">90 days</button></div>
-            <select id="pjGrowth" aria-label="Growth assumption">
-              <option value="damped">Recent trend, slowing</option>
-              <option value="trend">Recent trend, continuing</option>
-              <option value="flat">No growth</option>
-              <option value="custom">Custom monthly growth</option>
-            </select>
-            <label id="pjCustomWrap" hidden style="font-size:12.5px;display:inline-flex;gap:6px;align-items:center"><input type="number" id="pjCustom" value="5" step="1" min="-50" max="100" style="width:64px;border:1px solid var(--border);border-radius:8px;padding:4px 6px;background:var(--surface)">% a month</label>
-            <label class="chip on" id="pjHolToggle"><input type="checkbox" hidden>Holiday effects</label>
+            <div class="seg" id="pjHorizon" aria-label="How far ahead"><button data-h="30">30 days</button><button data-h="60">60 days</button><button data-h="90" class="on">90 days</button><button data-h="180">6 months</button><button data-h="365">1 year</button></div>
           </div>
         </div>
-        <div class="chart"><canvas id="pjChart" aria-label="Actual and projected orders by week"></canvas></div>
+        <div class="chart"><canvas id="pjChart" aria-label="Actual and projected orders"></canvas></div>
         <div class="legend" id="pjLegend"></div>
-        <ul class="assume" id="pjAssume"></ul>
       </section>
-      <div class="grid2">
-        <section class="panel" aria-labelledby="pjMH">
-          <div class="phead"><div><h2 id="pjMH">By month</h2><div class="desc">The current month combines orders so far with the projection for the rest of it.</div></div></div>
-          <div class="tablewrap"><table id="pjMonth"></table></div>
+      <section class="panel" aria-labelledby="pjFH">
+        <div class="phead">
+          <div><h2 id="pjFH">What goes into the projection</h2><div class="desc">Tick a factor to include it. Each row shows what it measured in your data and how much it changes the projection. The ticked growth rates are averaged into one.</div></div>
+          <div class="ctrls"><span class="flabel" style="min-width:0">Growth pace</span><div class="seg" id="pjPace"><button data-p="damped" title="The growth rate fades, roughly halving every 10 weeks">Slowing</button><button data-p="constant" title="The growth rate holds for the whole horizon">Constant</button></div><button class="btn" type="button" id="pjReset">Reset factors</button></div>
+        </div>
+        <div class="tablewrap"><table id="pjFactors" class="fxtable"></table></div>
+      </section>
+      <div class="module">
+        <section class="panel" aria-labelledby="pjPH">
+          <div class="phead"><div><h2 id="pjPH">By period</h2><div class="desc">Periods in progress combine what has happened so far with the projection for the rest.</div></div></div>
+          <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="pjMonth"></table></div>
         </section>
         <section class="panel" aria-labelledby="pjSH">
           <div class="phead"><div><h2 id="pjSH">By service</h2><div class="desc" id="pjSDesc"></div></div></div>
           <div class="tablewrap"><table id="pjSvc"></table></div>
         </section>
       </div>
-      <section class="panel" aria-labelledby="pjAH">
-        <div class="phead"><div><h2 id="pjAH">How accurate is it?</h2><div class="desc">The same model re-run as if it were an earlier date, then compared with what actually happened over the next 28 days. This is where the likely range comes from.</div></div></div>
+      <details class="more"><summary>How accurate is this mix? <span class="note">· past checks and the likely range</span></summary>
+        <p class="note" id="pjAccNote" style="margin:0 0 8px"></p>
         <div class="tablewrap"><table id="pjAcc"></table></div>
-      </section>
+      </details>
+      </div>
     </section>
 
     <section class="module" data-mod="calendar" id="calendar" hidden>
@@ -326,6 +340,7 @@
     </section>
 
     <section class="module" data-mod="data" id="data" hidden>
+      <div class="frow"><h2 style="font-size:18px;flex:1">Data</h2><span class="note">Ads CSVs and other exports can also be loaded here:</span><button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button><input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden></div>
       <div class="grid3">
         <section class="panel" aria-labelledby="dOH">
           <div class="phead"><div><h2 id="dOH">Orders</h2><div class="desc">The Metabase service performance export, with the columns day, service_category, visit_status, services_delivered, distinct_orders and distinct_patients.</div></div></div>

@@ -6,13 +6,19 @@ Open `dist/saleem-performance.html` in a browser. It needs internet only for the
 
 ## Modules
 
-The page has ten modules, switched with the tabs under the header: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+The page has ten modules, switched with the tabs in the header (Data is the button at the right): Overview, Month by month, Services, Patients, Providers, Service links, Meta ads, Calendar (holidays and events), Projections, and Data. The filter bar is one row: date range, services, measure and By; Dates by, visit status, New patient and Ad spend are under More filters. Earlier order: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
 
 ## Projections
 
-For the selected services and statuses: measured holiday effects are removed, a weekday pattern is taken from the last 12 weeks, and a weighted trend line is fitted to the last 26 weeks. The forecast puts those back together for the chosen horizon, with a choice of growth assumption (slowing trend, continuing trend, no growth, or a custom monthly %). The likely range comes from re-running the model at eight earlier dates and comparing with what actually happened.
+Built from the factors ticked in "What goes into the projection"; every row shows what it measured in the data and how much it changes the next 30 days to 1 year.
+
+- Patterns: weekday pattern (last 12 weeks of orders, each weekday against the average day, shrunk 30% toward even), holidays (each holiday against the same weekdays in the 4 weeks around it, from the last year, 2 years or all years), last year's seasonal shape (last year's weeks against last year's own trend, at half strength), and upcoming events in the Outside Factors sheet (at the measured effect of their category).
+- Growth: trend (weighted line through 26 weeks), year over year, month over month, week over week, a custom period over period, and your own rate. The ticked rates are averaged into one monthly rate, which either holds (constant) or fades (slowing, about half every 10 weeks).
+- Forecast = level of the last 28 days (patterns removed) × growth × seasonal shape × weekday × holiday × events.
+- The chart and table follow By in the filter bar (day, week or month). The likely range and "typical error" come from re-running the same mix at 8 earlier dates; sheet events are left out of those checks since sudden events aren't known in advance.
+- On the data to 23 Sep 2026 the default mix (weekday, holidays, events, trend, year over year) missed by about 3% over 28 days; adding last year's seasonal shape made it about 5%, so it is off by default.
 
 ## Service links
 

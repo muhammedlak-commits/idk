@@ -26,13 +26,10 @@ function syncChips(){
   const bk=document.querySelector('#basis [data-b="booked"]'); if(bk){ bk.classList.toggle('unavail',!P.servicesBooked); bk.title= P.servicesBooked? 'The day the order was booked' : 'Load a booking-time export in the Data tab to use this'; } seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
   document.getElementById('dFrom').value=toS(st.from); document.getElementById('dTo').value=toS(st.to);
   [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
+  syncContext();
 }
 function preset(p){
-  const end=S.max; let a=S.min, b=end;
-  if(p==='30d') a=end-29; else if(p==='90d') a=end-89; else if(p==='mtd') a=monthStart(end);
-  else if(p==='lastm'){ b=monthStart(end)-1; a=monthStart(b); }
-  else if(p==='ytd') a=toN(toS(end).slice(0,4)+'-01-01'); else if(p==='12m') a=toN(addMonths(monthKey(end),-11)+'-01');
-  st.from=Math.max(a,S.min); st.to=b;
+  [st.from,st.to]=presetRange(p);
   if(p==='30d'||p==='mtd'||p==='lastm') st.gran='day'; else if(p==='all'||p==='12m') st.gran= p==='all'?'month':'week'; else st.gran='week';
   render();
 }
@@ -88,4 +85,56 @@ function buildAdChips(){
 function setAdMode(m){
   if(m==='pick' && !st.adGroups.size) st.adGroups=new Set(groupsForCats(selCats()));   // start from what matches now
   st.adMode=m; render();
+}
+
+/* ---------- context bar: popovers, drawer, pill labels ---------- */
+const PRESET_LABEL={'30d':'Last 30 days','90d':'Last 90 days',mtd:'This month',lastm:'Last month',ytd:'This year','12m':'Last 12 months',all:'All time'};
+function presetRange(p){
+  const end=S.max; let a=S.min, b=end;
+  if(p==='30d') a=end-29; else if(p==='90d') a=end-89; else if(p==='mtd') a=monthStart(end);
+  else if(p==='lastm'){ b=monthStart(end)-1; a=monthStart(b); }
+  else if(p==='ytd') a=toN(toS(end).slice(0,4)+'-01-01'); else if(p==='12m') a=toN(addMonths(monthKey(end),-11)+'-01');
+  return [Math.max(a,S.min),b];
+}
+const DEFAULT_STATUS=()=>S.stList.filter(s=>s!=='cancelled');
+function moreCount(){
+  const def=new Set(DEFAULT_STATUS()); const stSame=st.status.size===def.size&&[...def].every(s=>st.status.has(s));
+  return (st.basis!=='scheduled')+(!stSame)+(st.newBasis!=='first')+(st.adMode!=='match');
+}
+function syncContext(){
+  const p=Object.keys(PRESET_LABEL).find(k=>{ const [a,b]=presetRange(k); return a===st.from&&b===st.to; });
+  document.getElementById('datePillTxt').innerHTML=(p?esc(PRESET_LABEL[p])+' <span class="sub">'+esc(fmtD(st.from)+' – '+fmtD(st.to))+'</span>':esc(fmtD(st.from)+' – '+fmtD(st.to)));
+  document.querySelectorAll('#presets button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  const cats=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c)), all=cats.length===S.catList.length;
+  document.getElementById('svcPillTxt').textContent= all? 'All '+S.catList.length+' services' : !cats.length? 'No services' : cats.length<=2? cats.map(label).join(', ') : cats.length+' services';
+  document.getElementById('svcPill').classList.toggle('on',!all);
+  const n=moreCount(), c=document.getElementById('moreCount'); c.textContent=n; c.hidden=!n;
+}
+function closePops(except){
+  document.querySelectorAll('.popover').forEach(el=>{ if(el.id===except) return; el.hidden=true; const b=document.querySelector('[aria-controls="'+el.id+'"]'); if(b) b.setAttribute('aria-expanded','false'); });
+}
+function togglePop(btnId,popId){
+  const el=document.getElementById(popId), open=el.hidden; closePops(popId); el.hidden=!open;
+  document.getElementById(btnId).setAttribute('aria-expanded',String(open));
+}
+function setDrawer(open){
+  document.getElementById('drawer').hidden=!open; document.getElementById('drawerBack').hidden=!open;
+  document.getElementById('moreBtn').setAttribute('aria-expanded',String(open));
+  if(open){ closePops(); document.getElementById('drawerClose').focus(); } else document.getElementById('moreBtn').focus();
+}
+function wireContext(){
+  document.getElementById('datePill').addEventListener('click',e=>{ e.stopPropagation(); togglePop('datePill','datePop'); });
+  document.getElementById('svcPill').addEventListener('click',e=>{ e.stopPropagation(); togglePop('svcPill','svcPop'); });
+  document.querySelectorAll('.popover').forEach(el=>el.addEventListener('click',e=>e.stopPropagation()));
+  document.addEventListener('click',()=>closePops());
+  document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; if(!document.getElementById('drawer').hidden) setDrawer(false); else closePops(); });
+  document.getElementById('moreBtn').addEventListener('click',()=>setDrawer(true));
+  document.getElementById('drawerClose').addEventListener('click',()=>setDrawer(false));
+  document.getElementById('drawerDone').addEventListener('click',()=>setDrawer(false));
+  document.getElementById('drawerBack').addEventListener('click',()=>setDrawer(false));
+  document.getElementById('drawerReset').addEventListener('click',()=>{
+    st.status=new Set(DEFAULT_STATUS()); st.newBasis='first'; st.adMode='match';
+    if(st.basis!=='scheduled') setBasis('scheduled'); else render();
+  });
+  document.getElementById('dataBtn').addEventListener('click',()=>{ showModule(st.mod==='data'?'overview':'data',true); window.scrollTo({top:0}); });
 }

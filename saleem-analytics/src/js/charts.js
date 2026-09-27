@@ -23,7 +23,7 @@ const bandPlugin={id:'bands',beforeDatasetsDraw(chart,args,opts){
   const {ctx,chartArea:ca,scales:{x}}=chart; ctx.save();
   for(const b of bands){
     const x0=x.getPixelForValue(b.i0)-(b.half||0), x1=x.getPixelForValue(b.i1)+(b.half||0);
-    if(b.type==='event'){ ctx.strokeStyle=opts.evtColor; ctx.lineWidth=1; ctx.beginPath(); const xm=(x0+x1)/2; ctx.moveTo(xm,ca.top); ctx.lineTo(xm,ca.bottom); ctx.stroke();
+    if(b.type==='event'){ /* a small marker along the top edge instead of a full-height line */ ctx.strokeStyle=opts.evtColor; ctx.lineWidth=1; ctx.beginPath(); const xm=(x0+x1)/2; ctx.moveTo(xm,ca.top+4); ctx.lineTo(xm,ca.top+12); ctx.stroke();
       ctx.fillStyle=opts.evtColor; ctx.beginPath(); ctx.arc(xm,ca.top+4,3.5,0,Math.PI*2); ctx.fill(); }
     else { ctx.fillStyle=b.type==='ramadan'?opts.ramColor:opts.holColor; ctx.fillRect(Math.max(ca.left,x0),ca.top,Math.min(ca.right,x1)-Math.max(ca.left,x0),ca.bottom-ca.top); }
   }
