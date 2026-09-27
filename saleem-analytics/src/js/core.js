@@ -33,6 +33,6 @@ const QUICK = {
 /* ad group -> service categories it promotes */
 const GROUP_SVCS = {'Physiotherapy':['physiotherapy'],'Nursing':['nursing'],'Doctor visit':['doctorVisit'],'Lab tests':['labTest'],
   'Imaging':['xRay','ultrasound','echocardiogram','doppler'],'Wound care':['woundCare'],'Eye exam':['eyeExam'],'Surgery':['surgeries'],
-  'Telemedicine':['onlineConsultation','psychiatristVisit'],'B2B':['physiotherapy (b2b)','b2b'],'Products':['productPurchase']};
+  'Telemedicine':['onlineConsultation','psychiatristVisit'],'Ambulance':['ambulance'],'B2B':['physiotherapy (b2b)','b2b'],'Products':['productPurchase']};
 const SHARED_GROUPS = ['All services (general)','Brand & awareness','App','International referral','Recruitment'];
 

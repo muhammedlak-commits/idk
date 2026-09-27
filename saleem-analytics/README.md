@@ -34,7 +34,9 @@ In the Data tab, choose *This file is dated by: Booking time* before dropping th
 | `services_daily.csv` | Metabase service performance export | day × service × visit status |
 | `meta_ads_daily.csv` | Meta Ads, Saleem Ad Account (USD) | day, account total |
 | `meta_ads_campaign_monthly.csv` | Meta Ads | month × campaign |
-| `campaign_service_map.csv` | Campaign name → service group (edit the `ad_group` column to correct it) | campaign |
+| `meta_ads_ad_monthly.csv` | Meta Ads, every ad with spend | month × ad |
+| `ad_service_map.csv` | Ad → service group, made by `python3 map_ads.py` (edit `ad_group` and set `matched_by` to `manual` to correct one; manual rows are kept) | ad |
+| `campaign_service_map.csv` | Campaign name → service group, used only when the ad-level file is missing | campaign |
 | `events.csv` | Political, economic and marketing events | event |
 
 Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq's fixed public holidays.
@@ -49,5 +51,6 @@ Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq'
 - Main measure is `distinct_orders`; cancelled orders are excluded unless the Cancelled status is switched on.
 - Previous period = same number of days just before the range. Last year = the range shifted back 364 days so weekdays match.
 - Month table MoM/YoY compares orders per day, so short months and the current partial month compare fairly.
-- Daily ad spend by service = each campaign's monthly spend spread over the month in proportion to the account's daily spend.
+- Ads are matched to services one by one: the ad's code (PT, NS, DRV, LT, US, OLC, TX, GA…), then words in the ad name, ad set name and campaign name; recruitment, app-install and awareness campaigns keep their own groups.
+- Daily ad spend by service = each ad's monthly spend spread over the month in proportion to the account's daily spend.
 - Holiday effects compare each holiday with the same weekdays in the four weeks before and after, skipping other holidays.

@@ -15,6 +15,7 @@ Order, first match wins:
 """
 import csv, re, pathlib
 
+GENERAL = 'All services (general)'
 root = pathlib.Path(__file__).parent
 data = root / 'data'
 
@@ -28,6 +29,10 @@ CODE_PREFIX = [  # ad names that start with a creative code
     (r'^\W*Psych\s?\d', 'Telemedicine'),
     (r'^\W*(Eco|ECG)\s?\d', 'Imaging'),
     (r'^\W*App\s?\d', 'App'),
+    (r'^\W*OLC\s?\d', 'Telemedicine'),
+    (r'^\W*US\s?\d', 'Imaging'),
+    (r'^\W*TX\s?\d', 'Ambulance'),
+    (r'^\W*GA\s?\d', GENERAL),
 ]
 KEYWORDS = [  # checked in this order, so specific services come before broad words
     ('Recruitment', r'hiring|recruit|\bstaff\b|توظيف'),
@@ -38,7 +43,8 @@ KEYWORDS = [  # checked in this order, so specific services come before broad wo
     ('Eye exam', r'eye exam|\beyes?\b|عيون|نظر'),
     ('Imaging', r'imaging|x-?ray|ultra ?sound|doppler|\becho\b|\beco\b|\becg\b|radiolog|sonar|أشعة|اشعة|سونار|ايكو|تخطيط'),
     ('Lab tests', r'lab ?test|\blab\b|\blt\b|تحاليل|تحليل|فحوصات'),
-    ('Telemedicine', r'psych|therapy session|arab therapy|second opinion|نفسي|استشارة'),
+    ('Telemedicine', r'psych|therapy session|arab therapy|second opinion|online consult|نفسي|استشارة'),
+    ('Ambulance', r'ambulance|patient transport|إسعاف|اسعاف'),
     ('Surgery', r'surger'),
     ('Physiotherapy', r'physio|phyiso|\bpt\b|rehab|علاج طبيعي|المعالج الفيزيائي|فيزيائي|تأهيل'),
     ('Nursing', r'nurs|\bns\b|تمريض|ممرض|رعاية'),
@@ -46,7 +52,6 @@ KEYWORDS = [  # checked in this order, so specific services come before broad wo
     ('App', r'\bapp\b|install|تطبيق'),
     ('Brand & awareness', r'awareness|profile traffic|followers|engagement campaign|tvc|\bugc\b'),
 ]
-GENERAL = 'All services (general)'
 
 
 def keyword_group(text):
