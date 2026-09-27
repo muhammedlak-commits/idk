@@ -1,8 +1,8 @@
 /* ---------- render ---------- */
 const MODULES={
   overview:()=>{ renderKpis(); renderTrend(); },
-  monthly:renderMom, services:renderSvcTable, patients:renderUnique, ads:renderAds,
-  projections:renderProjections, calendar:()=>{ renderHolidays(); renderEvents(); }, data:renderData
+  monthly:renderMom, services:renderSvcTable, links:renderLinks, patients:renderUnique, ads:renderAds,
+  projections:renderProjections, calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderSheetStatus(); }, data:renderData
 };
 /* only the visible module is drawn; switching tabs draws the next one with the current filters */
 function render(){
@@ -28,17 +28,18 @@ function wireTabs(){
 }
 function boot(reload){
   // files loaded in this browser are reused until a newer build of the page replaces them
-  if(!reload && lsGet('spl.build')===P.built){ ['services','servicesBooked','adsDaily','adsMonthly','map','uniquePatients'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  if(!reload && lsGet('spl.build')===P.built){ ['services','servicesBooked','adsDaily','adsMonthly','map','uniquePatients','followon'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
   if(!reload){ const b=lsGet('spl.basis'); if(b==='booked'&&P.servicesBooked) st.basis='booked'; }
   if(st.basis==='booked'&&!P.servicesBooked) st.basis='scheduled';
   const prevCats= S? new Set(S.catList) : null, prevStats= S? new Set(S.stList) : null;
   const wasAtEnd = reload && S && st.to===S.max;   // keep following the latest day when new days arrive
-  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); loadEvents();
+  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); loadEvents();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
     buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireTabs();
+    setTimeout(startSheet,0);
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
   } else {
     // keep what was selected; anything new in this dataset (e.g. the scheduled status) starts selected, except cancelled

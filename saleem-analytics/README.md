@@ -6,13 +6,26 @@ Open `dist/saleem-performance.html` in a browser. It needs internet only for the
 
 ## Modules
 
-The page has eight modules, switched with the tabs under the header: Overview, Month by month, Services, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+The page has nine modules, switched with the tabs under the header: Overview, Month by month, Services, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
 
 ## Projections
 
 For the selected services and statuses: measured holiday effects are removed, a weekday pattern is taken from the last 12 weeks, and a weighted trend line is fitted to the last 26 weeks. The forecast puts those back together for the chosen horizon, with a choice of growth assumption (slowing trend, continuing trend, no growth, or a custom monthly %). The likely range comes from re-running the model at eight earlier dates and comparing with what actually happened.
+
+## Service links
+
+The Service links module uses the services picked in the filter bar. With 2 or 3 selected it shows:
+- their weekly volume on one indexed scale
+- whether week-to-week changes in one are followed by changes in the other, and after how many weeks
+- one service per 100 of the other, by month
+
+With more than 3 selected it shows a grid of every pair. The patient-level view (same patient, second service within 7 or 30 days) needs the export from `sql/service_followon_monthly.sql`, loaded in the Data tab.
+
+## Outside factors (Google Sheet)
+
+Events live in the Google Sheet **Saleem Outside Factors** (id in `data/sheet.json`). When the dashboard is opened in claude.ai it reads the sheet through the viewer's Google Drive connector, on open and every 10 minutes. Without the connector it shows the last copy it read in that browser, then `data/events.csv`. Columns: start, end, category, title, scope, status, source, notes. Official holidays in the sheet are for reference; the dashboard draws them from the Hijri calendar. Sudden holidays, salary windows, security, political and economic events are measured in the Holidays & events module.
 
 ## Scheduled time vs booking time
 

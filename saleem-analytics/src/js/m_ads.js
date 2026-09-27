@@ -1,14 +1,13 @@
 /* ---------- ads ---------- */
 function renderAds(){
   const a=st.from, b=st.to;
-  const sel=document.getElementById('adGroupSel');
-  if(!sel.options.length){ sel.innerHTML='<option value="">All ad groups</option>'+A.groups.map(g=>'<option>'+esc(g)+'</option>').join(''); }
-  sel.value=st.adGroup;
+  // follows the top service filter: all services -> every group, otherwise the groups promoting the selected services
+  const gset=new Set(groupsForCats(selCats()));
   // monthly stacked spend by group within the range (top 7 + Other, fixed colour by all-time spend rank)
   const m0=monthKey(a), m1=monthKey(b); const months=[]; for(let mk=m0; mk<=m1; mk=addMonths(mk,1)) months.push(mk);
-  const top=A.groups.slice(0,7), rest=A.groups.slice(7);
+  const shownGroups=A.groups.filter(g=>gset.has(g)); const top=shownGroups.slice(0,7), rest=shownGroups.slice(7);
   const seriesFor=gs=>months.map(mk=>{const s=toN(mk+'-01'), e=s+daysInMonth(mk)-1, lo=Math.max(s,a), hi=Math.min(e,b); return sum(adDaily(lo,hi,gs));});
-  const ds=top.map((g,i)=>({label:g,data:seriesFor([g]),backgroundColor:css('--s'+(i+1))}));
+  const ds=top.map(g=>({label:g,data:seriesFor([g]),backgroundColor:css('--s'+(A.groups.indexOf(g)<8?A.groups.indexOf(g)+1:'-other'))}));
   if(rest.length) ds.push({label:'Other',data:seriesFor(rest),backgroundColor:css('--s-other')});
   ds.forEach(d=>{d.borderColor=css('--surface'); d.borderWidth={top:2,bottom:0,left:0,right:0}; d.borderSkipped=false; d.maxBarThickness=28;});
   const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US');
@@ -28,7 +27,7 @@ function renderAds(){
   const rows=[];
   if(view==='ad'){
     for(const ad of A.units){
-      if(st.adGroup && ad.group!==st.adGroup) continue;
+      if(!gset.has(ad.group)) continue;
       if(q && !(ad.name+' '+ad.adset+' '+ad.campaign).toLowerCase().includes(q)) continue;
       const m=inRange(ad.months); if(m.sp<0.5) continue;
       rows.push({name:ad.name,group:ad.group,how:ad.how,adset:ad.adset,camp:ad.campaign,obj:obj(ad.objective),spend:m.sp,impr:m.impr,clicks:m.clicks,res:m.res,rtype:prettyRes(m.rtype),cpr:m.res?m.sp/m.res:null});
@@ -36,7 +35,7 @@ function renderAds(){
   } else {
     for(const c of Object.values(A.camps)){
       const gs=Object.entries(c.groups).sort((x,y)=>y[1]-x[1]), tot=gs.reduce((s,x)=>s+x[1],0);
-      if(st.adGroup && !c.groups[st.adGroup]) continue;
+      if(!Object.keys(c.groups).some(g=>gset.has(g))) continue;
       if(q && !c.name.toLowerCase().includes(q)) continue;
       const m=inRange(c.months); if(m.sp<0.5) continue;
       const mix= gs.length===1? gs[0][0] : gs.slice(0,3).map(([g,v])=>g+' '+Math.round(v/tot*100)+'%').join(' · ')+(gs.length>3?' …':'');
@@ -61,8 +60,8 @@ function renderAds(){
     shown.map(r=>'<tr>'+cols.map(([key])=>cell(key,r)).join('')+'</tr>').join('')+'</tbody>';
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.campSort= st.campSort.k===key?{k:key,dir:-st.campSort.dir}:{k:key,dir:textCols.has(key)?1:-1}; renderAds();}));
   document.querySelectorAll('#adView button').forEach(bt=>{ bt.classList.toggle('on',bt.dataset.v===view); bt.disabled= A.level!=='ad' && bt.dataset.v==='ad'; });
-  const allSpend=sum(adDaily(a,b,A.groups)), conv=sum(adDaily(a,b,A.groups,'conv'));
-  document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+' total spend · '+fmtInt(conv)+' WhatsApp conversations from message campaigns';
+  const allSpend=sum(adDaily(a,b,[...gset])), conv=sum(adDaily(a,b,[...gset],'conv'));
+  document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+(gset.size===A.groups.length?' total spend · ':' spend on campaigns for the selected services · ')+''+fmtInt(conv)+' WhatsApp conversations from message campaigns';
 }
 function prettyRes(t){ if(!t) return ''; return ({'onsite_conversion.messaging_conversation_started_7d':'WhatsApp conversations','mobile_app_install':'App installs','onsite_conversion.purchase':'Purchases (messaging)','offsite_conversion.fb_pixel_purchase':'Website purchases','leadgen.other':'Leads','reach':'Reach','link_click':'Link clicks','post_engagement':'Post engagement','click_to_call_native_call_placed':'Calls','mixed':'Mixed','profile_visit_view':'Profile visits'})[t] || t.replace(/_/g,' ').replace(/.*\./,''); }
 

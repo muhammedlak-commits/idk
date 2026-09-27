@@ -14,6 +14,7 @@
     <button role="tab" data-mod="overview">Overview</button>
     <button role="tab" data-mod="monthly">Month by month</button>
     <button role="tab" data-mod="services">Services</button>
+    <button role="tab" data-mod="links">Service links</button>
     <button role="tab" data-mod="patients">Patients</button>
     <button role="tab" data-mod="ads">Meta ads</button>
     <button role="tab" data-mod="projections">Projections</button>
@@ -49,6 +50,9 @@
       <span class="sep"></span>
       <span class="flabel" style="min-width:0">Status</span>
       <div class="chips" id="stChips"></div>
+      <span class="sep"></span>
+      <span class="flabel" style="min-width:0">New patient =</span>
+      <div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div>
     </div>
   </div>
 </section>
@@ -97,11 +101,49 @@
     </section>
     </section>
 
+    <section class="module" data-mod="links" id="links" hidden>
+      <p class="callout" id="lkMsg"></p>
+      <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
+        <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</div></div></div>
+        <div class="tablewrap"><table id="lkMatrixTable"></table></div>
+      </section>
+      <div id="lkDetail" hidden>
+        <section class="panel" aria-labelledby="lkH">
+          <div class="phead"><div><h2 id="lkH">Weekly volume side by side</h2><div class="desc" id="lkDesc"></div></div></div>
+          <div class="chart md"><canvas id="lkIdxChart" aria-label="Weekly volume indexed to each service's average"></canvas></div>
+          <div class="legend" id="lkIdxLegend"></div>
+          <p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p>
+        </section>
+        <div class="grid2">
+          <section class="panel" aria-labelledby="lkLH">
+            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes, with the second service shifted earlier or later. A bar well above zero at +1 means a rise in the first service is usually followed by a rise in the second a week later.</div></div></div>
+            <div class="chart md"><canvas id="lkLagChart" aria-label="Lead and lag correlations"></canvas></div>
+            <div class="legend" id="lkLagLegend"></div>
+            <ul class="assume" id="lkFindings"></ul>
+            <p class="note" style="margin:8px 0 0">Same-week links are often shared causes (holidays, ad pushes, salary days) rather than one service driving the other. A link that shows up one or two weeks later is the better sign of one service feeding another. Correlation is not proof of cause.</p>
+          </section>
+          <section class="panel" aria-labelledby="lkRH">
+            <div class="phead"><div><h2 id="lkRH">One per 100 of the other</h2><div class="desc">The smaller service per 100 of the larger, by month. A rising line means the smaller service is growing faster, for example more lab tests for every 100 doctor visits.</div></div></div>
+            <div class="chart md"><canvas id="lkRatioChart" aria-label="Ratio between services by month"></canvas></div>
+            <div class="legend" id="lkRatioLegend"></div>
+          </section>
+        </div>
+        <section class="panel" aria-labelledby="lkFH">
+          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had the first service in a month and then the second within 30 days. This is the direct measure of one service leading to another.</div></div></div>
+          <p class="callout" id="lkFollowEmpty">This needs the service follow-on export. Open the <strong>Data</strong> tab, copy the follow-on SQL, run it in Metabase and drop the CSV there.</p>
+          <div id="lkFollowBody" hidden>
+            <div class="chart md"><canvas id="lkFollowChart" aria-label="Follow-on share by month"></canvas></div>
+            <div class="legend" id="lkFollowLegend"></div>
+            <div class="tablewrap" style="margin-top:12px"><table id="lkFollowTable"></table></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
     <section class="module" data-mod="patients" id="patients" hidden>
     <section class="panel" aria-labelledby="upH">
       <div class="phead">
-        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. New = the month of their first-ever service with Saleem; returning = everyone else served that month. The service chips above don't apply here; pick a category on the right.</div></div>
-        <div class="ctrls"><select id="upCat" aria-label="Patient category"></select></div>
+        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. New patients follow the <strong>New patient =</strong> switch in the filter bar: first-ever visit in that month, or patient record created in that month. Returning = everyone else served that month.</div></div>
       </div>
       <div id="upEmpty" class="callout">
         <p style="margin:0 0 6px"><strong>This section needs one extra Metabase export.</strong> The main export counts patients per day, so unique patients can't be worked out from it.</p>
@@ -112,6 +154,7 @@
         </ol>
         <button class="btn" type="button" id="copySql">Copy SQL</button>
       </div>
+      <p class="callout" id="upNote" hidden></p>
       <div id="upBody" hidden>
         <div class="chart md"><canvas id="upChart" aria-label="New and returning patients by month"></canvas></div>
         <div class="legend" id="upLegend"></div>
@@ -125,7 +168,7 @@
     <section class="panel" aria-labelledby="adsH">
       <div class="phead">
         <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
-        <div class="ctrls"><div class="seg" id="adView"><button data-v="ad" class="on">Ads</button><button data-v="campaign">Campaigns</button></div><input type="search" id="adQuery" placeholder="Search names" aria-label="Search ads and campaigns" style="border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px;width:170px"><select id="adGroupSel" aria-label="Service"></select></div>
+        <div class="ctrls"><div class="seg" id="adView"><button data-v="ad" class="on">Ads</button><button data-v="campaign">Campaigns</button></div><input type="search" id="adQuery" placeholder="Search names" aria-label="Search ads and campaigns" style="border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px;width:170px"></div>
       </div>
       <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
       <div class="legend" id="adLegend"></div>
@@ -178,9 +221,14 @@
         <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</div></div></div>
         <div class="tablewrap"><table id="holTable"></table></div>
       </section>
+      <section class="panel" aria-labelledby="fxH">
+        <div class="phead"><div><h2 id="fxH">Outside factor effects</h2><div class="desc">Events from the Google Sheet (sudden holidays, salary windows, security and economic events), measured the same way as holidays: orders per day during the event against the same weekdays in the four weeks around it. Campaign launches and events longer than two weeks aren't measured.</div></div></div>
+        <div class="tablewrap"><table id="fxTable"></table></div>
+        <div class="tablewrap" style="margin-top:12px;max-height:320px;overflow:auto"><table id="fxEvents"></table></div>
+      </section>
       <section class="panel" aria-labelledby="evH">
         <div class="phead">
-          <div><h2 id="evH">Events log</h2><div class="desc">Political, economic and marketing events shown on the trend chart. Add Saleem's own events such as price changes, launches, contracts or outages.</div></div>
+          <div><h2 id="evH">Events log</h2><div class="desc">Everything in the Saleem Outside Factors Google Sheet except official holidays, which come from the calendar. These are the markers on the trend chart. Add new events to the sheet; ask Claude to check the news and it will add them there too.</div><p class="sheetstatus" id="sheetStatus"></p></div>
           <div class="ctrls"><select id="evCat" aria-label="Event category"><option value="">All categories</option></select></div>
         </div>
         <div class="evlist" id="evList"></div>
@@ -197,7 +245,7 @@
     </section>
 
     <section class="module" data-mod="data" id="data" hidden>
-      <div class="grid2">
+      <div class="grid3">
         <section class="panel" aria-labelledby="dOH">
           <div class="phead"><div><h2 id="dOH">Orders</h2><div class="desc">The Metabase service performance export, with the columns day, service_category, visit_status, services_delivered, distinct_orders and distinct_patients.</div></div></div>
           <div class="drop" id="drop-orders" role="button" tabindex="0" aria-label="Drop the orders CSV here or press Enter to choose a file">
@@ -227,6 +275,19 @@
           <dl class="dstat" id="stat-patients"></dl>
           <button class="btn" type="button" id="reset-patients" hidden>Remove loaded patients data</button>
           <div class="sample" id="sample-patients"></div>
+        </section>
+        <section class="panel" aria-labelledby="dLH">
+          <div class="phead"><div><h2 id="dLH">Service follow-on</h2><div class="desc">Which patients go on to a second service within 7 or 30 days, for example lab tests after a doctor visit. Loading it adds the patient-level view to the Service links module.</div></div></div>
+          <div class="drop" id="drop-links" role="button" tabindex="0" aria-label="Drop the service follow-on CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-links" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql3">Copy SQL</button></div>
+          <p class="dmsg" id="msg-links" hidden></p>
+          <dl class="dstat" id="stat-links"></dl>
+          <button class="btn" type="button" id="reset-links" hidden>Remove loaded follow-on data</button>
+          <div class="sample" id="sample-links"></div>
         </section>
       </div>
       <p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p>

@@ -17,10 +17,12 @@ JS_ORDER = [
     'm_overview.js',  # module: KPIs + trend + ad spend
     'm_monthly.js',   # module: month-by-month MoM / YoY
     'm_services.js',  # module: service breakdown
+    'm_links.js',     # module: service links
     'm_patients.js',  # module: unique patients
     'm_ads.js',       # module: Meta ads
     'm_calendar.js',  # module: holiday effects + events log
     'm_projections.js',  # module: projections
+    'm_sheet.js',     # live outside-factors Google Sheet
     'm_data.js',      # module: drag-and-drop data loading
     'files.js',       # Load CSV (header button)
     'main.js',        # tabs, render, boot
@@ -39,6 +41,9 @@ payload = {
     'events': (d / 'events.csv').read_text(),
     'uniquePatients': (d / 'unique_patients_monthly.csv').read_text() if (d / 'unique_patients_monthly.csv').exists() else '',
     'uniqueSql': (root / 'sql' / 'unique_patients_monthly.sql').read_text(),
+    'followon': (d / 'service_followon_monthly.csv').read_text() if (d / 'service_followon_monthly.csv').exists() else '',
+    'followonSql': (root / 'sql' / 'service_followon_monthly.sql').read_text(),
+    'sheet': json.loads((d / 'sheet.json').read_text()) if (d / 'sheet.json').exists() else None,
     'built': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
 }
 blob = json.dumps(payload, separators=(',', ':')).replace('</', '<\\/')

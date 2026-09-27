@@ -1,5 +1,5 @@
 /* ---------- data module: drag-and-drop / browse for the two Metabase exports ---------- */
-const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients};   // the data built into this page
+const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
 function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
@@ -31,6 +31,18 @@ const DROPS={
       return saved;
     },
     reset(){ P.uniquePatients=ORIG.uniquePatients; lsDel('spl.uniquePatients'); setDataMeta('patients',null); }
+  },
+  links:{
+    check:hdr=>/service_a/.test(hdr)&&/service_b/.test(hdr)&&/followed_30d/.test(hdr),
+    wrong:'This file doesn\u2019t look like the service follow-on export. Run the query from Copy SQL in this box and download its results.',
+    apply(text,name){
+      if(!buildFollowon(text)) throw new Error('No usable rows found. Check the file has month, service_a, service_b, patients_a and followed_30d columns.');
+      P.followon=text;
+      const saved=lsSave('spl.followon',text); lsSave('spl.build',P.built);
+      setDataMeta('links',{name,at:Date.now()});
+      return saved;
+    },
+    reset(){ P.followon=ORIG.followon; lsDel('spl.followon'); setDataMeta('links',null); }
   }
 };
 
@@ -48,7 +60,6 @@ async function takeFiles(kind, files){
     }catch(err){ showMsg(msg,'bad',err.message); }
   }
   if(!ok) return;
-  if(kind==='patients') document.getElementById('upCat').innerHTML='';
   if(kind==='orders') st.basis=st.loadBasis;   // show what was just loaded
   boot(true);
   showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
@@ -78,6 +89,11 @@ function renderData(){
     row('Source', p? esc(p.name)+' <span class="note">('+fmtAt(p.at)+')</span>' : (U?'Built into this page':'Nothing loaded yet'))+
     (U? row('Months', fmtM(months[0])+' – '+fmtM(months[months.length-1])+' ('+months.length+')')+row('Categories', U.cats.map(c=>esc(UP_LABEL[c]||label(c))).join(', ')) : '');
   document.getElementById('reset-patients').hidden=!p;
+  const l=meta.links, F=buildFollowon(P.followon);
+  document.getElementById('stat-links').innerHTML=
+    row('Source', l? esc(l.name)+' <span class="note">('+fmtAt(l.at)+')</span>' : (F?'Built into this page':'Nothing loaded yet'))+
+    (F? row('Months', fmtM(F.months[0])+' – '+fmtM(F.months[F.months.length-1])+' ('+F.months.length+')')+row('Services', F.cats.map(c=>esc(UP_LABEL[c]||label(c))).join(', ')) : '');
+  document.getElementById('reset-links').hidden=!l;
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
   renderSamples();
 }
@@ -104,13 +120,20 @@ const SAMPLES={
           ['unique_patients','Different patients served that month','1,240'],
           ['new_patients','Of those, first-ever service with Saleem','410'],
           ['returning_patients','Of those, served before','830'],
-          ['services','Services delivered to them','3,900']],
+          ['services','Services delivered to them','3,900'],
+          ['new_by_created','Of those, patients whose record was created that month','385'],
+          ['accounts_created','Only on all rows: patient records created that month, visited or not','520']],
     rules:['One row per month and category, plus one row per month with category all.',
            'new_patients + returning_patients = unique_patients on every row.',
            'Export the full history with no date filter, otherwise “new” is wrong for the early months.',
+           'Older exports without new_by_created still load; Account created then falls back to first order.',
            'The Copy SQL query produces exactly this layout.'],
-    csv:'month,category,unique_patients,new_patients,returning_patients,services\n2026-08,all,1240,410,830,3900\n2026-08,physiotherapy,420,120,300,1410\n2026-08,nursing,380,140,240,1680\n2026-08,doctorVisit,310,130,180,480\n2026-09,all,1180,360,820,3300\n2026-09,physiotherapy,400,105,295,1030\n2026-09,nursing,370,125,245,1330\n2026-09,doctorVisit,290,115,175,330\n'}
+    csv:'month,category,unique_patients,new_patients,returning_patients,services,new_by_created,accounts_created\n2026-08,all,1240,410,830,3900,385,520\n2026-08,physiotherapy,420,120,300,1410,110,\n2026-08,nursing,380,140,240,1680,131,\n2026-08,doctorVisit,310,130,180,480,122,\n2026-09,all,1180,360,820,3300,340,470\n2026-09,physiotherapy,400,105,295,1030,98,\n2026-09,nursing,370,125,245,1330,117,\n2026-09,doctorVisit,290,115,175,330,108,\n'}
 };
+SAMPLES.links={file:'saleem-service-followon-sample.csv',
+  cols:[['month','Month of the first service, YYYY-MM','2026-08'],['service_a','The first service','doctorVisit'],['service_b','The service that may follow','labTest'],['patients_a','Patients who had service A that month','310'],['followed_7d','Of them, had service B within 7 days after','96'],['followed_30d','Of them, had service B within 30 days after','131']],
+  rules:['One row per month and ordered pair of services (doctor visit then lab test is a different row from lab test then doctor visit).','Counts are patients, not visits. Export the full history with no date filter.','The Copy SQL query in this box produces exactly this layout.'],
+  csv:'month,service_a,service_b,patients_a,followed_7d,followed_30d\n2026-08,doctorVisit,labTest,310,96,131\n2026-08,doctorVisit,radiology,310,22,35\n2026-08,doctorVisit,nursing,310,18,40\n2026-08,labTest,doctorVisit,280,30,61\n2026-08,physiotherapy,nursing,420,12,25\n'};
 let downloadsApi;   // undefined = not checked yet, null = not available in this view
 function renderSamples(){
   for(const [kind,s] of Object.entries(SAMPLES)){
@@ -148,7 +171,7 @@ function wireData(){
     zone.addEventListener('dragleave',()=>{ if(--depth<=0){ depth=0; zone.classList.remove('over'); } });
     zone.addEventListener('drop',e=>{ e.preventDefault(); depth=0; zone.classList.remove('over'); if(e.dataTransfer.files.length) takeFiles(kind,e.dataTransfer.files); });
     document.getElementById('reset-'+kind).addEventListener('click',()=>{
-      DROPS[kind].reset(); if(kind==='patients') document.getElementById('upCat').innerHTML='';
+      DROPS[kind].reset();
       boot(true); showMsg(document.getElementById('msg-'+kind),'good','Back to the data built into this page.');
     });
   }
@@ -157,6 +180,7 @@ function wireData(){
   const copy=(txt,label)=>navigator.clipboard.writeText(txt).then(()=>toast(label+' copied')).catch(()=>toast('Copy was blocked by this browser; the queries are in the sql folder'));
   document.getElementById('copySqlSched').addEventListener('click',()=>copy(P.sqlScheduled,'Scheduled-time SQL'));
   document.getElementById('copySqlBooked').addEventListener('click',()=>copy(P.sqlBooked,'Booking-time SQL'));
+  document.getElementById('copySql3').addEventListener('click',()=>navigator.clipboard.writeText(P.followonSql).then(()=>toast('Follow-on SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in the sql folder')));
   document.getElementById('copySql2').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));
   // a file dropped anywhere else shouldn't make the browser navigate away from the dashboard
   window.addEventListener('dragover',e=>{ if(!e.target.closest||!e.target.closest('.drop')) e.preventDefault(); });

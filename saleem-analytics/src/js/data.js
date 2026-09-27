@@ -118,8 +118,11 @@ function holidayWindows(from,to){ // contiguous windows per holiday type
 
 /* ---------- events ---------- */
 let EVENTS=[];
+/* events = the outside-factors sheet (live copy when available, else the copy built into the page)
+   plus anything added in this browser. Official holidays come from the Hijri calendar instead. */
 function loadEvents(){
-  const base=parseCsvObjects(P.events).map(r=>({s:toN(r.start),e:r.end?toN(r.end):toN(r.start),cat:r.category,title:r.title,note:r.note,own:false}));
+  const rows= sheetState.rows || parseCsvObjects(P.events);
+  const base=sheetEvents(rows).filter(e=>e.cat!=='Holiday (official)');
   let mine=[]; try{ mine=JSON.parse(lsGet('spl.events')||'[]'); }catch(e){}
   EVENTS=base.concat(mine.map(m=>({...m,own:true}))).sort((a,b)=>a.s-b.s);
 }

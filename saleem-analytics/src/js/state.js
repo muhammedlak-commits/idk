@@ -1,5 +1,5 @@
 /* ---------- state ---------- */
-const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'overview',pjH:90,pjGrowth:'damped',pjCustom:5,pjHol:true,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:''};
+const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'overview',pjH:90,pjGrowth:'damped',pjCustom:5,pjHol:true,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:'',newBasis:'first'};
 const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days'};
 
 /* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */

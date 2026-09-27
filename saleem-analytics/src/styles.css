@@ -150,3 +150,9 @@ td.proj{color:var(--ink-2)}
 .sampletable th,.sampletable td{text-align:left}
 .seg button.unavail{color:var(--muted)}
 .dstat h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.06em}
+.sheetstatus{margin:6px 0 0;font-size:12px;color:var(--ink-2)}
+.sheetstatus.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px}
+.sheetstatus.error{color:var(--bad)}
+.sheetstatus a{color:var(--accent)}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px}
+.grid3>*{min-width:0}

@@ -54,3 +54,31 @@ function wireEvents(){
   });
 }
 
+
+/* ---------- outside factor effects ----------
+   Same method as holidays: each event window against the same weekdays in the four weeks around it,
+   leaving out holiday days and other event days. Campaign launches are left out (they start
+   something rather than mark a window), and so are events longer than two weeks. */
+function renderFactorEffects(){
+  const cats=selCats(), stats=selStats(), m=st.measure;
+  const y=series(S.min,S.max,m,cats,stats), at=n=>y[n-S.min];
+  const evs=EVENTS.filter(e=>e.cat!=='Marketing' && e.e-e.s<=14 && e.s>=S.min+28 && e.e<=S.max-7);
+  const busy=new Set(); EVENTS.forEach(e=>{ if(e.cat!=='Marketing') for(let n=e.s;n<=e.e;n++) busy.add(n); });
+  const skip=n=>busy.has(n)||holKeysOn(n).length>0;
+  const res=[];
+  for(const ev of evs){
+    const base={}, cnt={};
+    for(let n=ev.s-28;n<=ev.e+28;n++){ if(n>=ev.s&&n<=ev.e) continue; if(n<S.min||n>S.max||skip(n)) continue; const d=dow(n); base[d]=(base[d]||0)+at(n); cnt[d]=(cnt[d]||0)+1; }
+    let act=0, exp=0, ok=true;
+    for(let n=ev.s;n<=ev.e;n++){ const d=dow(n); if(!cnt[d]){ok=false;break;} act+=at(n); exp+=base[d]/cnt[d]; }
+    if(ok&&exp>0) res.push({ev,act,exp,eff:(act/exp-1)*100,thin:exp/(ev.e-ev.s+1)<15});
+  }
+  const byCat={}; res.forEach(r=>{ (byCat[r.ev.cat]||(byCat[r.ev.cat]=[])).push(r); });
+  const cell=v=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),50)/50; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'">'+fmtPct(v)+'</td>'; };
+  const catRows=Object.entries(byCat).map(([c,rs])=>{ const ok=rs.filter(r=>!r.thin); const A_=ok.reduce((s,r)=>s+r.act,0), E_=ok.reduce((s,r)=>s+r.exp,0); return {c,n:rs.length,avg:E_?(A_/E_-1)*100:null}; }).sort((a,b)=>(a.avg??0)-(b.avg??0));
+  document.getElementById('fxTable').innerHTML= res.length?
+    '<thead><tr><th class="nosort">Category</th><th class="nosort">Events measured</th><th class="nosort">Average effect</th></tr></thead><tbody>'+catRows.map(r=>'<tr><td>'+esc(r.c)+'</td><td>'+r.n+'</td>'+cell(r.avg)+'</tr>').join('')+'</tbody>'
+    : '<tbody><tr><td class="note" style="text-align:left">No measurable events yet. Add sudden holidays, salary windows or security events to the Google Sheet.</td></tr></tbody>';
+  document.getElementById('fxEvents').innerHTML= res.length?
+    '<thead><tr><th class="nosort">Event</th><th class="nosort">Dates</th><th class="nosort">Category</th><th class="nosort">Effect</th></tr></thead><tbody>'+res.slice().sort((a,b)=>b.ev.s-a.ev.s).map(r=>'<tr><td style="text-align:left;white-space:normal;min-width:200px">'+esc(r.ev.title)+'</td><td>'+fmtD(r.ev.s)+(r.ev.e>r.ev.s?' – '+fmtDs(r.ev.e):'')+'</td><td style="text-align:left">'+esc(r.ev.cat)+'</td>'+(r.thin?'<td style="color:var(--muted)" title="Too little volume at the time to count">'+fmtPct(r.eff)+'</td>':cell(r.eff))+'</tr>').join('')+'</tbody>' : '';
+}

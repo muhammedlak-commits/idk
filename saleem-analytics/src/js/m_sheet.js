@@ -1,0 +1,79 @@
+/* ---------- live outside-factors sheet ----------
+   The page asks the viewer's Google Drive connector for the "Saleem Outside Factors" sheet
+   (read_file_content) when it opens and every 10 minutes while open. Drive returns the sheet
+   as a Markdown table, parsed here into event rows. Without the connector the page keeps the
+   last copy it read in this browser, then the events built into the page. */
+const SHEET=P.sheet||null;          // {fileId, url, server, tool}
+let sheetState={status:'off', at:null, rows:null, message:''};
+
+/* Markdown table from Drive -> array of row objects keyed by the header row */
+function parseSheetTable(text){
+  if(typeof text!=='string') return null;
+  const cellsOf=line=>{ const out=[]; let cur='', esc=false;
+    for(const ch of line.trim().replace(/^\||\|$/g,'')){ if(esc){cur+=ch; esc=false;} else if(ch==='\\') esc=true; else if(ch==='|'){out.push(cur.trim()); cur='';} else cur+=ch; }
+    out.push(cur.trim()); return out; };
+  const lines=text.split('\n').filter(l=>/^\s*\|/.test(l));
+  let hdr=null; const rows=[];
+  for(const l of lines){
+    const c=cellsOf(l);
+    if(c.every(x=>/^:?-+:?$/.test(x)||x==='')) continue;          // alignment or blank rows
+    if(!hdr){ if(c.map(normHdr).includes('start')&&c.map(normHdr).includes('title')) hdr=c.map(normHdr); continue; }
+    const o={}; hdr.forEach((h,i)=>o[h]=c[i]||''); if(o.start||o.title) rows.push(o);
+  }
+  return hdr? rows : null;
+}
+function sheetDate(v){
+  v=(v||'').trim(); if(!v) return null;
+  let m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return Math.round(Date.UTC(+m[1],+m[2]-1,+m[3])/DAY);
+  m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if(m) return Math.round(Date.UTC(+m[3],+m[1]-1,+m[2])/DAY);   // Sheets' US display
+  const t=Date.parse(v); return isFinite(t)? Math.round(Date.UTC(new Date(t).getFullYear(),new Date(t).getMonth(),new Date(t).getDate())/DAY) : null;
+}
+function sheetEvents(rows){
+  return rows.map(r=>{ const s=sheetDate(r.start); if(s==null) return null; const e=sheetDate(r.end);
+    return {s,e:e!=null&&e>=s?e:s,cat:r.category||'Other',title:r.title||'(untitled)',note:[r.notes,r.status&&r.status!=='Confirmed'&&r.status!=='Calendar'?r.status:'',r.scope&&r.scope!=='National'&&r.scope!=='Saleem'?r.scope:''].filter(Boolean).join(' · '),scope:r.scope,status:r.status,source:r.source,own:false,sheet:true}; }).filter(Boolean);
+}
+function applySheetRows(rows, at){
+  sheetState.rows=rows; sheetState.at=at; loadEvents(); render(); renderSheetStatus();
+}
+function renderSheetStatus(){
+  const el=document.getElementById('sheetStatus'); if(!el) return;
+  const link=SHEET? ' <a href="'+esc(SHEET.url)+'" target="_blank" rel="noopener">Open the sheet</a>' : '';
+  const when=sheetState.at? new Date(sheetState.at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const txt={
+    off:'Events built into this page.',
+    loading:'Reading the Google Sheet…',
+    live:'Live from the Google Sheet · read '+when+'.',
+    cached:'Showing the copy of the Google Sheet read '+when+'. '+sheetState.message,
+    error:sheetState.message
+  }[sheetState.status]||'';
+  el.innerHTML=esc(txt)+link; el.className='sheetstatus '+sheetState.status;
+}
+function startSheet(){
+  if(!SHEET){ renderSheetStatus(); return; }
+  try{ const c=JSON.parse(lsGet('spl.sheet')||'null'); if(c&&c.rows){ sheetState={status:'cached',at:c.at,rows:c.rows,message:'Connecting to Google Drive…'}; loadEvents(); } }catch(e){}
+  renderSheetStatus();
+  const use=window.claude&&window.claude.use;
+  if(!use){ if(sheetState.status!=='cached') sheetState={status:'off',at:null,rows:null,message:''}; else sheetState.message='Live updates work when this page is opened in claude.ai.'; renderSheetStatus(); return; }
+  Promise.resolve(window.claude.use('mcp')).then(mcp=>{
+    if(!mcp){ if(sheetState.status==='cached') sheetState.message='Live updates aren’t available in this view.'; renderSheetStatus(); return; }
+    if(sheetState.status!=='cached') sheetState.status='loading'; renderSheetStatus();
+    mcp.watchTool(SHEET.server, SHEET.tool, {fileId:SHEET.fileId}, ev=>{
+      if(ev.type==='data'){
+        const p=ev.result&&ev.result.payload; const text= p&&typeof p==='object'? p.fileContent : typeof p==='string'? p : null;
+        const rows=parseSheetTable(text);
+        if(!rows){ sheetState.status= sheetState.rows?'cached':'error'; sheetState.message='The sheet was read but its table couldn’t be understood. Keep the header row: start, end, category, title, scope, status, source, notes.'; renderSheetStatus(); return; }
+        const at= ev.result.cache&&ev.result.cache.storedAt || Date.now();
+        sheetState.status='live'; sheetState.message='';
+        lsSet('spl.sheet',JSON.stringify({rows,at}));
+        applySheetRows(rows,at);
+        return;
+      }
+      const code=ev.error&&ev.error.code;
+      const denial={needs_reauth:'Google Drive needs to be reconnected: claude.ai Settings → Connectors.',server_not_connected:'Add the Google Drive connector in claude.ai Settings → Connectors to read the sheet live.',selection_required:'Choose which Google Drive connection to use when claude.ai asks.',not_in_manifest:'Google Drive is turned off for this page. Allow it from the page’s connector prompt to read the sheet live.',blocked_by_policy:'Your organisation’s policy blocks reading Google Drive from this page.',approval_required:'Reading Google Drive from this page needs approval from your organisation.'}[code];
+      if(denial){ sheetState={status:'error',at:null,rows:null,message:denial}; lsSet('spl.sheet','null'); loadEvents(); render(); renderSheetStatus(); return; }
+      if(code==='tool_error'){ sheetState.status=sheetState.rows?'cached':'error'; sheetState.message='Google Drive couldn’t read the sheet: '+(ev.error.message||'unknown error')+'. It may have been moved or deleted.'; renderSheetStatus(); return; }
+      // transient: keep what is shown
+      sheetState.status=sheetState.rows?'cached':'error'; sheetState.message='Couldn’t reach Google Drive just now; it will try again.'; renderSheetStatus();
+    }, {refetchInterval:600000, cache:{staleTime:60000}});
+  }).catch(()=>renderSheetStatus());
+}
