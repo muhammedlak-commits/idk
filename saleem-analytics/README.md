@@ -14,6 +14,15 @@ Source code is split the same way under `src/`: `layout.html` and `styles.css` f
 
 For the selected services and statuses: measured holiday effects are removed, a weekday pattern is taken from the last 12 weeks, and a weighted trend line is fitted to the last 26 weeks. The forecast puts those back together for the chosen horizon, with a choice of growth assumption (slowing trend, continuing trend, no growth, or a custom monthly %). The likely range comes from re-running the model at eight earlier dates and comparing with what actually happened.
 
+## Scheduled time vs booking time
+
+By default every order counts on its **scheduled time** (the visit date). The **Dates by** switch in the filter bar shows the same dashboard by **booking time** (the day the order was created) instead. The two need separate exports with the same columns:
+
+- `sql/orders_daily_by_scheduled_time.sql`: started, finished, reviewed and cancelled visits, up to today.
+- `sql/orders_daily_by_booking_time.sql`: also includes orders still waiting for their visit (status *scheduled*).
+
+In the Data tab, choose *This file is dated by: Booking time* before dropping the booking-time file. To embed it permanently, save it as `data/services_daily_booked.csv` and run `python3 build.py`. The unique patients export always uses scheduled time.
+
 ## Sample files
 
 `samples/` has an example of each export the Data tab accepts (`saleem-orders-sample.csv`, `saleem-unique-patients-sample.csv`). The Data tab shows the same samples with a column-by-column guide.

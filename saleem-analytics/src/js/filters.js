@@ -20,7 +20,8 @@ function syncChips(){
   document.querySelectorAll('#svcChips .chip').forEach(b=>{const on=st.svc.has(b.dataset.c); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   document.querySelectorAll('#stChips .chip').forEach(b=>{const on=st.status.has(b.dataset.s); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const seg=(id,attr,val)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===val));
-  seg('measure','m',st.measure); seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
+  seg('measure','m',st.measure); seg('basis','b',st.basis);
+  const bk=document.querySelector('#basis [data-b="booked"]'); if(bk){ bk.classList.toggle('unavail',!P.servicesBooked); bk.title= P.servicesBooked? 'The day the order was booked' : 'Load a booking-time export in the Data tab to use this'; } seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
   document.getElementById('dFrom').value=toS(st.from); document.getElementById('dTo').value=toS(st.to);
   [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
 }
@@ -35,6 +36,7 @@ function preset(p){
 }
 function wireFilters(){
   document.querySelectorAll('#presets button').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.p)));
+  document.querySelectorAll('#basis button').forEach(b=>b.addEventListener('click',()=>setBasis(b.dataset.b)));
   document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{st.measure=b.dataset.m;render();}));
   document.querySelectorAll('#gran button').forEach(b=>b.addEventListener('click',()=>{st.gran=b.dataset.g;render();}));
   document.querySelectorAll('#trendMode button').forEach(b=>b.addEventListener('click',()=>{st.trend=b.dataset.t;render();}));
@@ -54,3 +56,14 @@ function wireFilters(){
   document.getElementById('evCat').addEventListener('change',e=>{st.evCat=e.target.value; renderEvents();});
 }
 
+
+/* which date each order counts on: scheduled visit time (default) or booking time */
+function setBasis(b){
+  if(b===st.basis) return;
+  if(b==='booked' && !P.servicesBooked){
+    st.loadBasis='booked'; showModule('data',true);
+    showMsg(document.getElementById('msg-orders'),'bad','There\u2019s no booking-time data yet. Copy the booking-time SQL below, run it in Metabase, and drop the CSV here with \u201cBooking time\u201d selected.');
+    return;
+  }
+  st.basis=b; lsSet('spl.basis',b); boot(true);
+}

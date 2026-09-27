@@ -148,3 +148,5 @@ td.proj{color:var(--ink-2)}
 .coltable td:first-child{white-space:nowrap}
 .coltable code,.sampletable td{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
 .sampletable th,.sampletable td{text-align:left}
+.seg button.unavail{color:var(--muted)}
+.dstat h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.06em}

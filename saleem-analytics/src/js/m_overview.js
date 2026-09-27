@@ -81,7 +81,7 @@ function renderTrend(){
   leg.innerHTML=items.join('');
   const total_=total(a,b,m,cats,stats);
   document.getElementById('trendH').textContent=MLABEL[m]+' over time';
-  document.getElementById('trendDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
+  document.getElementById('trendDesc').textContent=(st.basis==='booked'?'By booking time':'By scheduled time')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
 
   // spend chart on the same buckets (separate axis, separate chart: never dual-axis)
   const groups=groupsForCats(cats);

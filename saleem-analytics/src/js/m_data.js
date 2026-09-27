@@ -1,5 +1,5 @@
 /* ---------- data module: drag-and-drop / browse for the two Metabase exports ---------- */
-const ORIG={services:P.services, uniquePatients:P.uniquePatients};   // the data built into this page
+const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
 function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
@@ -10,15 +10,15 @@ const DROPS={
     check:hdr=>/service_category/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr),
     wrong:'This file doesn’t look like the orders export. It needs the columns day, service_category and distinct_orders.',
     apply(text,name){
-      const mode=st.ordersMode;
-      const next= mode==='replace'? text : mergeServices(P.services,text);
+      const mode=st.ordersMode, key=st.loadBasis==='booked'?'servicesBooked':'services';
+      const next= mode==='replace'||!P[key]? text : mergeServices(P[key],text);
       buildServices(next);                  // throws with a readable message if the file can't be used
-      P.services=next;
-      const saved=lsSave('spl.services',next); lsSave('spl.build',P.built);
-      setDataMeta('orders',{name,at:Date.now(),mode});
+      P[key]=next;
+      const saved=lsSave('spl.'+key,next); lsSave('spl.build',P.built);
+      setDataMeta(key==='services'?'orders':'ordersBooked',{name,at:Date.now(),mode});
       return saved;
     },
-    reset(){ P.services=ORIG.services; lsDel('spl.services'); setDataMeta('orders',null); }
+    reset(){ const key=st.loadBasis==='booked'?'servicesBooked':'services'; P[key]=ORIG[key]; lsDel('spl.'+key); setDataMeta(key==='services'?'orders':'ordersBooked',null); if(key==='servicesBooked'&&!P.servicesBooked) st.basis='scheduled'; }
   },
   patients:{
     check:hdr=>/unique_patients/.test(hdr)&&/new_patients/.test(hdr),
@@ -49,6 +49,7 @@ async function takeFiles(kind, files){
   }
   if(!ok) return;
   if(kind==='patients') document.getElementById('upCat').innerHTML='';
+  if(kind==='orders') st.basis=st.loadBasis;   // show what was just loaded
   boot(true);
   showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
   toast('Loaded '+(ok>1?ok+' files':last));
@@ -60,13 +61,17 @@ function renderData(){
   const meta=dataMeta();
   const fmtAt=t=>new Date(t).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const row=(k,v)=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>';
-  const o=meta.orders;
-  document.getElementById('stat-orders').innerHTML=
-    row('Source', o? esc(o.name)+' <span class="note">('+(o.mode==='replace'?'replaced all':'added to built-in data')+', '+fmtAt(o.at)+')</span>' : 'Built into this page')+
-    row('Dates', fmtD(S.min)+' – '+fmtD(S.max))+
-    row('Rows', S.rowCount.toLocaleString('en-US'))+
-    row('Services', S.C+' categories, '+S.T+' statuses');
-  document.getElementById('reset-orders').hidden=!o;
+  const block=(title,key,m)=>{
+    const text=P[key]; if(!text) return '<h4>'+title+'</h4>'+row('Source','Nothing loaded yet. Run the '+(key==='servicesBooked'?'booking':'scheduled')+'-time query and drop it here.');
+    const X= (st.basis==='booked')===(key==='servicesBooked')? S : buildServices(text);
+    return '<h4>'+title+(((st.basis==='booked')===(key==='servicesBooked'))?' · showing now':'')+'</h4>'+
+      row('Source', m? esc(m.name)+' <span class="note">('+(m.mode==='replace'||key==='servicesBooked'&&!ORIG.servicesBooked?'loaded':'added to built-in data')+', '+fmtAt(m.at)+')</span>' : 'Built into this page')+
+      row('Dates', fmtD(X.min)+' – '+fmtD(X.max))+row('Rows', X.rowCount.toLocaleString('en-US'))+row('Services', X.C+' categories, '+X.T+' statuses');
+  };
+  document.getElementById('stat-orders').innerHTML=block('By scheduled time','services',meta.orders)+block('By booking time','servicesBooked',meta.ordersBooked);
+  const cur= st.loadBasis==='booked'? meta.ordersBooked : meta.orders;
+  const rb=document.getElementById('reset-orders'); rb.hidden=!cur; rb.textContent= st.loadBasis==='booked'? 'Remove loaded booking-time data' : 'Go back to built-in orders data';
+  document.querySelectorAll('#loadBasis button').forEach(b=>b.classList.toggle('on',b.dataset.b===st.loadBasis));
   const p=meta.patients;
   const months=U? [...new Set(Object.values(U.by).flatMap(x=>Object.keys(x)))].sort() : [];
   document.getElementById('stat-patients').innerHTML=
@@ -83,14 +88,15 @@ const SAMPLES={
   orders:{file:'saleem-orders-sample.csv',
     cols:[['day','Date, YYYY-MM-DD','2026-09-01'],
           ['service_category','Service as Metabase names it','physiotherapy, nursing, doctorVisit, labTest, xRay, physiotherapy (b2b)…'],
-          ['visit_status','Visit status','finished, reviewed, started or cancelled'],
+          ['visit_status','Visit status','finished, reviewed, started or cancelled (a booking-time file can also have scheduled)'],
           ['services_delivered','Number of services','42'],
           ['distinct_orders','Number of distinct orders','42'],
           ['distinct_patients','Distinct patients that day','41']],
     rules:['One row for each day, service and visit status. Days with nothing for a service can be left out.',
            'Keep the column names as shown. Their order doesn’t matter, and extra columns are ignored.',
            'A time after the date (2026-09-01T00:00:00) is fine. Numbers can have thousands separators.',
-           'For a quick update, export only the latest days and use “Add or update days”.'],
+           'For a quick update, export only the latest days and use “Add or update days”.',
+           'The day is either the scheduled visit date or the booking date. Pick which one under \u201cThis file is dated by\u201d before dropping the file.'],
     csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients\n2026-09-01,physiotherapy,finished,42,42,41\n2026-09-01,physiotherapy,cancelled,3,3,3\n2026-09-01,nursing,finished,51,50,44\n2026-09-01,nursing,reviewed,6,6,6\n2026-09-01,doctorVisit,finished,14,14,14\n2026-09-01,labTest,finished,13,12,12\n2026-09-01,physiotherapy (b2b),finished,4,4,4\n2026-09-02,physiotherapy,finished,45,45,44\n2026-09-02,nursing,finished,49,48,42\n'},
   patients:{file:'saleem-unique-patients-sample.csv',
     cols:[['month','Month, YYYY-MM','2026-08'],
@@ -147,6 +153,10 @@ function wireData(){
     });
   }
   document.querySelectorAll('#ordersMode button').forEach(b=>b.addEventListener('click',()=>{ st.ordersMode=b.dataset.m; renderData(); }));
+  document.querySelectorAll('#loadBasis button').forEach(b=>b.addEventListener('click',()=>{ st.loadBasis=b.dataset.b; renderData(); }));
+  const copy=(txt,label)=>navigator.clipboard.writeText(txt).then(()=>toast(label+' copied')).catch(()=>toast('Copy was blocked by this browser; the queries are in the sql folder'));
+  document.getElementById('copySqlSched').addEventListener('click',()=>copy(P.sqlScheduled,'Scheduled-time SQL'));
+  document.getElementById('copySqlBooked').addEventListener('click',()=>copy(P.sqlBooked,'Booking-time SQL'));
   document.getElementById('copySql2').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));
   // a file dropped anywhere else shouldn't make the browser navigate away from the dashboard
   window.addEventListener('dragover',e=>{ if(!e.target.closest||!e.target.closest('.drop')) e.preventDefault(); });

@@ -28,6 +28,9 @@ JS_ORDER = [
 
 payload = {
     'services': (d / 'services_daily.csv').read_text(),
+    'servicesBooked': (d / 'services_daily_booked.csv').read_text() if (d / 'services_daily_booked.csv').exists() else '',
+    'sqlScheduled': (root / 'sql' / 'orders_daily_by_scheduled_time.sql').read_text(),
+    'sqlBooked': (root / 'sql' / 'orders_daily_by_booking_time.sql').read_text(),
     'adsDaily': (d / 'meta_ads_daily.csv').read_text(),
     'adsMonthly': (d / 'meta_ads_campaign_monthly.csv').read_text(),
     'map': (d / 'campaign_service_map.csv').read_text(),
