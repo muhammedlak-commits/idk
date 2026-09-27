@@ -18,6 +18,7 @@
     <button role="tab" data-mod="ads">Meta ads</button>
     <button role="tab" data-mod="projections">Projections</button>
     <button role="tab" data-mod="calendar">Holidays &amp; events</button>
+    <button role="tab" data-mod="data">Data</button>
   </nav>
 </header>
 
@@ -104,7 +105,7 @@
         <ol style="margin:0 0 8px;padding-left:18px">
           <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
           <li>Run it with no date filter, then download the results as CSV.</li>
-          <li>Click <strong>Load CSV</strong> at the top of this page and pick that file.</li>
+          <li>Open the <strong>Data</strong> tab and drop the file on the patients box.</li>
         </ol>
         <button class="btn" type="button" id="copySql">Copy SQL</button>
       </div>
@@ -190,6 +191,37 @@
         <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
       </section>
     </div>
+    </section>
+
+    <section class="module" data-mod="data" id="data" hidden>
+      <div class="grid2">
+        <section class="panel" aria-labelledby="dOH">
+          <div class="phead"><div><h2 id="dOH">Orders</h2><div class="desc">The Metabase service performance export, with the columns day, service_category, visit_status, services_delivered, distinct_orders and distinct_patients.</div></div></div>
+          <div class="drop" id="drop-orders" role="button" tabindex="0" aria-label="Drop the orders CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the orders CSV here</strong><span>or click to choose a file · you can drop several at once</span>
+          </div>
+          <input type="file" id="file-orders" accept=".csv,text/csv" multiple hidden>
+          <div class="frow" style="margin-top:10px"><span class="flabel" style="min-width:0">When loading</span>
+            <div class="seg" id="ordersMode"><button data-m="merge" title="Days in the new file replace the same days; other days are kept">Add or update days</button><button data-m="replace" title="Use only the new file">Replace everything</button></div></div>
+          <p class="dmsg" id="msg-orders" hidden></p>
+          <dl class="dstat" id="stat-orders"></dl>
+          <button class="btn" type="button" id="reset-orders" hidden>Go back to built-in orders data</button>
+        </section>
+        <section class="panel" aria-labelledby="dPH">
+          <div class="phead"><div><h2 id="dPH">Unique patients</h2><div class="desc">The monthly unique patients export, with the columns month, category, unique_patients, new_patients, returning_patients and services. Loading it fills the Patients module.</div></div></div>
+          <div class="drop" id="drop-patients" role="button" tabindex="0" aria-label="Drop the unique patients CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the patients CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-patients" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Don’t have it yet? Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql2">Copy SQL</button></div>
+          <p class="dmsg" id="msg-patients" hidden></p>
+          <dl class="dstat" id="stat-patients"></dl>
+          <button class="btn" type="button" id="reset-patients" hidden>Remove loaded patients data</button>
+        </section>
+      </div>
+      <p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p>
     </section>
 
     <footer id="foot"></footer>

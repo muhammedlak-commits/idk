@@ -6,7 +6,7 @@ Open `dist/saleem-performance.html` in a browser. It needs internet only for the
 
 ## Modules
 
-The page has seven modules, switched with the tabs under the header: Overview, Month by month, Services, Patients, Meta ads, Projections, and Holidays & events. The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+The page has eight modules, switched with the tabs under the header: Overview, Month by month, Services, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
 
@@ -28,7 +28,7 @@ Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq'
 
 ## Refreshing
 
-- Quick: click **Load CSV** in the dashboard and pick a newer Metabase export (same columns). New days replace old ones. Ads CSVs in the formats above can be loaded the same way.
+- Quick: open the **Data** tab and drag the Metabase orders export onto the Orders box (or click it to choose the file). Choose *Add or update days* to merge with what's there or *Replace everything*. The unique patients export goes on the Patients box. Loaded files are kept in your browser until the page is rebuilt. Ads and events CSVs can still be loaded with **Load CSV** in the header.
 - Permanent: replace the files in `data/` and run `python3 build.py`.
 
 ## How numbers are calculated

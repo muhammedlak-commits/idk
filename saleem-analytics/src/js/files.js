@@ -5,8 +5,8 @@ function wireFiles(){
   inp.addEventListener('change',async()=>{
     for(const f of inp.files){ const text=await f.text(); const hdr=text.slice(0,300).split(/\r?\n/)[0];
       try{
-        if(/unique_patients/.test(hdr)){ P.uniquePatients=text; lsSet('spl.uniquePatients',text); }
-        else if(/service_category/.test(hdr)){ P.services=mergeServices(P.services,text); lsSet('spl.services',P.services); }
+        if(DROPS.patients.check(hdr)){ DROPS.patients.apply(text,f.name); document.getElementById('upCat').innerHTML=''; }
+        else if(DROPS.orders.check(hdr)){ DROPS.orders.apply(text,f.name); }
         else if(/campaign_id/.test(hdr)&&/ad_group/.test(hdr)){ P.map=text; lsSet('spl.map',text); }
         else if(/campaign_id/.test(hdr)&&/month/.test(hdr)){ P.adsMonthly=text; lsSet('spl.adsMonthly',text); }
         else if(/spend_usd/.test(hdr)){ P.adsDaily=text; lsSet('spl.adsDaily',text); }

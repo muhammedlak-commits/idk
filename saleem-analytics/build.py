@@ -21,7 +21,8 @@ JS_ORDER = [
     'm_ads.js',       # module: Meta ads
     'm_calendar.js',  # module: holiday effects + events log
     'm_projections.js',  # module: projections
-    'files.js',       # Load CSV
+    'm_data.js',      # module: drag-and-drop data loading
+    'files.js',       # Load CSV (header button)
     'main.js',        # tabs, render, boot
 ]
 

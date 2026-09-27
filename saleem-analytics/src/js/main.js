@@ -2,7 +2,7 @@
 const MODULES={
   overview:()=>{ renderKpis(); renderTrend(); },
   monthly:renderMom, services:renderSvcTable, patients:renderUnique, ads:renderAds,
-  projections:renderProjections, calendar:()=>{ renderHolidays(); renderEvents(); }
+  projections:renderProjections, calendar:()=>{ renderHolidays(); renderEvents(); }, data:renderData
 };
 /* only the visible module is drawn; switching tabs draws the next one with the current filters */
 function render(){
@@ -29,14 +29,15 @@ function wireTabs(){
 function boot(reload){
   // files loaded in this browser are reused until a newer build of the page replaces them
   if(!reload && lsGet('spl.build')===P.built){ ['services','adsDaily','adsMonthly','map','uniquePatients'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  const wasAtEnd = reload && S && st.to===S.max;   // keep following the latest day when new days arrive
   S=buildServices(P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); U=buildUnique(P.uniquePatients); loadEvents();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
-    buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireTabs();
+    buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireTabs();
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
-  } else { buildChips(); st.to=Math.min(Math.max(st.to,S.min),S.max); }
+  } else { buildChips(); st.to= wasAtEnd? S.max : Math.min(Math.max(st.to,S.min),S.max); st.from=Math.min(Math.max(st.from,S.min),st.to); }
   document.getElementById('dataMeta').textContent='Orders to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);
   document.getElementById('foot').textContent='Service data: Metabase export, '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Patient-days are distinct patients per service per day added up, so they are not unique patients; that needs a separate export. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
   showModule(st.mod,false);

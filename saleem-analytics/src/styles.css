@@ -129,3 +129,16 @@ footer{font-size:12px;color:var(--muted);padding-top:8px}
 .frow.dim{opacity:.45}
 .assume{margin:12px 0 0;padding-left:18px;font-size:12.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:3px}
 td.proj{color:var(--ink-2)}
+/* data module */
+.drop{border:2px dashed var(--axis);border-radius:var(--radius);padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;cursor:pointer;background:var(--surface-2);color:var(--ink-2);transition:background .15s,border-color .15s}
+.drop svg{width:30px;height:30px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
+.drop strong{color:var(--ink);font-size:14px}
+.drop span{font-size:12.5px}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-wash)}
+.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dmsg{margin:10px 0 0;font-size:12.5px;padding:7px 10px;border-radius:8px}
+.dmsg.good{color:var(--good);background:var(--good-bg)}
+.dmsg.bad{color:var(--bad);background:var(--bad-bg)}
+.dstat{margin:12px 0;display:flex;flex-direction:column;gap:0;font-size:12.5px}
+.dstat div{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:5px 0;border-bottom:1px solid var(--grid)}
+.dstat dt{color:var(--muted)} .dstat dd{margin:0;color:var(--ink)}
