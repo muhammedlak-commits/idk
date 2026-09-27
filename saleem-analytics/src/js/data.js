@@ -45,25 +45,45 @@ function parseCsvObjects(text){
 
 /* ---------- ads model ---------- */
 let A = null;
-function buildAds(dailyText, monthlyText, mapText){
+/* Ads model. With the ad-level export, every ad is matched to a service on its own (ad_service_map.csv),
+   so a campaign that mixes services is split correctly; without it, whole campaigns are matched by name. */
+function buildAds(dailyText, monthlyText, mapText, adText, adMapText){
   const daily=parseCsvObjects(dailyText), monthly=parseCsvObjects(monthlyText), map=parseCsvObjects(mapText);
-  const groupOf={}; map.forEach(r=>groupOf[r.campaign_id]=r.ad_group||'All services (general)');
-  const dSpend=new Map(); daily.forEach(r=>dSpend.set(toN(r.day), +r.spend_usd||0));
+  const campGroup={}; map.forEach(r=>campGroup[r.campaign_id]=r.ad_group||'All services (general)');
+  const objective={}; monthly.forEach(r=>objective[r.campaign_id]=r.objective);
+  const dSpend=new Map(); daily.forEach(r=>dSpend.set(toN(r.day), num(r.spend_usd)));
   const mTot={}; for(const [n,v] of dSpend){const mk=monthKey(n); mTot[mk]=(mTot[mk]||0)+v;}
-  const camps={}; const gm={};  // gm[group][month] = {spend, conv}
-  monthly.forEach(r=>{
-    const g=groupOf[r.campaign_id]||'All services (general)';
-    const c=camps[r.campaign_id] || (camps[r.campaign_id]={id:r.campaign_id,name:r.campaign_name,objective:r.objective,group:g,months:{}});
-    const isConv=/messaging_conversation_started/.test(r.result_type);
-    c.months[r.month]={spend:+r.spend_usd||0,impr:+r.impressions||0,clicks:+r.clicks||0,link:+r.link_clicks||0,res:+r.results||0,rtype:r.result_type,conv:isConv?(+r.results||0):0};
-    const gg=gm[g]||(gm[g]={}); const x=gg[r.month]||(gg[r.month]={spend:0,conv:0});
-    x.spend+=+r.spend_usd||0; if(isConv) x.conv+=+r.results||0;
-  });
+  const gm={}, camps={}, ads={};
+  const addTo=(obj,g,mk,x)=>{ const gg=obj[g]||(obj[g]={}); const y=gg[mk]||(gg[mk]={spend:0,conv:0}); y.spend+=x.spend; y.conv+=x.conv; };
+  const monthRow=r=>{ const isConv=/messaging_conversation_started/.test(r.result_type); const res=num(r.results);
+    return {spend:num(r.spend_usd),impr:num(r.impressions),clicks:num(r.clicks),res,rtype:r.result_type,conv:isConv?res:0}; };
+  const bump=(months,mk,x)=>{ const y=months[mk]||(months[mk]={spend:0,impr:0,clicks:0,res:0,conv:0,rtype:x.rtype}); y.spend+=x.spend; y.impr+=x.impr; y.clicks+=x.clicks; y.res+=x.res; y.conv+=x.conv; };
+  const adRows= adText? parseCsvObjects(adText) : [];
+  const level= adRows.length? 'ad' : 'campaign';
+  if(level==='ad'){
+    const adGroup={}, how={}; parseCsvObjects(adMapText||'').forEach(r=>{ adGroup[r.ad_id]=r.ad_group; how[r.ad_id]=r.matched_by; });
+    adRows.forEach(r=>{
+      const g=adGroup[r.ad_id]||campGroup[r.campaign_id]||'All services (general)', x=monthRow(r);
+      const ad=ads[r.ad_id]||(ads[r.ad_id]={id:r.ad_id,name:r.ad_name,adset:r.adset_name,campaign:r.campaign_name,campaignId:r.campaign_id,objective:objective[r.campaign_id]||'',group:g,how:how[r.ad_id]||'campaign',months:{}});
+      bump(ad.months,r.month,x);
+      const c=camps[r.campaign_id]||(camps[r.campaign_id]={id:r.campaign_id,name:r.campaign_name,objective:objective[r.campaign_id]||'',months:{},groups:{}});
+      bump(c.months,r.month,x); c.groups[g]=(c.groups[g]||0)+x.spend;
+      addTo(gm,g,r.month,x);
+    });
+  } else {
+    monthly.forEach(r=>{
+      const g=campGroup[r.campaign_id]||'All services (general)', x=monthRow(r);
+      const c=camps[r.campaign_id]||(camps[r.campaign_id]={id:r.campaign_id,name:r.campaign_name,objective:r.objective,months:{},groups:{}});
+      bump(c.months,r.month,x); c.groups[g]=(c.groups[g]||0)+x.spend; addTo(gm,g,r.month,x);
+    });
+  }
   const groups=Object.keys(gm).sort((a,b)=>sumG(gm[b])-sumG(gm[a]));
   function sumG(o){return Object.values(o).reduce((s,x)=>s+x.spend,0)}
   // weight of each day inside its month, from daily account spend (falls back to even split)
   function w(n){const mk=monthKey(n), t=mTot[mk]; return t>0 ? (dSpend.get(n)||0)/t : 1/daysInMonth(mk);}
-  return {dSpend,mTot,camps,gm,groups,w,
+  // the units spend is matched at: ads, or whole campaigns when only the campaign export exists
+  const units= level==='ad'? Object.values(ads) : Object.values(camps).map(c=>({...c,group:Object.keys(c.groups)[0]}));
+  return {dSpend,mTot,camps,ads,units,gm,groups,w,level,
     minDay:Math.min(...dSpend.keys()), maxDay:Math.max(...dSpend.keys())};
 }
 

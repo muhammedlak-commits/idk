@@ -125,12 +125,12 @@
     <section class="panel" aria-labelledby="adsH">
       <div class="phead">
         <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
-        <div class="ctrls"><select id="adGroupSel" aria-label="Ad group"></select></div>
+        <div class="ctrls"><div class="seg" id="adView"><button data-v="ad" class="on">Ads</button><button data-v="campaign">Campaigns</button></div><input type="search" id="adQuery" placeholder="Search names" aria-label="Search ads and campaigns" style="border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px;width:170px"><select id="adGroupSel" aria-label="Service"></select></div>
       </div>
       <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
       <div class="legend" id="adLegend"></div>
       <div class="tablewrap" style="margin-top:14px;max-height:420px;overflow:auto"><table id="campTable"></table></div>
-      <p class="note" style="margin:8px 0 0">Campaigns are matched to services by name. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p>
+      <p class="note" style="margin:8px 0 0">Each ad is matched to the service it promotes by its name: first its code (PT, NS, DRV, LT…), then words in the ad name, the ad set name, and finally the campaign name. Recruitment, app-install and awareness campaigns keep their own groups. Corrections go in ad_service_map.csv. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p>
     </section>
     </section>
 

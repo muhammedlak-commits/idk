@@ -34,6 +34,8 @@ payload = {
     'adsDaily': (d / 'meta_ads_daily.csv').read_text(),
     'adsMonthly': (d / 'meta_ads_campaign_monthly.csv').read_text(),
     'map': (d / 'campaign_service_map.csv').read_text(),
+    'adsAd': (d / 'meta_ads_ad_monthly.csv').read_text() if (d / 'meta_ads_ad_monthly.csv').exists() else '',
+    'adMap': (d / 'ad_service_map.csv').read_text() if (d / 'ad_service_map.csv').exists() else '',
     'events': (d / 'events.csv').read_text(),
     'uniquePatients': (d / 'unique_patients_monthly.csv').read_text() if (d / 'unique_patients_monthly.csv').exists() else '',
     'uniqueSql': (root / 'sql' / 'unique_patients_monthly.sql').read_text(),

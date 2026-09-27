@@ -33,7 +33,7 @@ function boot(reload){
   if(st.basis==='booked'&&!P.servicesBooked) st.basis='scheduled';
   const prevCats= S? new Set(S.catList) : null, prevStats= S? new Set(S.stList) : null;
   const wasAtEnd = reload && S && st.to===S.max;   // keep following the latest day when new days arrive
-  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); U=buildUnique(P.uniquePatients); loadEvents();
+  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); loadEvents();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}

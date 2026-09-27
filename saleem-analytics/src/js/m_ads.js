@@ -17,25 +17,50 @@ function renderAds(){
   if(adChart) adChart.destroy();
   adChart=new Chart(document.getElementById('adGroupChart'),{type:'bar',data:{labels:months.map(fmtM),datasets:ds},options:o});
   document.getElementById('adLegend').innerHTML=ds.map(d=>'<span><i class="box" style="background:'+d.backgroundColor+'"></i>'+esc(d.label)+'</span>').join('');
-  // campaign table
-  const rows=[];
-  for(const c of Object.values(A.camps)){
-    if(st.adGroup && c.group!==st.adGroup) continue;
-    let sp=0,res=0,conv=0,impr=0,clicks=0,rtype='';
-    for(const [mk,x] of Object.entries(c.months)){ const s=toN(mk+'-01'), e=s+daysInMonth(mk)-1, lo=Math.max(s,a), hi=Math.min(e,b); if(lo>hi) continue;
+  // ads / campaigns table
+  const inRange=months=>{ let sp=0,res=0,conv=0,impr=0,clicks=0,rtype='';
+    for(const [mk,x] of Object.entries(months)){ const s=toN(mk+'-01'), e=s+daysInMonth(mk)-1, lo=Math.max(s,a), hi=Math.min(e,b); if(lo>hi) continue;
       let w=0; for(let n=lo;n<=hi;n++) w+=A.w(n); sp+=x.spend*w; res+=x.res*w; conv+=x.conv*w; impr+=x.impr*w; clicks+=x.clicks*w; if(x.rtype) rtype=x.rtype; }
-    if(sp<0.5) continue;
-    rows.push({name:c.name,group:c.group,obj:c.objective.replace('OUTCOME_','').replace('_',' ').toLowerCase(),spend:sp,impr,clicks,res,rtype:prettyRes(rtype),cpr:res?sp/res:null});
+    return {sp,res,conv,impr,clicks,rtype}; };
+  const view= A.level==='ad'? st.adView : 'campaign';
+  const q=st.adQuery.trim().toLowerCase();
+  const obj=o=>(o||'').replace('OUTCOME_','').replace('_',' ').toLowerCase();
+  const rows=[];
+  if(view==='ad'){
+    for(const ad of A.units){
+      if(st.adGroup && ad.group!==st.adGroup) continue;
+      if(q && !(ad.name+' '+ad.adset+' '+ad.campaign).toLowerCase().includes(q)) continue;
+      const m=inRange(ad.months); if(m.sp<0.5) continue;
+      rows.push({name:ad.name,group:ad.group,how:ad.how,adset:ad.adset,camp:ad.campaign,obj:obj(ad.objective),spend:m.sp,impr:m.impr,clicks:m.clicks,res:m.res,rtype:prettyRes(m.rtype),cpr:m.res?m.sp/m.res:null});
+    }
+  } else {
+    for(const c of Object.values(A.camps)){
+      const gs=Object.entries(c.groups).sort((x,y)=>y[1]-x[1]), tot=gs.reduce((s,x)=>s+x[1],0);
+      if(st.adGroup && !c.groups[st.adGroup]) continue;
+      if(q && !c.name.toLowerCase().includes(q)) continue;
+      const m=inRange(c.months); if(m.sp<0.5) continue;
+      const mix= gs.length===1? gs[0][0] : gs.slice(0,3).map(([g,v])=>g+' '+Math.round(v/tot*100)+'%').join(' · ')+(gs.length>3?' …':'');
+      rows.push({name:c.name,group:mix,obj:obj(c.objective),spend:m.sp,impr:m.impr,clicks:m.clicks,res:m.res,rtype:prettyRes(m.rtype),cpr:m.res?m.sp/m.res:null});
+    }
   }
   const k=st.campSort.k, dir=st.campSort.dir;
   rows.sort((x,y)=>{const a1=x[k], b1=y[k]; if(a1==null) return 1; if(b1==null) return -1; return (a1<b1?-1:a1>b1?1:0)*dir;});
-  const cols=[['name','Campaign'],['group','Service'],['obj','Objective'],['spend','Spend'],['impr','Impressions'],['clicks','Clicks'],['res','Results'],['rtype','Result type'],['cpr','Cost / result']];
-  const tot=rows.reduce((s,r)=>s+r.spend,0);
+  const cols= view==='ad'
+    ? [['name','Ad'],['group','Service'],['how','Matched by'],['adset','Ad set'],['camp','Campaign'],['spend','Spend'],['impr','Impressions'],['clicks','Clicks'],['res','Results'],['rtype','Result type'],['cpr','Cost / result']]
+    : [['name','Campaign'],['group','Services'],['obj','Objective'],['spend','Spend'],['impr','Impressions'],['clicks','Clicks'],['res','Results'],['rtype','Result type'],['cpr','Cost / result']];
+  const textCols=new Set(['name','group','how','adset','camp','obj','rtype']);
+  const tot=rows.reduce((s,r)=>s+r.spend,0), shown=rows.slice(0,400);
+  const cell=(key,r)=>{ const v=r[key];
+    if(key==='spend'||key==='cpr') return '<td>'+(v?fmtUsd(v):'–')+'</td>';
+    if(key==='impr'||key==='clicks'||key==='res') return '<td>'+fmtInt(v)+'</td>';
+    const wide=key==='name'||key==='adset'||key==='camp'; return '<td style="text-align:left'+(wide?';max-width:280px;overflow:hidden;text-overflow:ellipsis':'')+'"'+(wide?' title="'+esc(v)+'"':'')+(key==='name'?' dir="auto"':'')+'>'+esc(v||'')+'</td>'; };
   const t=document.getElementById('campTable');
+  const spendCol=cols.findIndex(c=>c[0]==='spend');
   t.innerHTML='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
-    '<tr class="total"><td>'+rows.length+' campaigns</td><td></td><td></td><td>'+fmtUsd(tot)+'</td><td colspan="5"></td></tr>'+
-    rows.map(r=>'<tr><td style="max-width:360px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.name)+'">'+esc(r.name)+'</td><td style="text-align:left">'+esc(r.group)+'</td><td style="text-align:left">'+esc(r.obj)+'</td><td>'+fmtUsd(r.spend)+'</td><td>'+fmtInt(r.impr)+'</td><td>'+fmtInt(r.clicks)+'</td><td>'+fmtInt(r.res)+'</td><td style="text-align:left">'+esc(r.rtype)+'</td><td>'+(r.cpr?fmtUsd(r.cpr):'–')+'</td></tr>').join('')+'</tbody>';
-  t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.campSort= st.campSort.k===key?{k:key,dir:-st.campSort.dir}:{k:key,dir:(key==='name'||key==='group'||key==='obj'||key==='rtype')?1:-1}; renderAds();}));
+    '<tr class="total"><td>'+rows.length+(view==='ad'?' ads':' campaigns')+(rows.length>shown.length?' (top '+shown.length+' shown)':'')+'</td>'+'<td></td>'.repeat(spendCol-1)+'<td>'+fmtUsd(tot)+'</td>'+'<td></td>'.repeat(cols.length-spendCol-1)+'</tr>'+
+    shown.map(r=>'<tr>'+cols.map(([key])=>cell(key,r)).join('')+'</tr>').join('')+'</tbody>';
+  t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.campSort= st.campSort.k===key?{k:key,dir:-st.campSort.dir}:{k:key,dir:textCols.has(key)?1:-1}; renderAds();}));
+  document.querySelectorAll('#adView button').forEach(bt=>{ bt.classList.toggle('on',bt.dataset.v===view); bt.disabled= A.level!=='ad' && bt.dataset.v==='ad'; });
   const allSpend=sum(adDaily(a,b,A.groups)), conv=sum(adDaily(a,b,A.groups,'conv'));
   document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+' total spend · '+fmtInt(conv)+' WhatsApp conversations from message campaigns';
 }

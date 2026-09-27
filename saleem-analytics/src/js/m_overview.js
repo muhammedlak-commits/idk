@@ -37,7 +37,7 @@ function ptsChip(cur,prev,label){
 /* spend of message campaigns only, so cost per conversation is not diluted by sales or install campaigns */
 function sumConvSpend(a,b,groups){
   let s=0; const gs=new Set(groups);
-  for(const c of Object.values(A.camps)){ if(!gs.has(c.group)) continue;
+  for(const c of A.units){ if(!gs.has(c.group)) continue;
     for(const [mk,x] of Object.entries(c.months)){ if(!x.conv) continue;
       const m0=toN(mk+'-01'), m1=m0+daysInMonth(mk)-1, lo=Math.max(a,m0), hi=Math.min(b,m1); if(lo>hi) continue;
       let w=0; for(let n=lo;n<=hi;n++) w+=A.w(n); s+=x.spend*w; } }

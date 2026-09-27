@@ -53,6 +53,8 @@ function wireFilters(){
     render();
   }));
   document.getElementById('adGroupSel').addEventListener('change',e=>{st.adGroup=e.target.value; renderAds();});
+  document.querySelectorAll('#adView button').forEach(b=>b.addEventListener('click',()=>{st.adView=b.dataset.v; st.campSort={k:'spend',dir:-1}; renderAds();}));
+  let qT=null; document.getElementById('adQuery').addEventListener('input',e=>{ clearTimeout(qT); qT=setTimeout(()=>{st.adQuery=e.target.value; renderAds();},200); });
   document.getElementById('evCat').addEventListener('change',e=>{st.evCat=e.target.value; renderEvents();});
 }
 
