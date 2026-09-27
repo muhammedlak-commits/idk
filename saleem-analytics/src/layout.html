@@ -54,6 +54,11 @@
       <span class="flabel" style="min-width:0">New patient =</span>
       <div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div>
     </div>
+    <div class="frow">
+      <span class="flabel">Ad spend</span>
+      <div class="seg" id="adMode" title="Which ads count as ad spend in every module"><button data-a="match" class="on" title="Only ads matched to the services selected above">Matching ads</button><button data-a="all" title="Every ad, whatever service it promotes; orders still follow the services above">All ads</button><button data-a="pick" title="Only the ad groups you pick; use this to test one ad group against another service's orders">Pick ad groups</button></div>
+      <div class="chips" id="agChips" hidden></div>
+    </div>
   </div>
 </section>
 
@@ -97,11 +102,30 @@
         <div><h2 id="svcH">Service breakdown</h2><div class="desc" id="svcDesc"></div></div>
       </div>
       <div class="tablewrap"><table id="svcTable"></table></div>
-      <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Ad spend here is spend on campaigns for that service only; general, brand and app campaigns are shown in the ads section.</p>
+      <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Each row's ad spend is for ads matched to that service. The All selected row follows the Ad spend switch in the filter bar (matching ads, all ads, or chosen ad groups).</p>
     </section>
     </section>
 
     <section class="module" data-mod="links" id="links" hidden>
+      <section class="panel" aria-labelledby="alH">
+        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">Tests the ads chosen by the <strong>Ad spend</strong> switch in the filter bar against the orders of the services chosen by the chips. To test whether physio ads affect lab test orders: set Ad spend to <strong>Pick ad groups</strong>, pick Physiotherapy, and double-click the Lab tests service chip.</div><div class="desc" id="alDesc"></div></div></div>
+        <p class="callout" id="alMsg" hidden></p>
+        <div id="alBody">
+          <div class="grid2">
+            <div><h3 class="h3sm" id="alSpendH">Weekly ad spend</h3><div class="chart sm"><canvas id="alSpendChart" aria-label="Weekly ad spend"></canvas></div></div>
+            <div><h3 class="h3sm" id="alOrdH">Weekly orders</h3><div class="chart sm"><canvas id="alOrdChart" aria-label="Weekly orders"></canvas></div></div>
+          </div>
+          <div class="grid2" style="margin-top:14px">
+            <div><h3 class="h3sm">Change in spend vs change in orders, 0 to 4 weeks later</h3><div class="chart sm"><canvas id="alLagChart" aria-label="Correlation by lag"></canvas></div>
+              <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Passes the bar</span><span><i class="box" style="background:var(--ghost)"></i>Could be chance</span></div></div>
+            <div><div class="tablewrap"><table id="alLagTable"></table></div><p class="callout" id="alFinding" style="margin-top:10px"></p></div>
+          </div>
+          <h3 class="h3sm" style="margin-top:16px" id="alAdsH">Ads with the most spend in the weeks where the effect shows up</h3>
+          <p class="note" id="alWeeks" style="margin:2px 0 6px"></p>
+          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="alAds"></table></div>
+          <p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p>
+        </div>
+      </section>
       <p class="callout" id="lkMsg"></p>
       <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
         <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</div></div></div>

@@ -2,7 +2,7 @@
 function renderAds(){
   const a=st.from, b=st.to;
   // follows the top service filter: all services -> every group, otherwise the groups promoting the selected services
-  const gset=new Set(groupsForCats(selCats()));
+  const gset=new Set(spendGroups());
   // monthly stacked spend by group within the range (top 7 + Other, fixed colour by all-time spend rank)
   const m0=monthKey(a), m1=monthKey(b); const months=[]; for(let mk=m0; mk<=m1; mk=addMonths(mk,1)) months.push(mk);
   const shownGroups=A.groups.filter(g=>gset.has(g)); const top=shownGroups.slice(0,7), rest=shownGroups.slice(7);
@@ -61,7 +61,7 @@ function renderAds(){
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.campSort= st.campSort.k===key?{k:key,dir:-st.campSort.dir}:{k:key,dir:textCols.has(key)?1:-1}; renderAds();}));
   document.querySelectorAll('#adView button').forEach(bt=>{ bt.classList.toggle('on',bt.dataset.v===view); bt.disabled= A.level!=='ad' && bt.dataset.v==='ad'; });
   const allSpend=sum(adDaily(a,b,[...gset])), conv=sum(adDaily(a,b,[...gset],'conv'));
-  document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+(gset.size===A.groups.length?' total spend · ':' spend on campaigns for the selected services · ')+''+fmtInt(conv)+' WhatsApp conversations from message campaigns';
+  document.getElementById('adsDesc').textContent=fmtD(a)+' – '+fmtD(b)+' · '+fmtUsd(allSpend)+(' spend on '+adModeLabel()+' · ')+''+fmtInt(conv)+' WhatsApp conversations from message campaigns';
 }
 function prettyRes(t){ if(!t) return ''; return ({'onsite_conversion.messaging_conversation_started_7d':'WhatsApp conversations','mobile_app_install':'App installs','onsite_conversion.purchase':'Purchases (messaging)','offsite_conversion.fb_pixel_purchase':'Website purchases','leadgen.other':'Leads','reach':'Reach','link_click':'Link clicks','post_engagement':'Post engagement','click_to_call_native_call_placed':'Calls','mixed':'Mixed','profile_visit_view':'Profile visits'})[t] || t.replace(/_/g,' ').replace(/.*\./,''); }
 

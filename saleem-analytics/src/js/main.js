@@ -38,10 +38,11 @@ function boot(reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
-    buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireTabs();
     setTimeout(startSheet,0);
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
   } else {
+    buildAdChips();
     // keep what was selected; anything new in this dataset (e.g. the scheduled status) starts selected, except cancelled
     st.svc=new Set(S.catList.filter(c=> st.svc.has(c) || !prevCats.has(c))); if(!st.svc.size) st.svc=new Set(S.catList);
     st.status=new Set(S.stList.filter(x=> st.status.has(x) || (!prevStats.has(x) && x!=='cancelled')));

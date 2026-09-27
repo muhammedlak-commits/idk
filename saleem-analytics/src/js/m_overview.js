@@ -13,7 +13,7 @@ function renderKpis(){
   const allStats=S.stList; const canc=S.stList.filter(s=>s==='cancelled');
   const cRate=(x,y)=>{const all=total(x,y,'ord',cats,allStats); return all? total(x,y,'ord',cats,canc)/all*100 : null;};
   const cr=cRate(a,b), crp=hasP?cRate(pa,pb):null, cry=hasY?cRate(ya,yb):null;
-  const groups=groupsForCats(cats);
+  const groups=spendGroups();
   const spend=sum(adDaily(a,b,groups)), spendP=hasP?sum(adDaily(pa,pb,groups)):null, spendY=hasY?sum(adDaily(ya,yb,groups)):null;
   const conv=sum(adDaily(a,b,groups,'conv'));
   const ord=total(a,b,'ord',cats,stats), ordP=hasP?total(pa,pb,'ord',cats,stats):null, ordY=hasY?total(ya,yb,'ord',cats,stats):null;
@@ -23,8 +23,8 @@ function renderKpis(){
     {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' per day · '+len+' days'},
     ...(m!=='pat'?[{lab:'Patient-days',val:fmtInt(pat),d:[deltaChip(pat,patP,'vs prev'),deltaChip(pat,patY,'vs LY')],sub:'A patient seen on 10 days counts 10 times, not unique patients'}]:[]),
     {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled orders ÷ all orders'},
-    {lab:'Ad spend',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:groups.length===A.groups.length?'All campaigns':'Campaigns for selected services'},
-    {lab:'Ad cost per order',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:'Spend ÷ orders, same dates'},
+    {lab:'Ad spend · '+adModeLabel(),val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:st.adMode==='all'?'Every ad, whatever service it promotes':st.adMode==='pick'?groups.length+' ad group'+(groups.length===1?'':'s')+' picked in the filter bar':'Ads matched to the selected services'},
+    {lab:'Ad cost per order ('+adModeLabel()+')',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:'Spend on '+adModeLabel()+' ÷ orders for the selected services'},
     {lab:'WhatsApp conversations',val:fmtInt(conv),d:[],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation, message campaigns only':'From message campaigns'}
   ];
   document.getElementById('kpis').innerHTML=tiles.map(t=>'<div class="kpi'+(t.hero?' hero':'')+'"><span class="lab">'+t.lab+'</span><span class="val">'+t.val+'</span><div class="deltas">'+t.d.join('')+'</div><span class="sub">'+t.sub+'</span></div>').join('');
@@ -84,14 +84,14 @@ function renderTrend(){
   document.getElementById('trendDesc').textContent=(st.basis==='booked'?'By booking time':'By scheduled time')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
 
   // spend chart on the same buckets (separate axis, separate chart: never dual-axis)
-  const groups=groupsForCats(cats);
+  const groups=spendGroups();
   const sp=aggregate(adDaily(a,b,groups),a,B);
   const o2=baseOpts(); o2.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt')};
   o2.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US'); o2.scales.y.ticks.maxTicksLimit=4;
   o2.plugins.tooltip.callbacks={title:opts.plugins.tooltip.callbacks.title,label:it=>' Spend: '+fmtUsd(it.parsed.y),
-    afterLabel:it=>{const o=aggregate(series(a,b,'ord',cats,stats),a,B)[it.dataIndex]; return o? ' Cost per order: '+fmtUsd(it.parsed.y/o):'';},footer:opts.plugins.tooltip.callbacks.footer};
+    afterLabel:it=>{const o=aggregate(series(a,b,'ord',cats,stats),a,B)[it.dataIndex]; return o? ' Cost per order ('+adModeLabel()+'): '+fmtUsd(it.parsed.y/o):'';},footer:opts.plugins.tooltip.callbacks.footer};
   if(spendChart) spendChart.destroy();
   spendChart=new Chart(document.getElementById('spendChart'),{type:'bar',data:{labels,datasets:[{label:'Ad spend',data:[...sp],backgroundColor:css('--spend'),borderRadius:{topLeft:3,topRight:3},borderSkipped:'bottom',maxBarThickness:24,categoryPercentage:.8,barPercentage:.9}]},options:o2});
-  document.getElementById('spendDesc').textContent= groups.length===A.groups.length ? 'All campaigns · '+fmtUsd(sum(sp))+' in range' : 'Campaigns promoting the selected services · '+fmtUsd(sum(sp))+' in range (general and brand campaigns excluded)';
+  document.getElementById('spendDesc').textContent= (st.adMode==='all'?'All ads':st.adMode==='pick'?'Chosen ad groups: '+(groups.join(', ')||'none'):groups.length===A.groups.length?'All ads (every service is selected)':'Ads matched to the selected services (general and brand campaigns excluded)')+' · '+fmtUsd(sum(sp))+' in range';
 }
 

@@ -18,11 +18,12 @@ function renderSvcTable(){
   });
   const k=st.svcSort.k, dir=st.svcSort.dir;
   rows.sort((x,y)=>{const a1=x[k], b1=y[k]; if(a1==null) return 1; if(b1==null) return -1; return (a1<b1?-1:a1>b1?1:0)*dir;});
-  const cols=[['c','Service'],['cur',MLABEL[st.measure]],['share','Share'],['prevP','vs prev period'],['lyP','vs last year'],['canc','Cancel rate'],['pat','Patient-days'],['spend','Ad spend'],['cpo','Ad cost / order']];
+  const totSpend=sum(adDaily(a,b,spendGroups())), totOrd=total(a,b,'ord',cats,stats);
+  const cols=[['c','Service'],['cur',MLABEL[st.measure]],['share','Share'],['prevP','vs prev period'],['lyP','vs last year'],['canc','Cancel rate'],['pat','Patient-days'],['spend','Ad spend (matching ads)'],['cpo','Ad cost / order (matching ads)']];
   const cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';
   const tot={cur:grand, prev:hasP?total(a-len,a-1,m,cats,stats):null, ly:hasY?total(a-364,b-364,m,cats,stats):null};
   const html='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
-    '<tr class="total"><td>All selected</td><td>'+fmtInt(tot.cur)+'</td><td>100%</td><td class="'+cls(tot.prev&&(tot.cur-tot.prev)/tot.prev*100)+'">'+fmtPct(tot.prev?(tot.cur-tot.prev)/tot.prev*100:null,1)+'</td><td class="'+cls(tot.ly&&(tot.cur-tot.ly)/tot.ly*100)+'">'+fmtPct(tot.ly?(tot.cur-tot.ly)/tot.ly*100:null,1)+'</td><td colspan="4"></td></tr>'+
+    '<tr class="total"><td>All selected</td><td>'+fmtInt(tot.cur)+'</td><td>100%</td><td class="'+cls(tot.prev&&(tot.cur-tot.prev)/tot.prev*100)+'">'+fmtPct(tot.prev?(tot.cur-tot.prev)/tot.prev*100:null,1)+'</td><td class="'+cls(tot.ly&&(tot.cur-tot.ly)/tot.ly*100)+'">'+fmtPct(tot.ly?(tot.cur-tot.ly)/tot.ly*100:null,1)+'</td><td></td><td></td><td>'+fmtUsd(totSpend)+'<br><span class="note">'+adModeLabel()+'</span></td><td>'+(totOrd?fmtUsd(totSpend/totOrd):'–')+'<br><span class="note">'+adModeLabel()+'</span></td></tr>'+
     rows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td><td>'+fmtInt(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td class="'+cls(r.prevP)+'">'+fmtPct(r.prevP,1)+'</td><td class="'+cls(r.lyP)+'">'+fmtPct(r.lyP,1)+'</td><td>'+(r.canc==null?'–':r.canc.toFixed(1)+'%')+'</td><td>'+fmtInt(r.pat)+'</td><td>'+(r.spend?fmtUsd(r.spend):'–')+'</td><td>'+(r.cpo?fmtUsd(r.cpo):'–')+'</td></tr>').join('')+'</tbody>';
   const t=document.getElementById('svcTable'); t.innerHTML=html;
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.svcSort = st.svcSort.k===key? {k:key,dir:-st.svcSort.dir} : {k:key,dir:key==='c'?1:-1}; renderSvcTable();}));

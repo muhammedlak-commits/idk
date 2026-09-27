@@ -20,7 +20,9 @@ function syncChips(){
   document.querySelectorAll('#svcChips .chip').forEach(b=>{const on=st.svc.has(b.dataset.c); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   document.querySelectorAll('#stChips .chip').forEach(b=>{const on=st.status.has(b.dataset.s); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const seg=(id,attr,val)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===val));
-  seg('measure','m',st.measure); seg('basis','b',st.basis); seg('newBasis','n',st.newBasis);
+  seg('measure','m',st.measure); seg('basis','b',st.basis); seg('newBasis','n',st.newBasis); seg('adMode','a',st.adMode);
+  const ag=document.getElementById('agChips'); ag.hidden=st.adMode!=='pick';
+  ag.querySelectorAll('.chip').forEach(b=>{const on=st.adGroups.has(b.dataset.g); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const bk=document.querySelector('#basis [data-b="booked"]'); if(bk){ bk.classList.toggle('unavail',!P.servicesBooked); bk.title= P.servicesBooked? 'The day the order was booked' : 'Load a booking-time export in the Data tab to use this'; } seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
   document.getElementById('dFrom').value=toS(st.from); document.getElementById('dTo').value=toS(st.to);
   [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
@@ -36,6 +38,7 @@ function preset(p){
 }
 function wireFilters(){
   document.querySelectorAll('#presets button').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.p)));
+  document.querySelectorAll('#adMode button').forEach(b=>b.addEventListener('click',()=>setAdMode(b.dataset.a)));
   document.querySelectorAll('#newBasis button').forEach(b=>b.addEventListener('click',()=>{st.newBasis=b.dataset.n; render();}));
   document.querySelectorAll('#basis button').forEach(b=>b.addEventListener('click',()=>setBasis(b.dataset.b)));
   document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{st.measure=b.dataset.m;render();}));
@@ -68,4 +71,21 @@ function setBasis(b){
     return;
   }
   st.basis=b; lsSet('spl.basis',b); boot(true);
+}
+
+/* ad groups row: shown only in "Pick ad groups" mode; colours follow each group's all-time spend rank */
+function buildAdChips(){
+  const box=document.getElementById('agChips'); box.innerHTML='';
+  A.groups.forEach((g,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.g=g;
+    b.innerHTML='<span class="dot" style="background:var(--s'+(i<8?i+1:'-other')+')"></span>'+esc(g);
+    b.title='Click to toggle. Double-click to pick only this ad group.';
+    b.addEventListener('click',()=>{ st.adGroups.has(g)?st.adGroups.delete(g):st.adGroups.add(g); render(); });
+    b.addEventListener('dblclick',()=>{ st.adGroups=new Set([g]); render(); });
+    box.appendChild(b);
+  });
+}
+function setAdMode(m){
+  if(m==='pick' && !st.adGroups.size) st.adGroups=new Set(groupsForCats(selCats()));   // start from what matches now
+  st.adMode=m; render();
 }

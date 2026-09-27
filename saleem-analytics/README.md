@@ -23,6 +23,12 @@ The Service links module uses the services picked in the filter bar. With 2 or 3
 
 With more than 3 selected it shows a grid of every pair. The patient-level view (same patient, second service within 7 or 30 days) needs the export from `sql/service_followon_monthly.sql`, loaded in the Data tab.
 
+## Ad spend switch
+
+The **Ad spend** switch in the filter bar decides which ads count as spend in every module: *Matching ads* (ads matched to the selected services, the default), *All ads*, or *Pick ad groups* (a row of ad-group chips). Orders always follow the service chips. Cost per order is labelled with the mode. In the Services table each row stays on matching ads; the All selected row follows the switch.
+
+The Service links module uses it to test one ad group against another service's orders: weekly spend and weekly orders on separate charts, correlation of week-over-week changes at 0–4 weeks' lag with a 5% and a 1% bar, and the ads with the most spend in the weeks where the link shows up.
+
 ## Outside factors (Google Sheet)
 
 Events live in the Google Sheet **Saleem Outside Factors** (id in `data/sheet.json`). When the dashboard is opened in claude.ai it reads the sheet through the viewer's Google Drive connector, on open and every 10 minutes. Without the connector it shows the last copy it read in that browser, then `data/events.csv`. Columns: start, end, category, title, scope, status, source, notes. Official holidays in the sheet are for reference; the dashboard draws them from the Hijri calendar. Sudden holidays, salary windows, security, political and economic events are measured in the Holidays & events module.

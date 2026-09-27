@@ -1,5 +1,5 @@
 /* ---------- state ---------- */
-const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'overview',pjH:90,pjGrowth:'damped',pjCustom:5,pjHol:true,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:'',newBasis:'first'};
+const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'overview',pjH:90,pjGrowth:'damped',pjCustom:5,pjHol:true,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:'',newBasis:'first',adMode:'match',adGroups:new Set()};
 const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days'};
 
 /* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */
@@ -23,6 +23,14 @@ function adDaily(a,b,groups,field){
     for(const g of groups){ const x=A.gm[g]&&A.gm[g][mk]; if(x) s+=x[field||'spend']*w; } out[n-a]=s; }
   return out;
 }
+/* which ads count as "ad spend" everywhere, from the Ad spend switch in the filter bar */
+function spendGroups(){
+  if(st.adMode==='all') return A.groups.slice();
+  if(st.adMode==='pick') return A.groups.filter(g=>st.adGroups.has(g));
+  return groupsForCats(selCats());
+}
+const AD_MODE_LABEL={match:'matching ads',all:'all ads',pick:'chosen ad groups'};
+const adModeLabel=()=>AD_MODE_LABEL[st.adMode];
 function groupsForCats(cats){
   const set=new Set(cats); const allSel = S.catList.every(c=>st.svc.has(c));
   if(allSel) return A.groups.slice();

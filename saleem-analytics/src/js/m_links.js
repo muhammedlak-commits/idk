@@ -46,6 +46,7 @@ function renderLinks(){
   const a=st.from, b=st.to;
   const chosen=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
   const msg=document.getElementById('lkMsg'), detail=document.getElementById('lkDetail'), matrix=document.getElementById('lkMatrix');
+  renderAdLink(chosen,a,b);
   const all=S.catList.every(c=>st.svc.has(c));
   if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
   if(chosen.length>3){
@@ -113,4 +114,76 @@ function renderLinkMatrix(cats,a,b){
     return '<td class="heat" style="background:'+bg+'" title="Same-week r = '+(r==null?'–':r.toFixed(2))+(best?'; strongest r = '+best.r.toFixed(2)+' at '+best.k+' weeks':'')+'">'+(r==null?'–':r.toFixed(2))+'<span class="note">'+lead+'</span></td>'; };
   document.getElementById('lkMatrixTable').innerHTML='<thead><tr><th class="nosort"></th>'+cats.map(c=>'<th class="nosort">'+esc(label(c))+'</th>').join('')+'</tr></thead><tbody>'+
     cats.map((c,i)=>'<tr><td><span class="sw" style="background:'+S.colorOf[c]+'"></span>'+esc(label(c))+'</td>'+cats.map((_,j)=>cell(i,j)).join('')+'</tr>').join('')+'</tbody>';
+}
+
+/* ---------- ad spend -> orders ----------
+   Spend = the ads chosen by the Ad spend switch; orders = the services chosen above.
+   Week-over-week changes in spend against changes in orders 0-4 weeks later. With five lags
+   checked, "strong" uses the 1% bar (|r| > 2.58/√n) so a chance result rarely passes; "possible"
+   is the usual 5% bar (1.96/√n). */
+let adSpChart=null, adOrdChart=null, adLagChart=null;
+function renderAdLink(chosen,a,b){
+  const box=document.getElementById('alBody'), msg=document.getElementById('alMsg');
+  const groups=spendGroups();
+  const setMsg=t=>{ msg.innerHTML=t; msg.hidden=false; box.hidden=true; };
+  if(!chosen.length) return setMsg('Pick at least one service in the filter bar.');
+  if(!groups.length) return setMsg('No ad groups picked. Choose them in the filter bar under <strong>Ad spend → Pick ad groups</strong>.');
+  const w0=weekStart(a)+(weekStart(a)<a?7:0), keys=[]; for(let w=w0; w+6<=b; w+=7) keys.push(w);
+  if(keys.length<14) return setMsg('Pick a date range of at least 14 weeks to test ad spend against orders.');
+  msg.hidden=true; box.hidden=false;
+  const sp=adDaily(w0,keys[keys.length-1]+6,groups), yo=series(w0,keys[keys.length-1]+6,st.measure,chosen,selStats());
+  const wk=arr=>keys.map((w,i)=>{let s=0; for(let n=0;n<7;n++) s+=arr[i*7+n]; return s;});
+  const S_=wk(sp), O_=wk(yo);
+  const labels=keys.map(k=>fmtDs(k)), spendTitle= st.adMode==='all'?'All ads':st.adMode==='pick'?groups.join(', '):'Ads matched to '+chosen.map(label).join(', ');
+  const ordTitle=chosen.map(label).join(', ');
+  document.getElementById('alDesc').textContent='Spend: '+spendTitle+' · '+MLABEL[st.measure]+': '+ordTitle+' · '+keys.length+' full weeks, '+fmtD(keys[0])+' – '+fmtD(keys[keys.length-1]+6);
+  // two charts, one measure each
+  const o1=baseOpts(); o1.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US'); o1.scales.y.ticks.maxTicksLimit=4;
+  o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' Spend: '+fmtUsd(it.parsed.y)};
+  if(adSpChart) adSpChart.destroy();
+  adSpChart=new Chart(document.getElementById('alSpendChart'),{type:'bar',data:{labels,datasets:[{label:'Ad spend',data:S_,backgroundColor:css('--spend'),borderRadius:{topLeft:3,topRight:3},borderSkipped:'bottom',maxBarThickness:18}]},options:o1});
+  const o2=baseOpts(); o2.scales.y.ticks.maxTicksLimit=4; o2.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' '+MLABEL[st.measure]+': '+fmtInt(it.parsed.y)};
+  if(adOrdChart) adOrdChart.destroy();
+  adOrdChart=new Chart(document.getElementById('alOrdChart'),{type:'line',data:{labels,datasets:[{label:MLABEL[st.measure],data:O_,borderColor:css('--accent'),backgroundColor:css('--accent-wash'),fill:true,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}]},options:o2});
+  document.getElementById('alSpendH').textContent='Weekly ad spend · '+spendTitle;
+  document.getElementById('alOrdH').textContent='Weekly '+MLABEL[st.measure].toLowerCase()+' · '+ordTitle;
+  // lags 0..4: spend change in week t against order change in week t+k
+  const d=v=>v.slice(1).map((x,i)=>Math.log1p(x)-Math.log1p(v[i]));
+  const dx=d(S_), dy=d(O_);
+  const lags=[0,1,2,3,4].map(k=>{ const xs=[],ys=[]; for(let t=0;t+k<dy.length;t++){ xs.push(dx[t]); ys.push(dy[t+k]); } const r=corr(xs,ys), n=xs.length;
+    const strong=r!=null&&Math.abs(r)>2.58/Math.sqrt(n), possible=r!=null&&Math.abs(r)>1.96/Math.sqrt(n);
+    return {k,r,n,verdict:strong?'strong':possible?'possible':'noise'}; });
+  const good=css('--accent'), weak=css('--ghost');
+  const o3=baseOpts(); o3.scales.y.min=-1; o3.scales.y.max=1; o3.interaction={mode:'nearest',intersect:true};
+  o3.scales.x.title={display:true,text:'Weeks from the change in spend to the change in orders',color:css('--muted'),font:{size:11}};
+  o3.plugins.tooltip.callbacks={label:it=>{const l=lags[it.dataIndex]; return ' r = '+(l.r==null?'–':l.r.toFixed(2))+' · '+{strong:'strong (1% bar)',possible:'possible (5% bar)',noise:'could be chance'}[l.verdict]+' · n = '+l.n;}};
+  if(adLagChart) adLagChart.destroy();
+  adLagChart=new Chart(document.getElementById('alLagChart'),{type:'bar',data:{labels:lags.map(l=>l.k===0?'Same week':'+'+l.k+' wk'),datasets:[{label:'Correlation',data:lags.map(l=>l.r),backgroundColor:lags.map(l=>l.verdict==='noise'?weak:good),borderRadius:3,maxBarThickness:36}]},options:o3});
+  const vt={strong:'<span class="delta up">✓ Strong</span>',possible:'<span class="delta flat">~ Possible</span>',noise:'<span class="delta flat" style="opacity:.7">Could be chance</span>'};
+  document.getElementById('alLagTable').innerHTML='<thead><tr><th class="nosort">Lag</th><th class="nosort">Correlation</th><th class="nosort">Weeks</th><th class="nosort">Needs (5% / 1%)</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
+    lags.map(l=>'<tr><td>'+(l.k===0?'Same week':l.k+' week'+(l.k>1?'s':'')+' later')+'</td><td>'+(l.r==null?'–':l.r.toFixed(2))+'</td><td>'+l.n+'</td><td>±'+(1.96/Math.sqrt(l.n)).toFixed(2)+' / ±'+(2.58/Math.sqrt(l.n)).toFixed(2)+'</td><td>'+vt[l.verdict]+'</td></tr>').join('')+'</tbody>';
+  const best=lags.filter(l=>l.r!=null).reduce((m,l)=>Math.abs(l.r)>Math.abs(m.r)?l:m, {r:0,k:0,verdict:'noise',n:0});
+  const when=best.k===0?'in the same week':best.k+' week'+(best.k>1?'s':'')+' later';
+  document.getElementById('alFinding').innerHTML= best.verdict==='noise'
+    ? 'No lag passes the bar: week-to-week changes in this spend don’t line up with changes in '+esc(ordTitle)+' beyond what chance would give. The strongest is '+when+' (r = '+best.r.toFixed(2)+').'
+    : 'Changes in this spend line up with changes in '+esc(ordTitle)+' <strong>'+when+'</strong> (r = '+best.r.toFixed(2)+', '+(best.verdict==='strong'?'strong':'possible')+'). '+(best.r>0?'More spend goes with more orders.':'More spend goes with fewer orders, which usually means both follow something else, such as budget cuts during busy weeks.')+(best.k===0?' A same-week link can also come from shared causes like holidays.':'');
+  // ads behind the effect: weeks where spend and orders (k weeks later) both moved the same way, strongly
+  const k=best.k, pairs=[]; for(let t=0;t+k<dy.length;t++) pairs.push({t,x:dx[t],y:dy[t+k]});
+  const z=a_=>{const m=a_.reduce((s,v)=>s+v,0)/a_.length, sd=Math.sqrt(a_.reduce((s,v)=>s+(v-m)**2,0)/a_.length)||1; return v=>(v-m)/sd;};
+  const zx=z(pairs.map(p=>p.x)), zy=z(pairs.map(p=>p.y)), sign=best.r>=0?1:-1;
+  const scored=pairs.map(p=>({...p,s:zx(p.x)*zy(p.y)*sign})).filter(p=>p.s>0).sort((p,q)=>q.s-p.s);
+  const eff=scored.slice(0,Math.max(3,Math.round(pairs.length*0.2))).map(p=>p.t+1).sort((x,y)=>x-y);   // index of the spend week
+  document.getElementById('alAdsH').textContent= best.verdict==='noise'? 'Ads with the most spend in the weeks that line up best (no lag passes the bar, so treat this as a lead to check, not a finding)' : 'Ads with the most spend in the weeks where the effect shows up';
+  document.getElementById('alWeeks').textContent= eff.length? 'Weeks where it shows up most (spend week, orders '+(k?k+' week'+(k>1?'s':'')+' later':'same week')+'): '+eff.map(i=>fmtDs(keys[i])).join(', ')+'.' : '';
+  const svcSet=new Set(chosen), matchesSel=g=>GROUP_SVCS[g]&&GROUP_SVCS[g].some(c=>svcSet.has(c));
+  const gset=new Set(groups), weekSpend=(u,w)=>{ let s=0; for(let n=w;n<=w+6;n++){ const x=u.months[monthKey(n)]; if(x) s+=x.spend*A.w(n); } return s; };
+  const rows=[];
+  for(const u of A.units){ if(!gset.has(u.group)) continue;
+    let inEff=0; eff.forEach(i=>inEff+=weekSpend(u,keys[i])); if(inEff<1) continue;
+    let all=0; keys.forEach(w=>all+=weekSpend(u,w));
+    rows.push({u,inEff,avg:all/keys.length,ratio:all?(inEff/eff.length)/(all/keys.length):null}); }
+  rows.sort((x,y)=>y.inEff-x.inEff);
+  document.getElementById('alAds').innerHTML= rows.length? '<thead><tr><th class="nosort">'+(A.level==='ad'?'Ad':'Campaign')+'</th><th class="nosort">Ad group</th><th class="nosort">Campaign</th><th class="nosort">Spend in those weeks</th><th class="nosort">Usual week</th><th class="nosort">Those weeks vs usual</th></tr></thead><tbody>'+
+    rows.slice(0,15).map(r=>'<tr><td dir="auto" style="text-align:left;max-width:280px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.u.name)+'">'+esc(r.u.name)+'</td><td style="text-align:left">'+esc(r.u.group)+(matchesSel(r.u.group)||r.u.group==='All services (general)'?'':' <span class="badge" title="This ad promotes a different service from the orders being tested">other service</span>')+'</td><td style="text-align:left;max-width:220px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.u.campaign||r.u.name)+'">'+esc(r.u.campaign||'')+'</td><td>'+fmtUsd(r.inEff)+'</td><td>'+fmtUsd(r.avg)+'</td><td>'+(r.ratio==null?'–':r.ratio.toFixed(1)+'×')+'</td></tr>').join('')+'</tbody>'
+    : '<tbody><tr><td class="note" style="text-align:left">No ad spend in those weeks.</td></tr></tbody>';
 }
