@@ -52,7 +52,7 @@ function pfCompute(M,{fromMk,toMk,pairs,minElig=10}){
     const inL=acc.filter(a=>a.e30>=minElig), rb=robustBench(inL.map(a=>({r:a.f30/a.e30,n:a.e30})));
     inL.forEach((a,i)=>{
       const pe=E-a.e30, pf=Fo-a.f30, r30=a.f30/a.e30; let peer, z;
-      if(rb){ peer=rb.bench; z=rb.z[i]; }
+      if(rb){ peer=rb.benches[i]; z=rb.z[i]; }
       else { peer=pe>0?pf/pe:null; const se=pe>0?Math.sqrt(pool*(1-pool)*(1/a.e30+1/pe)):0; z=se>0?(r30-peer)/se:null; }
       const row={src:pr.src,tgt:pr.tgt,p:a.p,pat:a.pat,e7:a.e7,f7:a.f7,e30:a.e30,f30:a.f30,o30:a.o30,r7:a.e7?a.f7/a.e7:null,r30,peer,peerN:rb?inL.length:pe,peerKind:rb?'median':'pooled',
         diff:peer==null?null:r30-peer,z,per100:a.o30/a.e30*100,me:a.me,mf:a.mf};
@@ -99,7 +99,7 @@ function renderProvFollowon(chosen){
     'Eligible = the 30-day (or 7-day) window has passed. Typical = the median provider of the same service (the others pooled when only one or two have enough patients), so one very large provider doesn’t make everyone else look worse; when providers differ more than chance allows, the bar is raised to match. A month on the chart needs 10 or more eligible patients.',
     '“Strong” passes a 5% bar corrected for all '+R.tests+' rows tested; “possible” passes the usual 5% bar for one test. A provider who sees sicker patients will send more on, so a gap is a lead to look at, not proof.',
     'Real visits only (started, finished or reviewed), whatever statuses are picked above; services with no provider yet are left out.'];
-  if(st.pview!=='all') notes.push('This export has all patients, so the New / Returning switch doesn’t change this panel.');
+  if(st.pview!=='all'&&S.hasNew) notes.push('This export has all patients, so the New / Returning switch doesn’t change this panel.');
   if(monthKey(st.from)<m0||monthKey(st.to)>m1) notes.push('The export covers '+fmtM(m0)+' – '+fmtM(m1)+'.');
   document.getElementById('pfNote').textContent=notes.join(' ');
 }
@@ -181,7 +181,7 @@ function renderBusyWeeks(chosen,a,b){
   const R=busyWeeksCompute(G.provW,G.catW,G.tgtW,{nW:G.keys.length});
   if(!R.rows.length) return setMsg('Not enough provider volume in this range to test.');
   msg.hidden=true; body.hidden=false;
-  bwRows=R.rows.slice(0,40); if(!(st.bwSel<bwRows.length)) st.bwSel=0;
+  bwRows=R.rows.slice(0,40); const bwKey=r=>r.name+'|'+r.cat+'|'+r.tgt; let bi=bwRows.findIndex(r=>bwKey(r)===st.bwSel); if(bi<0){ bi=0; st.bwSel=bwRows[0]?bwKey(bwRows[0]):''; }
   const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=R.tests*0.05, M=MLABEL[st.measure].toLowerCase();
   const tg=[...new Set(R.rows.map(r=>r.tgt))];
   document.getElementById('bwDesc').textContent=(st.basis==='booked'?'Provider data is dated by scheduled time, whatever Dates by is set to. ':'')+G.provW.length+' providers against '+tg.map(label).join(', ')+': '+R.rows.length+' rows, 2 and 4 weeks after, '+R.nW+' full weeks. '+
@@ -189,9 +189,9 @@ function renderBusyWeeks(chosen,a,b){
   const wk=k=>k+' weeks';
   const tb=document.getElementById('bwTable');
   tb.innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Busy weeks</th><th class="nosort">Growth after busy weeks</th><th class="nosort">After other weeks</th><th class="nosort">Difference</th><th class="nosort">Over</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
-    bwRows.map((r,i)=>'<tr data-i="'+i+'" class="'+(i===st.bwSel?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(r.name)+'</td><td style="text-align:left">'+esc(label(r.cat))+'</td><td style="text-align:left">'+esc(label(r.tgt))+'</td><td>'+fmtInt(r.nBusy)+'</td><td>'+fmtPct(r.gBusy*100,1)+'</td><td>'+fmtPct(r.gOther*100,1)+'</td>'+
+    bwRows.map((r,i)=>'<tr data-i="'+i+'" class="'+(i===bi?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(r.name)+'</td><td style="text-align:left">'+esc(label(r.cat))+'</td><td style="text-align:left">'+esc(label(r.tgt))+'</td><td>'+fmtInt(r.nBusy)+'</td><td>'+fmtPct(r.gBusy*100,1)+'</td><td>'+fmtPct(r.gOther*100,1)+'</td>'+
       '<td class="'+(r.verdict==='chance'?'':r.d>0?'pos':'neg')+'" title="p = '+(r.p<0.001?'< 0.001':r.p.toFixed(3))+' · '+r.nx+' busy and '+r.ny+' other weeks">'+fmtPct(r.diffPct*100,1)+'</td><td>'+wk(r.k)+'</td><td>'+plVerdict(r.verdict,r.d)+'</td></tr>').join('')+'</tbody>';
-  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ st.bwSel=+tr.dataset.i; renderBusyWeeks(chosen,a,b); }));
+  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ st.bwSel=bwKey(bwRows[+tr.dataset.i]); renderBusyWeeks(chosen,a,b); }));
   const top=R.rows[0], amt=v=>Math.abs(v*100).toFixed(Math.abs(v)<0.1?1:0)+'%';
   // shares in a service add up to 100%, so one provider's busy weeks are dips for colleagues: say so when the other side shows up too
   const mir=top.verdict!=='chance'&&R.rows.find(o=>o!==top&&o.cat===top.cat&&o.tgt===top.tgt&&o.verdict!=='chance'&&o.d*top.d<0);
@@ -200,7 +200,7 @@ function renderBusyWeeks(chosen,a,b){
     : 'In the '+wk(top.k)+' after '+esc(top.name)+'’s busy weeks, '+esc(label(top.tgt))+' grew <strong>'+amt(top.diffPct)+' '+(top.d>0?'faster':'slower')+'</strong> than after other weeks ('+(top.verdict==='strong'?'strong':'possible: passes the usual bar but not the strict one, so treat it as a lead')+').'+
       (mir?' Shares within a service add up to 100%, so this may be the other side of '+esc(mir.name)+'’s result ('+fmtPct(mir.diffPct*100,0)+' after their busy weeks).':'');
   // the selected row: share bars and the other service's weekly line, two charts
-  const r=bwRows[st.bwSel], labels=G.keys.map(k=>fmtDs(k)), acc=css('--accent'), gh=css('--ghost'), title=it=>'Week of '+fmtD(G.keys[it[0].dataIndex]);
+  const r=bwRows[bi], labels=G.keys.map(k=>fmtDs(k)), acc=css('--accent'), gh=css('--ghost'), title=it=>'Week of '+fmtD(G.keys[it[0].dataIndex]);
   const o1=baseOpts(); o1.scales.y.ticks.maxTicksLimit=4; o1.scales.y.ticks.callback=v=>v+'%';
   o1.plugins.tooltip.callbacks={title,label:it=>' Share of '+label(r.cat)+': '+(it.parsed.y==null?'–':it.parsed.y.toFixed(1)+'%')+(r.busy[it.dataIndex]?' · busy week':''),footer:()=>' Busy from '+(r.thr*100).toFixed(1)+'% (this provider’s 80th percentile)'};
   if(bwShare) bwShare.destroy();

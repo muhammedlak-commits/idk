@@ -192,7 +192,7 @@ function renderProjections(){
   pjChart=new Chart(document.getElementById('pjChart'),{type:'line',data:{labels:B.keys.map(x=>lab(x.k)),datasets:ds},options:o});
   document.getElementById('pjLegend').innerHTML='<span><i style="background:'+accent+'"></i>Actual</span><span><i style="background:repeating-linear-gradient(90deg,'+accent+' 0 5px,transparent 5px 9px)"></i>Projected</span><span><i class="box" style="background:'+css('--accent-wash')+'"></i>Likely range (about 8 in 10 periods fall inside)</span><span><i style="background:'+css('--ghost')+'"></i>Same period last year</span>';
   const GL={day:'day',week:'week',month:'month'}[g];
-  document.getElementById('pjH').textContent='Projected '+MLABEL[m].toLowerCase()+' by '+GL;
+  document.getElementById('pjH').textContent='Projected '+MLABEL[m].toLowerCase()+viewLabel(' from ')+' by '+GL;
   document.getElementById('pjDesc').textContent=(g==='day'?'The last 60 days':g==='week'?'The last 26 weeks':'The last 12 months')+', then '+H+' days ahead ('+fmtD(start)+' – '+fmtD(end)+'). Change the period with By in the filter bar.';
 
   // ---- table by period

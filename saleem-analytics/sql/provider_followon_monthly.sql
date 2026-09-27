@@ -1,4 +1,4 @@
--- Follow-on per provider and month, for the Providers and Service links modules.
+-- Follow-on per provider and month, for Service links › Specialties & providers (Saleem Performance Lab).
 -- For each provider and month: of the patients they served, how many went on to each service
 -- (their own included) within 7 and 30 days. Shows which doctors, nurses and physiotherapists lead
 -- patients on to lab tests, doctor visits and the rest.

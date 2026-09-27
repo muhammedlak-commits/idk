@@ -115,7 +115,7 @@ function syncContext(){
   const n=moreCount(), c=document.getElementById('moreCount'); c.textContent=n; c.hidden=!n;
 }
 function closePops(except){
-  document.querySelectorAll('.popover').forEach(el=>{ if(el.id===except) return; el.hidden=true; const b=document.querySelector('[aria-controls="'+el.id+'"]'); if(b) b.setAttribute('aria-expanded','false'); });
+  document.querySelectorAll('.popover').forEach(el=>{ if(el.id===except||el.hidden) return; const had=el.contains(document.activeElement); el.hidden=true; const b=document.querySelector('[aria-controls="'+el.id+'"]'); if(b){ b.setAttribute('aria-expanded','false'); if(had) b.focus(); } });
 }
 function togglePop(btnId,popId){
   const el=document.getElementById(popId), open=el.hidden; closePops(popId); el.hidden=!open;
@@ -123,6 +123,7 @@ function togglePop(btnId,popId){
 }
 function setDrawer(open){
   document.getElementById('drawer').hidden=!open; document.getElementById('drawerBack').hidden=!open;
+  ['header.top','.filters','main'].forEach(q=>{ const el=document.querySelector(q); if(el) el.inert=open; });   // keep focus inside the drawer
   document.getElementById('moreBtn').setAttribute('aria-expanded',String(open));
   if(open){ closePops(); document.getElementById('drawerClose').focus(); } else document.getElementById('moreBtn').focus();
 }

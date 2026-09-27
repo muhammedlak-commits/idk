@@ -62,7 +62,7 @@ function wireEvents(){
 function factorEffects(cats,stats,m){
   const y=series(S.min,S.max,m,cats,stats), at=n=>y[n-S.min];
   const evs=EVENTS.filter(e=>e.cat!=='Marketing' && e.e-e.s<=14 && e.s>=S.min+28 && e.e<=S.max-7);
-  const busy=new Set(); EVENTS.forEach(e=>{ if(e.cat!=='Marketing') for(let n=e.s;n<=e.e;n++) busy.add(n); });
+  const busy=new Set(); EVENTS.forEach(e=>{ if(e.cat!=='Marketing') for(let n=Math.max(e.s,S.min-28);n<=Math.min(e.e,S.max);n++) busy.add(n); });
   const skip=n=>busy.has(n)||holKeysOn(n).length>0;
   const res=[];
   for(const ev of evs){
@@ -103,12 +103,12 @@ function renderCompetitors(){
   if(!COMPETITORS.length){ empty.hidden=false; t.innerHTML=''; sm.innerHTML=''; return; }
   empty.hidden=true;
   const y=series(S.min,S.max,st.measure,selCats(),selStats());
-  const cell=v=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),40)/40; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'" title="Plain 4-week change: see the note">'+fmtPct(v)+'</td>'; };
+  const cell=(v,raw)=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),40)/40; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'" title="Against the usual 4-week change. Plain 4-week change: '+fmtPct(raw)+'">'+fmtPct(v)+'</td>'; };
   const rows=COMPETITORS.slice().reverse().map(c=>({c,x:competitorEffect(y,c.s)}));
   t.innerHTML='<thead><tr><th class="nosort">Date</th><th class="nosort" style="text-align:left">Competitor</th><th class="nosort" style="text-align:left">Milestone</th><th class="nosort" style="text-align:left">Type</th><th class="nosort" style="text-align:left">Services</th><th class="nosort">After vs usual</th><th class="nosort" style="text-align:left">Source</th></tr></thead><tbody>'+
     rows.map(({c,x})=>{ const u=safeUrl(c.source);
-      return '<tr><td>'+fmtD(c.s)+'</td><td dir="auto" style="text-align:left">'+esc(c.name)+'</td><td dir="auto" style="text-align:left;white-space:normal;min-width:240px">'+esc(c.milestone)+(c.notes?'<div class="note">'+esc(c.notes)+'</div>':'')+'</td><td style="text-align:left">'+esc(c.type)+'</td><td style="text-align:left;white-space:normal">'+esc(c.services)+(c.city?' · '+esc(c.city):'')+'</td>'+
-        (x&&x.eff!=null&&!x.thin? cell(x.eff) : '<td style="color:var(--muted)">'+(x&&x.thin?'too few orders':'–')+'</td>')+
+      return '<tr><td>'+fmtD(c.s)+'</td><td dir="auto" style="text-align:left">'+esc(c.name)+'</td><td dir="auto" style="text-align:left;white-space:normal;min-width:170px">'+esc(c.milestone)+(c.notes?'<div class="note">'+esc(c.notes)+'</div>':'')+'</td><td style="text-align:left">'+esc(c.type)+'</td><td style="text-align:left;white-space:normal">'+esc(c.services)+(c.city?' · '+esc(c.city):'')+'</td>'+
+        (x&&x.eff!=null&&!x.thin? cell(x.eff,x.raw) : '<td style="color:var(--muted)">'+(x&&x.thin?'too few orders':'–')+'</td>')+
         '<td style="text-align:left">'+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(c.status||'Source')+'</a>':esc(c.status||''))+'</td></tr>'; }).join('')+'</tbody>';
   const by={}; COMPETITORS.forEach(c=>{ const k=c.name; (by[k]||(by[k]={n:0,last:null,types:new Set()})); by[k].n++; by[k].last=c; by[k].types.add(c.type); });
   sm.innerHTML='<thead><tr><th class="nosort">Competitor</th><th class="nosort">Milestones</th><th class="nosort" style="text-align:left">Latest</th><th class="nosort" style="text-align:left">Kinds</th></tr></thead><tbody>'+

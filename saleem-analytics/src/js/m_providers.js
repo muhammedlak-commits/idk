@@ -48,6 +48,7 @@ function renderProviders(){
   const a=st.from, b=st.to, len=b-a+1, M=MLABEL[st.measure];
   const notes=[];
   if(st.basis==='booked') notes.push('Provider data is dated by scheduled time, whatever Dates by is set to.');
+  if(st.pview!=='all'&&S.hasNew) notes.push('The provider export has all patients, so the New / Returning switch doesn’t change this module.');
   if(a<PV.min||b>PV.max) notes.push('The provider export covers '+fmtD(PV.min)+' – '+fmtD(PV.max)+'; days outside that count as zero.');
   msg.textContent=notes.join(' '); msg.hidden=!notes.length; body.hidden=false;
   const hasP=a-len>=PV.min, hasY=a-364>=PV.min;
@@ -127,16 +128,24 @@ function renderSpecialties(a,b,B,labels,hasP,hasY,len){
    Targets: the other selected services. For every pair, week-over-week changes in the driver
    against changes in the target 0-4 weeks later. Many pairs are tested at once, so "strong" uses
    a Bonferroni bar (5% across every pair and lag); "possible" is the 5% bar for one test. */
-/* Provider comparison robust to one dominant provider (funnel-plot style): the benchmark is the median
-   provider's rate, z = (rate - median) / binomial SE at the median, and when providers really differ more
-   than chance allows, z is scaled down by the robust overdispersion factor phi = median(z^2) / 0.455.
-   rs = [{r, n}] (rate 0-1, denominator). Returns {bench, z:[...] } or null when fewer than 3 providers. */
+/* Provider comparison robust to one dominant provider: each provider is compared with the median of the
+   OTHER providers of the same service (leave-one-out), and the standard error includes the provider's own
+   binomial noise, the between-provider spread of the others (DerSimonian-Laird tau^2) and the uncertainty of
+   that median. Variances use the pooled rate q, so a median of 0% or 100% can't explode z. A provider whose
+   expected count is under 5 either way isn't tested (z = null).
+   rs = [{r, n}] (rate 0-1, denominator). Returns {bench, benches, z} or null when fewer than 3 providers. */
 function robustBench(rs){
-  if(rs.length<3) return null;
-  const v=rs.map(x=>x.r).sort((a,b)=>a-b), k=v.length, bench=k%2? v[(k-1)/2] : (v[k/2-1]+v[k/2])/2;
-  const b=Math.min(0.999,Math.max(0.001,bench)), z=rs.map(x=>(x.r-bench)/Math.sqrt(b*(1-b)/x.n));
-  const z2=z.map(t=>t*t).sort((a,b)=>a-b), m2=k%2? z2[(k-1)/2] : (z2[k/2-1]+z2[k/2])/2, phi=Math.max(1,m2/0.455);
-  return {bench, phi, z:z.map(t=>t/Math.sqrt(phi))};
+  const k=rs.length; if(k<3) return null;
+  const med=v=>{ const s=v.slice().sort((a,b)=>a-b), m=s.length; return m%2? s[(m-1)/2] : (s[m/2-1]+s[m/2])/2; };
+  const N=rs.reduce((t,x)=>t+x.n,0), q=(rs.reduce((t,x)=>t+x.r*x.n,0)+0.5)/(N+1), pq=q*(1-q);
+  const tau2Of=L=>{ const w=L.map(x=>x.n/pq), W=w.reduce((a,b)=>a+b,0), mu=L.reduce((t,x,i)=>t+w[i]*x.r,0)/W;
+    const Q=L.reduce((t,x,i)=>t+w[i]*(x.r-mu)**2,0), c=W-w.reduce((t,v)=>t+v*v,0)/W; return c>0? Math.max(0,(Q-(L.length-1))/c) : 0; };
+  const benches=[], z=[];
+  rs.forEach((x,i)=>{ const O=rs.filter((_,j)=>j!==i), m=med(O.map(o=>o.r)), t2=tau2Of(O);
+    const nh=O.length/O.reduce((t,o)=>t+1/o.n,0), vMed=(Math.PI/2)*(pq/nh+t2)/O.length;
+    benches.push(m);
+    z.push(x.n*q<5||x.n*(1-q)<5? null : (x.r-m)/Math.sqrt(pq/x.n+t2+vMed)); });
+  return {bench:med(rs.map(x=>x.r)), benches, z};
 }
 function zTwoSided(p){ // |z| with two-sided tail p, by bisection on the normal tail
   const tail=z=>{ const t=1/(1+0.2316419*z), d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI); return 2*d*t*(0.31938153+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429)))); };

@@ -22,17 +22,17 @@ const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
 
 /* ---------- services ---------- */
-const SVC_LABEL = {physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',xRay:'X-ray',ultrasound:'Ultrasound',woundCare:'Wound care',echocardiogram:'Echo',onlineConsultation:'Online consultation',doppler:'Doppler',productPurchase:'Product purchase',eyeExam:'Eye exam',psychiatristVisit:'Psychiatrist visit',ambulance:'Ambulance',surgeries:'Surgeries',booking:'Booking',b2b:'B2B (other)'};
+const SVC_LABEL = {physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',xRay:'X-ray',ultrasound:'Ultrasound',woundCare:'Wound care',echocardiogram:'Echo',onlineConsultation:'Online consultation',doppler:'Doppler',productPurchase:'Product purchase',eyeExam:'Eye exam',psychiatristVisit:'Psychiatrist visit',ambulance:'Ambulance',surgeries:'Surgeries',booking:'Booking',b2b:'B2B (other)',radiology:'Imaging',vendor:'Products'};
 const label = c => SVC_LABEL[c] || c.replace(/([A-Z])/g,' $1').replace(/^./,x=>x.toUpperCase());
 const QUICK = {
   core:['physiotherapy','nursing','doctorVisit','labTest'],
-  imaging:['xRay','ultrasound','echocardiogram','doppler'],
+  imaging:['xRay','ultrasound','echocardiogram','doppler','radiology'],
   b2b:['physiotherapy (b2b)','b2b'],
-  nonclinical:['productPurchase','booking','b2b','physiotherapy (b2b)']
+  nonclinical:['productPurchase','vendor','booking','b2b','physiotherapy (b2b)']
 };
 /* ad group -> service categories it promotes */
 const GROUP_SVCS = {'Physiotherapy':['physiotherapy'],'Nursing':['nursing'],'Doctor visit':['doctorVisit'],'Lab tests':['labTest'],
-  'Imaging':['xRay','ultrasound','echocardiogram','doppler'],'Wound care':['woundCare'],'Eye exam':['eyeExam'],'Surgery':['surgeries'],
-  'Telemedicine':['onlineConsultation','psychiatristVisit'],'Ambulance':['ambulance'],'B2B':['physiotherapy (b2b)','b2b'],'Products':['productPurchase']};
+  'Imaging':['xRay','ultrasound','echocardiogram','doppler','radiology'],'Wound care':['woundCare'],'Eye exam':['eyeExam'],'Surgery':['surgeries'],
+  'Telemedicine':['onlineConsultation','psychiatristVisit'],'Ambulance':['ambulance'],'B2B':['physiotherapy (b2b)','b2b'],'Products':['productPurchase','vendor']};
 const SHARED_GROUPS = ['All services (general)','Brand & awareness','App','International referral','Recruitment'];
 

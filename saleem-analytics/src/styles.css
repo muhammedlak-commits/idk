@@ -145,7 +145,7 @@ td.proj{color:var(--ink-2)}
 .sample{margin-top:16px;padding-top:14px;border-top:1px solid var(--grid)}
 .sample h3{font-size:13.5px;font-weight:600;margin-bottom:8px}
 .coltable td{white-space:normal;text-align:left;vertical-align:top}
-.coltable td:first-child{white-space:nowrap}
+.coltable td:first-child{white-space:normal;overflow-wrap:anywhere;min-width:9em}
 .coltable code,.sampletable td{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
 .sampletable th,.sampletable td{text-align:left}
 .seg button.unavail{color:var(--muted)}

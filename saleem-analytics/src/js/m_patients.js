@@ -5,7 +5,7 @@
 const UP_LABEL={all:'All services',physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',radiology:'Radiology',surgeries:'Surgeries',booking:'Booking',eyeExam:'Eye exam',ambulance:'Ambulance',vendor:'Products'};
 /* dashboard service -> the category the patients export uses (service types in the database) */
 const UP_CAT={physiotherapy:'physiotherapy','physiotherapy (b2b)':'physiotherapy (b2b)',nursing:'nursing',doctorVisit:'doctorVisit',labTest:'labTest',
-  xRay:'radiology',ultrasound:'radiology',echocardiogram:'radiology',doppler:'radiology',surgeries:'surgeries',booking:'booking',eyeExam:'eyeExam',ambulance:'ambulance',productPurchase:'vendor'};
+  xRay:'radiology',ultrasound:'radiology',echocardiogram:'radiology',doppler:'radiology',surgeries:'surgeries',booking:'booking',eyeExam:'eyeExam',ambulance:'ambulance',productPurchase:'vendor',radiology:'radiology',vendor:'vendor'};   // radiology/vendor: exports that use database service types
 let U=null, upChart=null;
 function buildUnique(text){
   if(!text||!text.trim()) return null;

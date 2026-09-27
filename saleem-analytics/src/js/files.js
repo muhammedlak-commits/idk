@@ -27,8 +27,13 @@ function mergeServices(oldText,newText){
   const days=new Set(); const nl=newText.trim().split(/\r?\n/); const hdrN=splitCsv(nl[0]).map(normHdr); const di=hdrN.indexOf('day');
   nl.slice(1).forEach(l=>days.add((splitCsv(l)[di]||'').slice(0,10)));
   const ol=oldText.trim().split(/\r?\n/); const hdrO=splitCsv(ol[0]).map(normHdr); const doi=hdrO.indexOf('day');
-  if(hdrO.join(',')!==hdrN.join(',')) return newText;   // different columns: can't merge safely, so the new file is used on its own
-  return [ol[0]].concat(ol.slice(1).filter(l=>!days.has((splitCsv(l)[doi]||'').slice(0,10))), nl.slice(1)).join('\n');
+  // same columns in any order: old rows are rewritten in the new file's column order; different columns can't be merged
+  const setN=[...hdrN].sort().join(','), setO=[...hdrO].sort().join(',');
+  if(setN!==setO){ const extra=hdrN.filter(h=>!hdrO.includes(h)), missing=hdrO.filter(h=>!hdrN.includes(h));
+    throw new Error('This file has '+(extra.length?'columns the loaded data lacks ('+extra.join(', ')+')':'fewer columns than the loaded data ('+missing.join(', ')+' missing)')+', so its days can\u2019t be added to it. Export the full history with the current query and choose \u201cReplace everything\u201d.'); }
+  const q=v=>/[",]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v, map=hdrN.map(h=>hdrO.indexOf(h));
+  const oldRows=ol.slice(1).filter(l=>l.trim()&&!days.has((splitCsv(l)[doi]||'').slice(0,10))).map(l=>{ if(hdrO.join(',')===hdrN.join(',')) return l; const f=splitCsv(l); return map.map(i=>q(f[i]||'')).join(','); });
+  return [nl[0]].concat(oldRows, nl.slice(1)).join('\n');
 }
 
 let toastT=null;

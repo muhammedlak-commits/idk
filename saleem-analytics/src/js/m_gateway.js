@@ -62,7 +62,9 @@ function gwCompute(M,{basis,fromMk,toMk,cats}){
   // with 3+ tested providers in a first service, compare with the median provider instead (robust to one dominant provider)
   const byCat=new Map(); R.forEach(x=>{ if(!x.none&&x.e90>=20) (byCat.get(x.cat)||byCat.set(x.cat,[]).get(x.cat)).push(x); });
   for(const L of byCat.values()){ const rb=robustBench(L.map(x=>({r:x.r90/x.e90,n:x.e90}))); if(!rb) continue;
-    L.forEach((x,i)=>{ x.diff=(x.r90/x.e90-rb.bench)*100; x.z=rb.z[i]; x.tested=true; x.bench=rb.bench; x.benchN=L.length; }); }
+    L.forEach((x,i)=>{ x.bench=rb.benches[i]; x.benchN=L.length-1; x.diff=(x.r90/x.e90-x.bench)*100; x.z=rb.z[i]; x.tested=x.z!=null; });
+    // smaller named providers in the same service: show the gap to the median, untested
+    R.forEach(x=>{ if(!x.none&&x.cat===L[0].cat&&x.bench==null&&x.e90>=10){ x.bench=rb.bench; x.benchN=L.length; x.diff=(x.r90/x.e90-rb.bench)*100; x.z=null; x.tested=false; } }); }
   const m=R.filter(x=>x.tested).length, zStrong=m? zTwoSided(0.05/m) : null;
   R.forEach(x=>{ if(x.tested) x.verdict= Math.abs(x.z)>zStrong? 'strong' : Math.abs(x.z)>1.96? 'possible' : ''; });
   R.sort((x,y)=>y.n-x.n);
@@ -124,7 +126,7 @@ function renderGateway(){
   const vt={strong:(u)=>'<span class="delta '+(u?'up':'down')+'">✓ '+(u?'Above':'Below')+' typical</span>',possible:(u)=>'<span class="delta flat">~ '+(u?'Above':'Below')+' typical</span>'};
   const rc=(r,e,d)=>'<td title="'+fmtInt(r)+' of '+fmtInt(e)+' whose '+d+' days have passed">'+(e>=10?pct(r/e):'–')+'</td>';
   const vc=x=>{ if(x.diff==null) return '<td title="'+(x.none?'Not a provider, so not compared':'Needs 10+ patients past 90 days here and among the peers')+'">–</td>';
-    const t=pct(x.r90/x.e90,1)+' of '+fmtInt(x.e90)+' vs '+pct(x.pr/x.pe,1)+' of '+fmtInt(x.pe)+' for the other '+svcName(x.cat).toLowerCase()+' providers'+(x.tested?'; z = '+x.z.toFixed(2)+' (strong needs '+R.zStrong.toFixed(2)+' with '+R.m+' tested)':'; not tested, needs 20+ on both sides');
+    const t=pct(x.r90/x.e90,1)+' of '+fmtInt(x.e90)+' vs '+(x.bench!=null? pct(x.bench,1)+', the median of '+x.benchN+' other '+svcName(x.cat).toLowerCase()+' providers' : pct(x.pr/x.pe,1)+' of '+fmtInt(x.pe)+' for the other '+svcName(x.cat).toLowerCase()+' providers together')+(x.tested?'; z = '+x.z.toFixed(2)+' (strong needs '+R.zStrong.toFixed(2)+' with '+R.m+' tested)':'; not tested (needs 20+ patients past 90 days and enough returns to judge)');
     return '<td title="'+esc(t)+'">'+pts(x.diff)+(x.verdict?' '+vt[x.verdict](x.diff>0):'')+'</td>'; };
   const t=document.getElementById('gwTable');
   if(gwSel&&!R.rows.some(x=>x.key===gwSel)) gwSel='';
@@ -137,7 +139,7 @@ function renderGateway(){
   t.querySelectorAll('tbody tr[data-key]').forEach(tr=>tr.addEventListener('click',()=>{ gwSel= gwSel===tr.dataset.key? '' : tr.dataset.key; renderGateway(); }));
   const nS=R.rows.filter(x=>x.verdict==='strong').length, nP=R.rows.filter(x=>x.verdict==='possible').length;
   document.getElementById('gwTableNote').textContent=(rows.length>60?'Top 60 of '+rows.length+' rows by the sorted column; '+(rows.length-60)+' hidden. ':'')+
-    'Rates show – under 10 patients whose window has passed (hover for the counts). '+(R.m? R.m+' provider'+(R.m>1?'s':'')+' with 20+ patients past 90 days tested against their peers: '+nS+' strong, '+nP+' possible'+(R.m*0.05>=0.5?' (about '+Math.round(R.m*0.05)+' possible would turn up by chance alone)':'')+'. ' : '')+
+    'Rates show – under 10 patients whose window has passed (hover for the counts). '+(R.m? R.m+' provider'+(R.m>1?'s':'')+' with 20+ patients past 90 days tested against the typical provider of their first service: '+nS+' strong, '+nP+' possible'+(R.m*0.05>=0.5?' (about '+Math.round(R.m*0.05)+' possible would turn up by chance alone)':'')+'. ' : '')+
     'The return chart shows the 4 providers with most patients past 90 days; click a row to follow that one there instead.';
   // new patients per month, stacked by gateway provider
   const labels=R.months.map(fmtM), mo=R.month;

@@ -27,6 +27,6 @@ function renderSvcTable(){
     rows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td><td>'+fmtInt(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td class="'+cls(r.prevP)+'">'+fmtPct(r.prevP,1)+'</td><td class="'+cls(r.lyP)+'">'+fmtPct(r.lyP,1)+'</td><td>'+(r.canc==null?'–':r.canc.toFixed(1)+'%')+'</td><td>'+fmtInt(r.pat)+'</td><td>'+(r.spend?fmtUsd(r.spend):'–')+'</td><td>'+(r.cpo?fmtUsd(r.cpo):'–')+'</td></tr>').join('')+'</tbody>';
   const t=document.getElementById('svcTable'); t.innerHTML=html;
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.svcSort = st.svcSort.k===key? {k:key,dir:-st.svcSort.dir} : {k:key,dir:key==='c'?1:-1}; renderSvcTable();}));
-  document.getElementById('svcDesc').textContent=fmtD(a)+' – '+fmtD(b)+(hasY?'':' · last-year comparison needs data from '+fmtD(a-364));
+  document.getElementById('svcDesc').textContent=fmtD(a)+' – '+fmtD(b)+viewLabel()+(hasY?'':' · last-year comparison needs data from '+fmtD(a-364));
 }
 

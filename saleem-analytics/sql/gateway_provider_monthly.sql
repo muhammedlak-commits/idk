@@ -1,4 +1,4 @@
--- Gateway providers per month, for the Providers and Service links modules.
+-- Gateway providers per month, for the gateway section of the Providers module (Saleem Performance Lab).
 -- For every new patient: which provider served their first-ever real visit (the gateway), and how much
 -- the patient kept ordering after it. One row per basis x cohort month x first service x gateway provider.
 -- First visit: the patient's earliest real service (started, finished or reviewed) by scheduled time, in any service.

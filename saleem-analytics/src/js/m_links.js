@@ -95,7 +95,7 @@ function renderLinks(){
   document.getElementById('lkRatioLegend').innerHTML=ratios.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
   // 4. patient follow-on (optional export)
   renderFollowon(chosen,months);
-  document.getElementById('lkDesc').textContent=chosen.map(label).join(', ')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
+  document.getElementById('lkDesc').textContent=chosen.map(label).join(', ')+viewLabel()+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
 }
 function renderFollowon(chosen,months){
   const box=document.getElementById('lkFollowBody'), empty=document.getElementById('lkFollowEmpty');
@@ -146,7 +146,7 @@ function renderAdLink(chosen,a,b){
   const S_=wk(sp), O_=wk(yo);
   const labels=keys.map(k=>fmtDs(k)), spendTitle= st.adMode==='all'?'All ads':st.adMode==='pick'?groups.join(', '):'Ads matched to '+chosen.map(label).join(', ');
   const ordTitle=chosen.map(label).join(', ');
-  document.getElementById('alDesc').textContent='Spend: '+spendTitle+' · '+MLABEL[st.measure]+': '+ordTitle+' · '+keys.length+' full weeks, '+fmtD(keys[0])+' – '+fmtD(keys[keys.length-1]+6);
+  document.getElementById('alDesc').textContent='Spend: '+spendTitle+' · '+MLABEL[st.measure]+viewLabel(' from ')+': '+ordTitle+' · '+keys.length+' full weeks, '+fmtD(keys[0])+' – '+fmtD(keys[keys.length-1]+6);
   // two charts, one measure each
   const o1=baseOpts(); o1.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US'); o1.scales.y.ticks.maxTicksLimit=4;
   o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' Spend: '+fmtUsd(it.parsed.y)};

@@ -2,7 +2,7 @@
 const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers, gateway:P.gateway, provFollowon:P.provFollowon};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
-function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ try{ if(k!=='spl.build') localStorage.removeItem(k); }catch(e2){} return false; } }   // a failed save must not leave an older copy behind
 function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 
 const DROPS={
@@ -15,7 +15,7 @@ const DROPS={
       buildServices(next);                  // throws with a readable message if the file can't be used
       P[key]=next;
       const saved=lsSave('spl.'+key,next); lsSave('spl.build',P.built);
-      setDataMeta(key==='services'?'orders':'ordersBooked',{name,at:Date.now(),mode});
+      setDataMeta(key==='services'?'orders':'ordersBooked',{name,at:Date.now(),mode,unsaved:!saved});
       return saved;
     },
     reset(){ const key=st.loadBasis==='booked'?'servicesBooked':'services'; P[key]=ORIG[key]; lsDel('spl.'+key); setDataMeta(key==='services'?'orders':'ordersBooked',null); if(key==='servicesBooked'&&!P.servicesBooked) st.basis='scheduled'; }
@@ -27,7 +27,7 @@ const DROPS={
       if(!buildUnique(text)) throw new Error('No usable rows found. Check the file has month, category and unique_patients columns.');
       P.uniquePatients=text;
       const saved=lsSave('spl.uniquePatients',text); lsSave('spl.build',P.built);
-      setDataMeta('patients',{name,at:Date.now()});
+      setDataMeta('patients',{name,at:Date.now(),unsaved:!saved});
       return saved;
     },
     reset(){ P.uniquePatients=ORIG.uniquePatients; lsDel('spl.uniquePatients'); setDataMeta('patients',null); }
@@ -39,7 +39,7 @@ const DROPS={
       if(!buildFollowon(text)) throw new Error('No usable rows found. Check the file has month, service_a, service_b, patients_a and followed_30d columns.');
       P.followon=text;
       const saved=lsSave('spl.followon',text); lsSave('spl.build',P.built);
-      setDataMeta('links',{name,at:Date.now()});
+      setDataMeta('links',{name,at:Date.now(),unsaved:!saved});
       return saved;
     },
     reset(){ P.followon=ORIG.followon; lsDel('spl.followon'); setDataMeta('links',null); }
@@ -47,13 +47,13 @@ const DROPS={
   gateway:{
     check:hdr=>/gateway_provider_name/.test(hdr)&&/new_patients/.test(hdr)&&/cohort_month/.test(hdr),
     wrong:'This file doesn\u2019t look like the gateway export. It needs the columns cohort_month, first_service, gateway_provider_name and new_patients.',
-    apply(text,name){ if(!buildGateway(text)) throw new Error('No usable rows found in '+name+'.'); P.gateway=text; const saved=lsSave('spl.gateway',text); lsSave('spl.build',P.built); setDataMeta('gateway',{name,at:Date.now()}); return saved; },
+    apply(text,name){ if(!buildGateway(text)) throw new Error('No usable rows found in '+name+'.'); P.gateway=text; const saved=lsSave('spl.gateway',text); lsSave('spl.build',P.built); setDataMeta('gateway',{name,at:Date.now(),unsaved:!saved}); return saved; },
     reset(){ P.gateway=ORIG.gateway; lsDel('spl.gateway'); setDataMeta('gateway',null); }
   },
   pfollow:{
     check:hdr=>/provider_service/.test(hdr)&&/target_service/.test(hdr)&&/followed_30d/.test(hdr),
     wrong:'This file doesn\u2019t look like the provider follow-on export. It needs the columns month, provider_service, provider_name, target_service and followed_30d.',
-    apply(text,name){ if(!buildProvFollowon(text)) throw new Error('No usable rows found in '+name+'.'); P.provFollowon=text; const saved=lsSave('spl.provFollowon',text); lsSave('spl.build',P.built); setDataMeta('pfollow',{name,at:Date.now()}); return saved; },
+    apply(text,name){ if(!buildProvFollowon(text)) throw new Error('No usable rows found in '+name+'.'); P.provFollowon=text; const saved=lsSave('spl.provFollowon',text); lsSave('spl.build',P.built); setDataMeta('pfollow',{name,at:Date.now(),unsaved:!saved}); return saved; },
     reset(){ P.provFollowon=ORIG.provFollowon; lsDel('spl.provFollowon'); setDataMeta('pfollow',null); }
   },
   providers:{
@@ -63,7 +63,7 @@ const DROPS={
       if(!buildProviders(text)) throw new Error('No usable rows found in '+name+'.');
       P.providers=text;
       const saved=lsSave('spl.providers',text); lsSave('spl.build',P.built);
-      setDataMeta('providers',{name,at:Date.now()});
+      setDataMeta('providers',{name,at:Date.now(),unsaved:!saved});
       return saved;
     },
     reset(){ P.providers=ORIG.providers; lsDel('spl.providers'); setDataMeta('providers',null); }
@@ -139,13 +139,13 @@ function renderData(){
 const SAMPLES={
   orders:{file:'saleem-orders-sample.csv',
     cols:[['day','Date, YYYY-MM-DD','2026-09-01'],
-          ['service_category','Service as Metabase names it','physiotherapy, nursing, doctorVisit, labTest, xRay, physiotherapy (b2b)…'],
+          ['service_category','Service as Metabase names it','physiotherapy, nursing, doctorVisit, labTest, radiology, physiotherapy (b2b)…'],
           ['visit_status','Visit status','finished, reviewed, started or cancelled (a booking-time file can also have scheduled)'],
           ['services_delivered','Number of services','42'],
           ['distinct_orders','Number of distinct orders','42'],
           ['distinct_patients','Distinct patients that day','41'],
-          ['new_first_services · new_first_orders · new_first_patients','The same three counts for new patients: first order with Saleem in that month (optional)','9 · 9 · 9'],
-          ['new_created_services · new_created_orders · new_created_patients','The same for patients whose record was created that month (optional)','7 · 7 · 7']],
+          ['new_first_services ·\u200b new_first_orders ·\u200b new_first_patients','The same three counts for new patients: first order with Saleem in that month (optional)','9 · 9 · 9'],
+          ['new_created_services ·\u200b new_created_orders ·\u200b new_created_patients','The same for patients whose record was created that month (optional)','7 · 7 · 7']],
     rules:['One row for each day, service and visit status. Days with nothing for a service can be left out.',
            'The six new_ columns are optional. With them, the All patients / New / Returning switch in the filter bar works; returning = all minus new.',
            'Keep the column names as shown. Their order doesn’t matter, and extra columns are ignored.',

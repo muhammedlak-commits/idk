@@ -56,7 +56,7 @@ payload = {
     'sheet': json.loads((d / 'sheet.json').read_text()) if (d / 'sheet.json').exists() else None,
     'built': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
 }
-blob = json.dumps(payload, separators=(',', ':')).replace('</', '<\\/')
+blob = json.dumps(payload, separators=(',', ':')).replace('<', '\\u003c')
 js = '\n'.join(f'/* ===== {name} ===== */\n' + (src / 'js' / name).read_text() for name in JS_ORDER)
 
 html = (
