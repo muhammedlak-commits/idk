@@ -1,5 +1,5 @@
 /* ---------- data module: drag-and-drop / browse for the two Metabase exports ---------- */
-const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon};   // the data built into this page
+const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
 function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
@@ -7,7 +7,7 @@ function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 
 const DROPS={
   orders:{
-    check:hdr=>/service_category/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr),
+    check:hdr=>/service_category/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr)&&!/provider_name/.test(hdr),
     wrong:'This file doesn’t look like the orders export. It needs the columns day, service_category and distinct_orders.',
     apply(text,name){
       const mode=st.ordersMode, key=st.loadBasis==='booked'?'servicesBooked':'services';
@@ -43,6 +43,18 @@ const DROPS={
       return saved;
     },
     reset(){ P.followon=ORIG.followon; lsDel('spl.followon'); setDataMeta('links',null); }
+  },
+  providers:{
+    check:hdr=>/provider_name/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr),
+    wrong:'This file doesn\u2019t look like the provider export. It needs the columns day, service_category, provider_name and distinct_orders.',
+    apply(text,name){
+      if(!buildProviders(text)) throw new Error('No usable rows found in '+name+'.');
+      P.providers=text;
+      const saved=lsSave('spl.providers',text); lsSave('spl.build',P.built);
+      setDataMeta('providers',{name,at:Date.now()});
+      return saved;
+    },
+    reset(){ P.providers=ORIG.providers; lsDel('spl.providers'); setDataMeta('providers',null); }
   }
 };
 
@@ -94,6 +106,11 @@ function renderData(){
     row('Source', l? esc(l.name)+' <span class="note">('+fmtAt(l.at)+')</span>' : (F?'Built into this page':'Nothing loaded yet'))+
     (F? row('Months', fmtM(F.months[0])+' – '+fmtM(F.months[F.months.length-1])+' ('+F.months.length+')')+row('Services', F.cats.map(c=>esc(UP_LABEL[c]||label(c))).join(', ')) : '');
   document.getElementById('reset-links').hidden=!l;
+  const v=meta.providers; let V=null; try{ V=buildProviders(P.providers); }catch(e){}
+  document.getElementById('stat-providers').innerHTML=
+    row('Source', v? esc(v.name)+' <span class="note">('+fmtAt(v.at)+')</span>' : (V?'Built into this page':'Nothing loaded yet'))+
+    (V? row('Dates', fmtD(V.min)+' – '+fmtD(V.max))+row('Providers', fmtInt(V.provs.filter(p=>p.name!=='Unassigned').length)+' across '+V.cats.map(c=>esc(label(c))).join(', '))+row('Specialties', V.hasSpec? fmtInt(V.specs.length) : 'None yet (see the query’s specialty line)') : '');
+  document.getElementById('reset-providers').hidden=!v;
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
   renderSamples();
 }
@@ -134,6 +151,12 @@ SAMPLES.links={file:'saleem-service-followon-sample.csv',
   cols:[['month','Month of the first service, YYYY-MM','2026-08'],['service_a','The first service','doctorVisit'],['service_b','The service that may follow','labTest'],['patients_a','Patients who had service A that month','310'],['followed_7d','Of them, had service B within 7 days after','96'],['followed_30d','Of them, had service B within 30 days after','131']],
   rules:['One row per month and ordered pair of services (doctor visit then lab test is a different row from lab test then doctor visit).','Counts are patients, not visits. Export the full history with no date filter.','The Copy SQL query in this box produces exactly this layout.'],
   csv:'month,service_a,service_b,patients_a,followed_7d,followed_30d\n2026-08,doctorVisit,labTest,310,96,131\n2026-08,doctorVisit,radiology,310,22,35\n2026-08,doctorVisit,nursing,310,18,40\n2026-08,labTest,doctorVisit,280,30,61\n2026-08,physiotherapy,nursing,420,12,25\n'};
+SAMPLES.providers={file:'saleem-providers-sample.csv',
+  cols:[['day','Scheduled date, YYYY-MM-DD','2026-09-01'],['service_category','Service, named as in the orders export','doctorVisit, nursing, physiotherapy, surgeries'],['visit_status','Visit status','finished, reviewed, started or cancelled'],
+        ['provider_id','Provider\u2019s user id (optional, keeps two people with the same name apart)','c1f0…'],['provider_name','Provider\u2019s name; Unassigned when none','Dr. Ahmed Ali'],['specialty','Doctor\u2019s specialty; empty for nurses and physiotherapists','Internal medicine'],
+        ['services_delivered','Number of services','6'],['distinct_orders','Number of distinct orders','6'],['distinct_patients','Distinct patients that day','6']],
+  rules:['One row for each day, service, visit status and provider. Days with nothing can be left out.','Keep the column names as shown; their order doesn\u2019t matter.','The Copy SQL query in this box produces exactly this layout.'],
+  csv:'day,service_category,visit_status,provider_id,provider_name,specialty,services_delivered,distinct_orders,distinct_patients\n2026-09-01,doctorVisit,finished,u101,Dr. Ahmed Ali,Internal medicine,6,6,6\n2026-09-01,doctorVisit,finished,u102,Dr. Sara Kareem,Pediatrics,3,3,3\n2026-09-01,nursing,finished,u201,Zainab Hassan,,9,8,7\n2026-09-01,nursing,finished,,Unassigned,,1,1,1\n2026-09-01,physiotherapy,finished,u301,Omar Jasim,,7,7,7\n'};
 let downloadsApi;   // undefined = not checked yet, null = not available in this view
 function renderSamples(){
   for(const [kind,s] of Object.entries(SAMPLES)){
@@ -180,6 +203,7 @@ function wireData(){
   const copy=(txt,label)=>navigator.clipboard.writeText(txt).then(()=>toast(label+' copied')).catch(()=>toast('Copy was blocked by this browser; the queries are in the sql folder'));
   document.getElementById('copySqlSched').addEventListener('click',()=>copy(P.sqlScheduled,'Scheduled-time SQL'));
   document.getElementById('copySqlBooked').addEventListener('click',()=>copy(P.sqlBooked,'Booking-time SQL'));
+  document.getElementById('copySql4').addEventListener('click',()=>copy(P.providersSql,'Provider SQL'));
   document.getElementById('copySql3').addEventListener('click',()=>navigator.clipboard.writeText(P.followonSql).then(()=>toast('Follow-on SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in the sql folder')));
   document.getElementById('copySql2').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));
   // a file dropped anywhere else shouldn't make the browser navigate away from the dashboard

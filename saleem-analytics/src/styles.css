@@ -156,4 +156,7 @@ td.proj{color:var(--ink-2)}
 .sheetstatus a{color:var(--accent)}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px}
 .grid3>*{min-width:0}
+tr.sel td{background:var(--accent-wash)}
+#pvBody{display:flex;flex-direction:column;gap:18px}
+#pvBody[hidden]{display:none}
 .h3sm{font-size:13.5px;font-weight:600;margin-bottom:6px}

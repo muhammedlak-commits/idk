@@ -1,0 +1,6 @@
+day,service_category,visit_status,provider_id,provider_name,specialty,services_delivered,distinct_orders,distinct_patients
+2026-09-01,doctorVisit,finished,u101,Dr. Ahmed Ali,Internal medicine,6,6,6
+2026-09-01,doctorVisit,finished,u102,Dr. Sara Kareem,Pediatrics,3,3,3
+2026-09-01,nursing,finished,u201,Zainab Hassan,,9,8,7
+2026-09-01,nursing,finished,,Unassigned,,1,1,1
+2026-09-01,physiotherapy,finished,u301,Omar Jasim,,7,7,7

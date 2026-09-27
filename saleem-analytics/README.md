@@ -6,7 +6,7 @@ Open `dist/saleem-performance.html` in a browser. It needs internet only for the
 
 ## Modules
 
-The page has nine modules, switched with the tabs under the header: Overview, Month by month, Services, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+The page has ten modules, switched with the tabs under the header: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
 
@@ -22,6 +22,16 @@ The Service links module uses the services picked in the filter bar. With 2 or 3
 - one service per 100 of the other, by month
 
 With more than 3 selected it shows a grid of every pair. The patient-level view (same patient, second service within 7 or 30 days) needs the export from `sql/service_followon_monthly.sql`, loaded in the Data tab.
+
+## Providers and doctor specialties
+
+Needs the provider export (`sql/provider_orders_daily.sql`, dropped on the Providers box in the Data tab). One row per day, service, visit status and provider for doctor visits, nursing and physiotherapy, dated by scheduled time. The Providers module follows the filter bar and shows active providers, the top-5 share, a sortable table of each provider against the previous period and last year, the busiest providers over time, active providers per service, and doctor visits by specialty.
+
+The specialty column isn't in the schema notes yet: the query returns it empty until `NULL::text AS specialty` is replaced with the real column (the query's comment has an `information_schema` search to find it).
+
+In Service links, "What inside a service moves the others?" tests each doctor specialty and the busiest doctors, nurses and physiotherapists against the other selected services at 0–4 weeks' lag. "Strong" is corrected for every pair and lag tested (Bonferroni); "possible" is the single-test 5% bar.
+
+All lag tests (services, ad spend, drivers) shrink the number of weeks with Bartlett's correction, because week-over-week changes swing back and forth and would otherwise pass the bar by chance too often.
 
 ## Ad spend switch
 

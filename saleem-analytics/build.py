@@ -17,6 +17,7 @@ JS_ORDER = [
     'm_overview.js',  # module: KPIs + trend + ad spend
     'm_monthly.js',   # module: month-by-month MoM / YoY
     'm_services.js',  # module: service breakdown
+    'm_providers.js', # module: providers and doctor specialties (+ drivers panel in links)
     'm_links.js',     # module: service links
     'm_patients.js',  # module: unique patients
     'm_ads.js',       # module: Meta ads
@@ -43,6 +44,8 @@ payload = {
     'uniqueSql': (root / 'sql' / 'unique_patients_monthly.sql').read_text(),
     'followon': (d / 'service_followon_monthly.csv').read_text() if (d / 'service_followon_monthly.csv').exists() else '',
     'followonSql': (root / 'sql' / 'service_followon_monthly.sql').read_text(),
+    'providers': (d / 'provider_orders_daily.csv').read_text() if (d / 'provider_orders_daily.csv').exists() else '',
+    'providersSql': (root / 'sql' / 'provider_orders_daily.sql').read_text(),
     'sheet': json.loads((d / 'sheet.json').read_text()) if (d / 'sheet.json').exists() else None,
     'built': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
 }

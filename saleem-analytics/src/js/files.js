@@ -5,7 +5,8 @@ function wireFiles(){
   inp.addEventListener('change',async()=>{
     for(const f of inp.files){ const text=await f.text(); const hdr=headerLine(text);
       try{
-        if(DROPS.links.check(hdr)){ DROPS.links.apply(text,f.name); }
+        if(DROPS.providers.check(hdr)){ DROPS.providers.apply(text,f.name); }
+        else if(DROPS.links.check(hdr)){ DROPS.links.apply(text,f.name); }
         else if(DROPS.patients.check(hdr)){ DROPS.patients.apply(text,f.name); }
         else if(DROPS.orders.check(hdr)){ DROPS.orders.apply(text,f.name); }
         else if(/campaign_id/.test(hdr)&&/ad_group/.test(hdr)){ P.map=text; lsSet('spl.map',text); }

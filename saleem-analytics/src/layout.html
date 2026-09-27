@@ -14,6 +14,7 @@
     <button role="tab" data-mod="overview">Overview</button>
     <button role="tab" data-mod="monthly">Month by month</button>
     <button role="tab" data-mod="services">Services</button>
+    <button role="tab" data-mod="providers">Providers</button>
     <button role="tab" data-mod="links">Service links</button>
     <button role="tab" data-mod="patients">Patients</button>
     <button role="tab" data-mod="ads">Meta ads</button>
@@ -106,6 +107,49 @@
     </section>
     </section>
 
+    <section class="module" data-mod="providers" id="providers" hidden>
+      <div id="pvEmpty" class="callout">
+        <p style="margin:0 0 6px"><strong>This module needs the provider export.</strong> It shows which doctors, nurses and physiotherapists take the orders, and orders by doctor specialty.</p>
+        <ol style="margin:0 0 8px;padding-left:18px">
+          <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+          <li>Run it with no date filter, then download the results as CSV.</li>
+          <li>Open the <strong>Data</strong> tab and drop the file on the providers box.</li>
+        </ol>
+        <button class="btn" type="button" id="copySqlPv">Copy SQL</button>
+      </div>
+      <p class="callout" id="pvMsg" hidden></p>
+      <div id="pvBody" hidden>
+        <div class="kpis" id="pvKpis"></div>
+        <section class="panel" aria-labelledby="pvH">
+          <div class="phead"><div><h2 id="pvH">Orders by provider</h2><div class="desc" id="pvDesc"></div></div></div>
+          <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="pvTable"></table></div>
+          <p class="note" id="pvTableNote" style="margin:8px 0 0"></p>
+        </section>
+        <div class="grid2">
+          <section class="panel" aria-labelledby="pvTrendH">
+            <div class="phead"><div><h2 id="pvTrendH">Busiest providers</h2><div class="desc">The six providers with the most in the range, over time. A provider picking up a larger share, or dropping out, can move a whole service.</div></div></div>
+            <div class="chart md"><canvas id="pvTrendChart" aria-label="Orders of the busiest providers over time"></canvas></div>
+            <div class="legend" id="pvTrendLegend"></div>
+          </section>
+          <section class="panel" aria-labelledby="pvAH">
+            <div class="phead"><div><h2 id="pvAH">Active providers</h2><div class="desc">Providers with at least one in each period, per service. Fewer active providers can cap how many orders a service can take.</div></div></div>
+            <div class="chart md"><canvas id="pvActiveChart" aria-label="Active providers over time"></canvas></div>
+            <div class="legend" id="pvActiveLegend"></div>
+          </section>
+        </div>
+        <section class="panel" id="spPanel" aria-labelledby="spH">
+          <div class="phead"><div><h2 id="spH">Doctor visits by specialty</h2><div class="desc" id="spDesc"></div></div></div>
+          <p class="callout" id="spNone">The provider export has no specialty yet. In <code>sql/provider_orders_daily.sql</code>, replace <code>NULL::text AS specialty</code> with the column that holds the doctor’s specialty (the query’s comment has a search to find it), then load the export again.</p>
+          <div id="spBody" hidden>
+            <div class="chart md"><canvas id="spChart" aria-label="Doctor visits by specialty over time"></canvas></div>
+            <div class="legend" id="spLegend"></div>
+            <div class="tablewrap" style="margin-top:12px"><table id="spTable"></table></div>
+            <p class="note" style="margin:8px 0 0">To test whether a specialty moves another service, for example internal medicine and lab tests, open <strong>Service links</strong> with Doctor visit and Lab tests selected.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+
     <section class="module" data-mod="links" id="links" hidden>
       <section class="panel" aria-labelledby="alH">
         <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">Tests the ads chosen by the <strong>Ad spend</strong> switch in the filter bar against the orders of the services chosen by the chips. To test whether physio ads affect lab test orders: set Ad spend to <strong>Pick ad groups</strong>, pick Physiotherapy, and double-click the Lab tests service chip.</div><div class="desc" id="alDesc"></div></div></div>
@@ -124,6 +168,19 @@
           <p class="note" id="alWeeks" style="margin:2px 0 6px"></p>
           <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="alAds"></table></div>
           <p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p>
+        </div>
+      </section>
+      <section class="panel" id="pdPanel" aria-labelledby="pdH">
+        <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? Click a row to see both series.</div><div class="desc" id="pdDesc"></div></div></div>
+        <p class="callout" id="pdMsg" hidden></p>
+        <div id="pdBody" hidden>
+          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="pdTable"></table></div>
+          <p class="callout" id="pdFinding" style="margin-top:10px"></p>
+          <div class="grid2" style="margin-top:14px">
+            <div><h3 class="h3sm" id="pdDrvH">Driver</h3><div class="chart sm"><canvas id="pdDrvChart" aria-label="Weekly volume of the driver"></canvas></div></div>
+            <div><h3 class="h3sm" id="pdTgtH">Service</h3><div class="chart sm"><canvas id="pdTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
+          </div>
+          <p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "possible" passes the usual 5% bar for a single test, and with many pairs some will pass by chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p>
         </div>
       </section>
       <p class="callout" id="lkMsg"></p>
@@ -312,6 +369,19 @@
           <dl class="dstat" id="stat-links"></dl>
           <button class="btn" type="button" id="reset-links" hidden>Remove loaded follow-on data</button>
           <div class="sample" id="sample-links"></div>
+        </section>
+        <section class="panel" aria-labelledby="dVH">
+          <div class="phead"><div><h2 id="dVH">Providers</h2><div class="desc">Orders per day for each doctor, nurse and physiotherapist, with the doctor’s specialty. Loading it fills the Providers module and the specialty test in Service links.</div></div></div>
+          <div class="drop" id="drop-providers" role="button" tabindex="0" aria-label="Drop the provider CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the providers CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-providers" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql4">Copy SQL</button></div>
+          <p class="dmsg" id="msg-providers" hidden></p>
+          <dl class="dstat" id="stat-providers"></dl>
+          <button class="btn" type="button" id="reset-providers" hidden>Remove loaded provider data</button>
+          <div class="sample" id="sample-providers"></div>
         </section>
       </div>
       <p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p>

@@ -17,6 +17,12 @@ function buildFollowon(text){
 }
 function corr(x,y){ const n=x.length; if(n<3) return null; let mx=0,my=0; for(let i=0;i<n;i++){mx+=x[i];my+=y[i];} mx/=n; my/=n;
   let sxy=0,sxx=0,syy=0; for(let i=0;i<n;i++){const a=x[i]-mx,b=y[i]-my; sxy+=a*b; sxx+=a*a; syy+=b*b;} return sxx&&syy? sxy/Math.sqrt(sxx*syy) : null; }
+/* Week-over-week changes swing back and forth, and two such series line up by chance more often
+   than 1/√n suggests. Bartlett's correction shrinks the number of weeks used for the bars:
+   n_eff = n / (1 + 2·Σ ρx(j)·ρy(j)), over the first 3 autocorrelations, never above n. */
+function acf(v,j){ const n=v.length; if(n<=j+2) return 0; let m=0; for(const x of v) m+=x; m/=n; let num_=0, den=0;
+  for(let i=0;i<n;i++){ den+=(v[i]-m)**2; if(i+j<n) num_+=(v[i]-m)*(v[i+j]-m); } return den? num_/den : 0; }
+function effN(xs,ys){ let f=1; for(let j=1;j<=3;j++) f+=2*acf(xs,j)*acf(ys,j); return Math.max(3, xs.length/Math.max(1,f)); }
 /* weekly totals over full Saturday-to-Friday weeks inside the range */
 function weeklyOf(c,a,b){
   const w0=weekStart(a)+(weekStart(a)<a?7:0), out=[], keys=[];
@@ -29,12 +35,12 @@ function lagCorr(A,B,maxLag=4){
   const x=d(A), y=d(B), out=[];
   for(let k=-maxLag;k<=maxLag;k++){ const xs=[], ys=[];
     for(let t=0;t<x.length;t++){ const u=t+k; if(u<0||u>=y.length) continue; xs.push(x[t]); ys.push(y[u]); }
-    out.push({k,r:corr(xs,ys),n:xs.length}); }
+    out.push({k,r:corr(xs,ys),n:xs.length,ne:effN(xs,ys)}); }
   return out;
 }
 function describeLag(lags,a,b){
   const ok=lags.filter(l=>l.r!=null&&l.n>=12); if(!ok.length) return {text:'Not enough weeks in the range to tell. Pick a longer range.',best:null};
-  const best=ok.reduce((m,l)=>Math.abs(l.r)>Math.abs(m.r)?l:m), thr=1.96/Math.sqrt(best.n), sig=Math.abs(best.r)>thr;
+  const best=ok.reduce((m,l)=>Math.abs(l.r)>Math.abs(m.r)?l:m), thr=1.96/Math.sqrt(best.ne), sig=Math.abs(best.r)>thr;
   const same=ok.find(l=>l.k===0);
   if(!sig) return {text:'No clear link between week-to-week changes in '+a+' and '+b+' (strongest r = '+best.r.toFixed(2)+', needs about ±'+thr.toFixed(2)+').',best};
   const dir=best.r>0?'rise and fall together':'move in opposite directions';
@@ -47,6 +53,7 @@ function renderLinks(){
   const chosen=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
   const msg=document.getElementById('lkMsg'), detail=document.getElementById('lkDetail'), matrix=document.getElementById('lkMatrix');
   renderAdLink(chosen,a,b);
+  renderDrivers(chosen,a,b);
   const all=S.catList.every(c=>st.svc.has(c));
   if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
   if(chosen.length>3){
@@ -108,7 +115,7 @@ function renderLinkMatrix(cats,a,b){
   const W=cats.map(c=>({c,...weeklyOf(c,a,b)}));
   const cell=(i,j)=>{ if(i===j) return '<td style="color:var(--muted)">–</td>';
     const lags=lagCorr(W[i].v,W[j].v,3), same=lags.find(l=>l.k===0), d=describeLag(lags,'','');
-    const r=same&&same.r!=null?same.r:null, best=d.best; const thr=best?1.96/Math.sqrt(best.n):1, sig=best&&Math.abs(best.r)>thr;
+    const r=same&&same.r!=null?same.r:null, best=d.best; const thr=best?1.96/Math.sqrt(best.ne):1, sig=best&&Math.abs(best.r)>thr;
     const aC=Math.min(Math.abs(r||0),0.8)/0.8, bg=r==null?'':r>=0?'rgba(28,117,188,'+(0.05+aC*0.3)+')':'rgba(208,59,59,'+(0.05+aC*0.3)+')';
     const lead= sig&&best.k!==0? (best.k>0?' · follows '+best.k+'w later':' · moves '+(-best.k)+'w earlier') : '';
     return '<td class="heat" style="background:'+bg+'" title="Same-week r = '+(r==null?'–':r.toFixed(2))+(best?'; strongest r = '+best.r.toFixed(2)+' at '+best.k+' weeks':'')+'">'+(r==null?'–':r.toFixed(2))+'<span class="note">'+lead+'</span></td>'; };
@@ -150,18 +157,18 @@ function renderAdLink(chosen,a,b){
   // lags 0..4: spend change in week t against order change in week t+k
   const d=v=>v.slice(1).map((x,i)=>Math.log1p(x)-Math.log1p(v[i]));
   const dx=d(S_), dy=d(O_);
-  const lags=[0,1,2,3,4].map(k=>{ const xs=[],ys=[]; for(let t=0;t+k<dy.length;t++){ xs.push(dx[t]); ys.push(dy[t+k]); } const r=corr(xs,ys), n=xs.length;
-    const strong=r!=null&&Math.abs(r)>2.58/Math.sqrt(n), possible=r!=null&&Math.abs(r)>1.96/Math.sqrt(n);
-    return {k,r,n,verdict:strong?'strong':possible?'possible':'noise'}; });
+  const lags=[0,1,2,3,4].map(k=>{ const xs=[],ys=[]; for(let t=0;t+k<dy.length;t++){ xs.push(dx[t]); ys.push(dy[t+k]); } const r=corr(xs,ys), n=xs.length, ne=effN(xs,ys);
+    const strong=r!=null&&Math.abs(r)>2.58/Math.sqrt(ne), possible=r!=null&&Math.abs(r)>1.96/Math.sqrt(ne);
+    return {k,r,n,ne,verdict:strong?'strong':possible?'possible':'noise'}; });
   const good=css('--accent'), weak=css('--ghost');
   const o3=baseOpts(); o3.scales.y.min=-1; o3.scales.y.max=1; o3.interaction={mode:'nearest',intersect:true};
   o3.scales.x.title={display:true,text:'Weeks from the change in spend to the change in orders',color:css('--muted'),font:{size:11}};
-  o3.plugins.tooltip.callbacks={label:it=>{const l=lags[it.dataIndex]; return ' r = '+(l.r==null?'–':l.r.toFixed(2))+' · '+{strong:'strong (1% bar)',possible:'possible (5% bar)',noise:'could be chance'}[l.verdict]+' · n = '+l.n;}};
+  o3.plugins.tooltip.callbacks={label:it=>{const l=lags[it.dataIndex]; return ' r = '+(l.r==null?'–':l.r.toFixed(2))+' · '+{strong:'strong (1% bar)',possible:'possible (5% bar)',noise:'could be chance'}[l.verdict]+' · '+l.n+' weeks';}};
   if(adLagChart) adLagChart.destroy();
   adLagChart=new Chart(document.getElementById('alLagChart'),{type:'bar',data:{labels:lags.map(l=>l.k===0?'Same week':'+'+l.k+' wk'),datasets:[{label:'Correlation',data:lags.map(l=>l.r),backgroundColor:lags.map(l=>l.verdict==='noise'?weak:good),borderRadius:3,maxBarThickness:36}]},options:o3});
   const vt={strong:'<span class="delta up">✓ Strong</span>',possible:'<span class="delta flat">~ Possible</span>',noise:'<span class="delta flat" style="opacity:.7">Could be chance</span>'};
   document.getElementById('alLagTable').innerHTML='<thead><tr><th class="nosort">Lag</th><th class="nosort">Correlation</th><th class="nosort">Weeks</th><th class="nosort">Needs (5% / 1%)</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
-    lags.map(l=>'<tr><td>'+(l.k===0?'Same week':l.k+' week'+(l.k>1?'s':'')+' later')+'</td><td>'+(l.r==null?'–':l.r.toFixed(2))+'</td><td>'+l.n+'</td><td>±'+(1.96/Math.sqrt(l.n)).toFixed(2)+' / ±'+(2.58/Math.sqrt(l.n)).toFixed(2)+'</td><td>'+vt[l.verdict]+'</td></tr>').join('')+'</tbody>';
+    lags.map(l=>'<tr><td>'+(l.k===0?'Same week':l.k+' week'+(l.k>1?'s':'')+' later')+'</td><td>'+(l.r==null?'–':l.r.toFixed(2))+'</td><td>'+l.n+'</td><td>±'+(1.96/Math.sqrt(l.ne)).toFixed(2)+' / ±'+(2.58/Math.sqrt(l.ne)).toFixed(2)+'</td><td>'+vt[l.verdict]+'</td></tr>').join('')+'</tbody>';
   const best=lags.filter(l=>l.r!=null).reduce((m,l)=>Math.abs(l.r)>Math.abs(m.r)?l:m, {r:0,k:0,verdict:'noise',n:0});
   const when=best.k===0?'in the same week':best.k+' week'+(best.k>1?'s':'')+' later';
   document.getElementById('alFinding').innerHTML= best.verdict==='noise'
