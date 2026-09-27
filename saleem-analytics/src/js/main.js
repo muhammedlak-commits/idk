@@ -1,0 +1,46 @@
+/* ---------- render ---------- */
+const MODULES={
+  overview:()=>{ renderKpis(); renderTrend(); },
+  monthly:renderMom, services:renderSvcTable, patients:renderUnique, ads:renderAds,
+  projections:renderProjections, calendar:()=>{ renderHolidays(); renderEvents(); }
+};
+/* only the visible module is drawn; switching tabs draws the next one with the current filters */
+function render(){
+  syncChips();
+  (MODULES[st.mod]||MODULES.overview)();
+  lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend,mod:st.mod}));
+}
+function showModule(mod, push){
+  if(!MODULES[mod]) mod='overview';
+  st.mod=mod;
+  document.querySelectorAll('.module').forEach(el=>el.hidden=el.dataset.mod!==mod);
+  document.querySelectorAll('.tabs [data-mod]').forEach(b=>{ const on=b.dataset.mod===mod; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; });
+  if(push) try{ history.replaceState(null,'','#'+mod); }catch(e){}
+  render();
+}
+function wireTabs(){
+  const tabs=[...document.querySelectorAll('.tabs [data-mod]')];
+  tabs.forEach((b,i)=>{
+    b.addEventListener('click',()=>{ showModule(b.dataset.mod,true); window.scrollTo({top:0}); });
+    b.addEventListener('keydown',e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length]; n.focus(); showModule(n.dataset.mod,true); });
+  });
+  window.addEventListener('hashchange',()=>{ const h=location.hash.slice(1); if(h&&h!==st.mod) showModule(h,false); });
+}
+function boot(reload){
+  // files loaded in this browser are reused until a newer build of the page replaces them
+  if(!reload && lsGet('spl.build')===P.built){ ['services','adsDaily','adsMonthly','map','uniquePatients'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  S=buildServices(P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map); U=buildUnique(P.uniquePatients); loadEvents();
+  if(!reload){
+    st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
+    try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
+    const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
+    buildChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireTabs();
+    st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';
+  } else { buildChips(); st.to=Math.min(Math.max(st.to,S.min),S.max); }
+  document.getElementById('dataMeta').textContent='Orders to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);
+  document.getElementById('foot').textContent='Service data: Metabase export, '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Patient-days are distinct patients per service per day added up, so they are not unique patients; that needs a separate export. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
+  showModule(st.mod,false);
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());
+new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+boot(false);

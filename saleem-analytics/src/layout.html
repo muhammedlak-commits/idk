@@ -1,0 +1,197 @@
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Saleem Performance Lab</h1>
+      <p>Orders by service · MoM and YoY · Meta ads · projections</p>
+    </div>
+    <div class="top-actions">
+      <span class="meta" id="dataMeta"></span>
+      <button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button>
+      <input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden>
+    </div>
+  </div>
+  <nav class="tabs wrap" aria-label="Modules" role="tablist">
+    <button role="tab" data-mod="overview">Overview</button>
+    <button role="tab" data-mod="monthly">Month by month</button>
+    <button role="tab" data-mod="services">Services</button>
+    <button role="tab" data-mod="patients">Patients</button>
+    <button role="tab" data-mod="ads">Meta ads</button>
+    <button role="tab" data-mod="projections">Projections</button>
+    <button role="tab" data-mod="calendar">Holidays &amp; events</button>
+  </nav>
+</header>
+
+<section class="filters" aria-label="Filters">
+  <div class="wrap">
+    <div class="frow">
+      <span class="flabel">Range</span>
+      <input type="date" id="dFrom" aria-label="From date"><span>–</span><input type="date" id="dTo" aria-label="To date">
+      <div class="seg" id="presets">
+        <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
+      </div>
+      <span class="sep"></span>
+      <span class="flabel" style="min-width:0">Measure</span>
+      <div class="seg" id="measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Unique patients section.">Patient-days</button></div>
+      <span class="flabel" style="min-width:0">By</span>
+      <div class="seg" id="gran"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
+    </div>
+    <div class="frow">
+      <span class="flabel">Services</span>
+      <div class="chips" id="svcChips"></div>
+    </div>
+    <div class="frow">
+      <span class="flabel">Quick</span>
+      <button class="linkbtn" data-q="all">All</button><button class="linkbtn" data-q="core">Core 4</button><button class="linkbtn" data-q="clinical">Clinical only</button><button class="linkbtn" data-q="imaging">Imaging</button><button class="linkbtn" data-q="b2b">B2B</button><button class="linkbtn" data-q="none">None</button>
+      <span class="sep"></span>
+      <span class="flabel" style="min-width:0">Status</span>
+      <div class="chips" id="stChips"></div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <section class="module" data-mod="overview" id="overview">
+    <div class="kpis" id="kpis"></div>
+
+    <section class="panel" aria-labelledby="trendH">
+      <div class="phead">
+        <div><h2 id="trendH">Orders over time</h2><div class="desc" id="trendDesc"></div></div>
+        <div class="ctrls">
+          <div class="seg" id="trendMode"><button data-t="total" class="on">Total</button><button data-t="split">By service</button></div>
+          <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
+          <label class="chip on" id="holToggle"><input type="checkbox" id="holChk" checked hidden>Holidays</label>
+          <label class="chip on" id="evtToggle"><input type="checkbox" id="evtChk" checked hidden>Events</label>
+        </div>
+      </div>
+      <div class="chart"><canvas id="trendChart" aria-label="Trend chart"></canvas></div>
+      <div class="legend" id="trendLegend"></div>
+      <div style="margin-top:14px">
+        <div class="phead" style="margin-bottom:4px"><div><h3 style="font-size:13.5px;font-weight:600">Meta ad spend (USD)</h3><div class="desc" id="spendDesc"></div></div></div>
+        <div class="chart sm"><canvas id="spendChart" aria-label="Ad spend chart"></canvas></div>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="monthly" id="monthly" hidden>
+    <section class="panel" aria-labelledby="momH">
+      <div class="phead">
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY.</div></div>
+        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="yoy">YoY %</button></div></div>
+      </div>
+      <div class="tablewrap"><table id="momTable"></table></div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="services" id="services" hidden>
+    <section class="panel" aria-labelledby="svcH">
+      <div class="phead">
+        <div><h2 id="svcH">Service breakdown</h2><div class="desc" id="svcDesc"></div></div>
+      </div>
+      <div class="tablewrap"><table id="svcTable"></table></div>
+      <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Ad spend here is spend on campaigns for that service only; general, brand and app campaigns are shown in the ads section.</p>
+    </section>
+    </section>
+
+    <section class="module" data-mod="patients" id="patients" hidden>
+    <section class="panel" aria-labelledby="upH">
+      <div class="phead">
+        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month. New = the month of their first-ever service with Saleem; returning = everyone else served that month. The service chips above don't apply here; pick a category on the right.</div></div>
+        <div class="ctrls"><select id="upCat" aria-label="Patient category"></select></div>
+      </div>
+      <div id="upEmpty" class="callout">
+        <p style="margin:0 0 6px"><strong>This section needs one extra Metabase export.</strong> The main export counts patients per day, so unique patients can't be worked out from it.</p>
+        <ol style="margin:0 0 8px;padding-left:18px">
+          <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+          <li>Run it with no date filter, then download the results as CSV.</li>
+          <li>Click <strong>Load CSV</strong> at the top of this page and pick that file.</li>
+        </ol>
+        <button class="btn" type="button" id="copySql">Copy SQL</button>
+      </div>
+      <div id="upBody" hidden>
+        <div class="chart md"><canvas id="upChart" aria-label="New and returning patients by month"></canvas></div>
+        <div class="legend" id="upLegend"></div>
+        <div class="tablewrap" style="margin-top:12px"><table id="upTable"></table></div>
+        <p class="note" style="margin:8px 0 0">Unique patients can't be added across months or categories: someone treated in both March and April counts once in each month. For a longer period, compare month by month.</p>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="ads" id="ads" hidden>
+    <section class="panel" aria-labelledby="adsH">
+      <div class="phead">
+        <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
+        <div class="ctrls"><select id="adGroupSel" aria-label="Ad group"></select></div>
+      </div>
+      <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
+      <div class="legend" id="adLegend"></div>
+      <div class="tablewrap" style="margin-top:14px;max-height:420px;overflow:auto"><table id="campTable"></table></div>
+      <p class="note" style="margin:8px 0 0">Campaigns are matched to services by name. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p>
+    </section>
+    </section>
+
+    <section class="module" data-mod="projections" id="projections" hidden>
+      <div class="callout" id="pjScope"></div>
+      <div class="kpis" id="pjKpis"></div>
+      <section class="panel" aria-labelledby="pjH">
+        <div class="phead">
+          <div><h2 id="pjH">Projected orders</h2><div class="desc" id="pjDesc"></div></div>
+          <div class="ctrls">
+            <div class="seg" id="pjHorizon"><button data-h="30">30 days</button><button data-h="60">60 days</button><button data-h="90" class="on">90 days</button></div>
+            <select id="pjGrowth" aria-label="Growth assumption">
+              <option value="damped">Recent trend, slowing</option>
+              <option value="trend">Recent trend, continuing</option>
+              <option value="flat">No growth</option>
+              <option value="custom">Custom monthly growth</option>
+            </select>
+            <label id="pjCustomWrap" hidden style="font-size:12.5px;display:inline-flex;gap:6px;align-items:center"><input type="number" id="pjCustom" value="5" step="1" min="-50" max="100" style="width:64px;border:1px solid var(--border);border-radius:8px;padding:4px 6px;background:var(--surface)">% a month</label>
+            <label class="chip on" id="pjHolToggle"><input type="checkbox" hidden>Holiday effects</label>
+          </div>
+        </div>
+        <div class="chart"><canvas id="pjChart" aria-label="Actual and projected orders by week"></canvas></div>
+        <div class="legend" id="pjLegend"></div>
+        <ul class="assume" id="pjAssume"></ul>
+      </section>
+      <div class="grid2">
+        <section class="panel" aria-labelledby="pjMH">
+          <div class="phead"><div><h2 id="pjMH">By month</h2><div class="desc">The current month combines orders so far with the projection for the rest of it.</div></div></div>
+          <div class="tablewrap"><table id="pjMonth"></table></div>
+        </section>
+        <section class="panel" aria-labelledby="pjSH">
+          <div class="phead"><div><h2 id="pjSH">By service</h2><div class="desc" id="pjSDesc"></div></div></div>
+          <div class="tablewrap"><table id="pjSvc"></table></div>
+        </section>
+      </div>
+      <section class="panel" aria-labelledby="pjAH">
+        <div class="phead"><div><h2 id="pjAH">How accurate is it?</h2><div class="desc">The same model re-run as if it were an earlier date, then compared with what actually happened over the next 28 days. This is where the likely range comes from.</div></div></div>
+        <div class="tablewrap"><table id="pjAcc"></table></div>
+      </section>
+    </section>
+
+    <section class="module" data-mod="calendar" id="calendar" hidden>
+    <div class="grid2">
+      <section class="panel" aria-labelledby="holH">
+        <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</div></div></div>
+        <div class="tablewrap"><table id="holTable"></table></div>
+      </section>
+      <section class="panel" aria-labelledby="evH">
+        <div class="phead">
+          <div><h2 id="evH">Events log</h2><div class="desc">Political, economic and marketing events shown on the trend chart. Add Saleem's own events such as price changes, launches, contracts or outages.</div></div>
+          <div class="ctrls"><select id="evCat" aria-label="Event category"><option value="">All categories</option></select></div>
+        </div>
+        <div class="evlist" id="evList"></div>
+        <form class="evform" id="evForm">
+          <input type="date" id="evStart" required aria-label="Event date">
+          <select id="evNewCat" aria-label="New event category"><option>Internal</option><option>Marketing</option><option>Political</option><option>Economic</option><option>Health</option></select>
+          <input type="text" id="evTitle" placeholder="What happened, e.g. physio price change" required aria-label="Event title">
+          <button class="btn" type="submit">Add event</button>
+          <button class="btn" type="button" id="evCopy">Copy as CSV</button>
+        </form>
+        <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
+      </section>
+    </div>
+    </section>
+
+    <footer id="foot"></footer>
+  </div>
+</main>

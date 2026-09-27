@@ -4,6 +4,16 @@ A single-file dashboard for Saleem's orders by service, with MoM/YoY comparisons
 
 Open `dist/saleem-performance.html` in a browser. It needs internet only for the chart library and fonts.
 
+## Modules
+
+The page has seven modules, switched with the tabs under the header: Overview, Month by month, Services, Patients, Meta ads, Projections, and Holidays & events. The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+
+Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
+
+## Projections
+
+For the selected services and statuses: measured holiday effects are removed, a weekday pattern is taken from the last 12 weeks, and a weighted trend line is fitted to the last 26 weeks. The forecast puts those back together for the chosen horizon, with a choice of growth assumption (slowing trend, continuing trend, no growth, or a custom monthly %). The likely range comes from re-running the model at eight earlier dates and comparing with what actually happened.
+
 ## Data (`data/`)
 
 | File | Source | Grain |
