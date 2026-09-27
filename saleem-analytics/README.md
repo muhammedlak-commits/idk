@@ -39,6 +39,20 @@ In Service links, "What inside a service moves the others?" tests each doctor sp
 
 All lag tests (services, ad spend, drivers) shrink the number of weeks with Bartlett's correction, because week-over-week changes swing back and forth and would otherwise pass the bar by chance too often.
 
+## Gateway providers and retention
+
+Needs the gateway export (`sql/gateway_provider_monthly.sql`, Data tab). For every patient, the gateway is the provider on their first-ever real visit (doctor, nurse or physiotherapist; lab tests and imaging usually show No named provider). The Providers module shows, for the services and months in the filter bar, each gateway provider's new patients, their share of that first service, the share back within 30, 90 and 180 days (only patients whose window has passed count), further orders per patient in 90 days, how many tried another service, and how many saw the same provider again. New patient means (first order or account created) picks the cohort month.
+
+## Provider follow-on and busy weeks
+
+In Service links › Specialties & providers:
+
+- **Patient follow-on** (needs `sql/provider_followon_monthly.sql`): of the patients each doctor, nurse or physiotherapist saw, the share who had one of the other selected services within 7 and 30 days, for example lab tests after a doctor or nurse visit.
+- **Busy weeks** (uses the provider export): weeks when a provider took an unusually large share of their service (their own top 20%), and whether the other selected services grew faster in the 2 or 4 weeks after than after the provider's other weeks (Welch t-test, overlap-adjusted).
+- The lag table of specialties and top providers against the other services stays below.
+
+Both provider comparisons use the median provider of the same service as the benchmark, with an overdispersion correction (funnel-plot style), because comparing with "all the others pooled" let one dominant provider make every colleague look significantly worse. With only one or two providers they fall back to the others pooled. "Strong" is Bonferroni-corrected across every row tested; "possible" is the usual 5% bar.
+
 ## Ad spend switch
 
 The **Ad spend** switch in the filter bar decides which ads count as spend in every module: *Matching ads* (ads matched to the selected services, the default), *All ads*, or *Pick ad groups* (a row of ad-group chips). Orders always follow the service chips. Cost per order is labelled with the mode. In the Services table each row stays on matching ads; the All selected row follows the switch.
