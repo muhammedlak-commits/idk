@@ -20,12 +20,13 @@ function syncChips(){
   document.querySelectorAll('#svcChips .chip').forEach(b=>{const on=st.svc.has(b.dataset.c); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   document.querySelectorAll('#stChips .chip').forEach(b=>{const on=st.status.has(b.dataset.s); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const seg=(id,attr,val)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===val));
-  seg('measure','m',st.measure); seg('basis','b',st.basis); seg('newBasis','n',st.newBasis); seg('adMode','a',st.adMode);
+  seg('measure','m',st.measure); seg('pview','v',S.hasNew?st.pview:'all');
+  document.querySelectorAll('#pview [data-v="new"],#pview [data-v="ret"]').forEach(b=>{ b.classList.toggle('unavail',!S.hasNew); b.title= !S.hasNew? 'Load the latest orders export (Data tab) to split orders by new and returning patients' : b.dataset.v==='new'? 'Patients in their first month: '+(st.newBasis==='created'?'the month their record was created':'the month of their first order')+' (change it under More filters)' : 'Patients served in an earlier month'; }); seg('basis','b',st.basis); seg('newBasis','n',st.newBasis); seg('adMode','a',st.adMode);
   const ag=document.getElementById('agChips'); ag.hidden=st.adMode!=='pick';
   ag.querySelectorAll('.chip').forEach(b=>{const on=st.adGroups.has(b.dataset.g); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const bk=document.querySelector('#basis [data-b="booked"]'); if(bk){ bk.classList.toggle('unavail',!P.servicesBooked); bk.title= P.servicesBooked? 'The day the order was booked' : 'Load a booking-time export in the Data tab to use this'; } seg('gran','g',st.gran); seg('trendMode','t',st.trend); seg('momMode','v',st.mom);
   document.getElementById('dFrom').value=toS(st.from); document.getElementById('dTo').value=toS(st.to);
-  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
+  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt'],['cmpToggle','cmp']].forEach(([id,k])=>document.getElementById(id).classList.toggle('on',st[k]));
   syncContext();
 }
 function preset(p){
@@ -39,10 +40,13 @@ function wireFilters(){
   document.querySelectorAll('#newBasis button').forEach(b=>b.addEventListener('click',()=>{st.newBasis=b.dataset.n; render();}));
   document.querySelectorAll('#basis button').forEach(b=>b.addEventListener('click',()=>setBasis(b.dataset.b)));
   document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{st.measure=b.dataset.m;render();}));
+  document.querySelectorAll('#pview button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.v!=='all'&&!S.hasNew){ showModule('data',true); showMsg(document.getElementById('msg-orders'),'bad','This orders data has no new-patient columns. Copy the SQL below, run it in Metabase and drop the CSV here to use New and Returning.'); return; }
+    st.pview=b.dataset.v; render(); }));
   document.querySelectorAll('#gran button').forEach(b=>b.addEventListener('click',()=>{st.gran=b.dataset.g;render();}));
   document.querySelectorAll('#trendMode button').forEach(b=>b.addEventListener('click',()=>{st.trend=b.dataset.t;render();}));
   document.querySelectorAll('#momMode button').forEach(b=>b.addEventListener('click',()=>{st.mom=b.dataset.v;renderMom();syncChips();}));
-  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt']].forEach(([id,k])=>document.getElementById(id).addEventListener('click',e=>{e.preventDefault(); st[k]=!st[k]; render();}));
+  [['lyToggle','ly'],['holToggle','hol'],['evtToggle','evt'],['cmpToggle','cmp']].forEach(([id,k])=>document.getElementById(id).addEventListener('click',e=>{e.preventDefault(); st[k]=!st[k]; render();}));
   document.getElementById('dFrom').addEventListener('change',e=>{const n=toN(e.target.value); if(isFinite(n)){st.from=Math.max(S.min,Math.min(n,st.to)); render();}});
   document.getElementById('dTo').addEventListener('change',e=>{const n=toN(e.target.value); if(isFinite(n)){st.to=Math.min(S.max,Math.max(n,st.from)); render();}});
   document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{

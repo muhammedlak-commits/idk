@@ -41,6 +41,7 @@
         <p class="note" style="margin:10px 0 0">Click to add or remove a service. Double-click to keep only that one.</p>
       </div>
     </div>
+    <div class="seg" id="pview" aria-label="Patients"><button data-v="all" class="on">All patients</button><button data-v="new">New</button><button data-v="ret">Returning</button></div>
     <div class="seg" id="measure" aria-label="Measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Patients tab.">Patient-days</button></div>
     <div class="seg" id="gran" aria-label="Group by"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
     <span class="grow"></span>
@@ -73,6 +74,7 @@
           <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
           <label class="chip on" id="holToggle"><input type="checkbox" id="holChk" checked hidden>Holidays</label>
           <label class="chip on" id="evtToggle"><input type="checkbox" id="evtChk" checked hidden>Events</label>
+          <label class="chip on" id="cmpToggle"><input type="checkbox" checked hidden>Competitors</label>
         </div>
       </div>
       <div class="chart"><canvas id="trendChart" aria-label="Trend chart"></canvas></div>
@@ -336,6 +338,12 @@
         </form>
         <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
       </section>
+      <section class="panel" aria-labelledby="cmpH">
+        <div class="phead"><div><h2 id="cmpH">Competitor milestones</h2><div class="desc">From the Competitors tab of the Saleem Outside Factors sheet. After is the 4 weeks from the milestone against the 4 weeks before it, for the services picked above, compared with the usual 4-week change over the half year before; negative means orders grew less than usual.</div></div></div>
+        <p class="callout" id="cmpEmpty" hidden>No competitor milestones yet. Add rows to the Competitors tab of the sheet (date, competitor, milestone, type, services, city, status, source, notes), or ask Claude to research them.</p>
+        <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="cmpTable"></table></div>
+        <div class="tablewrap" style="margin-top:12px"><table id="cmpSummary"></table></div>
+      </section>
     </div>
     </section>
 
@@ -397,6 +405,32 @@
           <dl class="dstat" id="stat-providers"></dl>
           <button class="btn" type="button" id="reset-providers" hidden>Remove loaded provider data</button>
           <div class="sample" id="sample-providers"></div>
+        </section>
+        <section class="panel" aria-labelledby="dGH">
+          <div class="phead"><div><h2 id="dGH">Gateway providers</h2><div class="desc">Which provider served each new patient first, and how many came back within 30, 90 and 180 days. Fills the gateway section of the Providers module.</div></div></div>
+          <div class="drop" id="drop-gateway" role="button" tabindex="0" aria-label="Drop the gateway CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the gateway CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-gateway" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql5">Copy SQL</button></div>
+          <p class="dmsg" id="msg-gateway" hidden></p>
+          <dl class="dstat" id="stat-gateway"></dl>
+          <button class="btn" type="button" id="reset-gateway" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-gateway"></div>
+        </section>
+        <section class="panel" aria-labelledby="dFH">
+          <div class="phead"><div><h2 id="dFH">Provider follow-on</h2><div class="desc">For each provider and month, how many of their patients went on to each other service within 7 and 30 days. Fills the first panel of Service links › Specialties &amp; providers.</div></div></div>
+          <div class="drop" id="drop-pfollow" role="button" tabindex="0" aria-label="Drop the provider follow-on CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the provider follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-pfollow" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql6">Copy SQL</button></div>
+          <p class="dmsg" id="msg-pfollow" hidden></p>
+          <dl class="dstat" id="stat-pfollow"></dl>
+          <button class="btn" type="button" id="reset-pfollow" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-pfollow"></div>
         </section>
       </div>
       <p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p>

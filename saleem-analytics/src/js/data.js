@@ -5,6 +5,8 @@ function buildServices(csvText){
   const hdr = splitCsv(lines[0]).map(normHdr);
   const ix = n => hdr.indexOf(n);
   const iDay=ix('day'), iCat=ix('service_category'), iSt=ix('visit_status'), iS=ix('services_delivered'), iO=ix('distinct_orders'), iP=ix('distinct_patients');
+  // optional new-patient columns (latest export): new by first order, new by account created
+  const iNew=['first_services','first_orders','first_patients','created_services','created_orders','created_patients'].map(k=>ix('new_'+k)), hasNew=iNew.every(i=>i>=0);
   if(iDay<0||iCat<0||iO<0) throw new Error('This CSV needs day, service_category and distinct_orders columns.');
   const cats=new Map(), sts=new Map(), rows=[];
   let min=Infinity, max=-Infinity;
@@ -13,7 +15,7 @@ function buildServices(csvText){
     const n=toN(f[iDay].slice(0,10)); if(!isFinite(n)) continue;
     const c=f[iCat].trim(), st=iSt>=0?f[iSt].trim():'finished';
     if(!cats.has(c)) cats.set(c,cats.size); if(!sts.has(st)) sts.set(st,sts.size);
-    rows.push([n,cats.get(c),sts.get(st), num(f[iS]), num(f[iO]), iP>=0?num(f[iP]):0]);
+    const r=[n,cats.get(c),sts.get(st), num(f[iS]), num(f[iO]), iP>=0?num(f[iP]):0]; if(hasNew) iNew.forEach(i=>r.push(num(f[i]))); rows.push(r);
     if(n<min)min=n; if(n>max)max=n;
   }
   const catList=[...cats.keys()], stList=[...sts.keys()];
@@ -21,11 +23,17 @@ function buildServices(csvText){
   // cube[m][ (d*C + c)*T + t ]
   const cube=[new Float64Array(N*C*T),new Float64Array(N*C*T),new Float64Array(N*C*T)];
   for(const r of rows){const o=((r[0]-min)*C+r[1])*T+r[2]; cube[0][o]+=r[3]; cube[1][o]+=r[4]; cube[2][o]+=r[5];}
+  // new-patient cubes and returning = all - new, per basis, in the same [services, orders, patients] layout
+  let cubeNew=null, cubeRet=null;
+  if(hasNew){ const mk=()=>[new Float64Array(N*C*T),new Float64Array(N*C*T),new Float64Array(N*C*T)];
+    cubeNew={first:mk(),created:mk()}; cubeRet={first:mk(),created:mk()};
+    for(const r of rows){ const o=((r[0]-min)*C+r[1])*T+r[2]; for(let m=0;m<3;m++){ cubeNew.first[m][o]+=r[6+m]; cubeNew.created[m][o]+=r[9+m]; } }
+    for(const k of ['first','created']) for(let m=0;m<3;m++){ const A_=cube[m], B_=cubeNew[k][m], R=cubeRet[k][m]; for(let i=0;i<A_.length;i++) R[i]=Math.max(0,A_[i]-B_[i]); } }
   // colour order fixed by all-time non-cancelled orders, so a filter never repaints a service
   const tot=catList.map((c,ci)=>{let s=0; for(let d=0;d<N;d++) for(let t=0;t<T;t++) if(stList[t]!=='cancelled') s+=cube[1][(d*C+ci)*T+t]; return s;});
   const order=catList.map((c,i)=>i).sort((a,b)=>tot[b]-tot[a]);
   const colorOf={}; order.forEach((ci,rank)=>{colorOf[catList[ci]] = rank<8? 'var(--s'+(rank+1)+')' : 'var(--s-other)';});
-  return {min,max,N,C,T,catList,stList,cube,order,tot,colorOf,rowCount:rows.length};
+  return {min,max,N,C,T,catList,stList,cube,cubeNew,cubeRet,hasNew,order,tot,colorOf,rowCount:rows.length};
 }
 function splitCsv(line){
   if(line.indexOf('"')<0) return line.split(',');
@@ -120,6 +128,13 @@ function holidayWindows(from,to){ // contiguous windows per holiday type
 let EVENTS=[];
 /* events = the outside-factors sheet (live copy when available, else the copy built into the page)
    plus anything added in this browser. Official holidays come from the Hijri calendar instead. */
+/* competitor milestones: the sheet's Competitors tab when read live, else the rows built into the page */
+let COMPETITORS=[];
+function loadCompetitors(){
+  const rows= sheetState.cmpRows || (P.competitors? parseCsvObjects(P.competitors) : []);
+  COMPETITORS=rows.map(r=>{ const s=sheetDate(r.date); if(s==null||!r.competitor||/^dropped$/i.test(r.status||'')) return null; const e=sheetDate(r.end);
+    return {s,e:e!=null&&e>=s?e:s,name:r.competitor,milestone:r.milestone||'',type:r.type||'Other',services:r.services||'',city:r.city||'',status:r.status||'',source:r.source||'',notes:r.notes||''}; }).filter(Boolean).sort((a,b)=>a.s-b.s);
+}
 function loadEvents(){
   const rows= sheetState.rows || parseCsvObjects(P.events);
   const base=sheetEvents(rows).filter(e=>e.cat!=='Holiday (official)');

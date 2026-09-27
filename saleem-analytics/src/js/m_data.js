@@ -1,5 +1,5 @@
 /* ---------- data module: drag-and-drop / browse for the two Metabase exports ---------- */
-const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers};   // the data built into this page
+const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers, gateway:P.gateway, provFollowon:P.provFollowon};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
 function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
@@ -43,6 +43,18 @@ const DROPS={
       return saved;
     },
     reset(){ P.followon=ORIG.followon; lsDel('spl.followon'); setDataMeta('links',null); }
+  },
+  gateway:{
+    check:hdr=>/gateway_provider_name/.test(hdr)&&/new_patients/.test(hdr)&&/cohort_month/.test(hdr),
+    wrong:'This file doesn\u2019t look like the gateway export. It needs the columns cohort_month, first_service, gateway_provider_name and new_patients.',
+    apply(text,name){ if(!buildGateway(text)) throw new Error('No usable rows found in '+name+'.'); P.gateway=text; const saved=lsSave('spl.gateway',text); lsSave('spl.build',P.built); setDataMeta('gateway',{name,at:Date.now()}); return saved; },
+    reset(){ P.gateway=ORIG.gateway; lsDel('spl.gateway'); setDataMeta('gateway',null); }
+  },
+  pfollow:{
+    check:hdr=>/provider_service/.test(hdr)&&/target_service/.test(hdr)&&/followed_30d/.test(hdr),
+    wrong:'This file doesn\u2019t look like the provider follow-on export. It needs the columns month, provider_service, provider_name, target_service and followed_30d.',
+    apply(text,name){ if(!buildProvFollowon(text)) throw new Error('No usable rows found in '+name+'.'); P.provFollowon=text; const saved=lsSave('spl.provFollowon',text); lsSave('spl.build',P.built); setDataMeta('pfollow',{name,at:Date.now()}); return saved; },
+    reset(){ P.provFollowon=ORIG.provFollowon; lsDel('spl.provFollowon'); setDataMeta('pfollow',null); }
   },
   providers:{
     check:hdr=>/provider_name/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr),
@@ -111,6 +123,13 @@ function renderData(){
     row('Source', v? esc(v.name)+' <span class="note">('+fmtAt(v.at)+')</span>' : (V?'Built into this page':'Nothing loaded yet'))+
     (V? row('Dates', fmtD(V.min)+' – '+fmtD(V.max))+row('Providers', fmtInt(V.provs.filter(p=>p.name!=='Unassigned').length)+' across '+V.cats.map(c=>esc(label(c))).join(', '))+row('Specialties', V.hasSpec? fmtInt(V.specs.length) : 'None yet (see the query’s specialty line)') : '');
   document.getElementById('reset-providers').hidden=!v;
+  const mstat=(key,metaKey,model,extra)=>{ const mm=meta[metaKey];
+    document.getElementById('stat-'+key).innerHTML=row('Source', mm? esc(mm.name)+' <span class="note">('+fmtAt(mm.at)+')</span>' : (model?'Built into this page':'Nothing loaded yet'))+(model? extra(model) : '');
+    document.getElementById('reset-'+key).hidden=!mm; };
+  const monthsOf=mdl=>{ const ms=[...new Set(mdl.rows.map(r=>r.mk))].sort(); return ms.length? row('Months', fmtM(ms[0])+' – '+fmtM(ms[ms.length-1])+' ('+ms.length+')') : ''; };
+  let G_=null, F_=null; try{ G_=buildGateway(P.gateway); }catch(e){} try{ F_=buildProvFollowon(P.provFollowon); }catch(e){}
+  mstat('gateway','gateway',G_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
+  mstat('pfollow','pfollow',F_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
   renderSamples();
 }
@@ -124,13 +143,16 @@ const SAMPLES={
           ['visit_status','Visit status','finished, reviewed, started or cancelled (a booking-time file can also have scheduled)'],
           ['services_delivered','Number of services','42'],
           ['distinct_orders','Number of distinct orders','42'],
-          ['distinct_patients','Distinct patients that day','41']],
+          ['distinct_patients','Distinct patients that day','41'],
+          ['new_first_services · new_first_orders · new_first_patients','The same three counts for new patients: first order with Saleem in that month (optional)','9 · 9 · 9'],
+          ['new_created_services · new_created_orders · new_created_patients','The same for patients whose record was created that month (optional)','7 · 7 · 7']],
     rules:['One row for each day, service and visit status. Days with nothing for a service can be left out.',
+           'The six new_ columns are optional. With them, the All patients / New / Returning switch in the filter bar works; returning = all minus new.',
            'Keep the column names as shown. Their order doesn’t matter, and extra columns are ignored.',
            'A time after the date (2026-09-01T00:00:00) is fine. Numbers can have thousands separators.',
            'For a quick update, export only the latest days and use “Add or update days”.',
            'The day is either the scheduled visit date or the booking date. Pick which one under \u201cThis file is dated by\u201d before dropping the file.'],
-    csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients\n2026-09-01,physiotherapy,finished,42,42,41\n2026-09-01,physiotherapy,cancelled,3,3,3\n2026-09-01,nursing,finished,51,50,44\n2026-09-01,nursing,reviewed,6,6,6\n2026-09-01,doctorVisit,finished,14,14,14\n2026-09-01,labTest,finished,13,12,12\n2026-09-01,physiotherapy (b2b),finished,4,4,4\n2026-09-02,physiotherapy,finished,45,45,44\n2026-09-02,nursing,finished,49,48,42\n'},
+    csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients,new_first_services,new_first_orders,new_first_patients,new_created_services,new_created_orders,new_created_patients\n2026-09-01,physiotherapy,finished,42,42,41,6,6,6,5,5,5\n2026-09-01,physiotherapy,cancelled,3,3,3,1,1,1,1,1,1\n2026-09-01,nursing,finished,51,50,44,9,9,8,7,7,6\n2026-09-01,nursing,reviewed,6,6,6,0,0,0,0,0,0\n2026-09-01,doctorVisit,finished,14,14,14,5,5,5,4,4,4\n2026-09-01,labTest,finished,13,12,12,4,4,4,3,3,3\n2026-09-01,physiotherapy (b2b),finished,4,4,4,0,0,0,0,0,0\n2026-09-02,physiotherapy,finished,45,45,44,7,7,7,6,6,6\n2026-09-02,nursing,finished,49,48,42,8,8,7,6,6,6\n'},
   patients:{file:'saleem-unique-patients-sample.csv',
     cols:[['month','Month, YYYY-MM','2026-08'],
           ['category','Service type, or all for every service together','all, physiotherapy, nursing, doctorVisit, labTest, radiology…'],
@@ -204,6 +226,8 @@ function wireData(){
   document.getElementById('copySqlSched').addEventListener('click',()=>copy(P.sqlScheduled,'Scheduled-time SQL'));
   document.getElementById('copySqlBooked').addEventListener('click',()=>copy(P.sqlBooked,'Booking-time SQL'));
   document.getElementById('copySql4').addEventListener('click',()=>copy(P.providersSql,'Provider SQL'));
+  document.getElementById('copySql5').addEventListener('click',()=>copy(P.gatewaySql,'Gateway SQL'));
+  document.getElementById('copySql6').addEventListener('click',()=>copy(P.provFollowonSql,'Provider follow-on SQL'));
   document.getElementById('copySql3').addEventListener('click',()=>navigator.clipboard.writeText(P.followonSql).then(()=>toast('Follow-on SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in the sql folder')));
   document.getElementById('copySql2').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));
   // a file dropped anywhere else shouldn't make the browser navigate away from the dashboard

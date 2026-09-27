@@ -46,6 +46,11 @@ payload = {
     'followonSql': (root / 'sql' / 'service_followon_monthly.sql').read_text(),
     'providers': (d / 'provider_orders_daily.csv').read_text() if (d / 'provider_orders_daily.csv').exists() else '',
     'providersSql': (root / 'sql' / 'provider_orders_daily.sql').read_text(),
+    'gateway': (d / 'gateway_provider_monthly.csv').read_text() if (d / 'gateway_provider_monthly.csv').exists() else '',
+    'gatewaySql': (root / 'sql' / 'gateway_provider_monthly.sql').read_text() if (root / 'sql' / 'gateway_provider_monthly.sql').exists() else '',
+    'provFollowon': (d / 'provider_followon_monthly.csv').read_text() if (d / 'provider_followon_monthly.csv').exists() else '',
+    'provFollowonSql': (root / 'sql' / 'provider_followon_monthly.sql').read_text() if (root / 'sql' / 'provider_followon_monthly.sql').exists() else '',
+    'competitors': (d / 'competitors.csv').read_text() if (d / 'competitors.csv').exists() else '',
     'sheet': json.loads((d / 'sheet.json').read_text()) if (d / 'sheet.json').exists() else None,
     'built': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
 }

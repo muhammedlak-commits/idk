@@ -45,9 +45,16 @@ The **Ad spend** switch in the filter bar decides which ads count as spend in ev
 
 The Service links module uses it to test one ad group against another service's orders: weekly spend and weekly orders on separate charts, correlation of week-over-week changes at 0–4 weeks' lag with a 5% and a 1% bar, and the ads with the most spend in the weeks where the link shows up.
 
-## Outside factors (Google Sheet)
+## Outside factors and competitors (Google Sheet)
 
-Events live in the Google Sheet **Saleem Outside Factors** (id in `data/sheet.json`). When the dashboard is opened in claude.ai it reads the sheet through the viewer's Google Drive connector, on open and every 10 minutes. Without the connector it shows the last copy it read in that browser, then `data/events.csv`. Columns: start, end, category, title, scope, status, source, notes. Official holidays in the sheet are for reference; the dashboard draws them from the Hijri calendar. Sudden holidays, salary windows, security, political and economic events are measured in the Holidays & events module.
+The Google Sheet **Saleem Outside Factors** (settings in `data/sheet.json`) has two tabs, read through the viewer's **Google Sheets** connector (`get_values`, every row) when the dashboard is opened in claude.ai, and every 10 minutes while it is open. Google Drive's file reader isn't used: it returns only a sample of a sheet's rows. Without the connector the page shows the last copy it read in that browser, then `data/events.csv` and `data/competitors.csv`.
+
+- **Events**: start, end, category, title, scope, status, source, notes. Official holidays in the sheet are for reference; the dashboard draws them from the Hijri calendar. Sudden holidays, salary windows, security, political and economic events are measured in the Calendar module and can feed the projections.
+- **Competitors**: date, end, competitor, milestone, type, services, city, status, source, notes. Shown as diamonds on the Overview charts (Competitors toggle) and listed in the Calendar module with the change in orders over the 4 weeks after each milestone against the usual 4-week change. Rows with status Dropped are ignored.
+
+## Patient views
+
+All patients / New / Returning in the filter bar applies to every module that uses the orders data. It needs the six `new_*` columns of the current orders export (`sql/orders_daily_by_*.sql`): New follows **More filters › New patient means** (first order with Saleem in that month, or patient record created that month); Returning is all minus new. With an older export the switch stays on All.
 
 ## Scheduled time vs booking time
 

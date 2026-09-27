@@ -85,3 +85,32 @@ function renderFactorEffects(){
   document.getElementById('fxEvents').innerHTML= res.length?
     '<thead><tr><th class="nosort">Event</th><th class="nosort">Dates</th><th class="nosort">Category</th><th class="nosort">Effect</th></tr></thead><tbody>'+res.slice().sort((a,b)=>b.ev.s-a.ev.s).map(r=>'<tr><td style="text-align:left;white-space:normal;min-width:200px">'+esc(r.ev.title)+'</td><td>'+fmtD(r.ev.s)+(r.ev.e>r.ev.s?' – '+fmtDs(r.ev.e):'')+'</td><td style="text-align:left">'+esc(r.ev.cat)+'</td>'+(r.thin?'<td style="color:var(--muted)" title="Too little volume at the time to count">'+fmtPct(r.eff)+'</td>':cell(r.eff))+'</tr>').join('')+'</tbody>' : '';
 }
+
+
+/* ---------- competitor milestones ----------
+   After = 4 weeks from the milestone vs the 4 weeks before, divided by the usual 4-week change
+   (median over the half year before), so Saleem's own growth isn't read as a competitor effect. */
+function competitorEffect(y, s){
+  const sumR=(a,b)=>{ if(a<S.min||b>S.max) return null; let t=0; for(let n=a;n<=b;n++) t+=y[n-S.min]; return t; };
+  const before=sumR(s-28,s-1), after=sumR(s,s+27); if(!before||after==null) return null;
+  const usual=[]; for(let t=s-182;t<=s-28;t+=7){ const x=sumR(t-28,t-1), z=sumR(t,t+27); if(x&&z!=null) usual.push(z/x); }
+  const u=usual.length>=8? median(usual) : null;
+  return {eff: u? (after/before/u-1)*100 : null, raw:(after/before-1)*100, thin: before/28<10};
+}
+const safeUrl=u=>/^https?:\/\//i.test(u||'')? u : null;
+function renderCompetitors(){
+  const empty=document.getElementById('cmpEmpty'), t=document.getElementById('cmpTable'), sm=document.getElementById('cmpSummary');
+  if(!COMPETITORS.length){ empty.hidden=false; t.innerHTML=''; sm.innerHTML=''; return; }
+  empty.hidden=true;
+  const y=series(S.min,S.max,st.measure,selCats(),selStats());
+  const cell=v=>{ if(v==null) return '<td>–</td>'; const a=Math.min(Math.abs(v),40)/40; const bg=v>=0?'rgba(12,163,12,'+(0.05+a*0.25)+')':'rgba(208,59,59,'+(0.05+a*0.25)+')'; return '<td class="heat" style="background:'+bg+'" title="Plain 4-week change: see the note">'+fmtPct(v)+'</td>'; };
+  const rows=COMPETITORS.slice().reverse().map(c=>({c,x:competitorEffect(y,c.s)}));
+  t.innerHTML='<thead><tr><th class="nosort">Date</th><th class="nosort" style="text-align:left">Competitor</th><th class="nosort" style="text-align:left">Milestone</th><th class="nosort" style="text-align:left">Type</th><th class="nosort" style="text-align:left">Services</th><th class="nosort">After vs usual</th><th class="nosort" style="text-align:left">Source</th></tr></thead><tbody>'+
+    rows.map(({c,x})=>{ const u=safeUrl(c.source);
+      return '<tr><td>'+fmtD(c.s)+'</td><td dir="auto" style="text-align:left">'+esc(c.name)+'</td><td dir="auto" style="text-align:left;white-space:normal;min-width:240px">'+esc(c.milestone)+(c.notes?'<div class="note">'+esc(c.notes)+'</div>':'')+'</td><td style="text-align:left">'+esc(c.type)+'</td><td style="text-align:left;white-space:normal">'+esc(c.services)+(c.city?' · '+esc(c.city):'')+'</td>'+
+        (x&&x.eff!=null&&!x.thin? cell(x.eff) : '<td style="color:var(--muted)">'+(x&&x.thin?'too few orders':'–')+'</td>')+
+        '<td style="text-align:left">'+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(c.status||'Source')+'</a>':esc(c.status||''))+'</td></tr>'; }).join('')+'</tbody>';
+  const by={}; COMPETITORS.forEach(c=>{ const k=c.name; (by[k]||(by[k]={n:0,last:null,types:new Set()})); by[k].n++; by[k].last=c; by[k].types.add(c.type); });
+  sm.innerHTML='<thead><tr><th class="nosort">Competitor</th><th class="nosort">Milestones</th><th class="nosort" style="text-align:left">Latest</th><th class="nosort" style="text-align:left">Kinds</th></tr></thead><tbody>'+
+    Object.entries(by).sort((a,b)=>b[1].last.s-a[1].last.s).map(([k,v])=>'<tr><td dir="auto">'+esc(k)+'</td><td>'+v.n+'</td><td dir="auto" style="text-align:left;white-space:normal">'+fmtD(v.last.s)+' · '+esc(v.last.milestone)+'</td><td style="text-align:left">'+esc([...v.types].join(', '))+'</td></tr>').join('')+'</tbody>';
+}

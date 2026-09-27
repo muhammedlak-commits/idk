@@ -20,10 +20,10 @@ function renderKpis(){
   const cpo=ord?spend/ord:null, cpoP=ordP?spendP/ordP:null, cpoY=ordY?spendY/ordY:null;
   const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
   const tiles=[
-    {hero:true,lab:MLABEL[m],val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' a day · '+len+' days'},
+    {hero:true,lab:MLABEL[m]+viewLabel(' <span class="note">· ')+(viewLabel()?'</span>':''),val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' a day · '+len+' days'},
     {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled ÷ all orders'},
     {lab:'Ad spend <span class="note">· '+adModeLabel()+'</span>',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:conv? fmtInt(conv)+' WhatsApp conversations':''},
-    {lab:'Ad cost per order <span class="note">· '+adModeLabel()+'</span>',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation':''}
+    {lab:'Ad cost per '+(viewLabel()?(st.pview==='new'?'new-patient ':'returning-patient '):'')+'order <span class="note">· '+adModeLabel()+'</span>',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation':''}
   ];
   document.getElementById('kpis').innerHTML=tiles.map(t=>'<div class="kpi'+(t.hero?' hero':'')+'"><span class="lab">'+t.lab+'</span><span class="val">'+t.val+'</span><div class="deltas">'+t.d.join('')+'</div><span class="sub">'+t.sub+'</span></div>').join('');
 }
@@ -64,11 +64,11 @@ function renderTrend(){
   }
   const notes=hoverNotes(B,a,b,g);
   const opts=baseOpts();
-  opts.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt')};
+  opts.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt'),cmpColor:css('--s2')};
   opts.plugins.tooltip.callbacks={
     title:items=>{const i=items[0].dataIndex, k=B.keys[i].k; return g==='week'? 'Week of '+fmtD(k)+(partial[i]?' (partial)':'') : g==='month'? fmtM(monthKey(k))+(partial[i]?' (partial)':'') : new Date(k*DAY).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});},
     label:it=>' '+it.dataset.label+': '+fmtInt(it.parsed.y),
-    footer:items=>{const n=notes[items[0].dataIndex]; const out=[]; if(n.hol.length) out.push('Holidays: '+n.hol.join(', ')); n.ev.slice(0,4).forEach(e=>out.push('• '+e)); return out;}
+    footer:items=>{const n=notes[items[0].dataIndex]; const out=[]; if(n.hol.length) out.push('Holidays: '+n.hol.join(', ')); n.ev.slice(0,4).forEach(e=>out.push('• '+e)); (n.cmp||[]).slice(0,3).forEach(c=>out.push('◆ '+c)); return out;}
   };
   if(trendChart) trendChart.destroy();
   trendChart=new Chart(document.getElementById('trendChart'),{type:'line',data:{labels,datasets:ds},options:opts});
@@ -76,15 +76,16 @@ function renderTrend(){
   const items=ds.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>');
   if(st.hol) items.push('<span><i class="box" style="background:'+css('--ram')+'"></i>Ramadan</span><span><i class="box" style="background:'+css('--hol')+'"></i>Other holidays</span>');
   if(st.evt) items.push('<span><i style="background:'+css('--evt')+';width:2px;height:12px"></i>Event (hover for details)</span>');
+  if(st.cmp&&COMPETITORS.length) items.push('<span><i style="background:'+css('--s2')+';width:9px;height:9px;transform:rotate(45deg);border-radius:1px"></i>Competitor milestone</span>');
   leg.innerHTML=items.join('');
   const total_=total(a,b,m,cats,stats);
-  document.getElementById('trendH').textContent=MLABEL[m]+' over time';
+  document.getElementById('trendH').textContent=MLABEL[m]+viewLabel(' from ')+' over time';
   document.getElementById('trendDesc').textContent=(st.basis==='booked'?'By booking time':'By scheduled time')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
 
   // spend chart on the same buckets (separate axis, separate chart: never dual-axis)
   const groups=spendGroups();
   const sp=aggregate(adDaily(a,b,groups),a,B);
-  const o2=baseOpts(); o2.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt')};
+  const o2=baseOpts(); o2.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt'),cmpColor:css('--s2')};
   o2.scales.y.ticks.callback=v=>'$'+Number(v).toLocaleString('en-US'); o2.scales.y.ticks.maxTicksLimit=4;
   o2.plugins.tooltip.callbacks={title:opts.plugins.tooltip.callbacks.title,label:it=>' Spend: '+fmtUsd(it.parsed.y),
     afterLabel:it=>{const o=aggregate(series(a,b,'ord',cats,stats),a,B)[it.dataIndex]; return o? ' Cost per order ('+adModeLabel()+'): '+fmtUsd(it.parsed.y/o):'';},footer:opts.plugins.tooltip.callbacks.footer};
