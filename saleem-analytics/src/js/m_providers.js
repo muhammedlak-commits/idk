@@ -127,6 +127,17 @@ function renderSpecialties(a,b,B,labels,hasP,hasY,len){
    Targets: the other selected services. For every pair, week-over-week changes in the driver
    against changes in the target 0-4 weeks later. Many pairs are tested at once, so "strong" uses
    a Bonferroni bar (5% across every pair and lag); "possible" is the 5% bar for one test. */
+/* Provider comparison robust to one dominant provider (funnel-plot style): the benchmark is the median
+   provider's rate, z = (rate - median) / binomial SE at the median, and when providers really differ more
+   than chance allows, z is scaled down by the robust overdispersion factor phi = median(z^2) / 0.455.
+   rs = [{r, n}] (rate 0-1, denominator). Returns {bench, z:[...] } or null when fewer than 3 providers. */
+function robustBench(rs){
+  if(rs.length<3) return null;
+  const v=rs.map(x=>x.r).sort((a,b)=>a-b), k=v.length, bench=k%2? v[(k-1)/2] : (v[k/2-1]+v[k/2])/2;
+  const b=Math.min(0.999,Math.max(0.001,bench)), z=rs.map(x=>(x.r-bench)/Math.sqrt(b*(1-b)/x.n));
+  const z2=z.map(t=>t*t).sort((a,b)=>a-b), m2=k%2? z2[(k-1)/2] : (z2[k/2-1]+z2[k/2])/2, phi=Math.max(1,m2/0.455);
+  return {bench, phi, z:z.map(t=>t/Math.sqrt(phi))};
+}
 function zTwoSided(p){ // |z| with two-sided tail p, by bisection on the normal tail
   const tail=z=>{ const t=1/(1+0.2316419*z), d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI); return 2*d*t*(0.31938153+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429)))); };
   let lo=0, hi=8; for(let i=0;i<60;i++){ const m=(lo+hi)/2; if(tail(m)>p) lo=m; else hi=m; } return (lo+hi)/2;

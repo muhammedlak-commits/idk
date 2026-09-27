@@ -1,7 +1,8 @@
 /* ---------- Service links › Specialties & providers: follow-on by provider, busy weeks ----------
    1. Provider follow-on (optional export, sql/provider_followon_monthly.sql): of the patients a doctor,
       nurse or physiotherapist saw, the share who had one of the other selected services within 7 and
-      30 days, against the other providers of the same service pooled (two-proportion z-test per row).
+      30 days, against the median provider of the same service (robustBench in m_providers.js), or the
+      other providers pooled (two-proportion z-test) when fewer than 3 have enough patients.
    2. Busy weeks (provider export): weeks when a provider took an unusually large share of their
       service, and whether the other selected services grew faster in the 2 or 4 weeks after. */
 let PF=null, pfChart=null, bwShare=null, bwTgt=null, bwRows=[];
@@ -47,11 +48,15 @@ function pfCompute(M,{fromMk,toMk,pairs,minElig=10}){
         a.pat+=b.pat; a.e7+=b.e7; a.e30+=b.e30; if(c){ a.f7+=c.f7; a.f30+=c.f30; a.o30+=c.o30; } }
       return a; });
     const E=acc.reduce((s,a)=>s+a.e30,0), Fo=acc.reduce((s,a)=>s+a.f30,0), pool=E?Fo/E:0, mine=[];
-    for(const a of acc){ if(a.e30<minElig) continue;
-      const pe=E-a.e30, pf=Fo-a.f30, r30=a.f30/a.e30, peer=pe>0?pf/pe:null, se=pe>0?Math.sqrt(pool*(1-pool)*(1/a.e30+1/pe)):0;
-      const row={src:pr.src,tgt:pr.tgt,p:a.p,pat:a.pat,e7:a.e7,f7:a.f7,e30:a.e30,f30:a.f30,o30:a.o30,r7:a.e7?a.f7/a.e7:null,r30,peer,peerN:pe,
-        diff:peer==null?null:r30-peer,z:se>0?(r30-peer)/se:null,per100:a.o30/a.e30*100,me:a.me,mf:a.mf};
-      rows.push(row); mine.push(row); }
+    // benchmark: the median provider when there are 3+ (robust to one big outlier), else the other providers pooled
+    const inL=acc.filter(a=>a.e30>=minElig), rb=robustBench(inL.map(a=>({r:a.f30/a.e30,n:a.e30})));
+    inL.forEach((a,i)=>{
+      const pe=E-a.e30, pf=Fo-a.f30, r30=a.f30/a.e30; let peer, z;
+      if(rb){ peer=rb.bench; z=rb.z[i]; }
+      else { peer=pe>0?pf/pe:null; const se=pe>0?Math.sqrt(pool*(1-pool)*(1/a.e30+1/pe)):0; z=se>0?(r30-peer)/se:null; }
+      const row={src:pr.src,tgt:pr.tgt,p:a.p,pat:a.pat,e7:a.e7,f7:a.f7,e30:a.e30,f30:a.f30,o30:a.o30,r7:a.e7?a.f7/a.e7:null,r30,peer,peerN:rb?inL.length:pe,peerKind:rb?'median':'pooled',
+        diff:peer==null?null:r30-peer,z,per100:a.o30/a.e30*100,me:a.me,mf:a.mf};
+      rows.push(row); mine.push(row); });
     const pooled=months.map((_,i)=>{ let e=0,f=0; for(const a of acc){ e+=a.me[i]; f+=a.mf[i]; } return e?f/e:null; });
     pairOut.push({...pr,E,F:Fo,rate:E?Fo/E:null,n:mine.length,pooled,top:mine.slice().sort((x,y)=>y.e30-x.e30).slice(0,4)});
   }
@@ -78,9 +83,9 @@ function renderProvFollowon(chosen){
   document.getElementById('pfDesc').textContent=[...bySrc].map(([s,t])=>label(s)+' → '+t.join(', ')).join(' · ')+' · '+fmtM(R.months[0])+' – '+fmtM(R.months[R.months.length-1])+' · '+
     R.rows.length+' provider rows with 10 or more patients: '+nS+' strong, '+nP+' possible'+(chance>=0.5?' (about '+Math.round(chance)+' possible would turn up by chance alone)':'')+'.';
   const pc=v=>v==null?'–':(v*100).toFixed(1)+'%', pts=v=>v==null?'–':(v>0?'+':'')+(v*100).toFixed(1)+' pts';
-  document.getElementById('pfTable').innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Patients seen</th><th class="nosort">Within 7 days</th><th class="nosort">Within 30 days</th><th class="nosort">vs peers (30 days)</th><th class="nosort">Verdict</th><th class="nosort">Orders per 100 patients</th></tr></thead><tbody>'+
+  document.getElementById('pfTable').innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Patients seen</th><th class="nosort">Within 7 days</th><th class="nosort">Within 30 days</th><th class="nosort" title="Against the median provider of the same service (or the other providers together when there are only one or two)">vs typical provider (30 days)</th><th class="nosort">Verdict</th><th class="nosort">Orders per 100 patients</th></tr></thead><tbody>'+
     R.rows.slice(0,40).map(r=>'<tr><td dir="auto" style="text-align:left">'+esc(r.p.name)+(r.p.spec?' <span class="note">'+esc(r.p.spec)+'</span>':'')+'</td><td style="text-align:left">'+esc(label(r.src))+'</td><td style="text-align:left">'+esc(pfTl(r.tgt))+'</td><td>'+fmtInt(r.pat)+'</td><td>'+pc(r.r7)+'</td><td title="'+fmtInt(r.f30)+' of '+fmtInt(r.e30)+' patients">'+pc(r.r30)+'</td>'+
-      '<td class="'+(r.verdict==='strong'||r.verdict==='possible'?(r.diff>0?'pos':'neg'):'')+'" title="'+(r.peer==null?'No other provider':'Peers: '+pc(r.peer)+' of '+fmtInt(r.peerN)+' patients')+'">'+pts(r.diff)+'</td><td>'+plVerdict(r.verdict,r.diff)+'</td><td>'+r.per100.toFixed(1)+'</td></tr>').join('')+'</tbody>';
+      '<td class="'+(r.verdict==='strong'||r.verdict==='possible'?(r.diff>0?'pos':'neg'):'')+'" title="'+(r.peer==null?'No other provider':r.peerKind==='median'?'Median of '+r.peerN+' providers: '+pc(r.peer):'Other providers: '+pc(r.peer)+' of '+fmtInt(r.peerN)+' patients')+'">'+pts(r.diff)+'</td><td>'+plVerdict(r.verdict,r.diff)+'</td><td>'+r.per100.toFixed(1)+'</td></tr>').join('')+'</tbody>';
   // monthly rate for the first pair with data: every provider pooled, plus the four with the most eligible patients
   const pr=R.pairs.find(p=>p.n>0), labels=R.months.map(fmtM), pal=['--s1','--s2','--s3','--s4'];
   const ds=[{label:'All providers, pooled',data:pr.pooled.map(v=>v==null?null:v*100),borderColor:css('--ghost'),backgroundColor:css('--ghost'),borderDash:[5,4],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}]
@@ -91,7 +96,7 @@ function renderProvFollowon(chosen){
   document.getElementById('pfLegend').innerHTML=ds.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
   document.getElementById('pfChartH').textContent='30-day follow-on by month · '+label(pr.src)+' → '+pfTl(pr.tgt);
   const notes=['Pooled over the months in the range. A patient counts once per provider and month, from their first visit with that provider that month, so a patient seen in two months counts in both.',
-    'Eligible = the 30-day (or 7-day) window has passed. Peers = every other provider of the same service, pooled. A month on the chart needs 10 or more eligible patients.',
+    'Eligible = the 30-day (or 7-day) window has passed. Typical = the median provider of the same service (the others pooled when only one or two have enough patients), so one very large provider doesn’t make everyone else look worse; when providers differ more than chance allows, the bar is raised to match. A month on the chart needs 10 or more eligible patients.',
     '“Strong” passes a 5% bar corrected for all '+R.tests+' rows tested; “possible” passes the usual 5% bar for one test. A provider who sees sicker patients will send more on, so a gap is a lead to look at, not proof.',
     'Real visits only (started, finished or reviewed), whatever statuses are picked above; services with no provider yet are left out.'];
   if(st.pview!=='all') notes.push('This export has all patients, so the New / Returning switch doesn’t change this panel.');

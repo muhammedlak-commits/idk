@@ -4,8 +4,9 @@
    and eligible only counts patients whose N days have passed, so an unfinished window never drags a rate down.
    Follows the top filter: services (as database service types, via UP_CAT), the date range (cohort months)
    and New patient means (basis). Visit status and measure don't apply: these are patients, from real visits.
-   "vs peers" compares a provider with the other named providers of the same first service (two-proportion
-   z-test on the 90-day rate). Many providers are tested at once, so "strong" uses a Bonferroni bar
+   "vs typical" compares a provider's 90-day rate with the median provider of the same first service
+   (robustBench: funnel-style z with an overdispersion correction), or with the other named providers
+   pooled (two-proportion z-test) when fewer than 3 are tested. Many providers are tested at once, so "strong" uses a Bonferroni bar
    (5% across every provider tested); "possible" is the 5% bar for one test. */
 let GW=null, gwMonth=null, gwRet=null, gwSel='';
 const GW_NONE='No named provider', GW_F=['n','e30','r30','e90','r90','e180','r180','o90','x90','s90'];
@@ -58,6 +59,10 @@ function gwCompute(M,{basis,fromMk,toMk,cats}){
     if(x.e90>=10&&pe>=10) x.diff=(x.r90/x.e90-pr/pe)*100;
     if(x.e90>=20&&pe>=20){ const q=(x.r90+pr)/(x.e90+pe), se=Math.sqrt(q*(1-q)*(1/x.e90+1/pe));
       if(se>0){ x.z=(x.r90/x.e90-pr/pe)/se; x.tested=true; } } });
+  // with 3+ tested providers in a first service, compare with the median provider instead (robust to one dominant provider)
+  const byCat=new Map(); R.forEach(x=>{ if(!x.none&&x.e90>=20) (byCat.get(x.cat)||byCat.set(x.cat,[]).get(x.cat)).push(x); });
+  for(const L of byCat.values()){ const rb=robustBench(L.map(x=>({r:x.r90/x.e90,n:x.e90}))); if(!rb) continue;
+    L.forEach((x,i)=>{ x.diff=(x.r90/x.e90-rb.bench)*100; x.z=rb.z[i]; x.tested=true; x.bench=rb.bench; x.benchN=L.length; }); }
   const m=R.filter(x=>x.tested).length, zStrong=m? zTwoSided(0.05/m) : null;
   R.forEach(x=>{ if(x.tested) x.verdict= Math.abs(x.z)>zStrong? 'strong' : Math.abs(x.z)>1.96? 'possible' : ''; });
   R.sort((x,y)=>y.n-x.n);
@@ -114,9 +119,9 @@ function renderGateway(){
   const showSpec=GW.hasSpec&&R.rows.some(x=>x.spec);
   const cols=[['name','Provider'],['cat','First service']].concat(showSpec?[['spec','Specialty']]:[]).concat([['n','New patients','New patients whose first visit was with this provider'],['share','Share of service','Share of that first service’s new patients'],
     ['R30','Back in 30 days','Came back for another order within 30 days of the first visit'],['R90','Back in 90 days','Came back for another order within 90 days'],['R180','Back in 180 days','Came back for another order within 180 days'],
-    ['vs','90 days vs peers','90-day return minus that of the other named providers with the same first service, in percentage points'],['opp','Orders each, 90 days','Further orders per patient within 90 days'],
+    ['vs','90 days vs typical','90-day return minus the median provider’s with the same first service (the other named providers together when fewer than 3 are tested), in percentage points'],['opp','Orders each, 90 days','Further orders per patient within 90 days'],
     ['oth','Other service, 90 days','Had a different service within 90 days'],['same','Same provider, 90 days','Saw the same provider again in another order within 90 days']]);
-  const vt={strong:(u)=>'<span class="delta '+(u?'up':'down')+'">✓ '+(u?'Above':'Below')+' peers</span>',possible:(u)=>'<span class="delta flat">~ '+(u?'Above':'Below')+' peers</span>'};
+  const vt={strong:(u)=>'<span class="delta '+(u?'up':'down')+'">✓ '+(u?'Above':'Below')+' typical</span>',possible:(u)=>'<span class="delta flat">~ '+(u?'Above':'Below')+' typical</span>'};
   const rc=(r,e,d)=>'<td title="'+fmtInt(r)+' of '+fmtInt(e)+' whose '+d+' days have passed">'+(e>=10?pct(r/e):'–')+'</td>';
   const vc=x=>{ if(x.diff==null) return '<td title="'+(x.none?'Not a provider, so not compared':'Needs 10+ patients past 90 days here and among the peers')+'">–</td>';
     const t=pct(x.r90/x.e90,1)+' of '+fmtInt(x.e90)+' vs '+pct(x.pr/x.pe,1)+' of '+fmtInt(x.pe)+' for the other '+svcName(x.cat).toLowerCase()+' providers'+(x.tested?'; z = '+x.z.toFixed(2)+' (strong needs '+R.zStrong.toFixed(2)+' with '+R.m+' tested)':'; not tested, needs 20+ on both sides');

@@ -18,6 +18,7 @@
 --   first_month            : month of the patient's first-ever real visit (started, finished or reviewed) in any service
 --   new by first order     : the visit's month is on or before first_month, or the patient has no real visit yet (only cancelled)
 --   new by account created : the patient record (PatientInfo.createdAt) was created in the visit's month
+-- Both tests use the month the visit is scheduled for, which here is the month of the row's day (same test as the booking-time export).
 -- Only independent and dependant patients can be new; rows of any other account type stay in returning.
 -- Export the full history (no date filter), so first_month is right for every patient.
 WITH tagged_orders AS (

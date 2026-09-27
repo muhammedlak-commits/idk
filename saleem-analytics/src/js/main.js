@@ -1,7 +1,7 @@
 /* ---------- render ---------- */
 const MODULES={
   overview:()=>{ renderKpis(); renderTrend(); },
-  monthly:renderMom, services:renderSvcTable, providers:renderProviders, links:renderLinks, patients:renderUnique, ads:renderAds,
+  monthly:renderMom, services:renderSvcTable, providers:()=>{ renderProviders(); renderGateway(); }, links:renderLinks, patients:renderUnique, ads:renderAds,
   projections:renderProjections, calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderCompetitors(); renderSheetStatus(); }, data:renderData
 };
 /* only the visible module is drawn; switching tabs draws the next one with the current filters */
@@ -34,12 +34,12 @@ function boot(reload){
   if(st.basis==='booked'&&!P.servicesBooked) st.basis='scheduled';
   const prevCats= S? new Set(S.catList) : null, prevStats= S? new Set(S.stList) : null;
   const wasAtEnd = reload && S && st.to===S.max;   // keep following the latest day when new days arrive
-  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); try{ PV=buildProviders(P.providers); }catch(e){ PV=null; } loadEvents(); loadCompetitors();
+  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); try{ PV=buildProviders(P.providers); }catch(e){ PV=null; } try{ GW=buildGateway(P.gateway); }catch(e){ GW=null; } try{ PF=buildProvFollowon(P.provFollowon); }catch(e){ PF=null; } loadEvents(); loadCompetitors();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
-    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireContext(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
     setTimeout(startSheet,0);
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';

@@ -147,6 +147,41 @@
           </div>
         </section>
       </div>
+      <section class="panel" id="gwPanel" aria-labelledby="gwH">
+        <div class="phead"><div><h2 id="gwH">Gateway providers: who new patients start with, and do they come back</h2><div class="desc" id="gwDesc"></div></div></div>
+        <div id="gwEmpty" class="callout">
+          <p style="margin:0 0 6px"><strong>This needs the gateway export.</strong> It shows which provider served each new patient’s first visit, and how many of those patients came back within 30, 90 and 180 days.</p>
+          <ol style="margin:0 0 8px;padding-left:18px">
+            <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+            <li>Run it with no date filter, then download the results as CSV.</li>
+            <li>Open the <strong>Data</strong> tab and drop the file on the gateway box.</li>
+          </ol>
+          <button class="btn" type="button" id="copySqlGw">Copy SQL</button>
+        </div>
+        <div id="gwBody" hidden>
+          <div class="kpis" id="gwKpis"></div>
+          <h3 class="h3sm" style="margin-top:16px">By gateway provider and first service</h3>
+          <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="gwTable"></table></div>
+          <p class="note" id="gwTableNote" style="margin:8px 0 0"></p>
+          <div class="grid2" style="margin-top:16px">
+            <div><h3 class="h3sm" id="gwMonthH">New patients per month, by gateway provider</h3><div class="chart md"><canvas id="gwMonthChart" aria-label="New patients per month by gateway provider"></canvas></div><div class="legend" id="gwMonthLegend"></div></div>
+            <div><h3 class="h3sm" id="gwRetH">Back within 90 days, by cohort month</h3><div class="chart md"><canvas id="gwRetChart" aria-label="90-day return rate by cohort month"></canvas></div><div class="legend" id="gwRetLegend"></div></div>
+          </div>
+          <h3 class="h3sm" style="margin-top:16px">By first service</h3>
+          <div class="tablewrap"><table id="gwSvcTable"></table></div>
+          <p class="note" id="gwNote" style="margin:8px 0 0"></p>
+          <details class="more"><summary>How this is worked out</summary>
+            <ul class="assume">
+              <li>The gateway is the provider on a patient’s first-ever real visit (started, finished or reviewed). Services with no provider, like most lab tests, show as No named provider.</li>
+              <li>Back within 30, 90 or 180 days: the patient had a real service in another order within that many days after the first visit. A patient only counts once that many days have passed.</li>
+              <li>vs typical: the provider’s 90-day return minus the median provider’s with the same first service, so one very large or very good provider doesn’t make everyone else look worse. With only one or two providers tested, they’re compared with the others together. Providers with fewer than 20 patients past 90 days aren’t tested. When providers differ from each other more than chance allows, the bar is raised to match.</li>
+              <li>Strong: passes the strict bar, 5% shared across every provider tested. Possible: passes the usual 5% bar for one test only, so with many providers a few turn up by chance. Treat them as leads.</li>
+                            <li>A provider can look better because of the patients they get (area, age, reason for the visit), not only how they treat them.</li>
+              <li>The services and dates in the filter bar pick the first service and the cohort month. New patient means (under More filters) picks first visit or account created. Visit status and measure don’t apply here.</li>
+            </ul>
+          </details>
+        </div>
+      </section>
     </section>
 
     <section class="module" data-mod="links" id="links" hidden>
@@ -182,6 +217,31 @@
       </section>
       </div>
       <div data-lkpane="drv" hidden>
+      <section class="panel" id="pfPanel" aria-labelledby="pfH">
+        <div class="phead"><div><h2 id="pfH">Do a provider’s patients go on to other services?</h2><div class="desc">For each doctor, nurse and physiotherapist among the selected services: of the patients they saw, the share who had one of the other selected services within 7 and 30 days, against the typical (median) provider of the same service. For example, how many of a doctor’s patients had a lab test afterwards.</div><div class="desc" id="pfDesc"></div></div></div>
+        <p class="callout" id="pfMsg" hidden></p>
+        <div id="pfBody" hidden>
+          <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="pfTable"></table></div>
+          <h3 class="h3sm" id="pfChartH" style="margin-top:14px">30-day follow-on by month</h3>
+          <div class="chart md"><canvas id="pfChart" aria-label="Share of each provider’s patients with the other service within 30 days, by month"></canvas></div>
+          <div class="legend" id="pfLegend"></div>
+          <p class="note" id="pfNote" style="margin:8px 0 0"></p>
+        </div>
+      </section>
+      <section class="panel" id="bwPanel" aria-labelledby="bwH">
+        <div class="phead"><div><h2 id="bwH">Busy weeks and what followed</h2><div class="desc">When a doctor, nurse or physiotherapist takes an unusually large share of their service in a week, do the other selected services grow faster in the 2 to 4 weeks after? Click a row to see both series.</div><div class="desc" id="bwDesc"></div></div></div>
+        <p class="callout" id="bwMsg" hidden></p>
+        <div id="bwBody" hidden>
+          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="bwTable"></table></div>
+          <p class="callout" id="bwFinding" style="margin-top:10px"></p>
+          <div class="grid2" style="margin-top:14px">
+            <div><h3 class="h3sm" id="bwShareH">Weekly share</h3><div class="chart sm"><canvas id="bwShareChart" aria-label="The provider’s weekly share of their service"></canvas></div>
+              <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Busy week</span><span><i class="box" style="background:var(--ghost)"></i>Other week</span></div></div>
+            <div><h3 class="h3sm" id="bwTgtH">Service</h3><div class="chart sm"><canvas id="bwTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
+          </div>
+          <p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “possible” passes the usual 5% bar. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p>
+        </div>
+      </section>
       <section class="panel" id="pdPanel" aria-labelledby="pdH">
         <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? Click a row to see both series.</div><div class="desc" id="pdDesc"></div></div></div>
         <p class="callout" id="pdMsg" hidden></p>

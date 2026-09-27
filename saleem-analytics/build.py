@@ -18,6 +18,8 @@ JS_ORDER = [
     'm_monthly.js',   # module: month-by-month MoM / YoY
     'm_services.js',  # module: service breakdown
     'm_providers.js', # module: providers and doctor specialties (+ drivers panel in links)
+    'm_gateway.js',   # providers module: gateway providers and retention
+    'm_provlinks.js', # service links: provider follow-on and busy weeks
     'm_links.js',     # module: service links
     'm_patients.js',  # module: unique patients
     'm_ads.js',       # module: Meta ads

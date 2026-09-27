@@ -46,12 +46,13 @@ WITH tagged_orders AS (
         'Labs Discounts', '3P Investor Share', 'Salaries'
     )
 ),
-svc AS (       -- one slim row per real service of a patient, every category (built once, used twice)
+svc AS (       -- one slim row per real service of a patient, every category (built once, reused below)
   SELECT
     s.id                                                         AS service_id,
     o.id                                                         AS order_id,
     pi."user_id"                                                 AS patient_id,
     v."scheduledTime"                                            AS ts,
+    floor(extract(epoch FROM v."scheduledTime") / (31 * 86400))::int AS slot,   -- 31-day slot: a visit up to 30 days later is in the same slot or the next
     CASE
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                     THEN 'surgeries'
@@ -89,32 +90,40 @@ anchors AS (   -- each patient's earliest real visit with each provider, per mon
     service_id,
     order_id,
     ts,
+    slot,
     (ts <= now() - interval '7 days')                            AS eligible_7d,
     (ts <= now() - interval '30 days')                           AS eligible_30d
   FROM svc
   WHERE is_provider_service
   ORDER BY date_trunc('month', ts), category, provider_id, patient_id, ts, service_id
 ),
-links AS (     -- each anchor with every follow-on within 30 days (same patient, so the join stays small);
-               -- an anchor with none keeps one row with empty follow-on columns
-  SELECT
-    a.month,
-    a.provider_service,
-    a.provider_id,
-    a.patient_id,
-    a.eligible_7d,
-    a.eligible_30d,
-    t.category                                                   AS target_category,
-    t.order_id                                                   AS target_order_id,
-    t.is_tagged                                                  AS target_is_tagged,
-    (   (t.order_id = a.order_id AND t.category <> a.provider_service)
-     OR (t.ts > a.ts AND t.ts <= a.ts + interval '7 days'))      AS within_7d
-  FROM      anchors a
-  LEFT JOIN svc     t
-    ON  t.patient_id  = a.patient_id
-    AND t.service_id <> a.service_id
-    AND (   (t.order_id = a.order_id AND t.category <> a.provider_service)
-         OR (t.ts > a.ts AND t.ts <= a.ts + interval '30 days'))
+links AS (     -- each anchor with every follow-on within 30 days, in three parts; a follow-on found by both of the
+               -- first two parts comes out twice, which the COUNT(DISTINCT ...) below doesn't mind
+  -- same order as the anchor and another category, at any time
+  SELECT a.month, a.provider_service, a.provider_id, a.patient_id, a.eligible_7d, a.eligible_30d,
+         t.category AS target_category, t.order_id AS target_order_id, t.is_tagged AS target_is_tagged,
+         TRUE AS within_7d
+  FROM anchors a
+  JOIN svc     t ON  t.patient_id = a.patient_id
+                 AND t.order_id   = a.order_id
+                 AND t.category  <> a.provider_service
+  UNION ALL
+  -- scheduled after the anchor, no more than 30 days after it (looked up in the anchor's slot and the next only)
+  SELECT a.month, a.provider_service, a.provider_id, a.patient_id, a.eligible_7d, a.eligible_30d,
+         t.category, t.order_id, t.is_tagged,
+         (t.ts <= a.ts + interval '7 days')
+  FROM anchors a
+  CROSS JOIN (VALUES (0), (1)) AS next_slot(n)
+  JOIN svc     t ON  t.patient_id = a.patient_id
+                 AND t.slot       = a.slot + next_slot.n
+                 AND t.ts         > a.ts
+                 AND t.ts        <= a.ts + interval '30 days'
+  UNION ALL
+  -- every anchor once more with empty follow-on columns, so a provider-month with no follow-on still gets its '(any)' row
+  SELECT a.month, a.provider_service, a.provider_id, a.patient_id, a.eligible_7d, a.eligible_30d,
+         NULL, NULL, NULL,
+         NULL
+  FROM anchors a
 ),
 counts AS (    -- one '(any)' row per provider-month, plus one row per provider-month and target service
   SELECT
@@ -151,6 +160,6 @@ FROM      counts c
 LEFT JOIN "public"."User" p ON p.id = c.provider_id
 WHERE c.target_service = '(any)'                                 -- always kept
    OR c.followed_7d  > 0                                         -- target rows only when someone followed on
-   OR c.followed_30d > 0                                         -- (this also drops the empty group of anchors with no follow-on)
+   OR c.followed_30d > 0                                         -- (this also drops the group of the anchors' empty rows)
 WINDOW pm AS (PARTITION BY c.month, c.provider_service, c.provider_id)
 ORDER BY 1, 2, 4, 3, (c.target_service <> '(any)'), 6;

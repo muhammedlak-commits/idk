@@ -56,7 +56,7 @@ function renderLinks(){
   document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.lk===st.lkTab)));
   document.querySelectorAll('[data-lkpane]').forEach(p=>p.hidden=p.dataset.lkpane!==st.lkTab);
   if(st.lkTab==='ad') return renderAdLink(chosen,a,b);
-  if(st.lkTab==='drv') return renderDrivers(chosen,a,b);
+  if(st.lkTab==='drv'){ renderDrivers(chosen,a,b); renderProvFollowon(chosen); renderBusyWeeks(chosen,a,b); return; }
   const all=S.catList.every(c=>st.svc.has(c));
   if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
   if(chosen.length>3){

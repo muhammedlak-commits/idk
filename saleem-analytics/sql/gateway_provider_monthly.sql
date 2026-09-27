@@ -7,6 +7,8 @@
 --   physiotherapist for physiotherapy, doctor for everything else). No provider -> 'No named provider', empty id.
 -- The retention clock always starts at the first visit: "within N days" = after the first visit's time and at most
 --   N days after it. A patient only counts in the N-day columns once N days have passed since the first visit.
+--   Other services in the first order count for other_service_90d even at the first visit's own time (same visit),
+--   as in the provider follow-on export; returns and repeat orders always need a different order.
 -- Order counts leave out the accounting/adjustment tags; patient counts don't depend on them.
 -- Only independent and dependant patients are counted.
 --
@@ -25,7 +27,7 @@
 --   eligible_180d         : of new_patients, patients whose first visit was at least 180 days ago
 --   returned_180d         : of eligible_180d, patients with a real service in a different order within 180 days after the first visit
 --   orders_90d            : per eligible_90d patient, distinct orders other than the first one with a real service within 90 days after the first visit, summed (tagged orders left out)
---   other_service_90d     : of eligible_90d, patients with a real service of another category than first_service within 90 days after the first visit (any order, the first one included)
+--   other_service_90d     : of eligible_90d, patients with a real service of another category than first_service within 90 days after the first visit (any order; the first order's other services also at the first visit's time)
 --   same_provider_90d     : of eligible_90d, patients with a real service by the gateway provider in a different order within 90 days after the first visit; 0 without a named provider
 -- Retention rate = returned_Nd / eligible_Nd (worked out in the dashboard). The 'first' and 'created' rows hold the same patients; don't add them up.
 --
@@ -84,6 +86,7 @@ svc AS (          -- every real service of every patient, built once
 first_visit AS (  -- each patient's first real visit and its provider (the gateway)
   SELECT DISTINCT ON (patient_id)
     patient_id,
+    service_id                                                   AS first_service_id,
     ts                                                           AS first_ts,
     order_id                                                     AS first_order_id,
     category                                                     AS first_service,
@@ -104,6 +107,8 @@ first_visit AS (  -- each patient's first real visit and its provider (the gatew
            service_id
 ),
 after_first AS (  -- per patient, what followed in the 180 days after the first visit
+                  -- (plus the first order's other services at the first visit's time, used only by other_service_90d:
+                  --  every other column needs a different order, and those are always later than the first visit)
   SELECT
     f.patient_id,
     bool_or(l.order_id <> f.first_order_id AND l.ts <= f.first_ts + interval '30 days')        AS returned_30d,
@@ -116,8 +121,9 @@ after_first AS (  -- per patient, what followed in the 180 days after the first 
             AND l.ts <= f.first_ts + interval '90 days')                                        AS same_provider_90d
   FROM first_visit f
   JOIN svc l
-    ON l.patient_id = f.patient_id
-   AND l.ts >  f.first_ts
+    ON l.patient_id  = f.patient_id
+   AND l.service_id <> f.first_service_id
+   AND (l.ts > f.first_ts OR l.order_id = f.first_order_id)
    AND l.ts <= f.first_ts + interval '180 days'
   GROUP BY f.patient_id
 )
