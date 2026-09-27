@@ -47,8 +47,7 @@ created AS (
   SELECT date_trunc('month', pi."createdAt")::date AS month, COUNT(DISTINCT pi."user_id") AS accounts_created
   FROM       "public"."PatientInfo" pi
   JOIN       "public"."User"        u  ON u.id = pi."user_id"
-  WHERE pi."deletedAt" IS NULL
-    AND u."deletedAt" IS NULL
+  WHERE u."deletedAt" IS NULL      -- PatientInfo has no deletedAt; the User row carries it
     AND u."userType" IN ('independent_patient', 'dependant_patient')
   GROUP BY 1
 )
