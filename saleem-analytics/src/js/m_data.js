@@ -41,7 +41,7 @@ async function takeFiles(kind, files){
   let ok=0, notSaved=false, last='';
   for(const f of list){
     try{
-      const text=await f.text(); const hdr=text.slice(0,500).split(/\r?\n/)[0];
+      const text=await f.text(); const hdr=headerLine(text);
       if(!D.check(hdr)) throw new Error(f.name+': '+D.wrong);
       if(!D.apply(text,f.name)) notSaved=true;
       ok++; last=f.name;
@@ -53,6 +53,7 @@ async function takeFiles(kind, files){
   showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
   toast('Loaded '+(ok>1?ok+' files':last));
 }
+function headerLine(text){ return splitCsv(text.slice(0,1000).split(/\r?\n/)[0]).map(normHdr).join(','); }
 function showMsg(el,tone,text){ el.className='dmsg '+tone; el.textContent=text; el.hidden=false; }
 
 function renderData(){
@@ -73,8 +74,62 @@ function renderData(){
     (U? row('Months', fmtM(months[0])+' – '+fmtM(months[months.length-1])+' ('+months.length+')')+row('Categories', U.cats.map(c=>esc(UP_LABEL[c]||label(c))).join(', ')) : '');
   document.getElementById('reset-patients').hidden=!p;
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
+  renderSamples();
 }
 
+
+/* ---------- sample files: what each export should look like ---------- */
+const SAMPLES={
+  orders:{file:'saleem-orders-sample.csv',
+    cols:[['day','Date, YYYY-MM-DD','2026-09-01'],
+          ['service_category','Service as Metabase names it','physiotherapy, nursing, doctorVisit, labTest, xRay, physiotherapy (b2b)…'],
+          ['visit_status','Visit status','finished, reviewed, started or cancelled'],
+          ['services_delivered','Number of services','42'],
+          ['distinct_orders','Number of distinct orders','42'],
+          ['distinct_patients','Distinct patients that day','41']],
+    rules:['One row for each day, service and visit status. Days with nothing for a service can be left out.',
+           'Keep the column names as shown. Their order doesn’t matter, and extra columns are ignored.',
+           'A time after the date (2026-09-01T00:00:00) is fine. Numbers can have thousands separators.',
+           'For a quick update, export only the latest days and use “Add or update days”.'],
+    csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients\n2026-09-01,physiotherapy,finished,42,42,41\n2026-09-01,physiotherapy,cancelled,3,3,3\n2026-09-01,nursing,finished,51,50,44\n2026-09-01,nursing,reviewed,6,6,6\n2026-09-01,doctorVisit,finished,14,14,14\n2026-09-01,labTest,finished,13,12,12\n2026-09-01,physiotherapy (b2b),finished,4,4,4\n2026-09-02,physiotherapy,finished,45,45,44\n2026-09-02,nursing,finished,49,48,42\n'},
+  patients:{file:'saleem-unique-patients-sample.csv',
+    cols:[['month','Month, YYYY-MM','2026-08'],
+          ['category','Service type, or all for every service together','all, physiotherapy, nursing, doctorVisit, labTest, radiology…'],
+          ['unique_patients','Different patients served that month','1,240'],
+          ['new_patients','Of those, first-ever service with Saleem','410'],
+          ['returning_patients','Of those, served before','830'],
+          ['services','Services delivered to them','3,900']],
+    rules:['One row per month and category, plus one row per month with category all.',
+           'new_patients + returning_patients = unique_patients on every row.',
+           'Export the full history with no date filter, otherwise “new” is wrong for the early months.',
+           'The Copy SQL query produces exactly this layout.'],
+    csv:'month,category,unique_patients,new_patients,returning_patients,services\n2026-08,all,1240,410,830,3900\n2026-08,physiotherapy,420,120,300,1410\n2026-08,nursing,380,140,240,1680\n2026-08,doctorVisit,310,130,180,480\n2026-09,all,1180,360,820,3300\n2026-09,physiotherapy,400,105,295,1030\n2026-09,nursing,370,125,245,1330\n2026-09,doctorVisit,290,115,175,330\n'}
+};
+let downloadsApi;   // undefined = not checked yet, null = not available in this view
+function renderSamples(){
+  for(const [kind,s] of Object.entries(SAMPLES)){
+    const box=document.getElementById('sample-'+kind); if(box.dataset.done) continue; box.dataset.done='1';
+    const lines=s.csv.trim().split('\n'), hdr=lines[0].split(',');
+    box.innerHTML='<h3>How the file should look</h3>'+
+      '<div class="tablewrap"><table class="coltable"><thead><tr><th class="nosort">Column</th><th class="nosort">What it holds</th><th class="nosort">Example</th></tr></thead><tbody>'+
+      s.cols.map(c=>'<tr><td><code>'+esc(c[0])+'</code></td><td>'+esc(c[1])+'</td><td>'+esc(c[2])+'</td></tr>').join('')+'</tbody></table></div>'+
+      '<ul class="assume">'+s.rules.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul>'+
+      '<p class="note" style="margin:12px 0 4px">Sample file (example values, not your data):</p>'+
+      '<div class="tablewrap"><table class="sampletable"><thead><tr>'+hdr.map(h=>'<th class="nosort">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
+      lines.slice(1).map(l=>'<tr>'+splitCsv(l).map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'+
+      '<div class="frow" style="margin-top:10px"><button class="btn" type="button" data-save="'+kind+'" hidden>Save sample file</button><button class="btn" type="button" data-copy="'+kind+'">Copy sample</button></div>';
+    box.querySelector('[data-copy]').addEventListener('click',()=>navigator.clipboard.writeText(s.csv).then(()=>toast('Sample copied. Paste it into a text file saved as .csv')).catch(()=>toast('Copy was blocked by this browser')));
+    box.querySelector('[data-save]').addEventListener('click',async()=>{
+      try{ await downloadsApi.save({filename:s.file,data:s.csv}); toast('Sample saved'); }
+      catch(e){ if(e&&e.code==='declined') return; toast(e&&e.code==='rate_limited'?'A save is already waiting for you':'Saving isn’t available here. Use Copy sample instead.'); }
+    });
+  }
+  if(downloadsApi===undefined){
+    downloadsApi=null;
+    const use=window.claude&&window.claude.use;
+    if(use) Promise.resolve(window.claude.use('downloads')).then(api=>{ downloadsApi=api; document.querySelectorAll('[data-save]').forEach(b=>b.hidden=!api); }).catch(()=>{});
+  } else document.querySelectorAll('[data-save]').forEach(b=>b.hidden=!downloadsApi);
+}
 function wireData(){
   for(const kind of Object.keys(DROPS)){
     const zone=document.getElementById('drop-'+kind), inp=document.getElementById('file-'+kind);

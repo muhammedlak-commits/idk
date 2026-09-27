@@ -1,0 +1,10 @@
+day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients
+2026-09-01,physiotherapy,finished,42,42,41
+2026-09-01,physiotherapy,cancelled,3,3,3
+2026-09-01,nursing,finished,51,50,44
+2026-09-01,nursing,reviewed,6,6,6
+2026-09-01,doctorVisit,finished,14,14,14
+2026-09-01,labTest,finished,13,12,12
+2026-09-01,physiotherapy (b2b),finished,4,4,4
+2026-09-02,physiotherapy,finished,45,45,44
+2026-09-02,nursing,finished,49,48,42

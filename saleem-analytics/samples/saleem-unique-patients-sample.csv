@@ -1,0 +1,9 @@
+month,category,unique_patients,new_patients,returning_patients,services
+2026-08,all,1240,410,830,3900
+2026-08,physiotherapy,420,120,300,1410
+2026-08,nursing,380,140,240,1680
+2026-08,doctorVisit,310,130,180,480
+2026-09,all,1180,360,820,3300
+2026-09,physiotherapy,400,105,295,1030
+2026-09,nursing,370,125,245,1330
+2026-09,doctorVisit,290,115,175,330

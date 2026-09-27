@@ -2,7 +2,7 @@
 let S = null;   // services model
 function buildServices(csvText){
   const lines = csvText.trim().split(/\r?\n/);
-  const hdr = lines[0].split(',').map(h=>h.trim());
+  const hdr = splitCsv(lines[0]).map(normHdr);
   const ix = n => hdr.indexOf(n);
   const iDay=ix('day'), iCat=ix('service_category'), iSt=ix('visit_status'), iS=ix('services_delivered'), iO=ix('distinct_orders'), iP=ix('distinct_patients');
   if(iDay<0||iCat<0||iO<0) throw new Error('This CSV needs day, service_category and distinct_orders columns.');
@@ -13,7 +13,7 @@ function buildServices(csvText){
     const n=toN(f[iDay].slice(0,10)); if(!isFinite(n)) continue;
     const c=f[iCat].trim(), st=iSt>=0?f[iSt].trim():'finished';
     if(!cats.has(c)) cats.set(c,cats.size); if(!sts.has(st)) sts.set(st,sts.size);
-    rows.push([n,cats.get(c),sts.get(st), +f[iS]||0, +f[iO]||0, iP>=0?(+f[iP]||0):0]);
+    rows.push([n,cats.get(c),sts.get(st), num(f[iS]), num(f[iO]), iP>=0?num(f[iP]):0]);
     if(n<min)min=n; if(n>max)max=n;
   }
   const catList=[...cats.keys()], stList=[...sts.keys()];
@@ -35,8 +35,11 @@ function splitCsv(line){
     else if(ch==='"') q=true; else if(ch===','){out.push(cur);cur=''} else cur+=ch;}
   out.push(cur); return out;
 }
+/* headers: ignore case, spaces and a byte-order mark; numbers: ignore thousands separators */
+function normHdr(h){ return String(h).replace(/^\uFEFF/,'').trim().toLowerCase().replace(/\s+/g,'_'); }
+function num(v){ const n=+String(v==null?'':v).replace(/[,\s]/g,''); return isFinite(n)?n:0; }
 function parseCsvObjects(text){
-  const lines=text.trim().split(/\r?\n/); const hdr=splitCsv(lines[0]).map(h=>h.trim());
+  const lines=text.trim().split(/\r?\n/); const hdr=splitCsv(lines[0]).map(normHdr);
   return lines.slice(1).filter(l=>l.trim()).map(l=>{const f=splitCsv(l); const o={}; hdr.forEach((h,i)=>o[h]=(f[i]||'').trim()); return o;});
 }
 

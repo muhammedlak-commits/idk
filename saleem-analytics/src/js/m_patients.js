@@ -6,7 +6,7 @@ function buildUnique(text){
   const rows=parseCsvObjects(text); if(!rows.length||!('unique_patients' in rows[0])) return null;
   const by={};
   rows.forEach(r=>{ const m=(r.month||'').match(/(\d{4})-(\d{2})/); const mk=m? m[1]+'-'+m[2] : (isFinite(Date.parse(r.month))? new Date(Date.parse(r.month)).toISOString().slice(0,7):null); if(!mk) return;
-    const c=r.category||'all'; (by[c]||(by[c]={}))[mk]={u:+r.unique_patients||0,n:+r.new_patients||0,r:+r.returning_patients||0,s:+r.services||0}; });
+    const c=r.category||'all'; (by[c]||(by[c]={}))[mk]={u:num(r.unique_patients),n:num(r.new_patients),r:num(r.returning_patients),s:num(r.services)}; });
   const cats=Object.keys(by).sort((a,b)=> a==='all'?-1: b==='all'?1 : sumU(by[b])-sumU(by[a]));
   function sumU(o){return Object.values(o).reduce((s,x)=>s+x.u,0)}
   return {by,cats};

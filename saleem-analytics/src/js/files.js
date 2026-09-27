@@ -3,7 +3,7 @@ function wireFiles(){
   const inp=document.getElementById('fileInput');
   document.getElementById('loadBtn').addEventListener('click',()=>inp.click());
   inp.addEventListener('change',async()=>{
-    for(const f of inp.files){ const text=await f.text(); const hdr=text.slice(0,300).split(/\r?\n/)[0];
+    for(const f of inp.files){ const text=await f.text(); const hdr=headerLine(text);
       try{
         if(DROPS.patients.check(hdr)){ DROPS.patients.apply(text,f.name); document.getElementById('upCat').innerHTML=''; }
         else if(DROPS.orders.check(hdr)){ DROPS.orders.apply(text,f.name); }
@@ -20,11 +20,11 @@ function wireFiles(){
 }
 /* newer file wins for any day it contains */
 function mergeServices(oldText,newText){
-  const days=new Set(); const nl=newText.trim().split(/\r?\n/); const hdrN=nl[0].split(','); const di=hdrN.indexOf('day');
-  nl.slice(1).forEach(l=>days.add(l.split(',')[di].slice(0,10)));
-  const ol=oldText.trim().split(/\r?\n/); const hdrO=ol[0].split(','); const doi=hdrO.indexOf('day');
-  if(hdrO.join(',')!==hdrN.join(',')) return newText;
-  return [ol[0]].concat(ol.slice(1).filter(l=>!days.has(l.split(',')[doi].slice(0,10))), nl.slice(1)).join('\n');
+  const days=new Set(); const nl=newText.trim().split(/\r?\n/); const hdrN=splitCsv(nl[0]).map(normHdr); const di=hdrN.indexOf('day');
+  nl.slice(1).forEach(l=>days.add((splitCsv(l)[di]||'').slice(0,10)));
+  const ol=oldText.trim().split(/\r?\n/); const hdrO=splitCsv(ol[0]).map(normHdr); const doi=hdrO.indexOf('day');
+  if(hdrO.join(',')!==hdrN.join(',')) return newText;   // different columns: can't merge safely, so the new file is used on its own
+  return [ol[0]].concat(ol.slice(1).filter(l=>!days.has((splitCsv(l)[doi]||'').slice(0,10))), nl.slice(1)).join('\n');
 }
 
 let toastT=null;

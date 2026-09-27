@@ -14,6 +14,10 @@ Source code is split the same way under `src/`: `layout.html` and `styles.css` f
 
 For the selected services and statuses: measured holiday effects are removed, a weekday pattern is taken from the last 12 weeks, and a weighted trend line is fitted to the last 26 weeks. The forecast puts those back together for the chosen horizon, with a choice of growth assumption (slowing trend, continuing trend, no growth, or a custom monthly %). The likely range comes from re-running the model at eight earlier dates and comparing with what actually happened.
 
+## Sample files
+
+`samples/` has an example of each export the Data tab accepts (`saleem-orders-sample.csv`, `saleem-unique-patients-sample.csv`). The Data tab shows the same samples with a column-by-column guide.
+
 ## Data (`data/`)
 
 | File | Source | Grain |
