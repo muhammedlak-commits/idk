@@ -102,7 +102,7 @@ function renderData(){
     const X= (st.basis==='booked')===(key==='servicesBooked')? S : buildServices(text);
     return '<h4>'+title+(((st.basis==='booked')===(key==='servicesBooked'))?' · showing now':'')+'</h4>'+
       row('Source', (typeof sheetFeed!=='undefined'&&sheetFeed.used[key]&&sheetFeed.used[key].state==='used')? 'Google Sheet, refreshed automatically' : m? esc(m.name)+' <span class="note">('+(m.mode==='replace'||key==='servicesBooked'&&!ORIG.servicesBooked?'loaded':'added to built-in data')+', '+fmtAt(m.at)+')</span>' : 'Built into this page')+
-      row('Dates', fmtD(X.min)+' – '+fmtD(X.max))+row('Rows', X.rowCount.toLocaleString('en-US'))+row('Services', X.C+' categories, '+X.T+' statuses')+row('Sales and revenue', X.hasRev? (X.hasRevNew?'Included, also for new patients':'Included') : 'Not in this export');
+      row('Dates', fmtD(X.min)+' – '+fmtD(X.max))+row('Rows', X.rowCount.toLocaleString('en-US'))+row('Services', X.C+' categories, '+X.T+' statuses')+(X.dropped? row('Left out', X.dropped.n+' row'+(X.dropped.n>1?'s':'')+' dated '+fmtD(X.dropped.from)+(X.dropped.n>1?' – '+fmtD(X.dropped.to):'')+', well before the rest of the data (likely mistyped visit dates)') : '')+row('Sales and revenue', X.hasRev? (X.hasRevNew?'Included, also for new patients':'Included') : 'Not in this export');
   };
   document.getElementById('stat-orders').innerHTML=block('By scheduled time','services',meta.orders)+block('By booking time','servicesBooked',meta.ordersBooked);
   const cur= st.loadBasis==='booked'? meta.ordersBooked : meta.orders;

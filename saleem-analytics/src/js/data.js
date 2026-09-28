@@ -12,12 +12,19 @@ function buildServices(csvText){
   const iNewF=newCols('first'), iNewC=newCols('created'), hasNew=[0,1,2].every(m=>iNewF[m]>=0&&iNewC[m]>=0), hasRevNew=hasNew&&hasRev&&[3,4].every(m=>iNewF[m]>=0&&iNewC[m]>=0);
   if(iDay<0||iCat<0||iO<0) throw new Error('This CSV needs day, service_category and distinct_orders columns.');
   const M=5;   // measures: services, orders, patient-days, sales, company revenue
-  const cats=new Map(), sts=new Map(), rows=[];
+  const cats=new Map(), sts=new Map(), rows=[], raw=[];
   let min=Infinity, max=-Infinity;
   const g=(f,i)=>i>=0?num(f[i]):0;
   for(let k=1;k<lines.length;k++){
     const f=splitCsv(lines[k]); if(f.length<hdr.length-1) continue;
     const n=toN(f[iDay].slice(0,10)); if(!isFinite(n)) continue;
+    raw.push([n,f]);
+  }
+  // a few visits carry mistyped dates decades back (1942, 1986…); start at the first day after which the data has no gap over 180 days
+  const ds=[...new Set(raw.map(x=>x[0]))].sort((x,y)=>x-y); let start=ds[0];
+  for(let i=ds.length-1;i>0;i--) if(ds[i]-ds[i-1]>180){ start=ds[i]; break; }
+  const dropped=raw.filter(x=>x[0]<start);
+  for(const [n,f] of raw){ if(n<start) continue;
     const c=f[iCat].trim(), st=iSt>=0?f[iSt].trim():'finished';
     if(!cats.has(c)) cats.set(c,cats.size); if(!sts.has(st)) sts.set(st,sts.size);
     const r=[n,cats.get(c),sts.get(st), g(f,iS), g(f,iO), g(f,iP), g(f,iMoney[0]), g(f,iMoney[1])];
@@ -25,6 +32,7 @@ function buildServices(csvText){
     rows.push(r);
     if(n<min)min=n; if(n>max)max=n;
   }
+  if(!rows.length) throw new Error('No usable rows found. Check the file has day, service_category and distinct_orders columns.');
   const catList=[...cats.keys()], stList=[...sts.keys()];
   const N=max-min+1, C=catList.length, T=stList.length;
   // cube[m][ (d*C + c)*T + t ]
@@ -41,7 +49,7 @@ function buildServices(csvText){
   const tot=catList.map((c,ci)=>{let s=0; for(let d=0;d<N;d++) for(let t=0;t<T;t++) if(stList[t]!=='cancelled') s+=cube[1][(d*C+ci)*T+t]; return s;});
   const order=catList.map((c,i)=>i).sort((a,b)=>tot[b]-tot[a]);
   const colorOf={}; order.forEach((ci,rank)=>{colorOf[catList[ci]] = rank<8? 'var(--s'+(rank+1)+')' : 'var(--s-other)';});
-  return {min,max,N,C,T,catList,stList,cube,cubeNew,cubeRet,hasNew,hasRev,hasRevNew,order,tot,colorOf,rowCount:rows.length};
+  return {min,max,N,C,T,catList,stList,cube,cubeNew,cubeRet,hasNew,hasRev,hasRevNew,order,tot,colorOf,rowCount:rows.length,dropped:dropped.length?{n:dropped.length,from:Math.min(...dropped.map(x=>x[0])),to:Math.max(...dropped.map(x=>x[0]))}:null};
 }
 function splitCsv(line){
   if(line.indexOf('"')<0) return line.split(',');
