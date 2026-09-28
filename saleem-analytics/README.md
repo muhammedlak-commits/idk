@@ -25,6 +25,22 @@ The opening tab. It compares the date range with the period before it (or the sa
 - A short written summary sits on top.
 - These are estimates. An event in the period counts toward its own category's average. The ads step shows timing, not proof.
 
+## Last year and the usual move
+
+Because Saleem grows fast, a year-over-year count is nearly always a big positive number. The dashboard leads with the **usual move** instead. It takes this period's change against the period before it, and subtracts the change over the same pair of periods a year earlier. With two earlier years, it uses the average of both.
+
+- **Last year lines up by Hijri date** by default (More filters › Last year lines up by). The same Hijri day a Hijri year back is 354 or 355 days earlier, so Ramadan, the Eids and Arbaeen line up. *Same weekdays* uses 364 days instead.
+- **Both years are adjusted first.** Each is divided by its calendar index: weekday shares times each holiday's measured effect.
+- **Small years are left out.** An earlier year under a quarter of this year's size doesn't count, because start-up growth isn't a season.
+- **Where it shows:**
+  - the Overview hero tile's "vs usual" chip
+  - the Services table's *vs usual move* column
+  - the Monthly table's *vs usual move* mode
+  - What changed › *vs usual move*, which adds a "usual move" step to the waterfall
+
+  The plain year-over-year figure stays as a small number.
+- **Why the alignment matters:** on the data to 28 Sep 2026, the usual July-to-August move was −4.1% aligned by Hijri date and −13.4% by weekdays. Arbaeen fell in last August's window.
+
 ## Sales and revenue
 
 The orders queries also return `sales_iqd`, the services' `finalPriceAmount`, with tagged orders included. They return `company_revenue_iqd` too: sales minus all ten provider revenue shares (override amount, else calculated amount). Both come in new-patient versions. With those columns, the measure switch gets Sales and Revenue, which every orders-based tab follows. Provider, gateway and follow-on exports stay counts.

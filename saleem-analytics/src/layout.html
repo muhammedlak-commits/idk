@@ -55,6 +55,7 @@
   <div class="dbody">
     <div class="dsec"><h3>Dates by</h3><div class="seg" id="basis" title="Which date each order counts on"><button data-b="scheduled" class="on" title="The day the visit is scheduled for">Scheduled time</button><button data-b="booked" title="The day the order was booked">Booking time</button></div></div>
     <div class="dsec"><h3>Visit status</h3><div class="chips" id="stChips"></div></div>
+    <div class="dsec"><h3>Last year lines up by</h3><div class="seg" id="align" title="How every “last year” comparison picks its days"><button data-al="hijri" class="on" title="The same Hijri dates a Hijri year earlier (354 or 355 days), so Ramadan, the Eids and Arbaeen line up">Hijri dates</button><button data-al="greg" title="364 days earlier, so weekdays line up">Same weekdays</button></div></div>
     <div class="dsec"><h3>New patient means</h3><div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div></div>
     <div class="dsec"><h3>Ad spend counts</h3><div class="seg" id="adMode" title="Which ads count as ad spend in every module"><button data-a="match" class="on" title="Only ads matched to the selected services">Matching ads</button><button data-a="all" title="Every ad, whatever service it promotes; orders still follow the selected services">All ads</button><button data-a="pick" title="Only the ad groups you pick">Pick ad groups</button></div>
       <div class="chips" id="agChips" hidden style="margin-top:10px"></div></div>
@@ -68,7 +69,7 @@
     <section class="panel" aria-labelledby="whyH">
       <div class="phead">
         <div><h2 id="whyH">What changed</h2><div class="desc" id="whyDesc"></div></div>
-        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="prev" class="on">vs period before</button><button data-c="ly">vs last year</button></div></div>
+        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="prev" class="on">vs period before</button><button data-c="usual" title="Against the period before, and whether that move beats the same move in past years (Hijri-aligned, holiday-adjusted)">vs usual move</button><button data-c="ly">vs last year</button></div></div>
       </div>
       <p class="dmsg bad" id="whyErr" hidden></p>
       <div id="whyBody">
@@ -111,8 +112,8 @@
     <section class="module" data-mod="monthly" id="monthly" hidden>
     <section class="panel" aria-labelledby="momH">
       <div class="phead">
-        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY.</div></div>
-        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="yoy">YoY %</button></div></div>
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>vs usual move</strong> takes this month’s change against last month and subtracts the change over the same Hijri dates a year earlier (or two), with weekdays and holidays taken out of both; hover a cell for both moves.</div></div>
+        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="usual" title="This month’s change against last month, minus the same change a year earlier (Hijri-aligned and holiday-adjusted), in points">vs usual move</button><button data-v="yoy">YoY %</button></div></div>
       </div>
       <div class="tablewrap"><table id="momTable"></table></div>
     </section>

@@ -10,7 +10,8 @@
 let whyChart=null;
 function whyPeriods(){
   const a=st.from, b=st.to, len=b-a+1;
-  return st.whyCmp==='ly'? {a,b,pa:a-364,pb:b-364,lab:'the same days last year',short:'last year'} : {a,b,pa:a-len,pb:a-1,lab:'the '+len+' days before',short:'the period before'};
+  if(st.whyCmp==='ly'){ const s_=lyShift(a); return {a,b,pa:a-s_,pb:b-s_,lab:'the same '+(st.align==='hijri'?'Hijri dates':'weekdays')+' last year',short:'last year'}; }
+  return {a,b,pa:a-len,pb:a-1,lab:'the '+len+' days before',short:'the period before',usual:st.whyCmp==='usual'};
 }
 const whyClamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
 
@@ -68,8 +69,11 @@ function whyCompute(){
     else ads.why='week-to-week changes in spend haven’t lined up with this measure over the past year';
   } else ads.why= sp0||sp1? 'there was no matching ad spend in one of the periods' : 'no matching ad spend in either period';
   const rAd= ads.ok? Math.exp(ads.beta*Math.log(sp1/sp0)) : 1;
-  const eCal=base*(rCal-1), eEv=base*rCal*(rEv-1), eAd=base*rCal*rEv*(rAd-1), eRest=cur-base-eCal-eEv-eAd;
-  return {P:P_,cats,stats,m,cur,base,eCal,eEv,eAd,eRest,rCal,rEv,rAd,ads,C1,C0};
+  // vs usual move: the same pair of periods in earlier years, calendar-adjusted, is the seasonal norm
+  let U=null, rSea=1;
+  if(P_.usual){ U=usualMove(P_.a,P_.b,P_.pa,P_.pb,cats,stats,m,(x,z)=>sumY(x,z)); if(U&&U.usual!=null) rSea=1+U.usual; }
+  const eCal=base*(rCal-1), eEv=base*rCal*(rEv-1), eSea=base*rCal*rEv*(rSea-1), eAd=base*rCal*rEv*rSea*(rAd-1), eRest=cur-base-eCal-eEv-eSea-eAd;
+  return {P:P_,cats,stats,m,cur,base,eCal,eEv,eSea,eAd,eRest,rCal,rEv,rAd,ads,C1,C0,U};
 }
 
 /* where the change landed: per service, per patient group, per provider and doctor specialty */
@@ -116,10 +120,10 @@ function renderWhy(){
   document.getElementById('whyKpis').innerHTML=
     tile(M+' now',f(cur),fmtD(P_.a)+' – '+fmtDs(P_.b),'hero')+
     tile('Change',(tot>0?'+':'')+f(tot),pc(tot)+' vs '+R.P.short)+
-    tile('Explained by calendar, events and ads',(R.eCal+R.eEv+R.eAd>0?'+':'')+f(R.eCal+R.eEv+R.eAd),pc(R.eCal+R.eEv+R.eAd)+' of the base')+
+    tile(R.P.usual?'Explained by calendar, events, the usual move and ads':'Explained by calendar, events and ads',(R.eCal+R.eEv+R.eSea+R.eAd>0?'+':'')+f(R.eCal+R.eEv+R.eSea+R.eAd),pc(R.eCal+R.eEv+R.eSea+R.eAd)+' of the base')+
     tile('Not explained by those',(R.eRest>0?'+':'')+f(R.eRest),pc(R.eRest)+' · the real underlying change');
   // waterfall
-  const steps=[{l:R.P.short.replace(/^the /,'').replace(/^./,c=>c.toUpperCase()),v:base,kind:'end'},{l:'Weekdays & holidays',v:R.eCal},{l:'Outside events',v:R.eEv},{l:'Meta ads (estimate)',v:R.eAd},{l:'Everything else',v:R.eRest},{l:'This period',v:cur,kind:'end'}];
+  const steps=[{l:R.P.short.replace(/^the /,'').replace(/^./,c=>c.toUpperCase()),v:base,kind:'end'},{l:'Weekdays & holidays',v:R.eCal},{l:'Outside events',v:R.eEv}].concat(R.P.usual?[{l:'Usual move (past years)',v:R.eSea}]:[],[{l:'Meta ads (estimate)',v:R.eAd},{l:'Everything else',v:R.eRest},{l:'This period',v:cur,kind:'end'}]);
   let run=0; const data=steps.map(s=>{ if(s.kind==='end'){ run=s.v; return [0,s.v]; } const lo=run, hi=run+s.v; run=hi; return [Math.min(lo,hi),Math.max(lo,hi)]; });
   const col=steps.map(s=> s.kind==='end'? css('--navy') : s.v>=0? css('--good') : css('--bad'));
   const o=baseOpts(); o.interaction={mode:'nearest',intersect:true}; o.scales.y.beginAtZero=false; moneyTicks(o);
@@ -142,6 +146,7 @@ function renderWhy(){
   document.getElementById('whySteps').innerHTML=
     '<div><dt>Weekdays & holidays <b class="'+(R.eCal>=0?'pos':'neg')+'">'+pc(R.eCal)+'</b></dt><dd>'+esc(holDiff)+' Each holiday counts with its average past effect (Calendar tab) and each weekday with its usual share.</dd></div>'+
     '<div><dt>Outside events <b class="'+(R.eEv>=0?'pos':'neg')+'">'+pc(R.eEv)+'</b></dt><dd>'+esc(evDiff)+' Each event counts with its category’s average past effect (Google Sheet events, Calendar tab).</dd></div>'+
+    (R.P.usual? '<div><dt>Usual move <b class="'+(R.eSea>=0?'pos':'neg')+'">'+pc(R.eSea)+'</b></dt><dd>'+(R.U&&R.U.usual!=null? esc('The same two periods '+(R.U.past.length>1?'in the last two years':'last year')+' ('+ALIGN_LABEL[st.align]+'): '+R.U.past.map(x=>fmtD(x.from)+' – '+fmtDs(x.to)+' moved '+fmtPct(x.raw*100,1)+', '+fmtPct(x.adj*100,1)+' after weekdays and holidays').join('; ')+'. That seasonal move counts as expected; only the gap from it is news.') : 'No earlier year covers these periods, so it counts as zero.')+'</dd></div>' : '')+
     '<div><dt>Meta ads <b class="'+(R.eAd>=0?'pos':'neg')+'">'+pc(R.eAd)+'</b></dt><dd>'+esc(adsTxt)+' ('+adModeLabel()+')</dd></div>'+
     '<div><dt>Everything else <b class="'+(R.eRest>=0?'pos':'neg')+'">'+pc(R.eRest)+'</b></dt><dd>Growth or decline the three above don’t account for: demand, prices, provider capacity, operations, competitors. The breakdowns below show where it happened.</dd></div>';
   // where it landed
@@ -154,7 +159,7 @@ function renderWhy(){
   document.getElementById('whyWhere').innerHTML=sections.join('');
   // the plain-language summary
   const svcTop=W.svc.slice().sort((p,q)=>Math.abs(q.d)-Math.abs(p.d)).filter(r=>Math.abs(r.d)>=Math.abs(tot)*0.1).slice(0,3);
-  const dir=tot>=0?'up':'down', big=[['the calendar',R.eCal],['outside events',R.eEv],['ads',R.eAd]].filter(x=>Math.abs(x[1])>=base*0.005).sort((p,q)=>Math.abs(q[1])-Math.abs(p[1]));
+  const dir=tot>=0?'up':'down', big=[['the calendar',R.eCal],['outside events',R.eEv],['the usual seasonal move',R.eSea],['ads',R.eAd]].filter(x=>Math.abs(x[1])>=base*0.005).sort((p,q)=>Math.abs(q[1])-Math.abs(p[1]));
   let s='<strong>'+M+viewLabel(' from ')+' went '+dir+' '+fmtPct(Math.abs(tot)/base*100,1).replace('+','')+' ('+(tot>0?'+':'')+f(tot)+') against '+R.P.lab+'.</strong> ';
   const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
   s+= big.length? cap(big.map(([n,v])=>n+' '+(v>=0?'added ':'took away ')+fmtPct(Math.abs(v)/base*100,1).replace('+','')).join(', '))+', which leaves '+(R.eRest>=0?'a real rise of ':'a real drop of ')+fmtPct(Math.abs(R.eRest)/base*100,1).replace('+','')+'. ' : 'Calendar, events and ads barely differ between the two periods, so the change is almost all real. ';

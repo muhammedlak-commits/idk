@@ -6,7 +6,7 @@ function deltaChip(cur,prev,label,upGood=true){
 }
 function renderKpis(){
   const cats=selCats(), stats=selStats(), a=st.from, b=st.to, len=b-a+1;
-  const pa=a-len, pb=a-1, ya=a-364, yb=b-364;
+  const pa=a-len, pb=a-1, ys=lyShift(a), ya=a-ys, yb=b-ys;
   const hasP=covered(pa,pb), hasY=covered(ya,yb);
   const m=st.measure;
   const cur=total(a,b,m,cats,stats), prev=hasP?total(pa,pb,m,cats,stats):null, ly=hasY?total(ya,yb,m,cats,stats):null;
@@ -20,7 +20,7 @@ function renderKpis(){
   const cpo=ord?spend/ord:null, cpoP=ordP?spendP/ordP:null, cpoY=ordY?spendY/ordY:null;
   const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
   const tiles=[
-    {hero:true,lab:MLABEL[m]+viewLabel(' <span class="note">· ')+(viewLabel()?'</span>':''),val:fmtVal(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtVal(cur/len)+' a day · '+len+' days'},
+    {hero:true,lab:MLABEL[m]+viewLabel(' <span class="note">· ')+(viewLabel()?'</span>':''),val:fmtVal(cur),d:[deltaChip(cur,prev,'vs prev'),usualChip(hasP?usualMove(a,b,pa,pb,cats,stats,m):null,'vs usual')],sub:fmtVal(cur/len)+' a day · '+len+' days'+(ly?' · '+fmtPct((cur-ly)/ly*100)+' vs last year':'')},
     {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled ÷ all orders'},
     {lab:'Ad spend <span class="note">· '+adModeLabel()+'</span>',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:conv? fmtInt(conv)+' WhatsApp conversations':''},
     {lab:'Ad cost per '+(viewLabel()?(st.pview==='new'?'new-patient ':'returning-patient '):'')+'order <span class="note">· '+adModeLabel()+'</span>',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation':''}
@@ -51,9 +51,10 @@ function renderTrend(){
   if(st.trend==='total' || cats.length<=1){
     const cur=aggregate(series(a,b,m,cats,stats),a,B);
     ds.push({label:MLABEL[m],data:[...cur],borderColor:css('--accent'),backgroundColor:css('--accent-wash'),fill:true,borderWidth:2,pointRadius:g==='month'?3:0,pointHoverRadius:5,tension:.25,order:1});
-    if(st.ly && covered(a-364,b-364)){
-      const ly=aggregate(series(a-364,b-364,m,cats,stats),a,B);
-      ds.push({label:'Same period last year',data:[...ly],borderColor:css('--ghost'),borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.25,fill:false,order:2});
+    const ys=lyShift(a);
+    if(st.ly && covered(a-ys,b-ys)){
+      const ly=aggregate(series(a-ys,b-ys,m,cats,stats),a,B);
+      ds.push({label:'Last year ('+ALIGN_LABEL[st.align]+')',data:[...ly],borderColor:css('--ghost'),borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.25,fill:false,order:2});
     }
   } else {
     const ranked=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));

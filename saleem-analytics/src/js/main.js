@@ -31,6 +31,7 @@ function boot(reload){
   // files loaded in this browser are reused until a newer build of the page replaces them
   if(!reload){ try{ const m=JSON.parse(lsGet('spl.meta')||'{}'); let ch=false; for(const k in m) if(m[k]&&m[k].unsaved){ delete m[k]; ch=true; } if(ch) lsSet('spl.meta',JSON.stringify(m)); }catch(e){} }
   if(!reload && lsGet('spl.build')===P.built){ ['services','servicesBooked','adsDaily','adsMonthly','map','uniquePatients','followon','providers','gateway','provFollowon'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  if(!reload){ const al=lsGet('spl.align'); if(al==='greg'||al==='hijri') st.align=al; }
   if(!reload){ const b=lsGet('spl.basis'); if(b==='booked'&&P.servicesBooked) st.basis='booked'; }
   if(st.basis==='booked'&&!P.servicesBooked) st.basis='scheduled';
   const prevCats= S? new Set(S.catList) : null, prevStats= S? new Set(S.stList) : null;
