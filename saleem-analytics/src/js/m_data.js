@@ -10,8 +10,9 @@ const DROPS={
     check:hdr=>/service_category/.test(hdr)&&/distinct_orders/.test(hdr)&&/(^|,)day(,|$)/.test(hdr)&&!/provider_name/.test(hdr),
     wrong:'This file doesn’t look like the orders export. It needs the columns day, service_category and distinct_orders.',
     apply(text,name){
-      const mode=st.ordersMode, key=st.loadBasis==='booked'?'servicesBooked':'services';
-      const next= mode==='replace'||!P[key]? text : mergeServices(P[key],text);
+      const key=st.loadBasis==='booked'?'servicesBooked':'services';
+      const m= st.ordersMode==='replace'||!P[key]? {text,replaced:false} : mergeServices(P[key],text), next=m.text, mode=m.replaced?'replace':st.ordersMode;
+      this.note= m.replaced? ' It comes from the newer query and covers every loaded day, so it replaced the loaded data.' : '';
       buildServices(next);                  // throws with a readable message if the file can't be used
       P[key]=next;
       const saved=lsSave('spl.'+key,next); lsSave('spl.build',P.built);
@@ -79,14 +80,14 @@ async function takeFiles(kind, files){
     try{
       const text=await f.text(); const hdr=headerLine(text);
       if(!D.check(hdr)) throw new Error(f.name+': '+D.wrong);
-      if(!D.apply(text,f.name)) notSaved=true;
+      D.note=''; if(!D.apply(text,f.name)) notSaved=true;
       ok++; last=f.name;
     }catch(err){ showMsg(msg,'bad',err.message); }
   }
   if(!ok) return;
   if(kind==='orders') st.basis=st.loadBasis;   // show what was just loaded
   boot(true);
-  showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
+  showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(D.note||'')+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
   toast('Loaded '+(ok>1?ok+' files':last));
 }
 function headerLine(text){ return splitCsv(text.slice(0,1000).split(/\r?\n/)[0]).map(normHdr).join(','); }
