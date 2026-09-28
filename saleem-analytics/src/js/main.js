@@ -56,6 +56,8 @@ function boot(reload){
     const h=location.hash.slice(1); if(MODULES[h]||OLD_TABS[h]) st.mod=resolveMod(h);
     buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
+    document.querySelectorAll('#lkSpan button').forEach(t=>t.addEventListener('click',()=>{ st.lkSpan=t.dataset.s; lsSet('spl.lkSpan',st.lkSpan); render(); }));
+    { const ls=lsGet('spl.lkSpan'); if(['12w','26w','52w','all','range'].includes(ls)) st.lkSpan=ls; }
     setTimeout(startSheet,0);
     // open on the last complete month, the period the Summary reads best on
     { const endM= monthKey(S.max+1)!==monthKey(S.max)? monthKey(S.max) : addMonths(monthKey(S.max),-1); st.from=Math.max(S.min,toN(endM+'-01')); st.to=Math.min(S.max,toN(endM+'-01')+daysInMonth(endM)-1); st.gran='week'; }

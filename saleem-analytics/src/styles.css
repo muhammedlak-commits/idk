@@ -294,6 +294,19 @@ details.how[open]{display:block;color:var(--ink-2)}
 @media (max-width:640px){ .drvcards{grid-template-columns:1fr} .mstrip{grid-template-columns:repeat(4,minmax(0,1fr))} .ctxlab{display:none} .ctxsent{font-size:12.5px} }
 
 .filters .wrap.ctxline{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:12px;padding-block:10px}
+/* the filter bar shrinks to one line: the sentence cut to fit, no controls */
+.btn.icon{padding:7px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.btn.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.filters.min .btn.icon svg{transform:rotate(180deg)}
+.filters.min .wrap.ctxline{padding-block:5px}
+.filters.min .ctxlab,.filters.min #ctxChange,.filters.min #ctxRow{display:none}
+.filters.min .ctxsent{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:5px 11px;font-size:12.5px;background:none;border-color:transparent}
+/* service links: period switch and the written read-out */
+.lkspan{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.lkread{padding:14px 16px;border-radius:12px;background:var(--surface-2);margin:0 0 14px;font-size:13.5px;line-height:1.55}
+.lkread .head{font-family:Montserrat,"Public Sans",sans-serif;font-size:17px;font-weight:700;margin:0 0 6px}
+.lkread ul{margin:0;padding-left:18px} .lkread li{margin:3px 0}
+.lkread .pos{color:var(--good);font-weight:600} .lkread .neg{color:var(--bad);font-weight:600}
 
 /* weekday grid and chart reading notes */
 .wdgrid td,.wdgrid th{text-align:center;padding:7px 6px;font-variant-numeric:tabular-nums}

@@ -141,7 +141,15 @@ function setDrawer(open){
   if(open){ closePops(); document.getElementById('drawerClose').focus(); } else document.getElementById('moreBtn').focus();
 }
 function setCtxOpen(open){ st.ctxOpen=open; document.getElementById('ctxRow').hidden=!open; ['ctxSentence','ctxChange'].forEach(id=>document.getElementById(id).setAttribute('aria-expanded',String(open))); document.getElementById('ctxChange').textContent=open?'Done':'Change'; lsSet('spl.ctx',open?'1':''); }
+/* the whole bar shrinks to one line; the controls also close by themselves once you scroll down into the page */
+function setBarMin(on){ st.barMin=on; const f=document.querySelector('.filters'); f.classList.toggle('min',on); const b=document.getElementById('ctxMin'); b.setAttribute('aria-pressed',String(on)); b.title=on?'Show the full filter bar':'Shrink this bar to one line'; b.setAttribute('aria-label',b.title); lsSet('spl.barMin',on?'1':''); }
 function wireContext(){
+  document.getElementById('ctxMin').addEventListener('click',()=>{ const on=!st.barMin; setBarMin(on); if(on) setCtxOpen(false); });
+  document.getElementById('ctxSentence').addEventListener('click',()=>{ if(st.barMin) setBarMin(false); },true);
+  setBarMin(lsGet('spl.barMin')==='1');
+  { let lastY=window.scrollY; window.addEventListener('scroll',()=>{ const y=window.scrollY;
+      if(st.ctxOpen && y>lastY+40 && y>240 && !document.querySelector('.popover:not([hidden])')){ setCtxOpen(false); }
+      if(Math.abs(y-lastY)>40) lastY=y; },{passive:true}); }
   ['ctxSentence','ctxChange'].forEach(id=>document.getElementById(id).addEventListener('click',()=>setCtxOpen(!st.ctxOpen)));
   setCtxOpen(lsGet('spl.ctx')==='1');
   document.querySelectorAll('#cmpWith button').forEach(b=>b.addEventListener('click',()=>{ st.whyCmp=b.dataset.c; render(); }));

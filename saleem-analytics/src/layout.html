@@ -15,7 +15,7 @@
 </header>
 
 <section class="filters" aria-label="Filters">
-  <div class="wrap ctxline"><span class="ctxlab">Showing</span><button class="ctxsent" type="button" id="ctxSentence" aria-expanded="false" aria-controls="ctxRow"></button><button class="btn primary" type="button" id="ctxChange" aria-expanded="false" aria-controls="ctxRow">Change</button></div>
+  <div class="wrap ctxline"><span class="ctxlab">Showing</span><button class="ctxsent" type="button" id="ctxSentence" aria-expanded="false" aria-controls="ctxRow"></button><button class="btn primary" type="button" id="ctxChange" aria-expanded="false" aria-controls="ctxRow">Change</button><button class="btn icon" type="button" id="ctxMin" aria-pressed="false" title="Shrink this bar to one line" aria-label="Shrink the filter bar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
   <div class="wrap ctx" id="ctxRow" hidden>
     <div class="pop">
       <button class="pill" type="button" id="datePill" aria-expanded="false" aria-controls="datePop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span id="datePillTxt"></span></button>
@@ -317,6 +317,7 @@
       </section>
       </div>
       <div data-lkpane="svc" hidden>
+      <div class="frow lkspan"><span class="note">Period</span><div class="seg" id="lkSpan" aria-label="Period for service links"><button data-s="12w">12 weeks</button><button data-s="26w" class="on">26 weeks</button><button data-s="52w">52 weeks</button><button data-s="all">All data</button><button data-s="range">Date range above</button></div><span class="note" id="lkSpanNote"></span></div>
       <p class="callout" id="lkMsg"></p>
       <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
         <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). <details class="how inline"><summary>How this is worked out</summary>A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</details></div></div></div>
@@ -325,6 +326,7 @@
       <div id="lkDetail" hidden>
         <section class="panel" aria-labelledby="lkH">
           <div class="phead"><div><h2 id="lkH">Weekly volume side by side</h2><div class="desc" id="lkDesc"></div></div></div>
+          <div class="lkread" id="lkRead"></div>
           <div class="chart md"><canvas id="lkIdxChart" aria-label="Weekly volume indexed to each service's average"></canvas></div>
           <div class="legend" id="lkIdxLegend"></div>
           <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p></details>

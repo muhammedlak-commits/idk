@@ -48,8 +48,11 @@ function describeLag(lags,a,b){
   return {text:a+' and '+b+' '+dir+': '+when+' (r = '+best.r.toFixed(2)+(same&&best.k!==0?'; same week r = '+same.r.toFixed(2):'')+').',best};
 }
 
+/* Service ↔ service has its own period: week-to-week links need months of weeks, more than a one-month range gives */
+function lkRange(){ const b=st.to; if(st.lkSpan==='range') return [st.from,b]; if(st.lkSpan==='all') return [S.min,b];
+  const w={'12w':12,'26w':26,'52w':52}[st.lkSpan]||26; return [Math.max(S.min,b-7*w+1),b]; }
 function renderLinks(){
-  const a=st.from, b=st.to;
+  let a=st.from, b=st.to;
   const chosen=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
   const msg=document.getElementById('lkMsg'), detail=document.getElementById('lkDetail'), matrix=document.getElementById('lkMatrix');
   // one sub-tab at a time: only the visible test is computed
@@ -57,6 +60,9 @@ function renderLinks(){
   document.querySelectorAll('[data-lkpane]').forEach(p=>p.hidden=p.dataset.lkpane!==st.lkTab);
   if(st.lkTab==='ad') return renderAdLink(chosen,a,b);
   if(st.lkTab==='drv'){ renderDrivers(chosen,a,b); renderProvFollowon(chosen); renderBusyWeeks(chosen,a,b); return; }
+  [a,b]=lkRange();
+  document.querySelectorAll('#lkSpan button').forEach(x=>x.classList.toggle('on',x.dataset.s===st.lkSpan));
+  document.getElementById('lkSpanNote').textContent=fmtD(a)+' – '+fmtD(b)+(st.lkSpan==='range'&&b-a<83?' · pick 12 weeks or more for the lead/lag test':'');
   const all=S.catList.every(c=>st.svc.has(c));
   if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
   if(chosen.length>3){
@@ -95,6 +101,7 @@ function renderLinks(){
   document.getElementById('lkRatioLegend').innerHTML=ratios.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
   // 4. patient follow-on (optional export)
   renderFollowon(chosen,months);
+  renderLinkRead(W,lagSets,ratios,months);
   document.getElementById('lkDesc').textContent=chosen.map(label).join(', ')+viewLabel()+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
 }
 function renderFollowon(chosen,months){
@@ -200,4 +207,39 @@ function renderAdLink(chosen,a,b){
   document.getElementById('alAds').innerHTML= rows.length? '<thead><tr><th class="nosort">'+(A.level==='ad'?'Ad':'Campaign')+'</th><th class="nosort">Ad group</th><th class="nosort">Campaign</th><th class="nosort">Spend in those weeks</th><th class="nosort">Usual week</th><th class="nosort">Those weeks vs usual</th></tr></thead><tbody>'+
     rows.slice(0,15).map(r=>'<tr><td dir="auto" style="text-align:left;max-width:280px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.u.name)+'">'+esc(r.u.name)+'</td><td style="text-align:left">'+esc(r.u.group)+(matchesSel(r.u.group)||r.u.group==='All services (general)'?'':' <span class="badge" title="This ad promotes a different service from the orders being tested">other service</span>')+'</td><td style="text-align:left;max-width:220px;overflow:hidden;text-overflow:ellipsis" title="'+esc(r.u.campaign||r.u.name)+'">'+esc(r.u.campaign||'')+'</td><td>'+fmtUsd(r.inEff)+'</td><td>'+fmtUsd(r.avg)+'</td><td>'+(r.ratio==null?'–':r.ratio.toFixed(1)+'×')+'</td></tr>').join('')+'</tbody>'
     : '<tbody><tr><td class="note" style="text-align:left">No ad spend in those weeks.</td></tr></tbody>';
+}
+
+/* the written read-out above the weekly chart: growth of each, the mix between them, timing, recent weeks */
+function linkTrend(v){ // weekly growth from a log-linear fit, and how steady it is
+  const n=v.length; if(n<6) return null; const y=v.map(x=>Math.log(Math.max(0,x)+1)); let mx=(n-1)/2, my=y.reduce((t,x)=>t+x,0)/n, sxy=0, sxx=0;
+  for(let i=0;i<n;i++){ sxy+=(i-mx)*(y[i]-my); sxx+=(i-mx)**2; } const b_=sxy/sxx; let rss=0; for(let i=0;i<n;i++) rss+=(y[i]-my-b_*(i-mx))**2;
+  const se=Math.sqrt(rss/Math.max(1,n-2)/sxx); return {g:Math.exp(b_)-1, total:Math.exp(b_*(n-1))-1, t:se? b_/se : 0};
+}
+function renderLinkRead(W,lagSets,ratios,months){
+  const el=document.getElementById('lkRead'), n=W[0].v.length, out=[];
+  if(n<6){ el.innerHTML='<p class="note" style="margin:0">Only '+n+' full week'+(n===1?'':'s')+' in this period, too few to read. Pick 12 weeks or more above.</p>'; return; }
+  const pc=v=>'<span class="'+(v>=0?'pos':'neg')+'">'+fmtPct(v*100,1)+'</span>';
+  // 1. growth of each, from a trend line so one odd week doesn't decide it
+  const T=W.map(w=>({c:w.c,t:linkTrend(w.v)})).filter(x=>x.t);
+  T.forEach(x=>{ const steady=Math.abs(x.t.t)>=2; out.push('<li><strong>'+esc(label(x.c))+'</strong>: '+(steady? (x.t.total>=0?'grew ':'fell ')+pc(x.t.total)+' over the '+n+' weeks on the trend line ('+fmtPct(x.t.g*100,1)+' a week)' : 'no clear trend over the '+n+' weeks ('+fmtPct(x.t.total*100,1)+' on the trend line, within normal week-to-week swings)')+'.</li>'); });
+  let head='';
+  if(T.length>=2){ const s_=T.slice().sort((p,q)=>q.t.total-p.t.total), f=s_[0], l=s_[s_.length-1], gap=f.t.total-l.t.total;
+    head= gap>=0.05? esc(label(f.c))+' is growing faster than '+esc(label(l.c)) : 'They are growing at about the same pace'; }
+  // 2. mix: the smaller per 100 of the larger, first full month against the last
+  ratios.forEach(r=>{ const pts=r.data.map((v,i)=>({v,mk:months[i]})).filter(x=>x.v!=null);
+    if(pts.length>=2){ const f=pts[0], l=pts[pts.length-1], ch=l.v/f.v-1;
+      out.push('<li><strong>Mix</strong>: '+esc(label(r.small))+' per 100 '+esc(label(r.big))+' went from '+f.v.toFixed(1)+' in '+fmtM(f.mk)+' to '+l.v.toFixed(1)+' in '+fmtM(l.mk)+' ('+pc(ch)+(Math.abs(ch)<0.05?', roughly steady':'')+').</li>'); } });
+  // 3. timing: does one lead the other
+  lagSets.forEach(p=>{ const d=describeLag(p.lags,label(p.A.c),label(p.B.c)); out.push('<li><strong>Timing</strong>: '+esc(d.text)+(d.best&&d.best.k===0&&Math.abs(d.best.r)>1.96/Math.sqrt(d.best.ne)?' A same-week link is usually a shared cause (holidays, ads, salary days) rather than one service feeding the other.':'')+'</li>'); });
+  // 4. weeks where they pulled apart
+  if(W.length>=2){ const [A,B]=W, split=[];
+    for(let i=1;i<n;i++){ const x=A.v[i-1]? A.v[i]/A.v[i-1]-1 : null, y=B.v[i-1]? B.v[i]/B.v[i-1]-1 : null; if(x==null||y==null) continue;
+      if((x>=0.1&&y<=-0.1)||(x<=-0.1&&y>=0.1)) split.push({k:A.keys[i],x,y}); }
+    if(split.length){ const l=split[split.length-1];
+      out.push('<li><strong>Pulled apart</strong> in '+split.length+' of '+(n-1)+' weeks (one up 10% or more while the other fell 10% or more). Latest: week of '+fmtDs(l.k)+', '+esc(label(A.c))+' '+fmtPct(l.x*100,0)+', '+esc(label(B.c))+' '+fmtPct(l.y*100,0)+(()=>{ const h=new Set(); for(let d=l.k-7;d<=l.k+6;d++) holsOn(d).forEach(x=>h.add(x)); return h.size? ' ('+[...h].join(', ')+' in that week or the one before, which can shift bookings between services)' : ''; })()+'.</li>'); }
+    else out.push('<li><strong>Never pulled apart</strong>: no week where one rose 10% or more while the other fell 10% or more.</li>'); }
+  // 5. the last 4 weeks against each service's own normal week
+  const recent=W.map(w=>{ const m=w.v.reduce((t,x)=>t+x,0)/n, r=w.v.slice(-4), rm=r.reduce((t,x)=>t+x,0)/r.length; return {c:w.c,d:m? rm/m-1 : null}; }).filter(x=>x.d!=null);
+  if(recent.length) out.push('<li><strong>Last 4 weeks</strong> against their average week in this period: '+recent.map(x=>esc(label(x.c))+' '+pc(x.d)).join(', ')+'.</li>');
+  el.innerHTML=(head?'<div class="head">'+head+'</div>':'')+'<ul>'+out.join('')+'</ul>';
 }
