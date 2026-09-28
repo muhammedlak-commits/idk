@@ -55,6 +55,9 @@ function usualMove(a,b,pa,pb,cats,stats,m,tot){
   const usual=Math.exp(past.reduce((s,p)=>s+Math.log1p(p.adj),0)/past.length)-1;
   return {now,nowAdj,usual,gap:nowAdj-usual,past};   // gap in points of growth
 }
+/* the two moves behind a gap, as percentages: this year's (after weekdays and holidays) and the usual one */
+const usualWho=U=>U.past.length>1?'past 2 yrs':'last year';
+function usualPair(U,sep){ return fmtPct(U.nowAdj*100,1)+(sep||' vs ')+fmtPct(U.usual*100,1)+' '+usualWho(U); }
 /* a chip for the gap: this period's adjusted growth minus the usual growth, in points */
 function usualChip(U,label){
   if(!U||U.gap==null) return '<span class="delta flat" title="Needs the same periods a year earlier">'+label+' –</span>';

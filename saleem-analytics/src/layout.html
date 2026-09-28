@@ -91,6 +91,7 @@
       <div class="phead">
         <div><h2 id="trendH">Orders over time</h2><div class="desc" id="trendDesc"></div></div>
         <div class="ctrls">
+          <div class="seg" id="chartType" aria-label="Chart type"><button data-c="line" class="on">Line</button><button data-c="bars">Bars</button><button data-c="share">Share</button><button data-c="change">Change %</button><button data-c="cum">Running total</button></div>
           <div class="seg" id="trendSpan" aria-label="Chart range"><button data-s="12m" class="on" title="The 12 months to the end of the range">12 months</button><button data-s="range" title="The date range above">Date range</button></div>
           <div class="seg" id="trendMode"><button data-t="total" class="on">Total</button><button data-t="split">By service</button></div>
           <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
@@ -101,6 +102,7 @@
       </div>
       <div class="chart"><canvas id="trendChart" aria-label="Trend chart"></canvas></div>
       <div class="legend" id="trendLegend"></div>
+      <details class="how" id="trendHow"><summary>How to read this chart</summary><div id="trendHowTxt" class="howtxt"></div></details>
       <div style="margin-top:14px">
         <div class="phead" style="margin-bottom:4px"><div><h3 style="font-size:13.5px;font-weight:600">Meta ad spend (USD)</h3><div class="desc" id="spendDesc"></div></div></div>
         <div class="chart sm"><canvas id="spendChart" aria-label="Ad spend chart"></canvas></div>
@@ -110,19 +112,39 @@
 
     <section class="module" data-mod="perf" id="perf" data-sec="performance" hidden>
     <section class="panel" aria-labelledby="stripH">
-      <div class="phead"><div><h2 id="stripH">Each month against its usual move</h2><div class="desc">Points above or below the same weeks in past years, weekdays and holidays taken out. Green beat the usual move, orange fell short.</div></div></div>
+      <div class="phead"><div><h2 id="stripH">Each month against its usual move</h2><div class="desc">Each box: the month’s move against the month before (top), the same move last year on the same Hijri dates (middle; <em>usual</em> when it’s the average of the last two years), and the gap in points (bottom). Weekdays and holidays are taken out of both years. Green beat last year’s move, orange fell short.</div></div></div>
       <div class="mstrip" id="perfStrip"></div>
     </section>
-    <div class="frow" style="margin:16px 0 10px"><div class="seg" id="perfTab" aria-label="Table"><button data-t="svc" class="on">By service</button><button data-t="month">By month</button></div></div>
+    <div class="frow" style="margin:16px 0 10px"><div class="seg" id="perfTab" aria-label="Table"><button data-t="svc" class="on">By service</button><button data-t="month">By month</button><button data-t="wd">By weekday</button></div></div>
     </section>
 
     <section class="module" data-mod="monthly" id="monthly" data-sec="performance" hidden>
     <section class="panel" aria-labelledby="momH">
       <div class="phead">
-        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. <details class="how inline"><summary>How this is worked out</summary>The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>vs usual move</strong> takes this month’s change against last month and subtracts the change over the same Hijri dates a year earlier (or two), with weekdays and holidays taken out of both; hover a cell for both moves.</details></div></div>
-        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="usual" title="This month’s change against last month, minus the same change a year earlier (Hijri-aligned and holiday-adjusted), in points">vs usual move</button><button data-v="yoy">YoY %</button></div></div>
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. <details class="how inline"><summary>How this is worked out</summary>The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>MoM vs last year’s MoM</strong> shows this month’s change against last month on top and, below it, the same change over the same Hijri dates a year earlier (the average of two years when both exist), with weekdays and holidays taken out of both. The colour is the gap between them: green when this year moved better than last year did. Hover a cell for the raw moves and the gap in points.</details></div></div>
+        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="usual" title="This month’s change against last month, next to the same change a year earlier (Hijri-aligned, weekdays and holidays taken out)">MoM vs last year’s MoM</button><button data-v="yoy">YoY %</button></div></div>
       </div>
       <div class="tablewrap"><table id="momTable"></table></div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="weekday" id="weekday" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="wdH">
+      <div class="phead">
+        <div><h2 id="wdH">By weekday</h2><div class="desc" id="wdDesc"></div></div>
+        <div class="ctrls">
+          <div class="seg" id="wdSpan" aria-label="Weekday range"><button data-s="12w" class="on" title="The 12 weeks to the end of the range">12 weeks</button><button data-s="26w" title="The 26 weeks to the end of the range">26 weeks</button><button data-s="range" title="The date range above">Date range</button></div>
+          <label class="chip on" id="wdHolToggle" title="Holiday days bend the weekday shape, so they are left out by default">Leave out holidays</label>
+        </div>
+      </div>
+      <div class="chart"><canvas id="wdChart" aria-label="Average per day by weekday"></canvas></div>
+      <div class="legend" id="wdLegend"></div>
+      <div class="tablewrap" style="margin-top:14px"><table id="wdTable"></table></div>
+      <details class="how"><summary>How to read this</summary><div class="howtxt"><p><strong>Bars</strong>: the average day for each weekday in these weeks (dark), in the same number of weeks just before (light), and a year earlier (grey, same Hijri dates or same weekdays, as set under More settings). Averages rather than totals, so a weekday that happens to fall five times in a month doesn’t look bigger.</p><p><strong>Table</strong>: <em>vs before</em> is the change in that weekday’s average against the weeks just before. <em>Same move last year</em> is the same change a year earlier; if both say −5%, nothing unusual happened to that weekday. <em>Share of the week</em> is how much of an average week that day carries.</p><p><strong>Grid</strong>: one row per week, Saturday to Friday. The lightest cell is the quietest day in the grid and the darkest the busiest. Dotted cells are holidays. Read down a column to see whether a weekday is drifting, across a row to see an odd week.</p></div></details>
+    </section>
+    <section class="panel" aria-labelledby="wdGridH" style="margin-top:16px">
+      <div class="phead"><div><h2 id="wdGridH">Week by week</h2><div class="desc" id="wdGridDesc"></div></div></div>
+      <div class="tablewrap"><table class="wdgrid" id="wdGrid"></table></div>
     </section>
     </section>
 

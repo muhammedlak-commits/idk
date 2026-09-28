@@ -14,13 +14,13 @@ function renderMom(){
       if(st.mom==='perday') return '<td>'+fmtPer(v.pd)+'</td>';
       if(st.mom==='usual'){ const pm=addMonths(mk,-1), [ps,pe]=span(pm), [cs,ce]=span(mk); if(pe<ps) return '<td>–</td>';
         const U=usualMove(cs,ce,ps,pe,r.cats,stats,m); if(!U||U.gap==null) return '<td title="Needs the same months a year earlier">–</td>';
-        const g=U.gap*100, a_=Math.min(Math.abs(g),30)/30, bg= g>=0? 'rgba(12,163,12,'+(0.05+a_*0.22)+')' : 'rgba(208,59,59,'+(0.05+a_*0.22)+')';
+        const g=U.gap*100, a_=Math.min(Math.abs(g),30)/30, bg= g>=0? 'rgba(12,163,12,'+(0.05+a_*0.22)+')' : 'rgba(194,65,12,'+(0.05+a_*0.22)+')';
         const tip='This year: '+fmtPct(U.now*100,1)+' vs '+fmtM(pm)+' ('+fmtPct(U.nowAdj*100,1)+' after weekdays and holidays). Usual: '+fmtPct(U.usual*100,1)+' ('+U.past.map(x=>fmtD(x.from)+' – '+fmtDs(x.to)+': '+fmtPct(x.raw*100,1)+' raw, '+fmtPct(x.adj*100,1)+' adjusted').join('; ')+').';
-        return '<td class="heat" style="background:'+bg+'" title="'+esc(tip)+'">'+(g>0?'+':'')+g.toFixed(1)+'<span class="note"> pts</span></td>'; }
+        return '<td class="heat" style="background:'+bg+'" title="'+esc(tip+' Gap: '+(g>0?'+':'')+g.toFixed(1)+' pts.')+'">'+fmtPct(U.nowAdj*100,1)+'<br><span class="note">'+(U.past.length>1?'usual ':'LY ')+fmtPct(U.usual*100,1)+'</span></td>'; }
       const ref= st.mom==='mom'? val(addMonths(mk,-1),r.cats) : (toN(addMonths(mk,-12)+'-01')>=S.min? val(addMonths(mk,-12),r.cats):null);
       if(!ref||!ref.pd) return '<td>–</td>';
       const p=(v.pd-ref.pd)/ref.pd*100; const a=Math.min(Math.abs(p),60)/60;
-      const bg = p>=0? 'rgba(12,163,12,'+(0.05+a*0.22)+')' : 'rgba(208,59,59,'+(0.05+a*0.22)+')';
+      const bg = p>=0? 'rgba(12,163,12,'+(0.05+a*0.22)+')' : 'rgba(194,65,12,'+(0.05+a*0.22)+')';
       return '<td class="heat" style="background:'+bg+'" title="'+fmtPer(v.pd)+' vs '+fmtPer(ref.pd)+' per day">'+fmtPct(p)+'</td>';
     }).join('');
     return '<tr'+(r.total?' class="total"':'')+'><td>'+(r.color?'<span class="sw" style="background:'+r.color+'"></span>':'')+esc(r.name)+'</td>'+cells+'</tr>';

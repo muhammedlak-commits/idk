@@ -26,7 +26,7 @@ function renderSvcTable(){
   const cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';
   const tot={cur:grand, prev:hasP?total(a-len,a-1,m,cats,stats):null, ly:hasY?total(a-ys,b-ys,m,cats,stats):null};
   const TU=hasP?usualMove(a,b,a-len,a-1,cats,stats,m):null;
-  const uCell=(g,U)=> g==null? '<td>–</td>' : '<td class="'+cls(g)+'" title="'+esc(U? 'This period vs the one before: '+fmtPct(U.now*100,1)+' ('+fmtPct(U.nowAdj*100,1)+' adjusted); usual: '+fmtPct(U.usual*100,1) : '')+'">'+(g>0?'+':'')+g.toFixed(1)+' pts</td>';
+  const uCell=(g,U)=> g==null? '<td>–</td>' : '<td class="'+cls(g)+'" title="'+esc(U? 'This period vs the one before: '+fmtPct(U.now*100,1)+' ('+fmtPct(U.nowAdj*100,1)+' adjusted); usual: '+fmtPct(U.usual*100,1) : '')+'">'+(g>0?'+':'')+g.toFixed(1)+' pts'+(U&&U.usual!=null?'<br><span class="note">'+esc(usualPair(U))+'</span>':'')+'</td>';
   const html='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'">'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
     '<tr class="total"><td>All selected</td><td>'+fmtVal(tot.cur)+'</td><td>100%</td><td class="'+cls(tot.prev&&(tot.cur-tot.prev)/tot.prev*100)+'">'+fmtPct(tot.prev?(tot.cur-tot.prev)/tot.prev*100:null,1)+'</td>'+uCell(TU&&TU.gap!=null?TU.gap*100:null,TU)+'<td class="'+cls(tot.ly&&(tot.cur-tot.ly)/tot.ly*100)+'">'+fmtPct(tot.ly?(tot.cur-tot.ly)/tot.ly*100:null,1)+'</td><td></td><td></td><td>'+fmtUsd(totSpend)+'<br><span class="note">'+adModeLabel()+'</span></td><td>'+(totOrd?fmtUsd(totSpend/totOrd):'–')+'<br><span class="note">'+adModeLabel()+'</span></td></tr>'+
     rows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td><td>'+fmtVal(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td class="'+cls(r.prevP)+'">'+fmtPct(r.prevP,1)+'</td>'+uCell(r.usual,r.U)+'<td class="'+cls(r.lyP)+'">'+fmtPct(r.lyP,1)+'</td><td>'+(r.canc==null?'–':r.canc.toFixed(1)+'%')+'</td><td>'+fmtInt(r.pat)+'</td><td>'+(r.spend?fmtUsd(r.spend):'–')+'</td><td>'+(r.cpo?fmtUsd(r.cpo):'–')+'</td></tr>').join('')+'</tbody>';
@@ -35,6 +35,6 @@ function renderSvcTable(){
   t.querySelectorAll('tr').forEach(tr=>[...tr.cells].forEach((c,i)=>{ if(i>=5) c.hidden=!st.svcMore; }));
   const mb=document.getElementById('svcMoreBtn'); mb.textContent=st.svcMore?'Fewer columns':'More columns'; mb.setAttribute('aria-pressed',String(st.svcMore));
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.k; st.svcSort = st.svcSort.k===key? {k:key,dir:-st.svcSort.dir} : {k:key,dir:key==='c'?1:-1}; renderSvcTable();}));
-  document.getElementById('svcDesc').textContent=fmtD(a)+' – '+fmtD(b)+viewLabel()+' · vs usual: this period’s change minus the usual change for the same weeks, in points'+(hiddenN?' · '+hiddenN+' services with no orders in either period left out':'');
+  document.getElementById('svcDesc').textContent=fmtD(a)+' – '+fmtD(b)+viewLabel()+' · vs usual: this period’s change (after weekdays and holidays) against the same change a year earlier; the points are the gap between the two percentages'+(hiddenN?' · '+hiddenN+' services with no orders in either period left out':'');
 }
 

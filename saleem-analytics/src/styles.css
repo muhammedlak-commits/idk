@@ -2,7 +2,7 @@
 :root{
   --page:#f4f6f9; --surface:#ffffff; --surface-2:#f0f3f7; --ink:#0b1a2b; --ink-2:#46546a; --muted:#7c8799;
   --grid:#e4e8ee; --axis:#c5ccd6; --border:rgba(11,26,43,.10); --navy:#003260; --navy-ink:#ffffff;
-  --accent:#1C75BC; --accent-wash:rgba(28,117,188,.10); --spend:#F98C41; --ghost:#aab3c0;
+  --accent:#1C75BC; --accent-wash:rgba(28,117,188,.10); --accent-rgb:28,117,188; --spend:#F98C41; --ghost:#aab3c0;
   --good:#0a7d0a; --good-bg:rgba(12,163,12,.10); --bad:#b8430d; --bad-bg:rgba(194,65,12,.10);
   --hol:rgba(28,117,188,.07); --ram:rgba(249,140,65,.10); --evt:#7c8799;
   --s1:#1C75BC; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948; --s-other:#9aa3b0;
@@ -13,7 +13,7 @@
     color-scheme:dark;
     --page:#0a1019; --surface:#111a26; --surface-2:#172232; --ink:#f3f6fa; --ink-2:#b8c2d0; --muted:#8490a2;
     --grid:#1f2b3b; --axis:#34425a; --border:rgba(255,255,255,.09); --navy:#0c2744; --navy-ink:#ffffff;
-    --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --spend:#f08a45; --ghost:#5d6a7d;
+    --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --accent-rgb:61,143,214; --spend:#f08a45; --ghost:#5d6a7d;
     --good:#2fbf4a; --good-bg:rgba(47,191,74,.13); --bad:#f08a45; --bad-bg:rgba(240,138,69,.14);
     --hol:rgba(61,143,214,.10); --ram:rgba(240,138,69,.12); --evt:#8490a2;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s-other:#6b7686;
@@ -23,7 +23,7 @@
   color-scheme:dark;
   --page:#0a1019; --surface:#111a26; --surface-2:#172232; --ink:#f3f6fa; --ink-2:#b8c2d0; --muted:#8490a2;
   --grid:#1f2b3b; --axis:#34425a; --border:rgba(255,255,255,.09); --navy:#0c2744; --navy-ink:#ffffff;
-  --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --spend:#f08a45; --ghost:#5d6a7d;
+  --accent:#3d8fd6; --accent-wash:rgba(61,143,214,.14); --accent-rgb:61,143,214; --spend:#f08a45; --ghost:#5d6a7d;
   --good:#2fbf4a; --good-bg:rgba(47,191,74,.13); --bad:#f08a45; --bad-bg:rgba(240,138,69,.14);
   --hol:rgba(61,143,214,.10); --ram:rgba(240,138,69,.12); --evt:#8490a2;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s-other:#6b7686;
@@ -282,7 +282,7 @@ details.how[open]{display:block;color:var(--ink-2)}
 .mstrip{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:6px}
 .mcell{border-radius:8px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;gap:2px;background:var(--surface-2)}
 .mcell.up{background:rgba(12,163,12,var(--a))} .mcell.down{background:rgba(194,65,12,var(--a))}
-.mcell .mm{font-size:11.5px;color:var(--ink-2)} .mcell .mv{font-size:14px;font-weight:600}
+.mcell .mm{font-size:11.5px;color:var(--ink-2)} .mcell .mt{font-size:14px;font-weight:600;color:var(--ink)} .mcell .ml{font-size:11px;color:var(--muted)} .mcell .mv{font-size:12px;font-weight:600}
 .mcell.up .mv{color:var(--good)} .mcell.down .mv{color:var(--bad)}
 .drvcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .drvcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
@@ -294,3 +294,11 @@ details.how[open]{display:block;color:var(--ink-2)}
 @media (max-width:640px){ .drvcards{grid-template-columns:1fr} .mstrip{grid-template-columns:repeat(4,minmax(0,1fr))} .ctxlab{display:none} .ctxsent{font-size:12.5px} }
 
 .filters .wrap.ctxline{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:12px;padding-block:10px}
+
+/* weekday grid and chart reading notes */
+.wdgrid td,.wdgrid th{text-align:center;padding:7px 6px;font-variant-numeric:tabular-nums}
+.wdgrid th[scope=row]{text-align:left;font-weight:500;color:var(--ink-2);white-space:nowrap}
+.wdgrid td.hol{outline:1.5px dotted var(--ink-2);outline-offset:-3px}
+.wdgrid td.none{color:var(--muted)} .wdgrid td.wsum{font-weight:600;background:var(--surface-2)}
+.howtxt{font-size:12.5px;line-height:1.55;color:var(--ink-2);max-width:880px}
+.howtxt p{margin:8px 0 0}

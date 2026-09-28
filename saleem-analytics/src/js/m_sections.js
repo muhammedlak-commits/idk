@@ -16,7 +16,7 @@ function summaryTiles(R){
   const U= covered(P_.a-len,P_.a-1)? usualMove(P_.a,P_.b,P_.a-len,P_.a-1,cats,stats,m) : null;
   const main=[]; if(U&&U.gap!=null) main.push(chip((U.gap>0?'+':'')+(U.gap*100).toFixed(1)+' pts vs usual',tone(U.gap*100)));
   main.push('<span class="delta plain">'+fmtPct(pct(cur,base),1)+' vs '+esc(short)+'</span>');
-  tile(esc(M)+viewLabel(' · '),fmtVal(cur,m),main,fmtVal(cur/len,m)+' a day',true);
+  tile(esc(M)+viewLabel(' · '),fmtVal(cur,m),main,fmtVal(cur/len,m)+' a day'+(U&&U.gap!=null?' · moved '+fmtPct(U.nowAdj*100,1)+', the same weeks '+(U.past.length>1?'usually move ':'last year moved ')+fmtPct(U.usual*100,1):''),true);
   // 2. revenue, or orders when a money measure is picked
   const m2= MONEY.has(m)? 'ord' : (S.hasRev? 'rev' : 'svc');
   const x2=total(P_.a,P_.b,m2,cats,stats), y2=total(P_.pa,P_.pb,m2,cats,stats), p2=pct(x2,y2);
@@ -83,8 +83,8 @@ function renderPerfStrip(){
     const U=usualMove(a,b,pa,pb,cats,stats,m), partial=b<toN(mk+'-01')+daysInMonth(mk)-1;
     if(!U||U.gap==null){ cells.push('<div class="mcell none"><span class="mm">'+fmtM(mk)+'</span><span class="mv">–</span></div>'); continue; }
     const g=U.gap*100, a_=Math.min(Math.abs(g),20)/20, cls=g>=0?'up':'down';
-    const tip='This year: '+fmtPct(U.now*100,1)+' vs '+fmtM(pm)+' ('+fmtPct(U.nowAdj*100,1)+' adjusted). Usual: '+fmtPct(U.usual*100,1)+'.'+(partial?' Month to '+fmtDs(b)+'.':'');
-    cells.push('<div class="mcell '+cls+'" style="--a:'+(0.08+a_*0.32).toFixed(2)+'" title="'+esc(tip)+'"><span class="mm">'+fmtM(mk)+(partial?'*':'')+'</span><span class="mv">'+(g>0?'+':g<0?'−':'')+Math.abs(g).toFixed(1)+'</span></div>'); }
+    const tip='vs '+fmtM(pm)+': '+fmtPct(U.now*100,1)+' this year ('+fmtPct(U.nowAdj*100,1)+' after weekdays and holidays). Same move '+U.past.map(x=>fmtD(x.from).slice(-4)+': '+fmtPct(x.raw*100,1)+' ('+fmtPct(x.adj*100,1)+' adjusted)').join(', ')+'. Gap: '+(g>0?'+':'')+g.toFixed(1)+' pts.'+(partial?' Month to '+fmtDs(b)+'.':'');
+    cells.push('<div class="mcell '+cls+'" style="--a:'+(0.08+a_*0.32).toFixed(2)+'" title="'+esc(tip)+'"><span class="mm">'+fmtM(mk)+(partial?'*':'')+'</span><span class="mt">'+fmtPct(U.nowAdj*100,1)+'</span><span class="ml">'+(U.past.length>1?'usual ':'LY ')+fmtPct(U.usual*100,1)+'</span><span class="mv">'+(g>0?'+':g<0?'−':'')+Math.abs(g).toFixed(1)+' pts</span></div>'); }
   el.innerHTML=cells.join('')||'<p class="note">Needs a year of history.</p>';
 }
 
@@ -112,6 +112,7 @@ function renderDrvCards(){
 
 function wirePerf(){
   document.querySelectorAll('#perfTab button').forEach(b=>b.addEventListener('click',()=>{ st.perfTab=b.dataset.t; showModule('performance',true); }));
+  document.querySelectorAll('#chartType button').forEach(b=>b.addEventListener('click',()=>{ st.chart=b.dataset.c; render(); }));
   document.querySelectorAll('#trendSpan button').forEach(b=>b.addEventListener('click',()=>{ st.trendSpan=b.dataset.s; render(); }));
   document.querySelectorAll('#drvTabs [data-d]').forEach(b=>b.addEventListener('click',()=>{ st.drv=b.dataset.d; showModule('drivers',true); }));
   const mb=document.getElementById('svcMoreBtn'); if(mb) mb.addEventListener('click',()=>{ st.svcMore=!st.svcMore; renderSvcTable(); });

@@ -17,6 +17,7 @@ JS_ORDER = [
     'm_overview.js',  # module: KPIs + trend + ad spend
     'm_monthly.js',   # module: month-by-month MoM / YoY
     'm_services.js',  # module: service breakdown
+    'm_weekday.js',   # module: by weekday (Performance)
     'm_providers.js', # module: providers and doctor specialties (+ drivers panel in links)
     'm_gateway.js',   # providers module: gateway providers and retention
     'm_provlinks.js', # service links: provider follow-on and busy weeks

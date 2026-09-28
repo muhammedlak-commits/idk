@@ -4,19 +4,19 @@ const DRIVERS={patients:renderUnique, providers:()=>{ renderProviders(); renderG
   calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderCompetitors(); renderSheetStatus(); }};
 const MODULES={
   summary:{mods:()=>['why'], draw:renderWhy},
-  performance:{mods:()=>['overview','perf',st.perfTab==='month'?'monthly':'services'], draw:()=>{ renderTrend(); renderPerfStrip(); if(st.perfTab==='month') renderMom(); else renderSvcTable(); }},
+  performance:{mods:()=>['overview','perf',st.perfTab==='month'?'monthly':st.perfTab==='wd'?'weekday':'services'], draw:()=>{ renderTrend(); renderPerfStrip(); if(st.perfTab==='month') renderMom(); else if(st.perfTab==='wd') renderWeekday(); else renderSvcTable(); }},
   drivers:{mods:()=>['drv',st.drv], draw:()=>{ renderDrvCards(); DRIVERS[st.drv](); }},
   plan:{mods:()=>['projections'], draw:renderProjections},
   data:{mods:()=>['data'], draw:renderData}
 };
 /* old tab names (links and saved views) land on their new place */
-const OLD_TABS={why:['summary'],overview:['performance'],monthly:['performance','month'],services:['performance','svc'],patients:['drivers','patients'],providers:['drivers','providers'],links:['drivers','links'],ads:['drivers','ads'],calendar:['drivers','calendar'],projections:['plan']};
+const OLD_TABS={why:['summary'],overview:['performance'],monthly:['performance','month'],services:['performance','svc'],weekday:['performance','wd'],weekdays:['performance','wd'],patients:['drivers','patients'],providers:['drivers','providers'],links:['drivers','links'],ads:['drivers','ads'],calendar:['drivers','calendar'],projections:['plan']};
 function resolveMod(m){ const o=OLD_TABS[m]; if(!o) return MODULES[m]? m : 'summary'; if(o[0]==='performance'&&o[1]) st.perfTab=o[1]; if(o[0]==='drivers') st.drv=o[1]; return o[0]; }
 /* only the visible section is drawn; switching draws the next one with the current filters */
 function render(){
   syncChips();
   (MODULES[st.mod]||MODULES.summary).draw();
-  lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend,mod:st.mod,perfTab:st.perfTab,drv:st.drv}));
+  lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend,chart:st.chart,mod:st.mod,perfTab:st.perfTab,drv:st.drv}));
 }
 /* go to a section, optionally a table (performance) or a driver */
 function go(sec,sub){ if(sec==='performance'&&sub) st.perfTab=sub; if(sec==='drivers'&&sub) st.drv=sub; showModule(sec,true); window.scrollTo({top:0}); }
@@ -52,9 +52,9 @@ function boot(reload){
   S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); try{ PV=buildProviders(P.providers); }catch(e){ PV=null; } try{ GW=buildGateway(P.gateway); }catch(e){ GW=null; } try{ PF=buildProvFollowon(P.provFollowon); }catch(e){ PF=null; } loadEvents(); loadCompetitors();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
-    try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.perfTab) st.perfTab=v.perfTab; if(DRIVERS[v.drv]) st.drv=v.drv; if(v.mod) st.mod=resolveMod(v.mod); }catch(e){}
+    try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(['line','bars','share','change','cum'].includes(v.chart)) st.chart=v.chart; if(v.perfTab) st.perfTab=v.perfTab; if(DRIVERS[v.drv]) st.drv=v.drv; if(v.mod) st.mod=resolveMod(v.mod); }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]||OLD_TABS[h]) st.mod=resolveMod(h);
-    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireWhy(); wirePerf(); wireContext(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
     setTimeout(startSheet,0);
     // open on the last complete month, the period the Summary reads best on
