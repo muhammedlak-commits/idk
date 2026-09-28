@@ -44,7 +44,10 @@ function sumConvSpend(a,b,groups){
 
 /* ---------- trend ---------- */
 function renderTrend(){
-  const cats=selCats(), stats=selStats(), a=st.from, b=st.to, g=st.gran, m=st.measure;
+  // Performance shows the 12 months to the end of the range unless the date range is picked
+  const span12=st.trendSpan==='12m', a= span12? Math.max(S.min,toN(addMonths(monthKey(st.to),-11)+'-01')) : st.from, b=st.to, g= span12&&st.gran==='day'? 'week' : st.gran;
+  const cats=selCats(), stats=selStats(), m=st.measure;
+  document.querySelectorAll('#trendSpan button').forEach(x=>x.classList.toggle('on',x.dataset.s===st.trendSpan));
   const B=buckets(a,b,g), labels=B.keys.map(x=>bucketLabel(x.k,g));
   const ds=[];
   const partial = B.keys.map((x,i)=>{ const full = g==='day'?1 : g==='week'?7 : daysInMonth(monthKey(x.k)); return x.days<full; });

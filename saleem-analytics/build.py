@@ -26,6 +26,7 @@ JS_ORDER = [
     'm_calendar.js',  # module: holiday effects + events log
     'seasonal.js',    # last year by Hijri date or weekday, and the usual move
     'm_why.js',       # module: what changed and why (uses calendar, ads, providers)
+    'm_sections.js',  # Summary tiles and attention list, Performance month strip, Drivers cards
     'm_projections.js',  # module: projections
     'm_sheet.js',     # live outside-factors Google Sheet
     'm_data.js',      # module: drag-and-drop data loading

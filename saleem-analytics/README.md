@@ -4,9 +4,18 @@ A single-file dashboard for Saleem's orders by service, with MoM/YoY comparisons
 
 Open `dist/saleem-performance.html` in a browser. It needs internet only for the chart library and fonts.
 
-## Modules
+## Layout
 
-The page has eleven modules, switched with the tabs in the header (Data is the button at the right): What changed, Overview, Monthly, Services, Patients, Providers, Links (service links), Meta ads, Calendar (holidays and events), Projections, and Data. The filter bar is one row: date range, services, patient view, measure (orders, services, patient-days, sales, company revenue) and By; Dates by, visit status, New patient and Ad spend are under More filters. Earlier order: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+Four sections, plus **Data & settings** at the right of the header.
+
+- **Summary:** what changed in the period and why. It has a written answer, four tiles (the measure, company revenue, returning-patient orders, cancellations), the waterfall, a "Worth your attention" list the page works out itself, and where the change landed.
+- **Performance:** the trend (the 12 months to the end of the range, or the range itself), each month against its usual move, and one table by service (five columns; *More columns* for the rest) or by month.
+- **Drivers:** one card per driver with a one-line answer, then the detail for Patients, Providers, Service links, Meta ads or Calendar.
+- **Plan:** projections.
+
+The line under the header says in plain words what every number shows. Examples: the measure, services, dates, what each period is judged against, dates by, how last year lines up, and any statuses left out. *Change* opens the controls; *More settings* holds the rest.
+
+Colours follow one rule: navy for this period, grey for the comparison, green for better than usual, orange for worse. Method notes sit behind "How this is worked out". The page opens on the last complete month. Old tab links (`#monthly`, `#providers`, …) still land in the right place.
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
 

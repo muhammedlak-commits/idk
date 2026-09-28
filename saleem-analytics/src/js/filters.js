@@ -108,7 +108,7 @@ function presetRange(p){
 const DEFAULT_STATUS=()=>S.stList.filter(s=>s!=='cancelled');
 function moreCount(){
   const def=new Set(DEFAULT_STATUS()); const stSame=st.status.size===def.size&&[...def].every(s=>st.status.has(s));
-  return (st.basis!=='scheduled')+(!stSame)+(st.newBasis!=='first')+(st.adMode!=='match');
+  return (st.basis!=='scheduled')+(!stSame)+(st.newBasis!=='first')+(st.adMode!=='match')+(st.align!=='hijri')+(st.whyCmp!=='usual');
 }
 function syncContext(){
   const p=Object.keys(PRESET_LABEL).find(k=>{ const [a,b]=presetRange(k); return a===st.from&&b===st.to; });
@@ -118,6 +118,14 @@ function syncContext(){
   document.getElementById('svcPillTxt').textContent= all? 'All '+S.catList.length+' services' : !cats.length? 'No services' : cats.length<=2? cats.map(label).join(', ') : cats.length+' services';
   document.getElementById('svcPill').classList.toggle('on',!all);
   const n=moreCount(), c=document.getElementById('moreCount'); c.textContent=n; c.hidden=!n;
+  // the plain-words line: what every number on the page is showing
+  const CMP={usual:'judged against the <strong>usual move</strong>',prev:'against <strong>the period before</strong>',ly:'against <strong>last year</strong>'};
+  const svcTxt= all? 'all '+S.catList.length+' services' : !cats.length? 'no services' : cats.length<=3? cats.map(c=>esc(label(c))).join(', ') : cats.length+' of '+S.catList.length+' services';
+  const range= p? esc(PRESET_LABEL[p])+' ('+esc(fmtD(st.from)+' – '+fmtD(st.to))+')' : esc(fmtD(st.from)+' – '+fmtD(st.to));
+  const parts=['<strong>'+esc(MLABEL[st.measure].replace(' (IQD)',''))+'</strong>'+(st.pview!=='all'&&S.hasNew?' from '+PVIEW_LABEL[st.pview]:''), svcTxt, '<strong>'+range+'</strong>', CMP[st.whyCmp]||CMP.usual, st.basis==='booked'?'by booking time':'by scheduled time', 'last year by '+(st.align==='hijri'?'Hijri date':'weekday')];
+  const excl=S.stList.filter(x=>!st.status.has(x)); if(excl.length) parts.push(excl.join(', ')+' left out');
+  document.getElementById('ctxSentence').innerHTML=parts.join(' · ');
+  document.querySelectorAll('#cmpWith button').forEach(b=>b.classList.toggle('on',b.dataset.c===st.whyCmp));
 }
 function closePops(except){
   document.querySelectorAll('.popover').forEach(el=>{ if(el.id===except||el.hidden) return; const had=el.contains(document.activeElement); el.hidden=true; const b=document.querySelector('[aria-controls="'+el.id+'"]'); if(b){ b.setAttribute('aria-expanded','false'); if(had) b.focus(); } });
@@ -132,7 +140,11 @@ function setDrawer(open){
   document.getElementById('moreBtn').setAttribute('aria-expanded',String(open));
   if(open){ closePops(); document.getElementById('drawerClose').focus(); } else document.getElementById('moreBtn').focus();
 }
+function setCtxOpen(open){ st.ctxOpen=open; document.getElementById('ctxRow').hidden=!open; ['ctxSentence','ctxChange'].forEach(id=>document.getElementById(id).setAttribute('aria-expanded',String(open))); document.getElementById('ctxChange').textContent=open?'Done':'Change'; lsSet('spl.ctx',open?'1':''); }
 function wireContext(){
+  ['ctxSentence','ctxChange'].forEach(id=>document.getElementById(id).addEventListener('click',()=>setCtxOpen(!st.ctxOpen)));
+  setCtxOpen(lsGet('spl.ctx')==='1');
+  document.querySelectorAll('#cmpWith button').forEach(b=>b.addEventListener('click',()=>{ st.whyCmp=b.dataset.c; render(); }));
   document.getElementById('datePill').addEventListener('click',e=>{ e.stopPropagation(); togglePop('datePill','datePop'); });
   document.getElementById('svcPill').addEventListener('click',e=>{ e.stopPropagation(); togglePop('svcPill','svcPop'); });
   document.querySelectorAll('.popover').forEach(el=>el.addEventListener('click',e=>e.stopPropagation()));
@@ -143,8 +155,8 @@ function wireContext(){
   document.getElementById('drawerDone').addEventListener('click',()=>setDrawer(false));
   document.getElementById('drawerBack').addEventListener('click',()=>setDrawer(false));
   document.getElementById('drawerReset').addEventListener('click',()=>{
-    st.status=new Set(DEFAULT_STATUS()); st.newBasis='first'; st.adMode='match';
+    st.status=new Set(DEFAULT_STATUS()); st.newBasis='first'; st.adMode='match'; st.align='hijri'; st.whyCmp='usual'; lsSet('spl.align','hijri');
     if(st.basis!=='scheduled') setBasis('scheduled'); else render();
   });
-  document.getElementById('dataBtn').addEventListener('click',()=>{ showModule(st.mod==='data'?'overview':'data',true); window.scrollTo({top:0}); });
+  document.getElementById('dataBtn').addEventListener('click',()=>{ showModule(st.mod==='data'?(st.prevMod||'summary'):(st.prevMod=st.mod,'data'),true); window.scrollTo({top:0}); });
 }

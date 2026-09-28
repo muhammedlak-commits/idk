@@ -1,29 +1,22 @@
 <header class="top">
   <div class="wrap bar">
     <div class="brand"><h1>Saleem Performance Lab</h1></div>
-    <nav class="tabs" aria-label="Modules" role="tablist">
-      <button role="tab" data-mod="why" title="What changed against the period before or last year, and why">What changed</button>
-      <button role="tab" data-mod="overview">Overview</button>
-      <button role="tab" data-mod="monthly" title="Month by month">Monthly</button>
-      <button role="tab" data-mod="services">Services</button>
-      <button role="tab" data-mod="patients">Patients</button>
-      <button role="tab" data-mod="providers">Providers</button>
-      <span class="tsep" aria-hidden="true"></span>
-      <button role="tab" data-mod="links" title="Service links">Links</button>
-      <button role="tab" data-mod="ads">Meta ads</button>
-      <button role="tab" data-mod="calendar" title="Holidays and events">Calendar</button>
-      <span class="tsep" aria-hidden="true"></span>
-      <button role="tab" data-mod="projections">Projections</button>
+    <nav class="tabs" aria-label="Sections" role="tablist">
+      <button role="tab" data-mod="summary" title="What changed, why, and what needs attention">Summary</button>
+      <button role="tab" data-mod="performance" title="Trend, months and services">Performance</button>
+      <button role="tab" data-mod="drivers" title="Patients, providers, service links, ads and the calendar">Drivers</button>
+      <button role="tab" data-mod="plan" title="Projections">Plan</button>
     </nav>
     <div class="top-actions">
       <span class="meta" id="dataMeta"></span>
-      <button class="btn" type="button" id="dataBtn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Data</button>
+      <button class="btn" type="button" id="dataBtn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Data &amp; settings</button>
     </div>
   </div>
 </header>
 
 <section class="filters" aria-label="Filters">
-  <div class="wrap ctx">
+  <div class="wrap ctxline"><span class="ctxlab">Showing</span><button class="ctxsent" type="button" id="ctxSentence" aria-expanded="false" aria-controls="ctxRow"></button><button class="btn primary" type="button" id="ctxChange" aria-expanded="false" aria-controls="ctxRow">Change</button></div>
+  <div class="wrap ctx" id="ctxRow" hidden>
     <div class="pop">
       <button class="pill" type="button" id="datePill" aria-expanded="false" aria-controls="datePop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span id="datePillTxt"></span></button>
       <div class="popover" id="datePop" hidden>
@@ -51,8 +44,9 @@
 </section>
 <div class="drawer-back" id="drawerBack" hidden></div>
 <aside class="drawer" id="drawer" aria-label="More filters" hidden>
-  <div class="dhead"><h2>More filters</h2><button class="iconbtn" type="button" id="drawerClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dhead"><h2>More settings</h2><button class="iconbtn" type="button" id="drawerClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="dbody">
+    <div class="dsec"><h3>Judge each period against</h3><div class="seg" id="cmpWith" title="Used by the Summary"><button data-c="usual" class="on" title="The period before, and whether that move beats the same move in past years">The usual move</button><button data-c="prev" title="The same number of days just before">The period before</button><button data-c="ly" title="The same dates last year">Last year</button></div></div>
     <div class="dsec"><h3>Dates by</h3><div class="seg" id="basis" title="Which date each order counts on"><button data-b="scheduled" class="on" title="The day the visit is scheduled for">Scheduled time</button><button data-b="booked" title="The day the order was booked">Booking time</button></div></div>
     <div class="dsec"><h3>Visit status</h3><div class="chips" id="stChips"></div></div>
     <div class="dsec"><h3>Last year lines up by</h3><div class="seg" id="align" title="How every “last year” comparison picks its days"><button data-al="hijri" class="on" title="The same Hijri dates a Hijri year earlier (354 or 355 days), so Ramadan, the Eids and Arbaeen line up">Hijri dates</button><button data-al="greg" title="364 days earlier, so weekdays line up">Same weekdays</button></div></div>
@@ -65,34 +59,39 @@
 
 <main>
   <div class="wrap">
-    <section class="module" data-mod="why" id="why">
+    <section class="module" data-mod="why" id="why" data-sec="summary">
     <section class="panel" aria-labelledby="whyH">
       <div class="phead">
         <div><h2 id="whyH">What changed</h2><div class="desc" id="whyDesc"></div></div>
-        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="prev" class="on">vs period before</button><button data-c="usual" title="Against the period before, and whether that move beats the same move in past years (Hijri-aligned, holiday-adjusted)">vs usual move</button><button data-c="ly">vs last year</button></div></div>
+        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="usual" class="on" title="Against the period before, and whether that move beats the same move in past years (Hijri-aligned, holiday-adjusted)">vs usual move</button><button data-c="prev">vs period before</button><button data-c="ly">vs last year</button></div></div>
       </div>
       <p class="dmsg bad" id="whyErr" hidden></p>
       <div id="whyBody">
         <p class="whysum" id="whySummary"></p>
         <div class="kpis" id="whyKpis"></div>
         <div class="whygrid">
-          <div><h3 class="wh">Why: the change, step by step</h3><div class="chart"><canvas id="whyChart" aria-label="Change split into calendar, events, ads and everything else"></canvas></div></div>
-          <dl class="dstat wsteps" id="whySteps"></dl>
+          <div>
+            <h3 class="wh" id="whyChartH">Why it moved</h3>
+            <div class="chart"><canvas id="whyChart" aria-label="Change split into calendar, events, the usual move, ads and everything else"></canvas></div>
+            <details class="how"><summary>How each step is worked out</summary><dl class="dstat wsteps" id="whySteps"></dl>
+              <details class="how"><summary>How this is worked out</summary><p class="note">The calendar and events steps use effects measured on past holidays and events, and an event in this period counts toward its own category’s average. The usual move is how the same weeks moved in past years, lined up by Hijri date unless set otherwise. The ads step is an estimate from how spend and this measure have moved together week to week; it shows timing, not proof that the ads caused it.</p></details></details>
+          </div>
+          <div><h3 class="wh">Worth your attention</h3><div class="attn" id="whyAttn"></div></div>
         </div>
         <h3 class="wh" style="margin-top:18px">Where it landed</h3>
         <div class="wwhere" id="whyWhere"></div>
-        <p class="note" style="margin-top:12px">The calendar and events steps use effects measured on past holidays and events, and an event in this period counts toward its own category’s average. The ads step is an estimate from how spend and this measure have moved together week to week; it shows timing, not proof that the ads caused it. Use the date range and services above to focus it, and the Calendar, Meta ads and Providers tabs for the detail.</p>
       </div>
     </section>
     </section>
 
-    <section class="module" data-mod="overview" id="overview" hidden>
-    <div class="kpis" id="kpis"></div>
+    <section class="module" data-mod="overview" id="overview" data-sec="performance" hidden>
+    <div class="kpis" id="kpis" hidden></div>
 
     <section class="panel" aria-labelledby="trendH">
       <div class="phead">
         <div><h2 id="trendH">Orders over time</h2><div class="desc" id="trendDesc"></div></div>
         <div class="ctrls">
+          <div class="seg" id="trendSpan" aria-label="Chart range"><button data-s="12m" class="on" title="The 12 months to the end of the range">12 months</button><button data-s="range" title="The date range above">Date range</button></div>
           <div class="seg" id="trendMode"><button data-t="total" class="on">Total</button><button data-t="split">By service</button></div>
           <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
           <label class="chip on" id="holToggle"><input type="checkbox" id="holChk" checked hidden>Holidays</label>
@@ -109,27 +108,43 @@
     </section>
     </section>
 
-    <section class="module" data-mod="monthly" id="monthly" hidden>
+    <section class="module" data-mod="perf" id="perf" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="stripH">
+      <div class="phead"><div><h2 id="stripH">Each month against its usual move</h2><div class="desc">Points above or below the same weeks in past years, weekdays and holidays taken out. Green beat the usual move, orange fell short.</div></div></div>
+      <div class="mstrip" id="perfStrip"></div>
+    </section>
+    <div class="frow" style="margin:16px 0 10px"><div class="seg" id="perfTab" aria-label="Table"><button data-t="svc" class="on">By service</button><button data-t="month">By month</button></div></div>
+    </section>
+
+    <section class="module" data-mod="monthly" id="monthly" data-sec="performance" hidden>
     <section class="panel" aria-labelledby="momH">
       <div class="phead">
-        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>vs usual move</strong> takes this month’s change against last month and subtracts the change over the same Hijri dates a year earlier (or two), with weekdays and holidays taken out of both; hover a cell for both moves.</div></div>
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. <details class="how inline"><summary>How this is worked out</summary>The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>vs usual move</strong> takes this month’s change against last month and subtracts the change over the same Hijri dates a year earlier (or two), with weekdays and holidays taken out of both; hover a cell for both moves.</details></div></div>
         <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="usual" title="This month’s change against last month, minus the same change a year earlier (Hijri-aligned and holiday-adjusted), in points">vs usual move</button><button data-v="yoy">YoY %</button></div></div>
       </div>
       <div class="tablewrap"><table id="momTable"></table></div>
     </section>
     </section>
 
-    <section class="module" data-mod="services" id="services" hidden>
+    <section class="module" data-mod="services" id="services" data-sec="performance" hidden>
     <section class="panel" aria-labelledby="svcH">
       <div class="phead">
         <div><h2 id="svcH">Service breakdown</h2><div class="desc" id="svcDesc"></div></div>
+        <div class="ctrls"><button class="btn" type="button" id="svcMoreBtn" aria-pressed="false">More columns</button></div>
       </div>
       <div class="tablewrap"><table id="svcTable"></table></div>
-      <p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Each row's ad spend is for ads matched to that service. The All selected row follows <strong>More filters › Ad spend counts</strong> (matching ads, all ads, or chosen ad groups).</p>
+      <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Each row's ad spend is for ads matched to that service. The All selected row follows <strong>More filters › Ad spend counts</strong> (matching ads, all ads, or chosen ad groups).</p></details>
     </section>
     </section>
 
-    <section class="module" data-mod="providers" id="providers" hidden>
+    <section class="module" data-mod="drv" id="drv" data-sec="drivers" hidden>
+    <div class="drvcards" id="drvCards"></div>
+    <div class="subtabs" role="tablist" aria-label="Drivers" id="drvTabs" style="margin:18px 0 14px">
+      <button role="tab" data-d="patients">Patients</button><button role="tab" data-d="providers">Providers</button><button role="tab" data-d="links">Service links</button><button role="tab" data-d="ads">Meta ads</button><button role="tab" data-d="calendar">Calendar</button>
+    </div>
+    </section>
+
+    <section class="module" data-mod="providers" id="providers" data-sec="drivers" hidden>
       <div id="pvEmpty" class="callout">
         <p style="margin:0 0 6px"><strong>This module needs the provider export.</strong> It shows which doctors, nurses and physiotherapists take the orders, and orders by doctor specialty.</p>
         <ol style="margin:0 0 8px;padding-left:18px">
@@ -207,7 +222,7 @@
       </section>
     </section>
 
-    <section class="module" data-mod="links" id="links" hidden>
+    <section class="module" data-mod="links" id="links" data-sec="drivers" hidden>
       <div class="subtabs" role="tablist" aria-label="Link tests" id="lkTabs">
         <button type="button" role="tab" data-lk="ad" aria-selected="true">Ad spend → orders</button>
         <button type="button" role="tab" data-lk="svc" aria-selected="false">Service ↔ service</button>
@@ -215,7 +230,7 @@
       </div>
       <div data-lkpane="ad">
       <section class="panel" aria-labelledby="alH">
-        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">The ads counted under <strong>More filters › Ad spend counts</strong>, against orders for the services picked above. To test physio ads against lab tests: pick the Physiotherapy ad group there and choose only Lab tests in Services.</div></div></div>
+        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">The ads counted under <strong>More filters › Ad spend counts</strong>, against orders for the services picked above. <details class="how inline"><summary>How this is worked out</summary>To test physio ads against lab tests: pick the Physiotherapy ad group there and choose only Lab tests in Services.</details></div></div></div>
         <p class="callout" id="alMsg" hidden></p>
         <div id="alBody">
           <div class="answer" id="alAnswer"></div>
@@ -233,7 +248,7 @@
                 <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Passes the bar</span><span><i class="box" style="background:var(--ghost)"></i>Could be chance</span></div></div>
               <div><div class="tablewrap"><table id="alLagTable"></table></div><p class="callout" id="alFinding" style="margin-top:10px"></p></div>
             </div>
-            <p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Both bars are corrected for week-to-week swings (Bartlett). Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p>
+            <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Both bars are corrected for week-to-week swings (Bartlett). Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p></details>
             <p class="note" id="alDesc" style="margin:4px 0 0"></p>
           </details>
         </div>
@@ -241,7 +256,7 @@
       </div>
       <div data-lkpane="drv" hidden>
       <section class="panel" id="pfPanel" aria-labelledby="pfH">
-        <div class="phead"><div><h2 id="pfH">Do a provider’s patients go on to other services?</h2><div class="desc">For each doctor, nurse and physiotherapist among the selected services: of the patients they saw, the share who had one of the other selected services within 7 and 30 days, against the typical (median) provider of the same service. For example, how many of a doctor’s patients had a lab test afterwards.</div><div class="desc" id="pfDesc"></div></div></div>
+        <div class="phead"><div><h2 id="pfH">Do a provider’s patients go on to other services?</h2><div class="desc">For each doctor, nurse and physiotherapist among the selected services: of the patients they saw, the share who had one of the other selected services within 7 and 30 days, against the typical (median) provider of the same service. <details class="how inline"><summary>How this is worked out</summary>For example, how many of a doctor’s patients had a lab test afterwards.</details></div><div class="desc" id="pfDesc"></div></div></div>
         <p class="callout" id="pfMsg" hidden></p>
         <div id="pfBody" hidden>
           <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="pfTable"></table></div>
@@ -252,7 +267,7 @@
         </div>
       </section>
       <section class="panel" id="bwPanel" aria-labelledby="bwH">
-        <div class="phead"><div><h2 id="bwH">Busy weeks and what followed</h2><div class="desc">When a doctor, nurse or physiotherapist takes an unusually large share of their service in a week, do the other selected services grow faster in the 2 to 4 weeks after? Click a row to see both series.</div><div class="desc" id="bwDesc"></div></div></div>
+        <div class="phead"><div><h2 id="bwH">Busy weeks and what followed</h2><div class="desc">When a doctor, nurse or physiotherapist takes an unusually large share of their service in a week, do the other selected services grow faster in the 2 to 4 weeks after? <details class="how inline"><summary>How this is worked out</summary>Click a row to see both series.</details></div><div class="desc" id="bwDesc"></div></div></div>
         <p class="callout" id="bwMsg" hidden></p>
         <div id="bwBody" hidden>
           <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="bwTable"></table></div>
@@ -262,11 +277,11 @@
               <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Busy week</span><span><i class="box" style="background:var(--ghost)"></i>Other week</span></div></div>
             <div><h3 class="h3sm" id="bwTgtH">Service</h3><div class="chart sm"><canvas id="bwTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
           </div>
-          <p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “worth checking” passes a false-discovery check (Benjamini–Hochberg, 10%) across rows, so about 1 in 10 of those can still be chance. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “worth checking” passes a false-discovery check (Benjamini–Hochberg, 10%) across rows, so about 1 in 10 of those can still be chance. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p></details>
         </div>
       </section>
       <section class="panel" id="pdPanel" aria-labelledby="pdH">
-        <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? Click a row to see both series.</div><div class="desc" id="pdDesc"></div></div></div>
+        <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? <details class="how inline"><summary>How this is worked out</summary>Click a row to see both series.</details></div><div class="desc" id="pdDesc"></div></div></div>
         <p class="callout" id="pdMsg" hidden></p>
         <div id="pdBody" hidden>
           <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="pdTable"></table></div>
@@ -275,14 +290,14 @@
             <div><h3 class="h3sm" id="pdDrvH">Driver</h3><div class="chart sm"><canvas id="pdDrvChart" aria-label="Weekly volume of the driver"></canvas></div></div>
             <div><h3 class="h3sm" id="pdTgtH">Service</h3><div class="chart sm"><canvas id="pdTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
           </div>
-          <p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "worth checking" passes a false-discovery check (Benjamini–Hochberg, 10%), so about 1 in 10 of those can still be chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "worth checking" passes a false-discovery check (Benjamini–Hochberg, 10%), so about 1 in 10 of those can still be chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p></details>
         </div>
       </section>
       </div>
       <div data-lkpane="svc" hidden>
       <p class="callout" id="lkMsg"></p>
       <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
-        <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</div></div></div>
+        <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). <details class="how inline"><summary>How this is worked out</summary>A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</details></div></div></div>
         <div class="tablewrap"><table id="lkMatrixTable"></table></div>
       </section>
       <div id="lkDetail" hidden>
@@ -290,24 +305,24 @@
           <div class="phead"><div><h2 id="lkH">Weekly volume side by side</h2><div class="desc" id="lkDesc"></div></div></div>
           <div class="chart md"><canvas id="lkIdxChart" aria-label="Weekly volume indexed to each service's average"></canvas></div>
           <div class="legend" id="lkIdxLegend"></div>
-          <p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p></details>
         </section>
         <div class="grid2">
           <section class="panel" aria-labelledby="lkLH">
-            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes, with the second service shifted earlier or later. A bar well above zero at +1 means a rise in the first service is usually followed by a rise in the second a week later.</div></div></div>
+            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes, with the second service shifted earlier or later. <details class="how inline"><summary>How this is worked out</summary>A bar well above zero at +1 means a rise in the first service is usually followed by a rise in the second a week later.</details></div></div></div>
             <div class="chart md"><canvas id="lkLagChart" aria-label="Lead and lag correlations"></canvas></div>
             <div class="legend" id="lkLagLegend"></div>
             <ul class="assume" id="lkFindings"></ul>
-            <p class="note" style="margin:8px 0 0">Same-week links are often shared causes (holidays, ad pushes, salary days) rather than one service driving the other. A link that shows up one or two weeks later is the better sign of one service feeding another. Correlation is not proof of cause.</p>
+            <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Same-week links are often shared causes (holidays, ad pushes, salary days) rather than one service driving the other. A link that shows up one or two weeks later is the better sign of one service feeding another. Correlation is not proof of cause.</p></details>
           </section>
           <section class="panel" aria-labelledby="lkRH">
-            <div class="phead"><div><h2 id="lkRH">One per 100 of the other</h2><div class="desc">The smaller service per 100 of the larger, by month. A rising line means the smaller service is growing faster, for example more lab tests for every 100 doctor visits.</div></div></div>
+            <div class="phead"><div><h2 id="lkRH">One per 100 of the other</h2><div class="desc">The smaller service per 100 of the larger, by month. <details class="how inline"><summary>How this is worked out</summary>A rising line means the smaller service is growing faster, for example more lab tests for every 100 doctor visits.</details></div></div></div>
             <div class="chart md"><canvas id="lkRatioChart" aria-label="Ratio between services by month"></canvas></div>
             <div class="legend" id="lkRatioLegend"></div>
           </section>
         </div>
         <section class="panel" aria-labelledby="lkFH">
-          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had the first service in a month and then the second within 30 days. This is the direct measure of one service leading to another.</div></div></div>
+          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had the first service in a month and then the second within 30 days. <details class="how inline"><summary>How this is worked out</summary>This is the direct measure of one service leading to another.</details></div></div></div>
           <p class="callout" id="lkFollowEmpty">This needs the service follow-on export. Open the <strong>Data</strong> tab, copy the follow-on SQL, run it in Metabase and drop the CSV there.</p>
           <div id="lkFollowBody" hidden>
             <div class="chart md"><canvas id="lkFollowChart" aria-label="Follow-on share by month"></canvas></div>
@@ -319,10 +334,10 @@
       </div>
     </section>
 
-    <section class="module" data-mod="patients" id="patients" hidden>
+    <section class="module" data-mod="patients" id="patients" data-sec="drivers" hidden>
     <section class="panel" aria-labelledby="upH">
       <div class="phead">
-        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. New patients follow <strong>More filters › New patient means</strong>: first-ever visit in that month, or patient record created in that month. Returning = everyone else served that month.</div></div>
+        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. <details class="how inline"><summary>How this is worked out</summary>New patients follow <strong>More filters › New patient means</strong>: first-ever visit in that month, or patient record created in that month. Returning = everyone else served that month.</details></div></div>
       </div>
       <div id="upEmpty" class="callout">
         <p style="margin:0 0 6px"><strong>This section needs one extra Metabase export.</strong> The main export counts patients per day, so unique patients can't be worked out from it.</p>
@@ -338,12 +353,12 @@
         <div class="chart md"><canvas id="upChart" aria-label="New and returning patients by month"></canvas></div>
         <div class="legend" id="upLegend"></div>
         <div class="tablewrap" style="margin-top:12px"><table id="upTable"></table></div>
-        <p class="note" style="margin:8px 0 0">Unique patients can't be added across months or categories: someone treated in both March and April counts once in each month. For a longer period, compare month by month.</p>
+        <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Unique patients can't be added across months or categories: someone treated in both March and April counts once in each month. For a longer period, compare month by month.</p></details>
       </div>
     </section>
     </section>
 
-    <section class="module" data-mod="ads" id="ads" hidden>
+    <section class="module" data-mod="ads" id="ads" data-sec="drivers" hidden>
     <section class="panel" aria-labelledby="adsH">
       <div class="phead">
         <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
@@ -352,11 +367,11 @@
       <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
       <div class="legend" id="adLegend"></div>
       <div class="tablewrap" style="margin-top:14px;max-height:420px;overflow:auto"><table id="campTable"></table></div>
-      <p class="note" style="margin:8px 0 0">Each ad is matched to the service it promotes by its name: first its code (PT, NS, DRV, LT…), then words in the ad name, the ad set name, and finally the campaign name. Recruitment, app-install and awareness campaigns keep their own groups. Corrections go in ad_service_map.csv. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p>
+      <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each ad is matched to the service it promotes by its name: first its code (PT, NS, DRV, LT…), then words in the ad name, the ad set name, and finally the campaign name. Recruitment, app-install and awareness campaigns keep their own groups. Corrections go in ad_service_map.csv. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p></details>
     </section>
     </section>
 
-    <section class="module" data-mod="projections" id="projections" hidden>
+    <section class="module" data-mod="projections" id="projections" data-sec="plan" hidden>
       <p class="note" id="pjScope" style="margin:0"></p>
       <p class="callout" id="pjEmpty" hidden>Select at least one service and status.</p>
       <div id="pjBody" class="module">
@@ -373,7 +388,7 @@
       </section>
       <section class="panel" aria-labelledby="pjFH">
         <div class="phead">
-          <div><h2 id="pjFH">What goes into the projection</h2><div class="desc">Tick a factor to include it. Each row shows what it measured in your data and how much it changes the projection. The ticked growth rates are averaged into one.</div></div>
+          <div><h2 id="pjFH">What goes into the projection</h2><div class="desc">Tick a factor to include it. <details class="how inline"><summary>How this is worked out</summary>Each row shows what it measured in your data and how much it changes the projection. The ticked growth rates are averaged into one.</details></div></div>
           <div class="ctrls"><span class="flabel" style="min-width:0">Growth pace</span><div class="seg" id="pjPace"><button data-p="damped" title="The growth rate fades, roughly halving every 10 weeks">Slowing</button><button data-p="constant" title="The growth rate holds for the whole horizon">Constant</button></div><button class="btn" type="button" id="pjReset">Reset factors</button></div>
         </div>
         <div class="tablewrap"><table id="pjFactors" class="fxtable"></table></div>
@@ -395,20 +410,20 @@
       </div>
     </section>
 
-    <section class="module" data-mod="calendar" id="calendar" hidden>
+    <section class="module" data-mod="calendar" id="calendar" data-sec="drivers" hidden>
     <div class="grid2">
       <section class="panel" aria-labelledby="holH">
-        <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</div></div></div>
+        <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. <details class="how inline"><summary>How this is worked out</summary>Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</details></div></div></div>
         <div class="tablewrap"><table id="holTable"></table></div>
       </section>
       <section class="panel" aria-labelledby="fxH">
-        <div class="phead"><div><h2 id="fxH">Outside factor effects</h2><div class="desc">Events from the Google Sheet (sudden holidays, salary windows, security and economic events), measured the same way as holidays: orders per day during the event against the same weekdays in the four weeks around it. Campaign launches and events longer than two weeks aren't measured.</div></div></div>
+        <div class="phead"><div><h2 id="fxH">Outside factor effects</h2><div class="desc">Events from the Google Sheet (sudden holidays, salary windows, security and economic events), measured the same way as holidays: orders per day during the event against the same weekdays in the four weeks around it. <details class="how inline"><summary>How this is worked out</summary>Campaign launches and events longer than two weeks aren't measured.</details></div></div></div>
         <div class="tablewrap"><table id="fxTable"></table></div>
         <div class="tablewrap" style="margin-top:12px;max-height:320px;overflow:auto"><table id="fxEvents"></table></div>
       </section>
       <section class="panel" aria-labelledby="evH">
         <div class="phead">
-          <div><h2 id="evH">Events log</h2><div class="desc">Everything in the Saleem Outside Factors Google Sheet except official holidays, which come from the calendar. These are the markers on the trend chart. Add new events to the sheet; ask Claude to check the news and it will add them there too.</div><p class="sheetstatus" id="sheetStatus"></p></div>
+          <div><h2 id="evH">Events log</h2><div class="desc">Everything in the Saleem Outside Factors Google Sheet except official holidays, which come from the calendar. <details class="how inline"><summary>How this is worked out</summary>These are the markers on the trend chart. Add new events to the sheet; ask Claude to check the news and it will add them there too.</details></div><p class="sheetstatus" id="sheetStatus"></p></div>
           <div class="ctrls"><select id="evCat" aria-label="Event category"><option value="">All categories</option></select></div>
         </div>
         <div class="evlist" id="evList"></div>
@@ -422,7 +437,7 @@
         <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
       </section>
       <section class="panel" aria-labelledby="cmpH">
-        <div class="phead"><div><h2 id="cmpH">Competitor milestones</h2><div class="desc">From the Competitors tab of the Saleem Outside Factors sheet. After is the 4 weeks from the milestone against the 4 weeks before it, for the services picked above, compared with the usual 4-week change over the half year before; negative means orders grew less than usual.</div></div></div>
+        <div class="phead"><div><h2 id="cmpH">Competitor milestones</h2><div class="desc">From the Competitors tab of the Saleem Outside Factors sheet. <details class="how inline"><summary>How this is worked out</summary>After is the 4 weeks from the milestone against the 4 weeks before it, for the services picked above, compared with the usual 4-week change over the half year before; negative means orders grew less than usual.</details></div></div></div>
         <p class="callout" id="cmpEmpty" hidden>No competitor milestones yet. Add rows to the Competitors tab of the sheet (date, competitor, milestone, type, services, city, status, source, notes), or ask Claude to research them.</p>
         <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="cmpTable"></table></div>
         <div class="tablewrap" style="margin-top:12px"><table id="cmpSummary"></table></div>
@@ -430,7 +445,7 @@
     </div>
     </section>
 
-    <section class="module" data-mod="data" id="data" hidden>
+    <section class="module" data-mod="data" id="data" data-sec="data" hidden>
       <div class="frow"><h2 style="font-size:18px;flex:1">Data</h2><span class="note">Ads CSVs and other exports can also be loaded here:</span><button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button><input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden></div>
       <div class="grid3">
         <section class="panel" aria-labelledby="dOH">
@@ -451,7 +466,7 @@
           <div class="sample" id="sample-orders"></div>
         </section>
         <section class="panel" aria-labelledby="dPH">
-          <div class="phead"><div><h2 id="dPH">Unique patients</h2><div class="desc">The monthly unique patients export, with the columns month, category, unique_patients, new_patients, returning_patients and services. Loading it fills the Patients module.</div></div></div>
+          <div class="phead"><div><h2 id="dPH">Unique patients</h2><div class="desc">The monthly unique patients export, with the columns month, category, unique_patients, new_patients, returning_patients and services. <details class="how inline"><summary>How this is worked out</summary>Loading it fills the Patients module.</details></div></div></div>
           <div class="drop" id="drop-patients" role="button" tabindex="0" aria-label="Drop the unique patients CSV here or press Enter to choose a file">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
             <strong>Drop the patients CSV here</strong><span>or click to choose a file · replaces the previous one</span>
@@ -464,7 +479,7 @@
           <div class="sample" id="sample-patients"></div>
         </section>
         <section class="panel" aria-labelledby="dLH">
-          <div class="phead"><div><h2 id="dLH">Service follow-on</h2><div class="desc">Which patients go on to a second service within 7 or 30 days, for example lab tests after a doctor visit. Loading it adds the patient-level view to the Service links module.</div></div></div>
+          <div class="phead"><div><h2 id="dLH">Service follow-on</h2><div class="desc">Which patients go on to a second service within 7 or 30 days, for example lab tests after a doctor visit. <details class="how inline"><summary>How this is worked out</summary>Loading it adds the patient-level view to the Service links module.</details></div></div></div>
           <div class="drop" id="drop-links" role="button" tabindex="0" aria-label="Drop the service follow-on CSV here or press Enter to choose a file">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
             <strong>Drop the follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
@@ -477,7 +492,7 @@
           <div class="sample" id="sample-links"></div>
         </section>
         <section class="panel" aria-labelledby="dVH">
-          <div class="phead"><div><h2 id="dVH">Providers</h2><div class="desc">Orders per day for each doctor, nurse and physiotherapist, with the doctor’s specialty. Loading it fills the Providers module and the specialty test in Service links.</div></div></div>
+          <div class="phead"><div><h2 id="dVH">Providers</h2><div class="desc">Orders per day for each doctor, nurse and physiotherapist, with the doctor’s specialty. <details class="how inline"><summary>How this is worked out</summary>Loading it fills the Providers module and the specialty test in Service links.</details></div></div></div>
           <div class="drop" id="drop-providers" role="button" tabindex="0" aria-label="Drop the provider CSV here or press Enter to choose a file">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
             <strong>Drop the providers CSV here</strong><span>or click to choose a file · replaces the previous one</span>
@@ -503,7 +518,7 @@
           <div class="sample" id="sample-gateway"></div>
         </section>
         <section class="panel" aria-labelledby="dFH">
-          <div class="phead"><div><h2 id="dFH">Provider follow-on</h2><div class="desc">For each provider and month, how many of their patients went on to each other service within 7 and 30 days. Fills the first panel of Service links › Specialties &amp; providers.</div></div></div>
+          <div class="phead"><div><h2 id="dFH">Provider follow-on</h2><div class="desc">For each provider and month, how many of their patients went on to each other service within 7 and 30 days. <details class="how inline"><summary>How this is worked out</summary>Fills the first panel of Service links › Specialties &amp; providers.</details></div></div></div>
           <div class="drop" id="drop-pfollow" role="button" tabindex="0" aria-label="Drop the provider follow-on CSV here or press Enter to choose a file">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
             <strong>Drop the provider follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
@@ -516,7 +531,7 @@
           <div class="sample" id="sample-pfollow"></div>
         </section>
       </div>
-      <p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p>
+      <details class="how"><summary>How this is worked out</summary><p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p></details>
     </section>
 
     <footer id="foot"></footer>

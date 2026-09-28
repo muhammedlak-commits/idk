@@ -113,17 +113,13 @@ function renderWhy(){
   err.hidden=true; box.hidden=false;
   const {P:P_,cur,base,m}=R, M=MLABEL[m].replace(' (IQD)',''), f=v=>fmtVal(v,m), pc=v=>fmtPct(v/base*100,1);
   const tot=cur-base, W=whyWhere(R);
-  document.getElementById('whyH').textContent=M+viewLabel(' from ')+': '+fmtD(P_.a)+' – '+fmtD(P_.b)+' vs '+R.P.short;
+  document.getElementById('whyH').textContent=M+viewLabel(' from ')+': '+fmtD(P_.a)+' – '+fmtD(P_.b)+' vs '+R.P.short+(R.P.usual?', judged against the usual move':'');
   document.getElementById('whyDesc').textContent='Compared with '+fmtD(P_.pa)+' – '+fmtD(P_.pb)+' · '+R.cats.length+' of '+S.C+' services · '+(st.basis==='booked'?'by booking time':'by scheduled time');
-  // headline tiles
-  const tile=(lab,val,sub,cls)=>'<div class="kpi'+(cls?' '+cls:'')+'"><span class="lab">'+lab+'</span><span class="val">'+val+'</span><span class="sub">'+sub+'</span></div>';
-  document.getElementById('whyKpis').innerHTML=
-    tile(M+' now',f(cur),fmtD(P_.a)+' – '+fmtDs(P_.b),'hero')+
-    tile('Change',(tot>0?'+':'')+f(tot),pc(tot)+' vs '+R.P.short)+
-    tile(R.P.usual?'Explained by calendar, events, the usual move and ads':'Explained by calendar, events and ads',(R.eCal+R.eEv+R.eSea+R.eAd>0?'+':'')+f(R.eCal+R.eEv+R.eSea+R.eAd),pc(R.eCal+R.eEv+R.eSea+R.eAd)+' of the base')+
-    tile('Not explained by those',(R.eRest>0?'+':'')+f(R.eRest),pc(R.eRest)+' · the real underlying change');
+  document.getElementById('whyKpis').innerHTML=summaryTiles(R);
+  renderAttention(R);
+  document.getElementById('whyChartH').textContent='Why it moved, step by step';
   // waterfall
-  const steps=[{l:R.P.short.replace(/^the /,'').replace(/^./,c=>c.toUpperCase()),v:base,kind:'end'},{l:'Weekdays & holidays',v:R.eCal},{l:'Outside events',v:R.eEv}].concat(R.P.usual?[{l:'Usual move (past years)',v:R.eSea}]:[],[{l:'Meta ads (estimate)',v:R.eAd},{l:'Everything else',v:R.eRest},{l:'This period',v:cur,kind:'end'}]);
+  const steps=[{l:R.P.short.replace(/^the /,'').replace(/^./,c=>c.toUpperCase()),v:base,kind:'end'},{l:'Weekdays & holidays',v:R.eCal},{l:'Outside events',v:R.eEv}].concat(R.P.usual?[{l:'Usual move',v:R.eSea}]:[],[{l:'Meta ads',v:R.eAd},{l:'Everything else',v:R.eRest},{l:'This period',v:cur,kind:'end'}]);
   let run=0; const data=steps.map(s=>{ if(s.kind==='end'){ run=s.v; return [0,s.v]; } const lo=run, hi=run+s.v; run=hi; return [Math.min(lo,hi),Math.max(lo,hi)]; });
   const col=steps.map(s=> s.kind==='end'? css('--navy') : s.v>=0? css('--good') : css('--bad'));
   const o=baseOpts(); o.interaction={mode:'nearest',intersect:true}; o.scales.y.beginAtZero=false; moneyTicks(o);
@@ -152,10 +148,10 @@ function renderWhy(){
   // where it landed
   const pvF=v=>fmtVal(v,pvMeasure()), sections=[];
   sections.push('<div class="wcol"><h3>By service</h3>'+whyBars(W.svc,f)+'</div>');
-  if(W.pat) sections.push('<div class="wcol"><h3>New vs returning patients</h3>'+whyBars(W.pat,f)+'<p class="note">New = '+(st.newBasis==='created'?'account created that month':'first order that month')+' (More filters).</p></div>');
+  if(W.pat) sections.push('<div class="wcol"><h3>New vs returning patients</h3>'+whyBars(W.pat,f)+'<p class="note">New = '+(st.newBasis==='created'?'account created that month':'first order that month')+' (More settings).</p></div>');
   if(W.prov) sections.push('<div class="wcol"><h3>Providers'+(MONEY.has(m)?' <span class="note">· orders</span>':'')+'</h3>'+(W.prov.length?whyBars(W.prov,pvF,null,8):'<p class="note">No provider changes.</p>')+'</div>');
   if(W.spec&&W.spec.length) sections.push('<div class="wcol"><h3>Doctor specialties'+(MONEY.has(m)?' <span class="note">· orders</span>':'')+'</h3>'+whyBars(W.spec,pvF,null,6)+'</div>');
-  if(!W.prov) sections.push('<div class="wcol"><h3>Providers</h3><p class="note">'+(PV?'The provider export doesn’t cover both periods.':'Load the provider export (Data tab) to see which providers the change came from.')+'</p></div>');
+  if(!W.prov) sections.push('<div class="wcol"><h3>Providers</h3><p class="note">'+(PV?'The provider export doesn’t cover both periods.':'Load the provider export (Data &amp; settings) to see which providers the change came from.')+'</p></div>');
   document.getElementById('whyWhere').innerHTML=sections.join('');
   // the plain-language summary
   const svcTop=W.svc.slice().sort((p,q)=>Math.abs(q.d)-Math.abs(p.d)).filter(r=>Math.abs(r.d)>=Math.abs(tot)*0.1).slice(0,3);
