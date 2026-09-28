@@ -51,7 +51,7 @@ function pjModel(y, cut, F, opt, hm, ev){
   const sig={};
   // weighted straight line through log(1+z) over the 26 weeks up to day c: slope and value at c
   const fitTrend=c=>{ let sw=0,sx=0,sy=0,sxx=0,sxy=0; const a=Math.max(S.min,c-PJ.window+1); if(c-a<56) return null;
-    for(let n=a;n<=c;n++){ const w=Math.pow(0.5,(c-n)/PJ.halfLife), x=n-c, v=Math.log1p(z(n)); sw+=w; sx+=w*x; sy+=w*v; sxx+=w*x*x; sxy+=w*x*v; }
+    for(let n=a;n<=c;n++){ const w=Math.pow(0.5,(c-n)/PJ.halfLife), x=n-c, v=Math.log1p(Math.max(0,z(n))); sw+=w; sx+=w*x; sy+=w*v; sxx+=w*x*x; sxy+=w*x*v; }
     const den=sw*sxx-sx*sx; if(!den) return null; const b=(sw*sxy-sx*sy)/den; return {b,a0:(sy-b*sx)/sw}; };
   { const t=fitTrend(cut); sig.trend=t? t.b : null; }
   sig.yoy=ratio(cut-27,cut,cut-391,cut-364,364);
@@ -134,7 +134,7 @@ function renderProjections(){
     rows.map(r=>{ const head= r.fx.g!==lastG? '<tr class="grp"><td colspan="3">'+r.fx.g+(r.fx.g==='Growth'?' <span class="note">· ticked rates are averaged: '+(M.used.length? fmtPct(M.monthly,1)+' a month' : 'none ticked, so flat')+'</span>':'')+'</td></tr>' : ''; lastG=r.fx.g;
       return head+'<tr class="'+(r.on?'':'offrow')+'"><td style="white-space:normal;min-width:220px"><label class="fxl"><input type="checkbox" data-fx="'+r.fx.k+'"'+(r.on?' checked':'')+'> '+esc(r.fx.label)+'</label>'+extra(r.fx.k)+'<div class="note">'+esc(r.fx.help)+'</div></td>'+
         '<td style="text-align:left;white-space:normal">'+esc(r.what)+'</td>'+
-        '<td class="'+(Math.abs(r.eff)<0.5?'':r.eff>0?'pos':'neg')+'">'+(r.on?'':'<span class="note">if ticked </span>')+(r.eff>0?'+':'')+fmtInt(r.eff)+' <span class="note">'+fmtPct(r.pct,1)+'</span></td></tr>'; }).join('')+'</tbody>';
+        '<td class="'+(Math.abs(r.eff)<0.5?'':r.eff>0?'pos':'neg')+'">'+(r.on?'':'<span class="note">if ticked </span>')+(r.eff>0?'+':'')+fmtVal(r.eff)+' <span class="note">'+fmtPct(r.pct,1)+'</span></td></tr>'; }).join('')+'</tbody>';
   const hy=document.getElementById('pjHolYears'); if(hy) hy.value=st.pjHolYears;
 
   // ---- KPI tiles
@@ -142,7 +142,7 @@ function renderProjections(){
   const sumF=(a,b)=>{let s=0; for(let n=a;n<=b;n++) s+= n<=S.max? act(n) : M.f(n); return s;};
   const sumA=(a,b)=>{let s=0; for(let n=Math.max(a,S.min);n<=Math.min(b,S.max);n++) s+=act(n); return s;};
   const rangePct=(futureDays,dist)=> e28*Math.sqrt(28/Math.max(futureDays,7))*(1+Math.max(0,dist)/240);
-  const rng=(v,days,dist)=>{const p=rangePct(days,dist)/100; return fmtInt(v*(1-p))+' – '+fmtInt(v*(1+p));};
+  const rng=(v,days,dist)=>{const p=rangePct(days,dist)/100; return fmtVal(v*(1-p))+' – '+fmtVal(v*(1+p));};
   const curMk=monthKey(S.max), nextMk=addMonths(curMk,1);
   const mStart=mk=>toN(mk+'-01'), mEnd=mk=>mStart(mk)+daysInMonth(mk)-1;
   const curTot=sumF(mStart(curMk),mEnd(curMk)), nextTot=sumF(mStart(nextMk),mEnd(nextMk));
@@ -151,9 +151,9 @@ function renderProjections(){
   const lastH=sumA(S.max-H+1,S.max);
   const pctChip=(cur,ref,lab)=> ref? '<span class="delta '+(Math.abs((cur-ref)/ref*100)<1?'flat':cur>ref?'up':'down')+'">'+(cur>ref?'▲ ':'▼ ')+fmtPct((cur-ref)/ref*100)+' '+lab+'</span>' : '';
   const tiles=[
-    {hero:true,lab:fmtM(curMk)+' projected',val:fmtInt(curTot),d:[pctChip(curTot,prevTot,'vs '+fmtM(prevMk)),pctChip(curTot,lyOf(curMk),'vs LY')],sub:fmtInt(sumA(mStart(curMk),S.max))+' so far'},
-    {lab:fmtM(nextMk)+' projected',val:fmtInt(nextTot),d:[pctChip(nextTot,curTot,'vs '+fmtM(curMk)),pctChip(nextTot,lyOf(nextMk),'vs LY')],sub:'Likely '+rng(nextTot,daysInMonth(nextMk),mStart(nextMk)-S.max)},
-    {lab:'Next '+H+' days',val:fmtInt(full),d:[pctChip(full,lastH,'vs last '+H+' days')],sub:'Likely '+rng(full,H,H/2)},
+    {hero:true,lab:fmtM(curMk)+' projected',val:fmtVal(curTot),d:[pctChip(curTot,prevTot,'vs '+fmtM(prevMk)),pctChip(curTot,lyOf(curMk),'vs LY')],sub:fmtVal(sumA(mStart(curMk),S.max))+' so far'},
+    {lab:fmtM(nextMk)+' projected',val:fmtVal(nextTot),d:[pctChip(nextTot,curTot,'vs '+fmtM(curMk)),pctChip(nextTot,lyOf(nextMk),'vs LY')],sub:'Likely '+rng(nextTot,daysInMonth(nextMk),mStart(nextMk)-S.max)},
+    {lab:'Next '+H+' days',val:fmtVal(full),d:[pctChip(full,lastH,'vs last '+H+' days')],sub:'Likely '+rng(full,H,H/2)},
     {lab:'Typical 28-day error',val:'±'+(e28/1.4).toFixed(0)+'%',d:[bias!=null?'<span class="delta flat">'+(bias>0?'runs high by ':'runs low by ')+Math.abs(bias).toFixed(0)+'%</span>':''],sub:'This mix, '+bt.length+' past checks'}
   ];
   document.getElementById('pjKpis').innerHTML=tiles.map(t=>'<div class="kpi'+(t.hero?' hero':'')+'"><span class="lab">'+t.lab+'</span><span class="val">'+t.val+'</span><div class="deltas">'+t.d.join('')+'</div><span class="sub">'+t.sub+'</span></div>').join('');
@@ -174,9 +174,9 @@ function renderProjections(){
     lyS.push(k-364>=S.min? sumA(k-364,e-364) : null); });
   // join the lines: the last complete bucket also starts the projected line
   const firstP=projS.findIndex(v=>v!=null); if(firstP>0) projS[firstP-1]=actualS[firstP-1];
-  const o=baseOpts();
+  const o=moneyTicks(baseOpts());
   const lab=k=> g==='month'? fmtM(monthKey(k)) : fmtDs(k);
-  o.plugins.tooltip.callbacks={title:it=>{const k=B.keys[it[0].dataIndex].k; return g==='month'? fmtM(monthKey(k)) : g==='week'? 'Week of '+fmtD(k) : fmtD(k);},label:it=>{ if(it.parsed.y==null) return null; const n={0:'Actual',1:'Projected',2:'Likely low',3:'Likely high',4:'Same period last year'}[it.datasetIndex]; return ' '+n+': '+fmtInt(it.parsed.y);},
+  o.plugins.tooltip.callbacks={title:it=>{const k=B.keys[it[0].dataIndex].k; return g==='month'? fmtM(monthKey(k)) : g==='week'? 'Week of '+fmtD(k) : fmtD(k);},label:it=>{ if(it.parsed.y==null) return null; const n={0:'Actual',1:'Projected',2:'Likely low',3:'Likely high',4:'Same period last year'}[it.datasetIndex]; return ' '+n+': '+fmtVal(it.parsed.y);},
     footer:it=>{const k=B.keys[it[0].dataIndex].k, e=endOf(k); const hs2=new Set(); for(let n=k;n<=e;n++) holsOn(n).forEach(h=>hs2.add(h)); const ev=EV.list.filter(x=>x.s<=e&&x.e>=k).map(x=>x.title); return [hs2.size?'Holidays: '+[...hs2].join(', '):'', ev.length?'Events: '+ev.join(', '):''].filter(Boolean).join('\n');}};
   o.plugins.tooltip.filter=it=>it.parsed.y!=null;
   const accent=css('--accent');
@@ -200,7 +200,7 @@ function renderProjections(){
   document.getElementById('pjPH').textContent='By '+GL;
   document.getElementById('pjMonth').innerHTML='<thead><tr><th class="nosort">'+({day:'Day',week:'Week of',month:'Month'})[g]+'</th><th class="nosort">So far</th><th class="nosort">Projected</th><th class="nosort">Total</th><th class="nosort">Likely range</th><th class="nosort">Last year</th><th class="nosort">vs LY</th><th class="nosort" style="text-align:left">Holidays and events</th></tr></thead><tbody>'+
     rowsP.map(r=>{ const vs=r.ly?(r.tot-r.ly)/r.ly*100:null;
-      return '<tr><td>'+(g==='month'?fmtM(monthKey(r.k)):g==='week'?fmtDs(r.k):fmtD(r.k)+' '+dn[dow(r.k)])+'</td><td>'+(r.soFar?fmtInt(r.soFar):'–')+'</td><td class="proj">'+fmtInt(r.proj)+'</td><td><strong>'+fmtInt(r.tot)+'</strong></td><td class="proj">'+fmtInt(r.lo)+' – '+fmtInt(r.hi)+'</td><td>'+(r.ly==null?'–':fmtInt(r.ly))+'</td><td class="'+(vs==null?'':vs>0?'pos':'neg')+'">'+fmtPct(vs)+'</td><td style="text-align:left;white-space:normal;min-width:160px">'+esc(holNames(r.k,r.e))+'</td></tr>'; }).join('')+'</tbody>';
+      return '<tr><td>'+(g==='month'?fmtM(monthKey(r.k)):g==='week'?fmtDs(r.k):fmtD(r.k)+' '+dn[dow(r.k)])+'</td><td>'+(r.soFar?fmtVal(r.soFar):'–')+'</td><td class="proj">'+fmtVal(r.proj)+'</td><td><strong>'+fmtVal(r.tot)+'</strong></td><td class="proj">'+fmtVal(r.lo)+' – '+fmtVal(r.hi)+'</td><td>'+(r.ly==null?'–':fmtVal(r.ly))+'</td><td class="'+(vs==null?'':vs>0?'pos':'neg')+'">'+fmtPct(vs)+'</td><td style="text-align:left;white-space:normal;min-width:160px">'+esc(holNames(r.k,r.e))+'</td></tr>'; }).join('')+'</tbody>';
 
   // ---- per service, each fitted on its own with the same mix
   const svc=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
@@ -213,13 +213,13 @@ function renderProjections(){
   });
   document.getElementById('pjSDesc').textContent='Next '+H+' days, each service projected from its own history with the same factors. Services with fewer than 5 in the last 28 days are too small to project.';
   document.getElementById('pjSvc').innerHTML='<thead><tr><th class="nosort">Service</th><th class="nosort">Last '+H+' days</th><th class="nosort">Next '+H+' days</th><th class="nosort">Change</th><th class="nosort">Growth used / month</th></tr></thead><tbody>'+
-    '<tr class="total"><td>Sum of services</td><td>'+fmtInt(lastH)+'</td><td>'+fmtInt(sumSvc)+'</td><td>'+fmtPct(lastH?(sumSvc-lastH)/lastH*100:null)+'</td><td></td></tr>'+
-    srows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td>'+(r.thin? '<td>'+fmtInt(r.last||0)+'</td><td colspan="3" style="text-align:left;color:var(--muted)">Too little recent volume</td>' :
-      '<td>'+fmtInt(r.last)+'</td><td>'+fmtInt(r.p)+'</td><td class="'+(r.chg>0.5?'pos':r.chg<-0.5?'neg':'')+'">'+fmtPct(r.chg)+'</td><td class="'+(r.mo>0.5?'pos':r.mo<-0.5?'neg':'')+'">'+fmtPct(r.mo,1)+'</td>')+'</tr>').join('')+'</tbody>';
+    '<tr class="total"><td>Sum of services</td><td>'+fmtVal(lastH)+'</td><td>'+fmtVal(sumSvc)+'</td><td>'+fmtPct(lastH?(sumSvc-lastH)/lastH*100:null)+'</td><td></td></tr>'+
+    srows.map(r=>'<tr><td><span class="sw" style="background:'+S.colorOf[r.c]+'"></span>'+esc(label(r.c))+'</td>'+(r.thin? '<td>'+fmtVal(r.last||0)+'</td><td colspan="3" style="text-align:left;color:var(--muted)">Too little recent volume</td>' :
+      '<td>'+fmtVal(r.last)+'</td><td>'+fmtVal(r.p)+'</td><td class="'+(r.chg>0.5?'pos':r.chg<-0.5?'neg':'')+'">'+fmtPct(r.chg)+'</td><td class="'+(r.mo>0.5?'pos':r.mo<-0.5?'neg':'')+'">'+fmtPct(r.mo,1)+'</td>')+'</tr>').join('')+'</tbody>';
 
   // ---- accuracy of this mix
   document.getElementById('pjAcc').innerHTML='<thead><tr><th class="nosort">As if it were</th><th class="nosort">Projected next 28 days</th><th class="nosort">Actual</th><th class="nosort">Error</th></tr></thead><tbody>'+
-    bt.map(x=>'<tr><td>'+fmtD(x.cut)+'</td><td>'+fmtInt(x.p)+'</td><td>'+fmtInt(x.a)+'</td><td class="'+(Math.abs(x.err)<5?'':x.err>0?'pos':'neg')+'">'+fmtPct(x.err,1)+'</td></tr>').join('')+'</tbody>';
+    bt.map(x=>'<tr><td>'+fmtD(x.cut)+'</td><td>'+fmtVal(x.p)+'</td><td>'+fmtVal(x.a)+'</td><td class="'+(Math.abs(x.err)<5?'':x.err>0?'pos':'neg')+'">'+fmtPct(x.err,1)+'</td></tr>').join('')+'</tbody>';
   document.getElementById('pjAccNote').textContent='Re-runs the ticked factors as if it were each earlier date. Upcoming sheet events are left out of these checks, since sudden events aren’t known in advance.'+(F.has('custom')?' Your own growth rate is applied as set.':'');
 }
 function wireProjections(){

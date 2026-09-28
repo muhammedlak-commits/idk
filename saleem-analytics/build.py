@@ -24,6 +24,7 @@ JS_ORDER = [
     'm_patients.js',  # module: unique patients
     'm_ads.js',       # module: Meta ads
     'm_calendar.js',  # module: holiday effects + events log
+    'm_why.js',       # module: what changed and why (uses calendar, ads, providers)
     'm_projections.js',  # module: projections
     'm_sheet.js',     # live outside-factors Google Sheet
     'm_data.js',      # module: drag-and-drop data loading

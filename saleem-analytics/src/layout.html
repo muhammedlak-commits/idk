@@ -2,13 +2,14 @@
   <div class="wrap bar">
     <div class="brand"><h1>Saleem Performance Lab</h1></div>
     <nav class="tabs" aria-label="Modules" role="tablist">
+      <button role="tab" data-mod="why" title="What changed against the period before or last year, and why">What changed</button>
       <button role="tab" data-mod="overview">Overview</button>
-      <button role="tab" data-mod="monthly">Month by month</button>
+      <button role="tab" data-mod="monthly" title="Month by month">Monthly</button>
       <button role="tab" data-mod="services">Services</button>
       <button role="tab" data-mod="patients">Patients</button>
       <button role="tab" data-mod="providers">Providers</button>
       <span class="tsep" aria-hidden="true"></span>
-      <button role="tab" data-mod="links">Service links</button>
+      <button role="tab" data-mod="links" title="Service links">Links</button>
       <button role="tab" data-mod="ads">Meta ads</button>
       <button role="tab" data-mod="calendar" title="Holidays and events">Calendar</button>
       <span class="tsep" aria-hidden="true"></span>
@@ -42,7 +43,7 @@
       </div>
     </div>
     <div class="seg" id="pview" aria-label="Patients"><button data-v="all" class="on">All patients</button><button data-v="new">New</button><button data-v="ret">Returning</button></div>
-    <div class="seg" id="measure" aria-label="Measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Patients tab.">Patient-days</button></div>
+    <div class="seg" id="measure" aria-label="Measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Patients tab.">Patient-days</button><button data-m="sales" title="Sales: the services’ final prices, in IQD">Sales</button><button data-m="rev" title="Company revenue: sales minus provider shares, in IQD">Revenue</button></div>
     <div class="seg" id="gran" aria-label="Group by"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
     <span class="grow"></span>
     <button class="pill" type="button" id="moreBtn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>More filters<span class="count" id="moreCount" hidden></span></button>
@@ -63,7 +64,28 @@
 
 <main>
   <div class="wrap">
-    <section class="module" data-mod="overview" id="overview">
+    <section class="module" data-mod="why" id="why">
+    <section class="panel" aria-labelledby="whyH">
+      <div class="phead">
+        <div><h2 id="whyH">What changed</h2><div class="desc" id="whyDesc"></div></div>
+        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="prev" class="on">vs period before</button><button data-c="ly">vs last year</button></div></div>
+      </div>
+      <p class="dmsg bad" id="whyErr" hidden></p>
+      <div id="whyBody">
+        <p class="whysum" id="whySummary"></p>
+        <div class="kpis" id="whyKpis"></div>
+        <div class="whygrid">
+          <div><h3 class="wh">Why: the change, step by step</h3><div class="chart"><canvas id="whyChart" aria-label="Change split into calendar, events, ads and everything else"></canvas></div></div>
+          <dl class="dstat wsteps" id="whySteps"></dl>
+        </div>
+        <h3 class="wh" style="margin-top:18px">Where it landed</h3>
+        <div class="wwhere" id="whyWhere"></div>
+        <p class="note" style="margin-top:12px">The calendar and events steps use effects measured on past holidays and events, and an event in this period counts toward its own category’s average. The ads step is an estimate from how spend and this measure have moved together week to week; it shows timing, not proof that the ads caused it. Use the date range and services above to focus it, and the Calendar, Meta ads and Providers tabs for the detail.</p>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="overview" id="overview" hidden>
     <div class="kpis" id="kpis"></div>
 
     <section class="panel" aria-labelledby="trendH">
@@ -239,7 +261,7 @@
               <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Busy week</span><span><i class="box" style="background:var(--ghost)"></i>Other week</span></div></div>
             <div><h3 class="h3sm" id="bwTgtH">Service</h3><div class="chart sm"><canvas id="bwTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
           </div>
-          <p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “possible” passes the usual 5% bar. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p>
+          <p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “worth checking” passes a false-discovery check (Benjamini–Hochberg, 10%) across rows, so about 1 in 10 of those can still be chance. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p>
         </div>
       </section>
       <section class="panel" id="pdPanel" aria-labelledby="pdH">
@@ -252,7 +274,7 @@
             <div><h3 class="h3sm" id="pdDrvH">Driver</h3><div class="chart sm"><canvas id="pdDrvChart" aria-label="Weekly volume of the driver"></canvas></div></div>
             <div><h3 class="h3sm" id="pdTgtH">Service</h3><div class="chart sm"><canvas id="pdTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
           </div>
-          <p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "possible" passes the usual 5% bar for a single test, and with many pairs some will pass by chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p>
+          <p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "worth checking" passes a false-discovery check (Benjamini–Hochberg, 10%), so about 1 in 10 of those can still be chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p>
         </div>
       </section>
       </div>

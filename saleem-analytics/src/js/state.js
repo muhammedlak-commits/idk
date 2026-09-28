@@ -1,7 +1,15 @@
 /* ---------- state ---------- */
 const PJ_DEFAULTS=()=>({pjF:new Set(['weekday','holidays','events','trend','yoy']),pjPop:60,pjCustom:5,pjHolYears:'2',pjPace:'damped'});
-const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'overview',pjH:90,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:'',newBasis:'first',adMode:'match',adGroups:new Set(),pvSort:{k:'cur',dir:-1},lkTab:'ad',bwSel:'',gwSort:{k:'n',dir:-1},pview:'all',cmp:true,...PJ_DEFAULTS()};
-const MI={svc:0,ord:1,pat:2}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days'};
+const st={from:0,to:0,measure:'ord',gran:'week',svc:new Set(),status:new Set(),trend:'total',ly:true,hol:true,evt:true,mom:'val',adGroup:'',svcSort:{k:'cur',dir:-1},campSort:{k:'spend',dir:-1},evCat:'',upCat:'',mod:'why',pjH:90,ordersMode:'merge',basis:'scheduled',loadBasis:'scheduled',adView:'ad',adQuery:'',newBasis:'first',adMode:'match',adGroups:new Set(),pvSort:{k:'cur',dir:-1},lkTab:'ad',bwSel:'',gwSort:{k:'n',dir:-1},pview:'all',cmp:true,whyCmp:'prev',...PJ_DEFAULTS()};
+const MI={svc:0,ord:1,pat:2,sales:3,rev:4}, MLABEL={ord:'Orders',svc:'Services delivered',pat:'Patient-days',sales:'Sales (IQD)',rev:'Company revenue (IQD)'};
+const MONEY=new Set(['sales','rev']);
+/* money measures need the sales columns, and for the New/Returning views the new-patient sales columns too */
+function measureOK(m){ if(!MONEY.has(m)) return true; if(!S.hasRev) return false; return st.pview==='all'||S.hasRevNew; }
+/* a value of the current (or given) measure: counts as whole numbers, money as compact IQD */
+function fmtIQD(v){ const a=Math.abs(v||0), s=v<0?'−':''; return s+(a>=1e9?(a/1e9).toFixed(a>=1e10?1:2)+'B':a>=1e6?(a/1e6).toFixed(a>=1e8?0:1)+'M':a>=1e3?Math.round(a/1e3)+'K':Math.round(a))+' IQD'; }
+function fmtVal(v,m){ return MONEY.has(m||st.measure)? fmtIQD(v) : fmtInt(v); }
+function fmtPer(v,m){ return MONEY.has(m||st.measure)? fmtIQD(v) : v.toFixed(v<10?1:0); }
+const moneyTicks=o=>{ if(MONEY.has(st.measure)) o.scales.y.ticks.callback=v=>fmtIQD(v).replace(' IQD',''); return o; };
 
 /* sum of a measure over days [a,b] for the selected services/statuses; returns daily array when asked */
 function series(a,b,m,cats,stats){

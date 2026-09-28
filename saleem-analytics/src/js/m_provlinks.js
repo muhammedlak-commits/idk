@@ -61,12 +61,14 @@ function pfCompute(M,{fromMk,toMk,pairs,minElig=10}){
     pairOut.push({...pr,E,F:Fo,rate:E?Fo/E:null,n:mine.length,pooled,top:mine.slice().sort((x,y)=>y.e30-x.e30).slice(0,4)});
   }
   const tests=rows.filter(r=>r.z!=null).length, zStrong=tests?zTwoSided(0.05/tests):Infinity, ord={strong:0,possible:1,chance:2,none:3};
-  rows.forEach(r=>{ const z=r.z==null?null:Math.abs(r.z); r.verdict=z==null?'none':z>zStrong?'strong':z>1.96?'possible':'chance'; });
+  rows.forEach(r=>{ r.pv=r.z==null?null:normP(r.z); });
+  const cut=bhCut(rows.map(r=>r.pv),tests);
+  rows.forEach(r=>{ const z=r.z==null?null:Math.abs(r.z); r.verdict=z==null?'none':z>zStrong?'strong':r.pv<=cut?'possible':'chance'; });
   rows.sort((x,y)=>ord[x.verdict]-ord[y.verdict]||Math.abs(y.diff||0)-Math.abs(x.diff||0));
   return {rows,tests,zStrong,months,pairs:pairOut};
 }
 const pfTl=t=>UP_LABEL[t]||label(t);
-const plVerdict=(v,d)=>({strong:'<span class="delta '+(d<0?'down':'up')+'">✓ Strong</span>',possible:'<span class="delta flat">~ Possible</span>',chance:'<span class="delta flat" style="opacity:.7">Could be chance</span>',none:'<span class="note">No peers</span>'})[v];
+const plVerdict=(v,d)=>({strong:'<span class="delta '+(d<0?'down':'up')+'">✓ Strong</span>',possible:'<span class="delta flat">~ Worth checking</span>',chance:'<span class="delta flat" style="opacity:.7">Could be chance</span>',none:'<span class="note">No peers</span>'})[v];
 function renderProvFollowon(chosen){
   const panel=document.getElementById('pfPanel'), msg=document.getElementById('pfMsg'), body=document.getElementById('pfBody');
   panel.hidden=false;
@@ -78,10 +80,10 @@ function renderProvFollowon(chosen){
   if(!R.months.length) return setMsg('The provider follow-on export covers '+fmtM(m0)+' – '+fmtM(m1)+', outside this date range.');
   if(!R.rows.length) return setMsg('No provider has 10 or more patients whose 30-day window has passed in this range. Pick a longer or earlier range.');
   msg.hidden=true; body.hidden=false;
-  const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=R.tests*0.05;
+  const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=0;
   const bySrc=new Map(); pairs.forEach(p=>{ if(!bySrc.has(p.src)) bySrc.set(p.src,[]); bySrc.get(p.src).push(pfTl(p.tgt)); });
   document.getElementById('pfDesc').textContent=[...bySrc].map(([s,t])=>label(s)+' → '+t.join(', ')).join(' · ')+' · '+fmtM(R.months[0])+' – '+fmtM(R.months[R.months.length-1])+' · '+
-    R.rows.length+' provider rows with 10 or more patients: '+nS+' strong, '+nP+' possible'+(chance>=0.5?' (about '+Math.round(chance)+' possible would turn up by chance alone)':'')+'.';
+    R.rows.length+' provider rows with 10 or more patients: '+nS+' strong, '+nP+' worth checking.';
   const pc=v=>v==null?'–':(v*100).toFixed(1)+'%', pts=v=>v==null?'–':(v>0?'+':'')+(v*100).toFixed(1)+' pts';
   document.getElementById('pfTable').innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Patients seen</th><th class="nosort">Within 7 days</th><th class="nosort">Within 30 days</th><th class="nosort" title="Against the median provider of the same service (or the other providers together when there are only one or two)">vs typical provider (30 days)</th><th class="nosort">Verdict</th><th class="nosort">Orders per 100 patients</th></tr></thead><tbody>'+
     R.rows.slice(0,40).map(r=>'<tr><td dir="auto" style="text-align:left">'+esc(r.p.name)+(r.p.spec?' <span class="note">'+esc(r.p.spec)+'</span>':'')+'</td><td style="text-align:left">'+esc(label(r.src))+'</td><td style="text-align:left">'+esc(pfTl(r.tgt))+'</td><td>'+fmtInt(r.pat)+'</td><td>'+pc(r.r7)+'</td><td title="'+fmtInt(r.f30)+' of '+fmtInt(r.e30)+' patients">'+pc(r.r30)+'</td>'+
@@ -97,7 +99,7 @@ function renderProvFollowon(chosen){
   document.getElementById('pfChartH').textContent='30-day follow-on by month · '+label(pr.src)+' → '+pfTl(pr.tgt);
   const notes=['Pooled over the months in the range. A patient counts once per provider and month, from their first visit with that provider that month, so a patient seen in two months counts in both.',
     'Eligible = the 30-day (or 7-day) window has passed. Typical = the median provider of the same service (the others pooled when only one or two have enough patients), so one very large provider doesn’t make everyone else look worse; when providers differ more than chance allows, the bar is raised to match. A month on the chart needs 10 or more eligible patients.',
-    '“Strong” passes a 5% bar corrected for all '+R.tests+' rows tested; “possible” passes the usual 5% bar for one test. A provider who sees sicker patients will send more on, so a gap is a lead to look at, not proof.',
+    '“Strong” passes a 5% bar corrected for all '+R.tests+' rows tested; “worth checking” passes a false-discovery check that keeps chance finds to about 1 in 10 of those rows. A provider who sees sicker patients will send more on, so a gap is a lead to look at, not proof.',
     'Real visits only (started, finished or reviewed), whatever statuses are picked above; services with no provider yet are left out.'];
   if(st.pview!=='all'&&S.hasNew) notes.push('This export has all patients, so the New / Returning switch doesn’t change this panel.');
   if(monthKey(st.from)<m0||monthKey(st.to)>m1) notes.push('The export covers '+fmtM(m0)+' – '+fmtM(m1)+'.');
@@ -153,7 +155,10 @@ function busyWeeksCompute(provW,catW,tgtW,opts={}){
     }
   }
   const tests=rows.reduce((s,r)=>s+r.tests.length,0), ord={strong:0,possible:1,chance:2};
-  rows.forEach(r=>{ r.verdict=r.p<0.05/tests?'strong':r.p<0.05?'possible':'chance'; });
+  // a row keeps its best lag, so its p is multiplied by the lags tried before the false-discovery check across rows
+  rows.forEach(r=>{ r.pr=Math.min(1,r.p*r.tests.length); });
+  const cut=bhCut(rows.map(r=>r.pr),rows.length);
+  rows.forEach(r=>{ r.verdict=r.p<0.05/tests?'strong':r.pr<=cut?'possible':'chance'; });
   rows.sort((x,y)=>ord[x.verdict]-ord[y.verdict]||Math.abs(y.d)-Math.abs(x.d));
   return {rows,tests,nW};
 }
@@ -182,10 +187,10 @@ function renderBusyWeeks(chosen,a,b){
   if(!R.rows.length) return setMsg('Not enough provider volume in this range to test.');
   msg.hidden=true; body.hidden=false;
   bwRows=R.rows.slice(0,40); const bwKey=r=>r.name+'|'+r.cat+'|'+r.tgt; let bi=bwRows.findIndex(r=>bwKey(r)===st.bwSel); if(bi<0){ bi=0; st.bwSel=bwRows[0]?bwKey(bwRows[0]):''; }
-  const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=R.tests*0.05, M=MLABEL[st.measure].toLowerCase();
+  const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=0, M=MLABEL[pvMeasure()].toLowerCase();
   const tg=[...new Set(R.rows.map(r=>r.tgt))];
   document.getElementById('bwDesc').textContent=(st.basis==='booked'?'Provider data is dated by scheduled time, whatever Dates by is set to. ':'')+G.provW.length+' providers against '+tg.map(label).join(', ')+': '+R.rows.length+' rows, 2 and 4 weeks after, '+R.nW+' full weeks. '+
-    nS+' strong, '+nP+' possible'+(chance>=0.5?' (about '+Math.round(chance)+' possible would turn up by chance alone)':'')+'.'+(R.rows.length>40?' Showing the top 40.':'');
+    nS+' strong, '+nP+' worth checking.'+(R.rows.length>40?' Showing the top 40.':'');
   const wk=k=>k+' weeks';
   const tb=document.getElementById('bwTable');
   tb.innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Busy weeks</th><th class="nosort">Growth after busy weeks</th><th class="nosort">After other weeks</th><th class="nosort">Difference</th><th class="nosort">Over</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
@@ -197,7 +202,7 @@ function renderBusyWeeks(chosen,a,b){
   const mir=top.verdict!=='chance'&&R.rows.find(o=>o!==top&&o.cat===top.cat&&o.tgt===top.tgt&&o.verdict!=='chance'&&o.d*top.d<0);
   document.getElementById('bwFinding').innerHTML= top.verdict==='chance'
     ? 'No provider’s busy weeks are clearly followed by faster or slower growth in the other services picked; every gap here could be chance. The largest: '+esc(label(top.tgt))+' after '+esc(top.name)+'’s busy weeks ('+fmtPct(top.diffPct*100,1)+' over '+wk(top.k)+').'
-    : 'In the '+wk(top.k)+' after '+esc(top.name)+'’s busy weeks, '+esc(label(top.tgt))+' grew <strong>'+amt(top.diffPct)+' '+(top.d>0?'faster':'slower')+'</strong> than after other weeks ('+(top.verdict==='strong'?'strong':'possible: passes the usual bar but not the strict one, so treat it as a lead')+').'+
+    : 'In the '+wk(top.k)+' after '+esc(top.name)+'’s busy weeks, '+esc(label(top.tgt))+' grew <strong>'+amt(top.diffPct)+' '+(top.d>0?'faster':'slower')+'</strong> than after other weeks ('+(top.verdict==='strong'?'strong':'worth checking: passes the false-discovery check but not the strict bar, so treat it as a lead')+').'+
       (mir?' Shares within a service add up to 100%, so this may be the other side of '+esc(mir.name)+'’s result ('+fmtPct(mir.diffPct*100,0)+' after their busy weeks).':'');
   // the selected row: share bars and the other service's weekly line, two charts
   const r=bwRows[bi], labels=G.keys.map(k=>fmtDs(k)), acc=css('--accent'), gh=css('--ghost'), title=it=>'Week of '+fmtD(G.keys[it[0].dataIndex]);

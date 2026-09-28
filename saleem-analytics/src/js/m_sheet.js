@@ -76,5 +76,47 @@ function startSheet(){
         sheetState.cmpRows=rows; sheetState.cmpMissing=false; saveSheetCache(); loadCompetitors(); render(); renderSheetStatus(); return; }
       if(ev.error&&ev.error.code==='tool_error'){ sheetState.cmpMissing=true; sheetState.cmpRows=null; loadCompetitors(); render(); renderSheetStatus(); }
     }, {refetchInterval:600000, cache:{staleTime:60000}});
+    // Metabase data tabs, filled on a timer by automation/metabase_to_sheet.gs; a tab that doesn't exist yet is skipped quietly
+    if(SHEET.data){
+      const opt={refetchInterval:1800000, cache:{staleTime:300000}};
+      if(SHEET.log) mcp.watchTool(SHEET.server, SHEET.tool, {spreadsheetId:SHEET.spreadsheetId, range:SHEET.log}, ev=>{
+        if(ev.type!=='data') return; const rows=valuesToRows(valuesOf(ev),['tab','refreshed_at']); if(!rows) return;
+        const L={}; rows.forEach(r=>{ const t=Date.parse(r.refreshed_at); L[r.tab]={at:isFinite(t)?t:null,rows:+r.rows||0,status:r.status||''}; });
+        sheetFeed.log=L; applySheetData(); }, opt);
+      Object.entries(SHEET.data).forEach(([key,tab])=>mcp.watchTool(SHEET.server, SHEET.tool, {spreadsheetId:SHEET.spreadsheetId, range:tab}, ev=>{
+        if(ev.type!=='data') return; const v=valuesOf(ev); if(!Array.isArray(v)||v.length<2) return;
+        sheetFeed.tabs[key]={csv:valuesToCsv(v),tab,rows:v.length-1}; applySheetData(); }, opt));
+    }
   }).catch(()=>renderSheetStatus());
+}
+
+/* ---------- Metabase data from the sheet ----------
+   A tab's copy replaces the built-in data unless a file was loaded by hand after the tab's last refresh. */
+const sheetFeed={tabs:{},log:null,used:{}};
+const FEED={services:['orders','orders'],servicesBooked:['ordersBooked','orders'],uniquePatients:['patients','patients'],followon:['links','links'],providers:['providers','providers'],gateway:['gateway','gateway'],provFollowon:['pfollow','pfollow']};   // P key -> [meta key, DROPS key]
+function valuesToCsv(values){
+  const q=v=>{ v=v==null?'':String(v); return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  return values.filter(r=>r&&r.some(v=>v!=null&&String(v)!=='')).map(r=>r.map(q).join(',')).join('\n');
+}
+let feedT=null;
+function applySheetData(){ clearTimeout(feedT); feedT=setTimeout(()=>{
+  const meta=dataMeta(); let changed=false;
+  for(const [key,f] of Object.entries(sheetFeed.tabs)){
+    const lg=sheetFeed.log&&sheetFeed.log[f.tab], at=lg&&lg.at||null, m=meta[FEED[key][0]];
+    if(m&&(!at||m.at>at)){ sheetFeed.used[key]={state:'older',at,rows:f.rows,tab:f.tab}; continue; }
+    if(!DROPS[FEED[key][1]].check(headerLine(f.csv))){ sheetFeed.used[key]={state:'bad',at,rows:f.rows,tab:f.tab}; continue; }
+    if(key==='services'||key==='servicesBooked'){ try{ buildServices(f.csv); }catch(e){ sheetFeed.used[key]={state:'bad',at,rows:f.rows,tab:f.tab}; continue; } }
+    sheetFeed.used[key]={state:'used',at,rows:f.rows,tab:f.tab};
+    if(P[key]!==f.csv){ P[key]=f.csv; changed=true; }
+  }
+  if(changed) boot(true); else if(st.mod==='data') renderData();
+},400); }
+function feedText(key){
+  const u=sheetFeed.used[key], lg=sheetFeed.log&&SHEET&&SHEET.data&&sheetFeed.log[SHEET.data[key]];
+  const when=t=>t? new Date(t).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'unknown time';
+  if(!u) return lg&&/^error/.test(lg.status)? 'Refresh failed: '+esc(lg.status.replace(/^error:\s*/,'')) : '<span class="note">Not set up (see automation/README.md)</span>';
+  const err=lg&&/^error/.test(lg.status)? ' <span class="note">· last refresh failed: '+esc(lg.status.replace(/^error:\s*/,''))+'</span>' : '';
+  if(u.state==='used') return 'In use · tab '+esc(u.tab)+', refreshed '+when(u.at)+', '+fmtInt(u.rows)+' rows'+err;
+  if(u.state==='older') return '<span class="note">Not used: the file you loaded is newer than the tab’s refresh ('+when(u.at)+')</span>'+err;
+  return '<span class="note">Tab '+esc(u.tab)+' doesn’t have the columns this box needs; check its question number</span>'+err;
 }

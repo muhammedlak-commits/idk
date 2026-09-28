@@ -20,7 +20,9 @@ function syncChips(){
   document.querySelectorAll('#svcChips .chip').forEach(b=>{const on=st.svc.has(b.dataset.c); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   document.querySelectorAll('#stChips .chip').forEach(b=>{const on=st.status.has(b.dataset.s); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
   const seg=(id,attr,val)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===val));
-  seg('measure','m',st.measure); seg('pview','v',S.hasNew?st.pview:'all');
+  if(!measureOK(st.measure)) st.measure='ord';
+  seg('measure','m',st.measure);
+  document.querySelectorAll('#measure [data-m="sales"],#measure [data-m="rev"]').forEach(b=>{ const ok=measureOK(b.dataset.m); b.classList.toggle('unavail',!ok); b.title= ok? (b.dataset.m==='sales'?'Sales: the services’ final prices, in IQD':'Company revenue: sales minus provider shares, in IQD') : !S.hasRev? 'Load the latest orders export (Data tab) to see sales and revenue' : 'The loaded export has no new-patient sales, so this view can’t show money'; }); seg('pview','v',S.hasNew?st.pview:'all');
   document.querySelectorAll('#pview [data-v="new"],#pview [data-v="ret"]').forEach(b=>{ b.classList.toggle('unavail',!S.hasNew); b.title= !S.hasNew? 'Load the latest orders export (Data tab) to split orders by new and returning patients' : b.dataset.v==='new'? 'Patients in their first month: '+(st.newBasis==='created'?'the month their record was created':'the month of their first order')+' (change it under More filters)' : 'Patients served in an earlier month'; }); seg('basis','b',st.basis); seg('newBasis','n',st.newBasis); seg('adMode','a',st.adMode);
   const ag=document.getElementById('agChips'); ag.hidden=st.adMode!=='pick';
   ag.querySelectorAll('.chip').forEach(b=>{const on=st.adGroups.has(b.dataset.g); b.classList.toggle('on',on); b.classList.toggle('off',!on); b.setAttribute('aria-pressed',on);});
@@ -39,7 +41,9 @@ function wireFilters(){
   document.querySelectorAll('#adMode button').forEach(b=>b.addEventListener('click',()=>setAdMode(b.dataset.a)));
   document.querySelectorAll('#newBasis button').forEach(b=>b.addEventListener('click',()=>{st.newBasis=b.dataset.n; render();}));
   document.querySelectorAll('#basis button').forEach(b=>b.addEventListener('click',()=>setBasis(b.dataset.b)));
-  document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{st.measure=b.dataset.m;render();}));
+  document.querySelectorAll('#measure button').forEach(b=>b.addEventListener('click',()=>{
+    if(!measureOK(b.dataset.m)){ showModule('data',true); showMsg(document.getElementById('msg-orders'),'bad', S.hasRev? 'This orders data has sales but not the new-patient sales columns, so New and Returning can’t show money. Copy the SQL below, run it and drop the CSV here.' : 'This orders data has no sales columns. Copy the SQL below, run it in Metabase and drop the CSV here to see sales and revenue.'); return; }
+    st.measure=b.dataset.m; render(); }));
   document.querySelectorAll('#pview button').forEach(b=>b.addEventListener('click',()=>{
     if(b.dataset.v!=='all'&&!S.hasNew){ showModule('data',true); showMsg(document.getElementById('msg-orders'),'bad','This orders data has no new-patient columns. Copy the SQL below, run it in Metabase and drop the CSV here to use New and Returning.'); return; }
     st.pview=b.dataset.v; render(); }));

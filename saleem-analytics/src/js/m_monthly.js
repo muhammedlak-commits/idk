@@ -10,13 +10,13 @@ function renderMom(){
   const body=rows.map(r=>{
     const cells=months.map(mk=>{
       const v=val(mk,r.cats); if(!v) return '<td>–</td>';
-      if(st.mom==='val') return '<td>'+fmtInt(v.t)+'</td>';
-      if(st.mom==='perday') return '<td>'+v.pd.toFixed(v.pd<10?1:0)+'</td>';
+      if(st.mom==='val') return '<td>'+fmtVal(v.t)+'</td>';
+      if(st.mom==='perday') return '<td>'+fmtPer(v.pd)+'</td>';
       const ref= st.mom==='mom'? val(addMonths(mk,-1),r.cats) : (toN(addMonths(mk,-12)+'-01')>=S.min? val(addMonths(mk,-12),r.cats):null);
       if(!ref||!ref.pd) return '<td>–</td>';
       const p=(v.pd-ref.pd)/ref.pd*100; const a=Math.min(Math.abs(p),60)/60;
       const bg = p>=0? 'rgba(12,163,12,'+(0.05+a*0.22)+')' : 'rgba(208,59,59,'+(0.05+a*0.22)+')';
-      return '<td class="heat" style="background:'+bg+'" title="'+v.pd.toFixed(1)+' vs '+ref.pd.toFixed(1)+' per day">'+fmtPct(p)+'</td>';
+      return '<td class="heat" style="background:'+bg+'" title="'+fmtPer(v.pd)+' vs '+fmtPer(ref.pd)+' per day">'+fmtPct(p)+'</td>';
     }).join('');
     return '<tr'+(r.total?' class="total"':'')+'><td>'+(r.color?'<span class="sw" style="background:'+r.color+'"></span>':'')+esc(r.name)+'</td>'+cells+'</tr>';
   }).join('');

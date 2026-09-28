@@ -5,35 +5,43 @@ function buildServices(csvText){
   const hdr = splitCsv(lines[0]).map(normHdr);
   const ix = n => hdr.indexOf(n);
   const iDay=ix('day'), iCat=ix('service_category'), iSt=ix('visit_status'), iS=ix('services_delivered'), iO=ix('distinct_orders'), iP=ix('distinct_patients');
-  // optional new-patient columns (latest export): new by first order, new by account created
-  const iNew=['first_services','first_orders','first_patients','created_services','created_orders','created_patients'].map(k=>ix('new_'+k)), hasNew=iNew.every(i=>i>=0);
+  // optional money columns (IQD): sales and company revenue
+  const iMoney=[ix('sales_iqd'),ix('company_revenue_iqd')], hasRev=iMoney.every(i=>i>=0);
+  // optional new-patient columns (latest export): new by first order, new by account created, in the cube's measure order
+  const newCols=k=>['services','orders','patients','sales_iqd','revenue_iqd'].map(x=>ix('new_'+k+'_'+x));
+  const iNewF=newCols('first'), iNewC=newCols('created'), hasNew=[0,1,2].every(m=>iNewF[m]>=0&&iNewC[m]>=0), hasRevNew=hasNew&&hasRev&&[3,4].every(m=>iNewF[m]>=0&&iNewC[m]>=0);
   if(iDay<0||iCat<0||iO<0) throw new Error('This CSV needs day, service_category and distinct_orders columns.');
+  const M=5;   // measures: services, orders, patient-days, sales, company revenue
   const cats=new Map(), sts=new Map(), rows=[];
   let min=Infinity, max=-Infinity;
+  const g=(f,i)=>i>=0?num(f[i]):0;
   for(let k=1;k<lines.length;k++){
     const f=splitCsv(lines[k]); if(f.length<hdr.length-1) continue;
     const n=toN(f[iDay].slice(0,10)); if(!isFinite(n)) continue;
     const c=f[iCat].trim(), st=iSt>=0?f[iSt].trim():'finished';
     if(!cats.has(c)) cats.set(c,cats.size); if(!sts.has(st)) sts.set(st,sts.size);
-    const r=[n,cats.get(c),sts.get(st), num(f[iS]), num(f[iO]), iP>=0?num(f[iP]):0]; if(hasNew) iNew.forEach(i=>r.push(num(f[i]))); rows.push(r);
+    const r=[n,cats.get(c),sts.get(st), g(f,iS), g(f,iO), g(f,iP), g(f,iMoney[0]), g(f,iMoney[1])];
+    if(hasNew){ iNewF.forEach(i=>r.push(g(f,i))); iNewC.forEach(i=>r.push(g(f,i))); }
+    rows.push(r);
     if(n<min)min=n; if(n>max)max=n;
   }
   const catList=[...cats.keys()], stList=[...sts.keys()];
   const N=max-min+1, C=catList.length, T=stList.length;
   // cube[m][ (d*C + c)*T + t ]
-  const cube=[new Float64Array(N*C*T),new Float64Array(N*C*T),new Float64Array(N*C*T)];
-  for(const r of rows){const o=((r[0]-min)*C+r[1])*T+r[2]; cube[0][o]+=r[3]; cube[1][o]+=r[4]; cube[2][o]+=r[5];}
-  // new-patient cubes and returning = all - new, per basis, in the same [services, orders, patients] layout
+  const mk=()=>Array.from({length:M},()=>new Float64Array(N*C*T));
+  const cube=mk();
+  for(const r of rows){const o=((r[0]-min)*C+r[1])*T+r[2]; for(let m=0;m<M;m++) cube[m][o]+=r[3+m];}
+  // new-patient cubes and returning = all - new, per basis, in the same measure layout
   let cubeNew=null, cubeRet=null;
-  if(hasNew){ const mk=()=>[new Float64Array(N*C*T),new Float64Array(N*C*T),new Float64Array(N*C*T)];
+  if(hasNew){
     cubeNew={first:mk(),created:mk()}; cubeRet={first:mk(),created:mk()};
-    for(const r of rows){ const o=((r[0]-min)*C+r[1])*T+r[2]; for(let m=0;m<3;m++){ cubeNew.first[m][o]+=r[6+m]; cubeNew.created[m][o]+=r[9+m]; } }
-    for(const k of ['first','created']) for(let m=0;m<3;m++){ const A_=cube[m], B_=cubeNew[k][m], R=cubeRet[k][m]; for(let i=0;i<A_.length;i++) R[i]=Math.max(0,A_[i]-B_[i]); } }
+    for(const r of rows){ const o=((r[0]-min)*C+r[1])*T+r[2]; for(let m=0;m<M;m++){ cubeNew.first[m][o]+=r[3+M+m]; cubeNew.created[m][o]+=r[3+2*M+m]; } }
+    for(const k of ['first','created']) for(let m=0;m<M;m++){ const A_=cube[m], B_=cubeNew[k][m], R=cubeRet[k][m]; for(let i=0;i<A_.length;i++) R[i]= m>=3? A_[i]-B_[i] : Math.max(0,A_[i]-B_[i]); } }
   // colour order fixed by all-time non-cancelled orders, so a filter never repaints a service
   const tot=catList.map((c,ci)=>{let s=0; for(let d=0;d<N;d++) for(let t=0;t<T;t++) if(stList[t]!=='cancelled') s+=cube[1][(d*C+ci)*T+t]; return s;});
   const order=catList.map((c,i)=>i).sort((a,b)=>tot[b]-tot[a]);
   const colorOf={}; order.forEach((ci,rank)=>{colorOf[catList[ci]] = rank<8? 'var(--s'+(rank+1)+')' : 'var(--s-other)';});
-  return {min,max,N,C,T,catList,stList,cube,cubeNew,cubeRet,hasNew,order,tot,colorOf,rowCount:rows.length};
+  return {min,max,N,C,T,catList,stList,cube,cubeNew,cubeRet,hasNew,hasRev,hasRevNew,order,tot,colorOf,rowCount:rows.length};
 }
 function splitCsv(line){
   if(line.indexOf('"')<0) return line.split(',');

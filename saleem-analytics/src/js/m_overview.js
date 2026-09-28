@@ -20,7 +20,7 @@ function renderKpis(){
   const cpo=ord?spend/ord:null, cpoP=ordP?spendP/ordP:null, cpoY=ordY?spendY/ordY:null;
   const pat=total(a,b,'pat',cats,stats), patP=hasP?total(pa,pb,'pat',cats,stats):null, patY=hasY?total(ya,yb,'pat',cats,stats):null;
   const tiles=[
-    {hero:true,lab:MLABEL[m]+viewLabel(' <span class="note">· ')+(viewLabel()?'</span>':''),val:fmtInt(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtInt(cur/len)+' a day · '+len+' days'},
+    {hero:true,lab:MLABEL[m]+viewLabel(' <span class="note">· ')+(viewLabel()?'</span>':''),val:fmtVal(cur),d:[deltaChip(cur,prev,'vs prev'),deltaChip(cur,ly,'vs LY')],sub:fmtVal(cur/len)+' a day · '+len+' days'},
     {lab:'Cancellation rate',val:cr==null?'–':cr.toFixed(1)+'%',d:[ptsChip(cr,crp,'vs prev'),ptsChip(cr,cry,'vs LY')],sub:'Cancelled ÷ all orders'},
     {lab:'Ad spend <span class="note">· '+adModeLabel()+'</span>',val:fmtUsd(spend),d:[deltaChip(spend,spendP,'vs prev',false),deltaChip(spend,spendY,'vs LY',false)],sub:conv? fmtInt(conv)+' WhatsApp conversations':''},
     {lab:'Ad cost per '+(viewLabel()?(st.pview==='new'?'new-patient ':'returning-patient '):'')+'order <span class="note">· '+adModeLabel()+'</span>',val:cpo==null?'–':fmtUsd(cpo),d:[deltaChip(cpo,cpoP,'vs prev',false),deltaChip(cpo,cpoY,'vs LY',false)],sub:conv? fmtUsd(sumConvSpend(a,b,groups)/conv)+' per conversation':''}
@@ -63,11 +63,11 @@ function renderTrend(){
     if(rest.length){ const v=aggregate(series(a,b,m,rest,stats),a,B); ds.push({label:'Other ('+rest.length+')',data:[...v],borderColor:css('--s-other'),borderWidth:2,pointRadius:0,tension:.25}); }
   }
   const notes=hoverNotes(B,a,b,g);
-  const opts=baseOpts();
+  const opts=moneyTicks(baseOpts());
   opts.plugins.bands={bands:bandsFor(a,b,B,g),holColor:css('--hol'),ramColor:css('--ram'),evtColor:css('--evt'),cmpColor:css('--s2')};
   opts.plugins.tooltip.callbacks={
     title:items=>{const i=items[0].dataIndex, k=B.keys[i].k; return g==='week'? 'Week of '+fmtD(k)+(partial[i]?' (partial)':'') : g==='month'? fmtM(monthKey(k))+(partial[i]?' (partial)':'') : new Date(k*DAY).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});},
-    label:it=>' '+it.dataset.label+': '+fmtInt(it.parsed.y),
+    label:it=>' '+it.dataset.label+': '+fmtVal(it.parsed.y),
     footer:items=>{const n=notes[items[0].dataIndex]; const out=[]; if(n.hol.length) out.push('Holidays: '+n.hol.join(', ')); n.ev.slice(0,4).forEach(e=>out.push('• '+e)); (n.cmp||[]).slice(0,3).forEach(c=>out.push('◆ '+c)); return out;}
   };
   if(trendChart) trendChart.destroy();
@@ -80,7 +80,7 @@ function renderTrend(){
   leg.innerHTML=items.join('');
   const total_=total(a,b,m,cats,stats);
   document.getElementById('trendH').textContent=MLABEL[m]+viewLabel(' from ')+' over time';
-  document.getElementById('trendDesc').textContent=(st.basis==='booked'?'By booking time':'By scheduled time')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtInt(total_)+' '+MLABEL[m].toLowerCase()+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
+  document.getElementById('trendDesc').textContent=(st.basis==='booked'?'By booking time':'By scheduled time')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+cats.length+' of '+S.C+' services · '+fmtVal(total_)+(MONEY.has(m)?' '+MLABEL[m].replace(' (IQD)','').toLowerCase():' '+MLABEL[m].toLowerCase())+(partial[partial.length-1]&&g!=='day'?' · last '+g+' is partial':'');
 
   // spend chart on the same buckets (separate axis, separate chart: never dual-axis)
   const groups=spendGroups();

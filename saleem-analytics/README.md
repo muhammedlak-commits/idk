@@ -6,9 +6,28 @@ Open `dist/saleem-performance.html` in a browser. It needs internet only for the
 
 ## Modules
 
-The page has ten modules, switched with the tabs in the header (Data is the button at the right): Overview, Month by month, Services, Patients, Providers, Service links, Meta ads, Calendar (holidays and events), Projections, and Data. The filter bar is one row: date range, services, measure and By; Dates by, visit status, New patient and Ad spend are under More filters. Earlier order: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
+The page has eleven modules, switched with the tabs in the header (Data is the button at the right): What changed, Overview, Monthly, Services, Patients, Providers, Links (service links), Meta ads, Calendar (holidays and events), Projections, and Data. The filter bar is one row: date range, services, patient view, measure (orders, services, patient-days, sales, company revenue) and By; Dates by, visit status, New patient and Ad spend are under More filters. Earlier order: Overview, Month by month, Services, Providers, Service links, Patients, Meta ads, Projections, Holidays & events, and Data (drag-and-drop loading of the orders and unique patients exports). The filter bar applies to all of them (Projections ignores the date range and always projects from the latest day in the data).
 
 Source code is split the same way under `src/`: `layout.html` and `styles.css` for the page, and one file per module in `src/js/` (`m_overview.js`, `m_projections.js`, …) plus shared helpers (`core.js`, `data.js`, `state.js`, `filters.js`, `charts.js`, `main.js`). `build.py` stitches them into the single file in `dist/`.
+
+## What changed
+
+The opening tab. It compares the date range with the period before it (or the same days last year) for the services, statuses, measure and patient view picked above, with quick buttons for the last month, last 4 weeks and last 3 months.
+
+- **Why**, as a waterfall that adds up to the real change:
+  1. Weekdays and holidays: each period's expected level from the usual weekday shares (last year, holiday days left out) and each holiday's measured past effect.
+  2. Outside events: sheet events at their category's measured effect.
+  3. Meta ads: the change in matching spend times the link between weekly spend and this measure over the past year. It counts only when that link passes the 5% bar (Bartlett-corrected), and the elasticity is capped at 0 to 1.
+  4. Everything else: what those three don't explain.
+
+  Each step applies to what the previous steps leave.
+- **Where it landed**: the change by service, new vs returning patients, provider and doctor specialty (providers use orders when a money measure is picked).
+- A short written summary sits on top.
+- These are estimates. An event in the period counts toward its own category's average. The ads step shows timing, not proof.
+
+## Sales and revenue
+
+The orders queries also return `sales_iqd`, the services' `finalPriceAmount`, with tagged orders included. They return `company_revenue_iqd` too: sales minus all ten provider revenue shares (override amount, else calculated amount). Both come in new-patient versions. With those columns, the measure switch gets Sales and Revenue, which every orders-based tab follows. Provider, gateway and follow-on exports stay counts.
 
 ## Projections
 
@@ -98,6 +117,8 @@ In the Data tab, choose *This file is dated by: Booking time* before dropping th
 Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq's fixed public holidays.
 
 ## Refreshing
+
+- Automatic: `automation/metabase_to_sheet.gs` copies saved Metabase questions into `data_…` tabs of the Saleem Outside Factors sheet every 6 hours. Opened in claude.ai, the page reads those tabs live. A tab's copy is used unless a file was loaded by hand after that tab's last refresh. Setup is in `automation/README.md`.
 
 - Quick: open the **Data** tab and drag the Metabase orders export onto the Orders box (or click it to choose the file). Choose *Add or update days* to merge with what's there or *Replace everything*. The unique patients export goes on the Patients box. Loaded files are kept in your browser until the page is rebuilt. Ads and events CSVs can still be loaded with **Load CSV** in the header.
 - Permanent: replace the files in `data/` and run `python3 build.py`.

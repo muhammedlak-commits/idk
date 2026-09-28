@@ -33,10 +33,13 @@ const isDoctorCat=c=> c==='doctorVisit'||c==='surgeries';
 /* rows inside [a,b] that pass the top filter; rows are sorted by day, so find the start by bisection */
 function pvEach(a,b,fn,extra){
   const R=PV.rows; let lo=0, hi=R.length; while(lo<hi){ const m=(lo+hi)>>1; if(R[m].n<a) lo=m+1; else hi=m; }
-  const mi=MI[st.measure];
+  const mi=MI[pvMeasure()];
   for(let i=lo;i<R.length&&R[i].n<=b;i++){ const r=R[i]; if(!st.svc.has(r.cat)||!st.status.has(r.st)) continue; if(extra&&!extra(r)) continue; fn(r,r.v[mi]); }
 }
 function pvTotals(a,b,keyFn,extra){ const m=new Map(); pvEach(a,b,(r,v)=>{ const k=keyFn(r); m.set(k,(m.get(k)||0)+v); },extra); return m; }
+/* the provider export has counts only, so money measures fall back to orders there */
+const pvMeasure=()=> MONEY.has(st.measure)? 'ord' : st.measure;
+const pvMoneyNote=()=> MONEY.has(st.measure)? 'The provider export has no sales, so this section shows orders. ' : '';
 function pvSelCats(){ return PV? PV.cats.filter(c=>st.svc.has(c)) : []; }
 
 function renderProviders(){
@@ -45,7 +48,7 @@ function renderProviders(){
   empty.hidden=true;
   const cats=pvSelCats();
   if(!cats.length){ msg.innerHTML='None of the services picked in the filter bar have named providers. Pick <strong>Doctor visit</strong>, <strong>Nursing</strong> or <strong>Physiotherapy</strong>.'; msg.hidden=false; body.hidden=true; return; }
-  const a=st.from, b=st.to, len=b-a+1, M=MLABEL[st.measure];
+  const a=st.from, b=st.to, len=b-a+1, M=MLABEL[pvMeasure()];
   const notes=[];
   if(st.basis==='booked') notes.push('Provider data is dated by scheduled time, whatever Dates by is set to.');
   if(st.pview!=='all'&&S.hasNew) notes.push('The provider export has all patients, so the New / Returning switch doesn’t change this module.');
@@ -79,7 +82,7 @@ function renderProviders(){
       '<td>'+fmtInt(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td>'+(r.prev==null?'–':fmtInt(r.prev))+'</td><td class="'+cls(r.diff)+'">'+(r.diff==null?'–':(r.diff>0?'+':'')+fmtInt(r.diff))+'</td><td class="'+cls(r.chg)+'">'+fmtPct(r.chg,0)+'</td><td class="'+cls(r.ly)+'">'+fmtPct(r.ly,0)+'</td></tr>').join('')+'</tbody>';
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const key=th.dataset.k; st.pvSort= st.pvSort.k===key? {k:key,dir:-st.pvSort.dir} : {k:key,dir:key==='name'||key==='cat'||key==='spec'?1:-1}; renderProviders(); }));
   document.getElementById('pvTableNote').textContent=(rows.length>60?'Top 60 of '+rows.length+' providers by the sorted column. ':'')+'Previous period = the same number of days just before. Change % needs at least 5 in the previous period.';
-  document.getElementById('pvDesc').textContent=cats.map(label).join(', ')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+M;
+  document.getElementById('pvDesc').textContent=pvMoneyNote()+cats.map(label).join(', ')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+M;
   // trend of the busiest providers
   const B=buckets(a,b,st.gran), labels=B.keys.map(x=>bucketLabel(x.k,st.gran));
   const topIds=active.sort((x,y)=>y[1]-x[1]).slice(0,6).map(x=>x[0]);
@@ -105,7 +108,7 @@ function renderSpecialties(a,b,B,labels,hasP,hasY,len){
   panel.hidden=false;
   if(!PV.hasSpec){ none.hidden=false; sbody.hidden=true; return; }
   none.hidden=true; sbody.hidden=false;
-  const onlyDoc=r=>isDoctorCat(r.cat), M=MLABEL[st.measure];
+  const onlyDoc=r=>isDoctorCat(r.cat), M=MLABEL[pvMeasure()];
   const cur=pvTotals(a,b,specOf,onlyDoc), prev=hasP?pvTotals(a-len,a-1,specOf,onlyDoc):new Map(), ly=hasY?pvTotals(a-364,b-364,specOf,onlyDoc):new Map();
   const grand=[...cur.values()].reduce((s,v)=>s+v,0);
   const specs=[...cur.keys()].sort((x,y)=>cur.get(y)-cur.get(x));
@@ -127,7 +130,7 @@ function renderSpecialties(a,b,B,labels,hasP,hasY,len){
    Drivers: each doctor specialty and the busiest doctors and nurses among the selected services.
    Targets: the other selected services. For every pair, week-over-week changes in the driver
    against changes in the target 0-4 weeks later. Many pairs are tested at once, so "strong" uses
-   a Bonferroni bar (5% across every pair and lag); "possible" is the 5% bar for one test. */
+   a Bonferroni bar (5% across every pair and lag); "worth checking" passes a Benjamini–Hochberg false-discovery check at 10%. */
 /* Provider comparison robust to one dominant provider: each provider is compared with the median of the
    OTHER providers of the same service (leave-one-out), and the standard error includes the provider's own
    binomial noise, the between-provider spread of the others (DerSimonian-Laird tau^2) and the uncertainty of
@@ -151,6 +154,11 @@ function zTwoSided(p){ // |z| with two-sided tail p, by bisection on the normal 
   const tail=z=>{ const t=1/(1+0.2316419*z), d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI); return 2*d*t*(0.31938153+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429)))); };
   let lo=0, hi=8; for(let i=0;i<60;i++){ const m=(lo+hi)/2; if(tail(m)>p) lo=m; else hi=m; } return (lo+hi)/2;
 }
+/* two-sided normal tail p for a z score */
+function normP(z){ z=Math.abs(z); const t=1/(1+0.2316419*z), d=Math.exp(-z*z/2)/Math.sqrt(2*Math.PI); return Math.min(1,2*d*t*(0.31938153+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429))))); }
+/* Benjamini–Hochberg: the largest p that keeps the expected share of chance findings among those
+   passing under q (10%), out of m tests. "Worth checking" rows pass this; "strong" rows pass Bonferroni. */
+function bhCut(ps,m,q=0.1){ const s=ps.filter(p=>p!=null&&isFinite(p)).sort((a,b)=>a-b); let cut=-1; s.forEach((p,i)=>{ if(p<=q*(i+1)/m) cut=p; }); return cut; }
 let pdSel=0, pdRows=[];
 function renderDrivers(chosen,a,b){
   const panel=document.getElementById('pdPanel'), msg=document.getElementById('pdMsg'), body=document.getElementById('pdBody');
@@ -173,7 +181,7 @@ function renderDrivers(chosen,a,b){
   driverCats.forEach(c=>{ const tp=pvTotals(w0,end,r=>r.p,r=>r.cat===c);
     [...tp.entries()].filter(([pi])=>PV.provs[pi].name!=='Unassigned').sort((x,y)=>y[1]-x[1]).slice(0,6).forEach(([pi])=>addWeekly(pvName(PV.provs[pi]),label(c)+' provider',c,r=>r.p===pi)); });
   const tgt=chosen.map(c=>({c,v:weeklyOf(c,a,b).v.slice(0,nW)}));
-  const d=v=>v.slice(1).map((x,i)=>Math.log1p(x)-Math.log1p(v[i]));
+  const d=v=>v.slice(1).map((x,i)=>Math.log1p(Math.max(0,x))-Math.log1p(Math.max(0,v[i])));
   const pairs=[];
   for(const dr of drivers){ const dx=d(dr.v);
     for(const t of tgt){ if(t.c===dr.cat) continue; const dy=d(t.v);
@@ -181,29 +189,32 @@ function renderDrivers(chosen,a,b){
       if(best) pairs.push({dr,t,...best}); } }
   if(!pairs.length){ msg.textContent='Not enough provider volume in this range to test.'; msg.hidden=false; body.hidden=true; return; }
   const tests=pairs.length*5, zStrong=zTwoSided(0.05/tests);
-  pairs.forEach(p=>{ const s=Math.sqrt(p.ne); p.verdict=Math.abs(p.r)>zStrong/s?'strong':Math.abs(p.r)>1.96/s?'possible':'noise'; });
+  // each pair keeps its best of 5 lags, so its p is multiplied by 5 before the false-discovery check across pairs
+  pairs.forEach(p=>{ p.p=Math.min(1,normP(p.r*Math.sqrt(p.ne))*5); });
+  const cut=bhCut(pairs.map(p=>p.p),pairs.length);
+  pairs.forEach(p=>{ const s=Math.sqrt(p.ne); p.verdict=Math.abs(p.r)>zStrong/s?'strong':p.p<=cut?'possible':'noise'; });
   pairs.sort((x,y)=>Math.abs(y.r)-Math.abs(x.r));
   pdRows=pairs.slice(0,20); if(pdSel>=pdRows.length) pdSel=0;
   msg.hidden=true; body.hidden=false;
   const nStrong=pairs.filter(p=>p.verdict==='strong').length, nPoss=pairs.filter(p=>p.verdict==='possible').length;
-  const chance=pairs.length*0.05;
-  document.getElementById('pdDesc').textContent=drivers.length+' drivers against '+tgt.map(t=>label(t.c)).join(', ')+': '+pairs.length+' pairs, lags 0–4 weeks, '+nW+' full weeks. '+nStrong+' strong, '+nPoss+' possible'+(chance>=0.5?' (about '+Math.round(chance)+' possible would turn up by chance alone)':'')+'.';
-  const vt={strong:'<span class="delta up">✓ Strong</span>',possible:'<span class="delta flat">~ Possible</span>',noise:'<span class="delta flat" style="opacity:.7">Could be chance</span>'};
+  const chance=0;
+  document.getElementById('pdDesc').textContent=drivers.length+' drivers against '+tgt.map(t=>label(t.c)).join(', ')+': '+pairs.length+' pairs, lags 0–4 weeks, '+nW+' full weeks. '+nStrong+' strong, '+nPoss+' worth checking'+(chance>=0.5?' (about '+Math.round(chance)+' possible would turn up by chance alone)':'')+'.';
+  const vt={strong:'<span class="delta up">✓ Strong</span>',possible:'<span class="delta flat">~ Worth checking</span>',noise:'<span class="delta flat" style="opacity:.7">Could be chance</span>'};
   const tb=document.getElementById('pdTable');
   tb.innerHTML='<thead><tr><th class="nosort" style="text-align:left">Driver</th><th class="nosort" style="text-align:left">Type</th><th class="nosort" style="text-align:left">Service it may move</th><th class="nosort">Best lag</th><th class="nosort">Correlation</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
     pdRows.map((p,i)=>'<tr data-i="'+i+'" class="'+(i===pdSel?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(p.dr.name)+'</td><td style="text-align:left">'+esc(p.dr.kind)+'</td><td style="text-align:left">'+esc(label(p.t.c))+'</td><td>'+(p.k===0?'Same week':p.k+' wk later')+'</td><td>'+p.r.toFixed(2)+'</td><td>'+vt[p.verdict]+'</td></tr>').join('')+'</tbody>';
   tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ pdSel=+tr.dataset.i; renderDrivers(chosen,a,b); }));
   document.getElementById('pdFinding').innerHTML= nStrong
     ? '<strong>'+nStrong+' pair'+(nStrong>1?'s pass':' passes')+' the strict bar.</strong> The top one: changes in '+esc(pairs[0].dr.name)+' line up with changes in '+esc(label(pairs[0].t.c))+' '+(pairs[0].k?pairs[0].k+' week'+(pairs[0].k>1?'s':'')+' later':'in the same week')+' (r = '+pairs[0].r.toFixed(2)+(pairs[0].r>0?', moving the same way':', moving in opposite directions')+').'
-    : 'No pair passes the strict bar, so none of these links is clearly more than chance with this many pairs tested. “Possible” rows are leads to check with a longer range.';
+    : 'No pair passes the strict bar, so none of these links is clearly more than chance with this many pairs tested. “Worth checking” rows are leads to check with a longer range.';
   // the selected row: two separate charts
   const p=pdRows[pdSel], labels=keys.map(k=>fmtDs(k));
   const mk=(el,old,lab,data,color)=>{ if(old) old.destroy(); const o=baseOpts(); o.scales.y.ticks.maxTicksLimit=4; o.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' '+lab+': '+fmtInt(it.parsed.y)};
     return new Chart(document.getElementById(el),{type:'line',data:{labels,datasets:[{label:lab,data,borderColor:color,backgroundColor:color,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}]},options:o}); };
   pdDrv=mk('pdDrvChart',pdDrv,p.dr.name,p.dr.v,css('--s2'));
   pdTgt=mk('pdTgtChart',pdTgt,label(p.t.c),p.t.v,css('--accent'));
-  document.getElementById('pdDrvH').textContent='Weekly '+MLABEL[st.measure].toLowerCase()+' · '+p.dr.name+' ('+p.dr.kind.toLowerCase()+')';
-  document.getElementById('pdTgtH').textContent='Weekly '+MLABEL[st.measure].toLowerCase()+' · '+label(p.t.c)+(p.k?' (compare with '+p.k+' week'+(p.k>1?'s':'')+' later)':'');
+  document.getElementById('pdDrvH').textContent='Weekly '+MLABEL[pvMeasure()].toLowerCase()+' · '+p.dr.name+' ('+p.dr.kind.toLowerCase()+')';
+  document.getElementById('pdTgtH').textContent='Weekly '+MLABEL[pvMeasure()].toLowerCase()+' · '+label(p.t.c)+(p.k?' (compare with '+p.k+' week'+(p.k>1?'s':'')+' later)':'');
 }
 function wireProviders(){
   document.getElementById('copySqlPv').addEventListener('click',()=>navigator.clipboard.writeText(P.providersSql).then(()=>toast('Provider SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/provider_orders_daily.sql')));

@@ -31,7 +31,7 @@ function weeklyOf(c,a,b){
   return {v:out,keys};
 }
 function lagCorr(A,B,maxLag=4){
-  const d=v=>v.slice(1).map((x,i)=>Math.log1p(x)-Math.log1p(v[i]));
+  const d=v=>v.slice(1).map((x,i)=>Math.log1p(Math.max(0,x))-Math.log1p(Math.max(0,v[i])));
   const x=d(A), y=d(B), out=[];
   for(let k=-maxLag;k<=maxLag;k++){ const xs=[], ys=[];
     for(let t=0;t<x.length;t++){ const u=t+k; if(u<0||u>=y.length) continue; xs.push(x[t]); ys.push(y[u]); }
@@ -69,7 +69,7 @@ function renderLinks(){
   const colorOf=c=>css(S.colorOf[c].slice(4,-1));
   // 1. indexed weekly volume
   const idx=W.map(w=>{ const m=w.v.reduce((s,x)=>s+x,0)/(w.v.length||1); return {label:label(w.c),data:w.v.map(x=>m?x/m*100:null),borderColor:colorOf(w.c),backgroundColor:colorOf(w.c),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}; });
-  const o1=baseOpts(); o1.scales.y.beginAtZero=false; o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(W[0].keys[it[0].dataIndex]),label:it=>' '+it.dataset.label+': '+Math.round(it.parsed.y)+' (= '+fmtInt(W[it.datasetIndex].v[it.dataIndex])+' '+MLABEL[st.measure].toLowerCase()+')'};
+  const o1=baseOpts(); o1.scales.y.beginAtZero=false; o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(W[0].keys[it[0].dataIndex]),label:it=>' '+it.dataset.label+': '+Math.round(it.parsed.y)+' (= '+fmtVal(W[it.datasetIndex].v[it.dataIndex])+' '+MLABEL[st.measure].toLowerCase()+')'};
   if(lkIdx) lkIdx.destroy(); lkIdx=new Chart(document.getElementById('lkIdxChart'),{type:'line',data:{labels,datasets:idx},options:o1});
   document.getElementById('lkIdxLegend').innerHTML=idx.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
   // 2. lead / lag for each pair
@@ -152,13 +152,13 @@ function renderAdLink(chosen,a,b){
   o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' Spend: '+fmtUsd(it.parsed.y)};
   if(adSpChart) adSpChart.destroy();
   adSpChart=new Chart(document.getElementById('alSpendChart'),{type:'bar',data:{labels,datasets:[{label:'Ad spend',data:S_,backgroundColor:css('--spend'),borderRadius:{topLeft:3,topRight:3},borderSkipped:'bottom',maxBarThickness:18}]},options:o1});
-  const o2=baseOpts(); o2.scales.y.ticks.maxTicksLimit=4; o2.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' '+MLABEL[st.measure]+': '+fmtInt(it.parsed.y)};
+  const o2=baseOpts(); o2.scales.y.ticks.maxTicksLimit=4; o2.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(keys[it[0].dataIndex]),label:it=>' '+MLABEL[st.measure]+': '+fmtVal(it.parsed.y)}; moneyTicks(o2);
   if(adOrdChart) adOrdChart.destroy();
   adOrdChart=new Chart(document.getElementById('alOrdChart'),{type:'line',data:{labels,datasets:[{label:MLABEL[st.measure],data:O_,borderColor:css('--accent'),backgroundColor:css('--accent-wash'),fill:true,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}]},options:o2});
   document.getElementById('alSpendH').textContent='Weekly ad spend · '+spendTitle;
   document.getElementById('alOrdH').textContent='Weekly '+MLABEL[st.measure].toLowerCase()+' · '+ordTitle;
   // lags 0..4: spend change in week t against order change in week t+k
-  const d=v=>v.slice(1).map((x,i)=>Math.log1p(x)-Math.log1p(v[i]));
+  const d=v=>v.slice(1).map((x,i)=>Math.log1p(Math.max(0,x))-Math.log1p(Math.max(0,v[i])));
   const dx=d(S_), dy=d(O_);
   const lags=[0,1,2,3,4].map(k=>{ const xs=[],ys=[]; for(let t=0;t+k<dy.length;t++){ xs.push(dx[t]); ys.push(dy[t+k]); } const r=corr(xs,ys), n=xs.length, ne=effN(xs,ys);
     const strong=r!=null&&Math.abs(r)>2.58/Math.sqrt(ne), possible=r!=null&&Math.abs(r)>1.96/Math.sqrt(ne);

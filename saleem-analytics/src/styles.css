@@ -231,3 +231,26 @@ details.more[open]>summary{margin-bottom:10px}
 .fxtable input[type=number]{width:64px;border:1px solid var(--border);border-radius:6px;padding:2px 6px;background:var(--surface);font-size:12.5px}
 .fxtable select{padding:2px 6px}
 .fxtable td .note{font-weight:400;margin-top:2px}
+
+/* ---------- what changed ---------- */
+.whygrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:14px;align-items:start}
+.whygrid .chart{height:300px}
+h3.wh{font-size:13.5px;font-weight:600;margin:0 0 6px}
+.wsteps{margin:0}
+.wsteps div{grid-template-columns:1fr}
+.wsteps dt{color:var(--ink);font-weight:600;display:flex;justify-content:space-between;gap:10px}
+.wsteps dt b.pos{color:var(--good)} .wsteps dt b.neg{color:var(--bad)}
+.wsteps dd{color:var(--ink-2)}
+.wwhere{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.wcol h3{font-size:12.5px;font-weight:600;color:var(--ink-2);margin:0 0 6px}
+.wbars{display:flex;flex-direction:column;gap:4px}
+.wrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(60px,1fr) auto 52px;gap:8px;align-items:center;font-size:12.5px}
+.wrow.other{color:var(--muted)}
+.wname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wtrack{position:relative;height:12px;background:linear-gradient(var(--axis),var(--axis)) center/1px 100% no-repeat}
+.wbar{position:absolute;top:1px;bottom:1px;border-radius:2px}
+.wbar.pos{background:var(--good)} .wbar.neg{background:var(--bad)}
+.wval{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap} .wval.pos{color:var(--good)} .wval.neg{color:var(--bad)}
+.wpct{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:900px){ .whygrid{grid-template-columns:1fr} }
+.whysum{padding:14px 16px;border-radius:12px;background:var(--surface-2);margin:0 0 14px;font-size:14px;line-height:1.55}

@@ -13,6 +13,10 @@
 --   new_created_services : services_delivered, counting only services of patients new by account created (below)
 --   new_created_orders   : distinct_orders, counting only services of patients new by account created
 --   new_created_patients : distinct_patients, counting only patients new by account created
+--   sales_iqd            : sum of finalPriceAmount (IQD) of those services; tagged orders are included, as in all sales totals
+--   company_revenue_iqd  : sales_iqd minus all ten provider revenue shares (override amount, else calculated amount);
+--                          a service with no share recorded counts in full
+--   new_first_sales_iqd, new_first_revenue_iqd, new_created_sales_iqd, new_created_revenue_iqd : the same, for new patients only
 --
 -- New patients, for the dashboard's All / New / Returning views (returning = total - new, worked out in the dashboard):
 --   first_month            : month of the patient's first-ever real visit (started, finished or reviewed) in any service
@@ -50,12 +54,33 @@ base AS (
     (o.id IN (SELECT order_id FROM tagged_orders))               AS is_tagged,
     date_trunc('month', v."scheduledTime")::date                 AS visit_month,     -- visit month, not booking month
     date_trunc('month', pi."createdAt")::date                    AS created_month,
-    (u."userType" IN ('independent_patient', 'dependant_patient')) AS is_patient
+    (u."userType" IN ('independent_patient', 'dependant_patient')) AS is_patient,
+    COALESCE(s."finalPriceAmount", 0)                            AS sales,
+    COALESCE(rs_physio."overrideAmount",  rs_physio."calculatedAmount",  0)
+    + COALESCE(rs_doc."overrideAmount",   rs_doc."calculatedAmount",     0)
+    + COALESCE(rs_nurse."overrideAmount", rs_nurse."calculatedAmount",   0)
+    + COALESCE(rs_rad."overrideAmount",   rs_rad."calculatedAmount",     0)
+    + COALESCE(rs_lab."overrideAmount",   rs_lab."calculatedAmount",     0)
+    + COALESCE(rs_eye."overrideAmount",   rs_eye."calculatedAmount",     0)
+    + COALESCE(rs_amb."overrideAmount",   rs_amb."calculatedAmount",     0)
+    + COALESCE(rs_vendor."overrideAmount",rs_vendor."calculatedAmount",  0)
+    + COALESCE(rs_b2b."overrideAmount",   rs_b2b."calculatedAmount",     0)
+    + COALESCE(rs_booking."overrideAmount",rs_booking."calculatedAmount",0) AS provider_share
   FROM       "public"."Service"     s
   JOIN       "public"."Visit"       v  ON v.id  = s."visitId"
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN  "public"."RevenueShare" rs_physio  ON rs_physio.id  = s."physiotherapistRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_doc     ON rs_doc.id     = s."doctorRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_nurse   ON rs_nurse.id   = s."nurseRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_rad     ON rs_rad.id     = s."radiologyTechnicianRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_lab     ON rs_lab.id     = s."labTestTechnicianRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_eye     ON rs_eye.id     = s."eyeExamTechnicianRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_amb     ON rs_amb.id     = s."ambulanceDriverRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_vendor  ON rs_vendor.id  = s."vendorRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_b2b     ON rs_b2b.id     = s."b2bInstitutionRevenueShareId"
+  LEFT JOIN  "public"."RevenueShare" rs_booking ON rs_booking.id = s."bookingProviderRevenueShareId"
   WHERE s."deletedAt" IS NULL
     AND o."deletedAt" IS NULL
     AND v."deletedAt" IS NULL
@@ -91,7 +116,13 @@ SELECT
   COUNT(DISTINCT CASE WHEN is_new_first THEN patient_id END)                     AS new_first_patients,
   COUNT(DISTINCT CASE WHEN is_new_created THEN service_id END)                   AS new_created_services,
   COUNT(DISTINCT CASE WHEN is_new_created AND NOT is_tagged THEN order_id END)   AS new_created_orders,
-  COUNT(DISTINCT CASE WHEN is_new_created THEN patient_id END)                   AS new_created_patients
+  COUNT(DISTINCT CASE WHEN is_new_created THEN patient_id END)                   AS new_created_patients,
+  ROUND(SUM(sales))                                                              AS sales_iqd,
+  ROUND(SUM(sales - provider_share))                                             AS company_revenue_iqd,
+  ROUND(SUM(CASE WHEN is_new_first THEN sales ELSE 0 END))                       AS new_first_sales_iqd,
+  ROUND(SUM(CASE WHEN is_new_first THEN sales - provider_share ELSE 0 END))      AS new_first_revenue_iqd,
+  ROUND(SUM(CASE WHEN is_new_created THEN sales ELSE 0 END))                     AS new_created_sales_iqd,
+  ROUND(SUM(CASE WHEN is_new_created THEN sales - provider_share ELSE 0 END))    AS new_created_revenue_iqd
 FROM flagged
 GROUP BY 1, 2, 3
 ORDER BY 1, 2, 3;

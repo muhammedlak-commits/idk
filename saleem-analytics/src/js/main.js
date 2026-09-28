@@ -1,6 +1,6 @@
 /* ---------- render ---------- */
 const MODULES={
-  overview:()=>{ renderKpis(); renderTrend(); },
+  why:renderWhy, overview:()=>{ renderKpis(); renderTrend(); },
   monthly:renderMom, services:renderSvcTable, providers:()=>{ renderProviders(); renderGateway(); }, links:renderLinks, patients:renderUnique, ads:renderAds,
   projections:renderProjections, calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderCompetitors(); renderSheetStatus(); }, data:renderData
 };
@@ -11,7 +11,7 @@ function render(){
   lsSet('spl.view',JSON.stringify({measure:st.measure,gran:st.gran,trend:st.trend,mod:st.mod}));
 }
 function showModule(mod, push){
-  if(!MODULES[mod]) mod='overview';
+  if(!MODULES[mod]) mod='why';
   st.mod=mod;
   document.querySelectorAll('.module').forEach(el=>el.hidden=el.dataset.mod!==mod);
   document.querySelectorAll('.tabs [data-mod]').forEach(b=>{ const on=b.dataset.mod===mod; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; });
@@ -40,7 +40,7 @@ function boot(reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(v.mod) st.mod=v.mod; }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]) st.mod=h;
-    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireContext(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireWhy(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
     setTimeout(startSheet,0);
     st.to=S.max; st.from=Math.max(S.min, toN(addMonths(monthKey(S.max),-11)+'-01')); st.gran='week';

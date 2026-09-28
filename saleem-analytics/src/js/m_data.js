@@ -101,8 +101,8 @@ function renderData(){
     const text=P[key]; if(!text) return '<h4>'+title+'</h4>'+row('Source','Nothing loaded yet. Run the '+(key==='servicesBooked'?'booking':'scheduled')+'-time query and drop it here.');
     const X= (st.basis==='booked')===(key==='servicesBooked')? S : buildServices(text);
     return '<h4>'+title+(((st.basis==='booked')===(key==='servicesBooked'))?' · showing now':'')+'</h4>'+
-      row('Source', m? esc(m.name)+' <span class="note">('+(m.mode==='replace'||key==='servicesBooked'&&!ORIG.servicesBooked?'loaded':'added to built-in data')+', '+fmtAt(m.at)+')</span>' : 'Built into this page')+
-      row('Dates', fmtD(X.min)+' – '+fmtD(X.max))+row('Rows', X.rowCount.toLocaleString('en-US'))+row('Services', X.C+' categories, '+X.T+' statuses');
+      row('Source', (typeof sheetFeed!=='undefined'&&sheetFeed.used[key]&&sheetFeed.used[key].state==='used')? 'Google Sheet, refreshed automatically' : m? esc(m.name)+' <span class="note">('+(m.mode==='replace'||key==='servicesBooked'&&!ORIG.servicesBooked?'loaded':'added to built-in data')+', '+fmtAt(m.at)+')</span>' : 'Built into this page')+
+      row('Dates', fmtD(X.min)+' – '+fmtD(X.max))+row('Rows', X.rowCount.toLocaleString('en-US'))+row('Services', X.C+' categories, '+X.T+' statuses')+row('Sales and revenue', X.hasRev? (X.hasRevNew?'Included, also for new patients':'Included') : 'Not in this export');
   };
   document.getElementById('stat-orders').innerHTML=block('By scheduled time','services',meta.orders)+block('By booking time','servicesBooked',meta.ordersBooked);
   const cur= st.loadBasis==='booked'? meta.ordersBooked : meta.orders;
@@ -132,6 +132,8 @@ function renderData(){
   mstat('gateway','gateway',G_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
   mstat('pfollow','pfollow',F_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
+  if(SHEET&&SHEET.data&&window.claude) [['stat-orders',['services','servicesBooked']],['stat-patients',['uniquePatients']],['stat-links',['followon']],['stat-providers',['providers']],['stat-gateway',['gateway']],['stat-pfollow',['provFollowon']]].forEach(([id,keys])=>{
+    const el=document.getElementById(id); if(el) el.insertAdjacentHTML('beforeend', keys.map(k=>row(keys.length>1?(k==='services'?'Sheet, scheduled':'Sheet, booking'):'Google Sheet', feedText(k))).join('')); });
   renderSamples();
 }
 
@@ -146,14 +148,16 @@ const SAMPLES={
           ['distinct_orders','Number of distinct orders','42'],
           ['distinct_patients','Distinct patients that day','41'],
           ['new_first_services ·\u200b new_first_orders ·\u200b new_first_patients','The same three counts for new patients: first order with Saleem in that month (optional)','9 · 9 · 9'],
-          ['new_created_services ·\u200b new_created_orders ·\u200b new_created_patients','The same for patients whose record was created that month (optional)','7 · 7 · 7']],
+          ['new_created_services ·\u200b new_created_orders ·\u200b new_created_patients','The same for patients whose record was created that month (optional)','7 · 7 · 7'],
+          ['sales_iqd ·\u200b company_revenue_iqd','Final prices, and final prices minus all provider shares, in IQD (optional; turns on Sales and Revenue)','1260000 · 441000'],
+          ['new_first_sales_iqd ·\u200b new_first_revenue_iqd ·\u200b new_created_sales_iqd ·\u200b new_created_revenue_iqd','The same for new patients (optional; money in the New and Returning views)','180000 · 63000 · 150000 · 52500']],
     rules:['One row for each day, service and visit status. Days with nothing for a service can be left out.',
            'The six new_ columns are optional. With them, the All patients / New / Returning switch in the filter bar works; returning = all minus new.',
            'Keep the column names as shown. Their order doesn’t matter, and extra columns are ignored.',
            'A time after the date (2026-09-01T00:00:00) is fine. Numbers can have thousands separators.',
            'For a quick update, export only the latest days and use “Add or update days”.',
            'The day is either the scheduled visit date or the booking date. Pick which one under \u201cThis file is dated by\u201d before dropping the file.'],
-    csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients,new_first_services,new_first_orders,new_first_patients,new_created_services,new_created_orders,new_created_patients\n2026-09-01,physiotherapy,finished,42,42,41,6,6,6,5,5,5\n2026-09-01,physiotherapy,cancelled,3,3,3,1,1,1,1,1,1\n2026-09-01,nursing,finished,51,50,44,9,9,8,7,7,6\n2026-09-01,nursing,reviewed,6,6,6,0,0,0,0,0,0\n2026-09-01,doctorVisit,finished,14,14,14,5,5,5,4,4,4\n2026-09-01,labTest,finished,13,12,12,4,4,4,3,3,3\n2026-09-01,physiotherapy (b2b),finished,4,4,4,0,0,0,0,0,0\n2026-09-02,physiotherapy,finished,45,45,44,7,7,7,6,6,6\n2026-09-02,nursing,finished,49,48,42,8,8,7,6,6,6\n'},
+    csv:'day,service_category,visit_status,services_delivered,distinct_orders,distinct_patients,new_first_services,new_first_orders,new_first_patients,new_created_services,new_created_orders,new_created_patients,sales_iqd,company_revenue_iqd,new_first_sales_iqd,new_first_revenue_iqd,new_created_sales_iqd,new_created_revenue_iqd\n2026-09-01,physiotherapy,finished,42,42,41,6,6,6,5,5,5,1260000,441000,180000,62999,150000,52500\n2026-09-01,physiotherapy,cancelled,3,3,3,1,1,1,1,1,1,90000,31499,30000,10500,30000,10500\n2026-09-01,nursing,finished,51,50,44,9,9,8,7,7,6,1275000,446250,225000,78750,175000,61249\n2026-09-01,nursing,reviewed,6,6,6,0,0,0,0,0,0,150000,52500,0,0,0,0\n2026-09-01,doctorVisit,finished,14,14,14,5,5,5,4,4,4,560000,196000,200000,70000,160000,56000\n2026-09-01,labTest,finished,13,12,12,4,4,4,3,3,3,455000,159250,140000,49000,105000,36750\n2026-09-01,physiotherapy (b2b),finished,4,4,4,0,0,0,0,0,0,80000,28000,0,0,0,0\n2026-09-02,physiotherapy,finished,45,45,44,7,7,7,6,6,6,1350000,472499,210000,73500,180000,62999\n2026-09-02,nursing,finished,49,48,42,8,8,7,6,6,6,1225000,428750,200000,70000,150000,52500\n'},
   patients:{file:'saleem-unique-patients-sample.csv',
     cols:[['month','Month, YYYY-MM','2026-08'],
           ['category','Service type, or all for every service together','all, physiotherapy, nursing, doctorVisit, labTest, radiology…'],
