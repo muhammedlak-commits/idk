@@ -34,6 +34,7 @@ JS_ORDER = [
     'm_cloud.js',     # saved uploads: CSV assets + db pointers on claude.ai
     'm_data.js',      # module: drag-and-drop data loading
     'files.js',       # Load CSV (header button)
+    'm_tips.js',      # hover explanations for every column header
     'main.js',        # tabs, render, boot
 ]
 
