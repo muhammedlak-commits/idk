@@ -18,8 +18,10 @@ const fmtM = mk => new Date(Date.UTC(+mk.slice(0,4), +mk.slice(5,7)-1, 1)).toLoc
 const fmtInt = v => Math.round(v||0).toLocaleString('en-US');
 const fmtUsd = v => '$'+(Math.abs(v)>=10000? Math.round(v).toLocaleString('en-US') : (v||0).toLocaleString('en-US',{maximumFractionDigits: v<100?2:0, minimumFractionDigits: v<100&&v>0?2:0}));
 const fmtPct = (v,d=0) => v==null||!isFinite(v) ? '–' : (v>0?'+':'')+v.toFixed(d)+'%';
-/* DoctorInfo.speciality comes as a code-like word (internist, general_surgeon): shown with a capital and spaces */
-const prettySpec = s => s ? String(s).trim().replace(/_/g,' ').replace(/^./,c=>c.toUpperCase()) : s;
+/* DoctorInfo.speciality comes as a code (Internist, GeneralSurgeon, EntOtolaryngologist): shown as words, with the odd spelling fixed */
+const SPEC_NAME={entotolaryngologist:'ENT (otolaryngologist)',gyncologist:'Gynecologist',orthopedicdoctor:'Orthopedic doctor'};
+const prettySpec = s => { if(!s) return s; const t=String(s).trim(), k=t.toLowerCase().replace(/[^a-z]/g,''); if(SPEC_NAME[k]) return SPEC_NAME[k];
+  const w=t.replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').toLowerCase(); return w.charAt(0).toUpperCase()+w.slice(1); };
 const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
 

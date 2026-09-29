@@ -64,8 +64,8 @@ function renderLinkPeriods(from,to){
     pfMonths={A:mA,B:mB};
     if(mA.length&&mB.length){
       // a recent month whose 30 days haven't passed for everyone would read low: use the 7-day window then
-      let pat=0, e30=0; PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return; mA.forEach(mk=>{ const b=PF.base.get(p.i+'|'+mk); if(b){ pat+=b.pat; e30+=b.e30; } }); });
-      if(pat&&e30<0.9*pat) pfWin=7;
+      let pat=0, e30=0, e7=0; PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return; [...mA,...mB].forEach(mk=>{ const b=PF.base.get(p.i+'|'+mk); if(b){ if(mA.includes(mk)){ pat+=b.pat; e30+=b.e30; } e7+=b.e7; } }); });
+      if(pat&&e30<0.9*pat&&e7>0) pfWin=7;   // only when the export carries the 7-day columns
       const eK='e'+pfWin, fK='f'+pfWin;
       PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return;
         const side=ms=>{ let e=0,f=0; ms.forEach(mk=>{ const b=PF.base.get(p.i+'|'+mk); if(!b) return; e+=b[eK];
@@ -79,6 +79,7 @@ function renderLinkPeriods(from,to){
   }
   // cases or doctors: fewer cases, a different case mix, or doctors sending a different share
   const SPL= pfRows.length? lkcSplit(A,B,pfSrc,pfTgt,pfMonths.A,pfMonths.B,pfWin) : null;
+  if(SPL&&SPL.empty) lines.push('<li><strong>Cases or doctors?</strong> The provider follow-on export has no '+esc(fN.toLowerCase())+' patients past their '+pfWin+'-day window in period '+SPL.noFollow+', so the share sent on can’t be worked out. Upload a newer follow-on export, or pick earlier periods.</li>');
   if(SPL&&SPL.R.length){ const S_=SPL, tot=S_.cases+S_.mix+S_.docs, f2=v=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(Math.abs(v)<10?1:0), grp=S_.useSpec?'specialties':'doctors';
     const caseSide=S_.cases+S_.mix, verdict= Math.abs(caseSide)>=2*Math.abs(S_.docs)? 'Mostly the cases, not the doctors: '+(S_.cases*S_.mix>=0||Math.abs(S_.cases)>Math.abs(S_.mix)? (S_.cases<0?'fewer':'more')+' patients'+(Math.abs(S_.mix)>=0.25*Math.abs(caseSide)?', and a mix shifted toward '+grp+' that send '+(S_.mix<0?'fewer':'more')+' on':'') : 'the mix of '+grp+' shifted')+'.'
       : Math.abs(S_.docs)>=2*Math.abs(caseSide)? 'Mostly the doctors: the same kinds of patients were sent on '+(S_.docs<0?'less':'more')+' often.' : 'Both: the cases and the share sent on each moved it.';
@@ -122,6 +123,7 @@ function renderLinkPeriods(from,to){
   if(pfMonths) notes.push('Follow-on uses the months '+(pfMonths.B.map(fmtM).join(', ')||'none')+' (B) and '+(pfMonths.A.map(fmtM).join(', ')||'none')+' (A) from the provider follow-on export'+(pfWin===7?'; A’s 30 days haven’t passed for everyone yet, so the 7-day window is used':'')+'.');
   if(!PF) notes.push('Load the provider follow-on export to see whose patients went on to '+tN.toLowerCase()+'.');
   if(!PV) notes.push('Load the provider export to see '+fN.toLowerCase()+' orders by provider.');
+  if(SPL&&SPL.R.length&&SPL.matchedShare<0.8) notes.push('Only '+Math.round(SPL.matchedShare*100)+'% of cases belong to doctors in the follow-on export; the rest use the overall share sent on (*). Upload a newer provider follow-on export so the two cover the same doctors.');
   if(SPL&&SPL.R.length){ notes.push('Cases a day come from '+(SPL.src==='pv'?'the daily provider export (exact dates)':'the follow-on export’s patients per day of its months, so a month exported part-way through reads low; load the provider export for exact counts')+'. * = under 10 patients, so the share uses everyone’s.');
     if(!SPL.useSpec) notes.push('The exports have no doctor specialty, so this groups by doctor. Run the updated provider and provider follow-on queries (Copy SQL in Data & settings) to group by specialty.'); }
   else if(!showSpec&&(PV||PF)) notes.push('No specialty in the exports yet. Run the updated queries (Copy SQL in Data & settings) to add it.');
@@ -143,10 +145,11 @@ function wireLinkPeriods(){
    A group with under 10 eligible patients in a period takes that period's pooled share. */
 function lkcSplit(A,B,pfSrc,pfTgt,mA,mB,win,byDoctor){
   const eK='e'+win, fK='f'+win;
+  const pvSpec=new Map(PV? PV.provs.filter(p=>p.spec).map(p=>[p.cat+'|'+p.id,p.spec]) : []), specOfPF=p=>p.spec||pvSpec.get(p.cat+'|'+p.id)||'';
   const useSpec=!byDoctor&&(PF.provs.some(p=>pfSrc.includes(p.cat)&&p.spec)||(!!PV&&PV.provs.some(p=>pfSrc.includes(p.cat)&&p.spec)));
   const gk=(cat,spec,id)=> useSpec? (isDoctorCat(cat)? (spec||'No specialty') : label(cat)) : cat+'|'+id;
   const G=new Map(), g=(k,name)=>G.get(k)||G.set(k,{k,name,eA:0,fA:0,eB:0,fB:0,pA:0,pB:0,nA:0,nB:0}).get(k);
-  PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return; const k=gk(p.cat,p.spec,p.id), o=g(k,useSpec?k:p.name+(p.name==='Unassigned'?' ('+label(p.cat)+')':'')); if(!useSpec&&p.spec) o.spec=p.spec;
+  PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return; const sp=specOfPF(p), k=gk(p.cat,sp,p.id), o=g(k,useSpec?k:p.name+(p.name==='Unassigned'?' ('+label(p.cat)+')':'')); if(!useSpec&&sp) o.spec=sp;
     [[mA,'A'],[mB,'B']].forEach(([ms,x])=>ms.forEach(mk=>{ const b=PF.base.get(p.i+'|'+mk); if(!b) return; let ff=0; pfTgt.forEach(t=>{ const c=PF.cell.get(p.i+'|'+mk+'|'+t); if(c) ff+=c[fK]; });
       o['e'+x]+=b[eK]; o['f'+x]+=Math.min(ff,b[eK]); o['p'+x]+=b.pat; })); });
   let src='pf';
@@ -154,10 +157,14 @@ function lkcSplit(A,B,pfSrc,pfTgt,mA,mB,win,byDoctor){
     for(const r of PV.rows){ if(!pfSrc.includes(r.cat)||!st.status.has(r.st)) continue; const x=r.n>=A[0]&&r.n<=A[1]?'nA':r.n>=B[0]&&r.n<=B[1]?'nB':null; if(!x) continue;
       const p=PV.provs[r.p], k=gk(r.cat,r.sp||p.spec,p.id); g(k,useSpec?k:pvName(p))[x]+=r.v[2]/(x==='nA'?dA:dB); } }
   else { const days=ms=>ms.reduce((t,mk)=>t+daysInMonth(mk),0), dA=days(mA)||1, dB=days(mB)||1; G.forEach(o=>{ o.nA=o.pA/dA; o.nB=o.pB/dB; }); }
-  const R=[...G.values()].filter(o=>o.nA+o.nB>0), sum=(f)=>R.reduce((t,o)=>t+f(o),0);
-  const RA=sum(o=>o.eA)?sum(o=>o.fA)/sum(o=>o.eA):0, RB=sum(o=>o.eB)?sum(o=>o.fB)/sum(o=>o.eB):0;
+  const all=[...G.values()], tA=all.reduce((t,o)=>t+o.eA,0), tB=all.reduce((t,o)=>t+o.eB,0);
+  const R=all.filter(o=>o.nA+o.nB>0), sum=(f)=>R.reduce((t,o)=>t+f(o),0);
+  // unmatched = cases with no follow-on rows at all (different doctors, or doctors missing from the follow-on export)
+  const matched=R.filter(o=>o.eA+o.eB>0).reduce((t,o)=>t+o.nA+o.nB,0), allCases=R.reduce((t,o)=>t+o.nA+o.nB,0);
+  if(!tA||!tB) return {R:[],empty:true,src,noFollow:!tA?'A':'B'};
+  const RA=all.reduce((t,o)=>t+o.fA,0)/tA, RB=all.reduce((t,o)=>t+o.fB,0)/tB;
   R.forEach(o=>{ o.estA=o.eA>=10; o.estB=o.eB>=10; o.rA=o.estA?o.fA/o.eA:RA; o.rB=o.estB?o.fB/o.eB:RB; o.vol=(o.nA-o.nB)*o.rB; o.doc=o.nA*(o.rA-o.rB); });
   const NA=sum(o=>o.nA), NB=sum(o=>o.nB), oA=sum(o=>o.nA*o.rA), oB=sum(o=>o.nB*o.rB), rbB=NB?oB/NB:0, rbA=NA?oA/NA:0;
   const cases=(NA-NB)*rbB, mix=sum(o=>o.nA*o.rB)-NA*rbB, docs=sum(o=>o.doc);
-  return {R,NA,NB,oA,oB,rbA,rbB,cases,mix,docs,useSpec,src};
+  return {R,NA,NB,oA,oB,rbA,rbB,cases,mix,docs,useSpec,src,matchedShare:allCases?matched/allCases:0};
 }
