@@ -144,6 +144,10 @@ In the Data tab, choose *This file is dated by: Booking time* before dropping th
 
 Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq's fixed public holidays.
 
+## Saved uploads
+
+In claude.ai, every export loaded in Data & settings (or with Load CSV) is saved with the dashboard: the file as an asset of the artifact, and a `saved/<export>` document pointing at it. On open the page loads the saved files over the built-in data, so they survive new versions of the page and open on any device. Only people who can edit the dashboard save files; everyone it's shared with sees them. Remove loaded data deletes the saved copy, and loading a newer file replaces it. When a later version of the page ships different built-in data for an export, the built-in data is used and the saved copy is listed as not used. Outside claude.ai, files stay in the browser as before.
+
 ## Refreshing
 
 - Automatic: `automation/metabase_to_sheet.gs` copies saved Metabase questions into `data_…` tabs of the Saleem Outside Factors sheet every 6 hours. Opened in claude.ai, the page reads those tabs live. A tab's copy is used unless a file was loaded by hand after that tab's last refresh. Setup is in `automation/README.md`.

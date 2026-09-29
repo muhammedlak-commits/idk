@@ -81,7 +81,7 @@ async function takeFiles(kind, files){
   const D=DROPS[kind], msg=document.getElementById('msg-'+kind);
   const list=[...files].filter(f=>/\.csv$/i.test(f.name)||/csv|text/.test(f.type));
   if(!list.length){ showMsg(msg,'bad','Only CSV files can be loaded here.'); return; }
-  let ok=0, notSaved=false, last='';
+  let ok=0, notSaved=false, last=''; const before=cloudSnap();
   for(const f of list){
     try{
       const text=await f.text(); const hdr=headerLine(text);
@@ -93,7 +93,10 @@ async function takeFiles(kind, files){
   if(!ok) return;
   if(kind==='orders') st.basis=st.loadBasis;   // show what was just loaded
   boot(true);
-  showMsg(msg,'good','Loaded '+(ok>1?ok+' files':last)+'.'+(D.note||'')+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
+  const base='Loaded '+(ok>1?ok+' files':last)+'.'+(D.note||'');
+  if(cloud.db&&cloud.assets){ showMsg(msg,'good',base+' Saving to the dashboard…');
+    cloudSaveChanged(before,ok>1?ok+' files ('+last+' last)':last).then(r=>showMsg(document.getElementById('msg-'+kind),r.err?'bad':'good',base+cloudNote(r)+(r.err&&notSaved?' This browser wouldn’t keep it either, so it will be gone after a reload.':''))); }
+  else showMsg(msg,'good',base+(notSaved?' This browser wouldn’t save it, so it will be gone after a reload.':' Saved in this browser.'));
   toast('Loaded '+(ok>1?ok+' files':last));
 }
 function headerLine(text){ return splitCsv(text.slice(0,1000).split(/\r?\n/)[0]).map(normHdr).join(','); }
@@ -141,6 +144,10 @@ function renderData(){
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
   if(SHEET&&SHEET.data&&window.claude) [['stat-orders',['services','servicesBooked']],['stat-patients',['uniquePatients']],['stat-links',['followon']],['stat-providers',['providers']],['stat-gateway',['gateway']],['stat-gwnext',['gatewayNext']],['stat-pfollow',['provFollowon']]].forEach(([id,keys])=>{
     const el=document.getElementById(id); if(el) el.insertAdjacentHTML('beforeend', keys.map(k=>row(keys.length>1?(k==='services'?'Sheet, scheduled':'Sheet, booking'):'Google Sheet', feedText(k))).join('')); });
+  // what is saved to the dashboard, per export box
+  const CL=document.getElementById('cloudLine'); if(CL) CL.textContent=cloudLine();
+  const box={services:'stat-orders',servicesBooked:'stat-orders',uniquePatients:'stat-patients',followon:'stat-links',providers:'stat-providers',gateway:'stat-gateway',gatewayNext:'stat-gwnext',provFollowon:'stat-pfollow'};
+  for(const [k,id] of Object.entries(box)){ const el=document.getElementById(id), r=cloudRow(k); if(el&&r) el.insertAdjacentHTML('beforeend',r.replace('Saved to dashboard',k==='servicesBooked'?'Saved, booking time':k==='services'?'Saved, scheduled time':'Saved to dashboard')); }
   renderSamples();
 }
 
@@ -261,8 +268,9 @@ function wireData(){
     zone.addEventListener('dragleave',()=>{ if(--depth<=0){ depth=0; zone.classList.remove('over'); } });
     zone.addEventListener('drop',e=>{ e.preventDefault(); depth=0; zone.classList.remove('over'); if(e.dataTransfer.files.length) takeFiles(kind,e.dataTransfer.files); });
     document.getElementById('reset-'+kind).addEventListener('click',()=>{
-      DROPS[kind].reset();
+      const before=cloudSnap(); DROPS[kind].reset();
       boot(true); showMsg(document.getElementById('msg-'+kind),'good','Back to the data built into this page.');
+      cloudSaveChanged(before).then(r=>{ if(r.forgot) showMsg(document.getElementById('msg-'+kind),'good','Back to the data built into this page. The saved copy was removed from the dashboard.'); else if(r.err) showMsg(document.getElementById('msg-'+kind),'bad','Back to the data built into this page here, but the saved copy couldn’t be removed ('+r.err+'), so it will load again next time.'); });
     });
   }
   document.querySelectorAll('#ordersMode button').forEach(b=>b.addEventListener('click',()=>{ st.ordersMode=b.dataset.m; renderData(); }));

@@ -3,6 +3,7 @@ function wireFiles(){
   const inp=document.getElementById('fileInput');
   document.getElementById('loadBtn').addEventListener('click',()=>inp.click());
   inp.addEventListener('change',async()=>{
+    const before=cloudSnap(), names=[...inp.files].map(f=>f.name);
     for(const f of inp.files){ const text=await f.text(); const hdr=headerLine(text);
       try{
         if(DROPS.gwnext.check(hdr)){ DROPS.gwnext.apply(text,f.name); }
@@ -21,6 +22,7 @@ function wireFiles(){
       }catch(err){ toast(err.message); }
     }
     inp.value=''; lsSet('spl.build',P.built); boot(true);
+    cloudSaveChanged(before,names.join(', ')).then(r=>{ if(r.saved||r.err) toast(r.err?'Loaded, but couldn’t save to the dashboard ('+r.err+')':'Saved to the dashboard'); });
   });
 }
 /* newer file wins for any day it contains. Returns {text, replaced}: an export from a newer query (extra columns)

@@ -30,6 +30,7 @@ JS_ORDER = [
     'm_sections.js',  # Summary tiles and attention list, Performance month strip, Drivers cards
     'm_projections.js',  # module: projections
     'm_sheet.js',     # live outside-factors Google Sheet
+    'm_cloud.js',     # saved uploads: CSV assets + db pointers on claude.ai
     'm_data.js',      # module: drag-and-drop data loading
     'files.js',       # Load CSV (header button)
     'main.js',        # tabs, render, boot

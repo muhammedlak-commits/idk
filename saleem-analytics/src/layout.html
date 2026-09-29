@@ -495,6 +495,7 @@
     </section>
 
     <section class="module" data-mod="data" id="data" data-sec="data" hidden>
+      <p class="callout" id="cloudLine" style="margin:0 0 12px"></p>
       <div class="frow"><h2 style="font-size:18px;flex:1">Data</h2><span class="note">Ads CSVs and other exports can also be loaded here:</span><button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button><input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden></div>
       <div class="grid3">
         <section class="panel" aria-labelledby="dOH">
@@ -593,7 +594,7 @@
           <div class="sample" id="sample-pfollow"></div>
         </section>
       </div>
-      <details class="how"><summary>How this is worked out</summary><p class="note">Files are read in your browser and saved there until this page is rebuilt with newer data; nothing is uploaded anywhere. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p></details>
+      <details class="how"><summary>How this is worked out</summary><p class="note">Files are read in your browser. When you can edit this dashboard in claude.ai, each file you load is also saved with the dashboard (visible to the people it is shared with), so it opens on any device and stays when the page is updated; Remove loaded data deletes that saved copy. If a later version of the page ships newer built-in data for an export, the built-in data is used and the saved copy is listed as not used. Outside claude.ai, files stay in this browser only. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p></details>
     </section>
 
     <footer id="foot"></footer>
