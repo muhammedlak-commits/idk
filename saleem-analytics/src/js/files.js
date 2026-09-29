@@ -5,7 +5,8 @@ function wireFiles(){
   inp.addEventListener('change',async()=>{
     for(const f of inp.files){ const text=await f.text(); const hdr=headerLine(text);
       try{
-        if(DROPS.gateway.check(hdr)){ DROPS.gateway.apply(text,f.name); }
+        if(DROPS.gwnext.check(hdr)){ DROPS.gwnext.apply(text,f.name); }
+        else if(DROPS.gateway.check(hdr)){ DROPS.gateway.apply(text,f.name); }
         else if(DROPS.pfollow.check(hdr)){ DROPS.pfollow.apply(text,f.name); }
         else if(DROPS.providers.check(hdr)){ DROPS.providers.apply(text,f.name); }
         else if(DROPS.links.check(hdr)){ DROPS.links.apply(text,f.name); }

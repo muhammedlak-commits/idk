@@ -203,7 +203,7 @@
             <div class="chart md"><canvas id="spChart" aria-label="Doctor visits by specialty over time"></canvas></div>
             <div class="legend" id="spLegend"></div>
             <div class="tablewrap" style="margin-top:12px"><table id="spTable"></table></div>
-            <p class="note" style="margin:8px 0 0">To test whether a specialty moves another service, for example internal medicine and lab tests, open <strong>Service links</strong> with Doctor visit and Lab tests selected.</p>
+            <p class="note" style="margin:8px 0 0">To test whether a specialty moves another service, for example internal medicine and lab tests, open <strong>Service links</strong> with Doctor visit under From and Lab tests under To.</p>
           </div>
         </section>
       </div>
@@ -223,6 +223,25 @@
           <h3 class="h3sm" style="margin-top:16px">By gateway provider and first service</h3>
           <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="gwTable"></table></div>
           <p class="note" id="gwTableNote" style="margin:8px 0 0"></p>
+          <section id="gnPanel" style="margin-top:20px" aria-labelledby="gnH">
+            <div class="phead"><div><h3 class="h3sm" id="gnH" style="font-size:15px">What each gateway’s patients ordered next</h3><div class="desc">For each gateway provider: of their new patients, the share who went on to each service within the window, against the other gateways with the same first service.</div></div>
+              <div class="ctrls"><div class="seg" id="gnWin" aria-label="Window"><button data-w="30">30 days</button><button data-w="90" class="on">90 days</button><button data-w="180">180 days</button></div>
+                <div class="seg" id="gnShow" aria-label="Show"><button data-s="pct" class="on">% of patients</button><button data-s="n">Patients</button><button data-s="o" title="Orders with that service within 90 days">Orders</button></div></div></div>
+            <div id="gnEmpty" class="callout">
+              <p style="margin:0 0 6px"><strong>This needs one more export: gateway next services.</strong> It lists, for every gateway provider, which services their new patients ordered afterwards and how many.</p>
+              <ol style="margin:0 0 8px;padding-left:18px"><li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li><li>Run it with no date filter, then download the results as CSV.</li><li>Open <strong>Data &amp; settings</strong> and drop the file on the gateway next-services box.</li></ol>
+              <button class="btn" type="button" id="copySqlGn">Copy SQL</button>
+            </div>
+            <div id="gnBody" hidden>
+              <div class="lkread" id="gnRead"></div>
+              <div class="tablewrap" style="max-height:480px;overflow:auto"><table id="gnTable"></table></div>
+              <p class="note" id="gnNote" style="margin:8px 0 0"></p>
+              <h3 class="h3sm" id="gnSelH" style="margin-top:16px"></h3>
+              <div class="chart" style="height:260px"><canvas id="gnChart" aria-label="Next services for the selected gateway against its peers"></canvas></div>
+              <div class="legend" id="gnLegend"></div>
+              <details class="how"><summary>How this is worked out</summary><div class="howtxt"><p>The gateway is the provider on a new patient’s first-ever real visit, as in the table above. A next service is any real service within the window after that visit: other services in the same first order count, and so does the first service coming back in a later order. A patient only counts once their window has passed, so recent months have fewer patients.</p><p>Each share is compared with all the other gateways of the same first service put together. With this many cells some gaps turn up by chance, so a cell is only marked worth checking when it passes the Benjamini–Hochberg test at 10% across every cell tested (20+ patients on both sides).</p></div></details>
+            </div>
+          </section>
           <div class="grid2" style="margin-top:16px">
             <div><h3 class="h3sm" id="gwMonthH">New patients per month, by gateway provider</h3><div class="chart md"><canvas id="gwMonthChart" aria-label="New patients per month by gateway provider"></canvas></div><div class="legend" id="gwMonthLegend"></div></div>
             <div><h3 class="h3sm" id="gwRetH">Back within 90 days, by cohort month</h3><div class="chart md"><canvas id="gwRetChart" aria-label="90-day return rate by cohort month"></canvas></div><div class="legend" id="gwRetLegend"></div></div>
@@ -247,8 +266,14 @@
     <section class="module" data-mod="links" id="links" data-sec="drivers" hidden>
       <div class="subtabs" role="tablist" aria-label="Link tests" id="lkTabs">
         <button type="button" role="tab" data-lk="ad" aria-selected="true">Ad spend → orders</button>
-        <button type="button" role="tab" data-lk="svc" aria-selected="false">Service ↔ service</button>
+        <button type="button" role="tab" data-lk="svc" aria-selected="false">Service → service</button>
         <button type="button" role="tab" data-lk="drv" aria-selected="false">Specialties &amp; providers</button>
+      </div>
+      <div class="lkpick" id="lkPick">
+        <div class="lkside"><div class="lklab">From <span class="note">the service that may lead</span></div><div class="lkchips" id="lkFrom" role="group" aria-label="From services"></div></div>
+        <div class="lkarrow" aria-hidden="true">→</div>
+        <div class="lkside"><div class="lklab">To <span class="note">the service that may follow</span></div><div class="lkchips" id="lkTo" role="group" aria-label="To services"></div></div>
+        <div class="lkact"><button class="btn" type="button" id="lkSwap" title="Swap From and To">⇄ Swap</button><button class="btn" type="button" id="lkGridBtn" aria-pressed="false" title="Every pair among the services picked in the filter bar">Every pair</button></div>
       </div>
       <div data-lkpane="ad">
       <section class="panel" aria-labelledby="alH">
@@ -333,20 +358,20 @@
         </section>
         <div class="grid2">
           <section class="panel" aria-labelledby="lkLH">
-            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes, with the second service shifted earlier or later. <details class="how inline"><summary>How this is worked out</summary>A bar well above zero at +1 means a rise in the first service is usually followed by a rise in the second a week later.</details></div></div></div>
+            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes in From and To, with To shifted later (positive weeks) or earlier. <details class="how inline"><summary>How this is worked out</summary>A bar well above zero at +1 means a rise in From is usually followed by a rise in To a week later.</details></div></div></div>
             <div class="chart md"><canvas id="lkLagChart" aria-label="Lead and lag correlations"></canvas></div>
             <div class="legend" id="lkLagLegend"></div>
             <ul class="assume" id="lkFindings"></ul>
             <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Same-week links are often shared causes (holidays, ad pushes, salary days) rather than one service driving the other. A link that shows up one or two weeks later is the better sign of one service feeding another. Correlation is not proof of cause.</p></details>
           </section>
           <section class="panel" aria-labelledby="lkRH">
-            <div class="phead"><div><h2 id="lkRH">One per 100 of the other</h2><div class="desc">The smaller service per 100 of the larger, by month. <details class="how inline"><summary>How this is worked out</summary>A rising line means the smaller service is growing faster, for example more lab tests for every 100 doctor visits.</details></div></div></div>
+            <div class="phead"><div><h2 id="lkRH">To per 100 From</h2><div class="desc">How many To orders there are for every 100 From orders, by month. <details class="how inline"><summary>How this is worked out</summary>A rising line means To is growing faster than From, for example more lab tests for every 100 doctor visits.</details></div></div></div>
             <div class="chart md"><canvas id="lkRatioChart" aria-label="Ratio between services by month"></canvas></div>
             <div class="legend" id="lkRatioLegend"></div>
           </section>
         </div>
         <section class="panel" aria-labelledby="lkFH">
-          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had the first service in a month and then the second within 30 days. <details class="how inline"><summary>How this is worked out</summary>This is the direct measure of one service leading to another.</details></div></div></div>
+          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had a From service in a month and then a To service within 30 days. <details class="how inline"><summary>How this is worked out</summary>This is the direct measure of one service leading to another.</details></div></div></div>
           <p class="callout" id="lkFollowEmpty">This needs the service follow-on export. Open the <strong>Data</strong> tab, copy the follow-on SQL, run it in Metabase and drop the CSV there.</p>
           <div id="lkFollowBody" hidden>
             <div class="chart md"><canvas id="lkFollowChart" aria-label="Follow-on share by month"></canvas></div>
@@ -540,6 +565,19 @@
           <dl class="dstat" id="stat-gateway"></dl>
           <button class="btn" type="button" id="reset-gateway" hidden>Remove loaded data</button>
           <div class="sample" id="sample-gateway"></div>
+        </section>
+        <section class="panel" aria-labelledby="dGNH">
+          <div class="phead"><div><h2 id="dGNH">Gateway next services</h2><div class="desc">For each gateway provider, which services their new patients ordered afterwards, within 30, 90 and 180 days. Fills “What each gateway’s patients ordered next” in Drivers › Providers.</div></div></div>
+          <div class="drop" id="drop-gwnext" role="button" tabindex="0" aria-label="Drop the gateway next-services CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the gateway next-services CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-gwnext" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql7">Copy SQL</button></div>
+          <p class="dmsg" id="msg-gwnext" hidden></p>
+          <dl class="dstat" id="stat-gwnext"></dl>
+          <button class="btn" type="button" id="reset-gwnext" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-gwnext"></div>
         </section>
         <section class="panel" aria-labelledby="dFH">
           <div class="phead"><div><h2 id="dFH">Provider follow-on</h2><div class="desc">For each provider and month, how many of their patients went on to each other service within 7 and 30 days. <details class="how inline"><summary>How this is worked out</summary>Fills the first panel of Service links › Specialties &amp; providers.</details></div></div></div>

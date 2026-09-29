@@ -23,6 +23,7 @@ const QUESTIONS = {
   data_followon        : '',   // sql/service_followon_monthly.sql
   data_providers       : '',   // sql/provider_orders_daily.sql
   data_gateway         : '',   // sql/gateway_provider_monthly.sql
+  data_gwnext          : '',   // sql/gateway_next_services_monthly.sql
   data_pfollow         : ''    // sql/provider_followon_monthly.sql
 };
 const LOG_TAB = 'data_log';

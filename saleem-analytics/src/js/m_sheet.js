@@ -93,7 +93,7 @@ function startSheet(){
 /* ---------- Metabase data from the sheet ----------
    A tab's copy replaces the built-in data unless a file was loaded by hand after the tab's last refresh. */
 const sheetFeed={tabs:{},log:null,used:{}};
-const FEED={services:['orders','orders'],servicesBooked:['ordersBooked','orders'],uniquePatients:['patients','patients'],followon:['links','links'],providers:['providers','providers'],gateway:['gateway','gateway'],provFollowon:['pfollow','pfollow']};   // P key -> [meta key, DROPS key]
+const FEED={services:['orders','orders'],servicesBooked:['ordersBooked','orders'],uniquePatients:['patients','patients'],followon:['links','links'],providers:['providers','providers'],gateway:['gateway','gateway'],gatewayNext:['gwnext','gwnext'],provFollowon:['pfollow','pfollow']};   // P key -> [meta key, DROPS key]
 function valuesToCsv(values){
   const q=v=>{ v=v==null?'':String(v); return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
   return values.filter(r=>r&&r.some(v=>v!=null&&String(v)!=='')).map(r=>r.map(q).join(',')).join('\n');

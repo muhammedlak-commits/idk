@@ -160,13 +160,13 @@ function normP(z){ z=Math.abs(z); const t=1/(1+0.2316419*z), d=Math.exp(-z*z/2)/
    passing under q (10%), out of m tests. "Worth checking" rows pass this; "strong" rows pass Bonferroni. */
 function bhCut(ps,m,q=0.1){ const s=ps.filter(p=>p!=null&&isFinite(p)).sort((a,b)=>a-b); let cut=-1; s.forEach((p,i)=>{ if(p<=q*(i+1)/m) cut=p; }); return cut; }
 let pdSel=0, pdRows=[];
-function renderDrivers(chosen,a,b){
+function renderDrivers(chosen,a,b,to=chosen){
   const panel=document.getElementById('pdPanel'), msg=document.getElementById('pdMsg'), body=document.getElementById('pdBody');
   const driverCats=PV? chosen.filter(c=>PV.cats.includes(c)) : [];
   panel.hidden=false;
-  if(!PV||!driverCats.length||chosen.length<2){
+  if(!PV||!driverCats.length||!to.some(c=>!driverCats.includes(c))){
     msg.innerHTML=!PV? 'This needs the provider export. Open the <strong>Data</strong> tab, copy the provider SQL, run it in Metabase and drop the CSV there.'
-      : 'Pick a service with named providers (Doctor visit, Nursing or Physiotherapy) and at least one other service in the filter bar.';
+      : 'Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.';
     msg.hidden=false; body.hidden=true; return; }
   const w0=weekStart(a)+(weekStart(a)<a?7:0), keys=[]; for(let w=w0; w+6<=b; w+=7) keys.push(w);
   if(keys.length<14){ msg.textContent='Pick a date range of at least 14 weeks.'; msg.hidden=false; body.hidden=true; return; }
@@ -180,7 +180,7 @@ function renderDrivers(chosen,a,b){
   }
   driverCats.forEach(c=>{ const tp=pvTotals(w0,end,r=>r.p,r=>r.cat===c);
     [...tp.entries()].filter(([pi])=>PV.provs[pi].name!=='Unassigned').sort((x,y)=>y[1]-x[1]).slice(0,6).forEach(([pi])=>addWeekly(pvName(PV.provs[pi]),label(c)+' provider',c,r=>r.p===pi)); });
-  const tgt=chosen.map(c=>({c,v:weeklyOf(c,a,b).v.slice(0,nW)}));
+  const tgt=to.map(c=>({c,v:weeklyOf(c,a,b).v.slice(0,nW)}));
   const d=v=>v.slice(1).map((x,i)=>Math.log1p(Math.max(0,x))-Math.log1p(Math.max(0,v[i])));
   const pairs=[];
   for(const dr of drivers){ const dx=d(dr.v);
@@ -203,7 +203,7 @@ function renderDrivers(chosen,a,b){
   const tb=document.getElementById('pdTable');
   tb.innerHTML='<thead><tr><th class="nosort" style="text-align:left">Driver</th><th class="nosort" style="text-align:left">Type</th><th class="nosort" style="text-align:left">Service it may move</th><th class="nosort">Best lag</th><th class="nosort">Correlation</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
     pdRows.map((p,i)=>'<tr data-i="'+i+'" class="'+(i===pdSel?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(p.dr.name)+'</td><td style="text-align:left">'+esc(p.dr.kind)+'</td><td style="text-align:left">'+esc(label(p.t.c))+'</td><td>'+(p.k===0?'Same week':p.k+' wk later')+'</td><td>'+p.r.toFixed(2)+'</td><td>'+vt[p.verdict]+'</td></tr>').join('')+'</tbody>';
-  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ pdSel=+tr.dataset.i; renderDrivers(chosen,a,b); }));
+  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ pdSel=+tr.dataset.i; renderDrivers(chosen,a,b,to); }));
   document.getElementById('pdFinding').innerHTML= nStrong
     ? '<strong>'+nStrong+' pair'+(nStrong>1?'s pass':' passes')+' the strict bar.</strong> The top one: changes in '+esc(pairs[0].dr.name)+' line up with changes in '+esc(label(pairs[0].t.c))+' '+(pairs[0].k?pairs[0].k+' week'+(pairs[0].k>1?'s':'')+' later':'in the same week')+' (r = '+pairs[0].r.toFixed(2)+(pairs[0].r>0?', moving the same way':', moving in opposite directions')+').'
     : 'No pair passes the strict bar, so none of these links is clearly more than chance with this many pairs tested. “Worth checking” rows are leads to check with a longer range.';

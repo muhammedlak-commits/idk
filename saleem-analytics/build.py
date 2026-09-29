@@ -54,6 +54,8 @@ payload = {
     'providersSql': (root / 'sql' / 'provider_orders_daily.sql').read_text(),
     'gateway': (d / 'gateway_provider_monthly.csv').read_text() if (d / 'gateway_provider_monthly.csv').exists() else '',
     'gatewaySql': (root / 'sql' / 'gateway_provider_monthly.sql').read_text() if (root / 'sql' / 'gateway_provider_monthly.sql').exists() else '',
+    'gatewayNext': (d / 'gateway_next_services_monthly.csv').read_text() if (d / 'gateway_next_services_monthly.csv').exists() else '',
+    'gatewayNextSql': (root / 'sql' / 'gateway_next_services_monthly.sql').read_text(),
     'provFollowon': (d / 'provider_followon_monthly.csv').read_text() if (d / 'provider_followon_monthly.csv').exists() else '',
     'provFollowonSql': (root / 'sql' / 'provider_followon_monthly.sql').read_text() if (root / 'sql' / 'provider_followon_monthly.sql').exists() else '',
     'competitors': (d / 'competitors.csv').read_text() if (d / 'competitors.csv').exists() else '',

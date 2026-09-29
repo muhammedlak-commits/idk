@@ -66,12 +66,13 @@ Built from the factors ticked in "What goes into the projection"; every row show
 
 ## Service links
 
-The Service links module uses the services picked in the filter bar. With 2 or 3 selected it shows:
-- their weekly volume on one indexed scale
-- whether week-to-week changes in one are followed by changes in the other, and after how many weeks
-- one service per 100 of the other, by month
+Service → service and Specialties & providers use the **From** and **To** services picked at the top of the module, not the filter bar (which still sets statuses, patient view and measure). Several services on one side are added together. Swap flips the direction. For Service → service it shows:
+- From and To's weekly volume on one indexed scale, with a written read-out (trend of each, the mix, timing, weeks they pulled apart, the last four weeks)
+- whether week-to-week changes in From are followed by changes in To, and after how many weeks
+- To per 100 From, by month (months with under a week in the period left out)
+- the patient-level view (same patient, a To service within 7 or 30 days of a From service), which needs `sql/service_followon_monthly.sql`
 
-With more than 3 selected it shows a grid of every pair. The patient-level view (same patient, second service within 7 or 30 days) needs the export from `sql/service_followon_monthly.sql`, loaded in the Data tab.
+It has its own period (12, 26 or 52 weeks, all data or the date range). **Every pair** shows a grid of every pair among the services picked in the filter bar instead.
 
 ## Providers and doctor specialties
 
@@ -87,11 +88,13 @@ All lag tests (services, ad spend, drivers) shrink the number of weeks with Bart
 
 Needs the gateway export (`sql/gateway_provider_monthly.sql`, Data tab). For every patient, the gateway is the provider on their first-ever real visit (doctor, nurse or physiotherapist; lab tests and imaging usually show No named provider). The Providers module shows, for the services and months in the filter bar, each gateway provider's new patients, their share of that first service, the share back within 30, 90 and 180 days (only patients whose window has passed count), further orders per patient in 90 days, how many tried another service, and how many saw the same provider again. New patient means (first order or account created) picks the cohort month.
 
+**What each gateway's patients ordered next** needs a second export, `sql/gateway_next_services_monthly.sql`. For each gateway provider it shows the share of their new patients who had each service within 30, 90 or 180 days of the first visit (as a %, as patients, or as orders in 90 days), coloured against the other gateways with the same first service. A cell is marked worth checking when it passes Benjamini–Hochberg at 10% across every cell tested (20+ patients on both sides). Clicking a row draws that gateway against its peers, service by service. Other services in the first order count as next services, and the first service counts again when it returns in a later order.
+
 ## Provider follow-on and busy weeks
 
 In Service links › Specialties & providers:
 
-- **Patient follow-on** (needs `sql/provider_followon_monthly.sql`): of the patients each doctor, nurse or physiotherapist saw, the share who had one of the other selected services within 7 and 30 days, for example lab tests after a doctor or nurse visit.
+- **Patient follow-on** (needs `sql/provider_followon_monthly.sql`): of the patients each doctor, nurse or physiotherapist saw (From), the share who had one of the To services within 7 and 30 days, for example lab tests after a doctor or nurse visit.
 - **Busy weeks** (uses the provider export): weeks when a provider took an unusually large share of their service (their own top 20%), and whether the other selected services grew faster in the 2 or 4 weeks after than after the provider's other weeks (Welch t-test, overlap-adjusted).
 - The lag table of specialties and top providers against the other services stays below.
 

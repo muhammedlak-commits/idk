@@ -31,11 +31,11 @@ function buildProvFollowon(text){
   return {rows,provs:[...provs.values()],base,cell,months:[...months].sort(),srcs:[...srcs],tgts:[...tgts]};
 }
 /* pairs from the top filter: a provider service picked there, then each other picked service as the database names it */
-function pfPairs(chosen,M=PF){
+function pfPairs(chosen,M=PF,to=chosen){
   if(!M) return [];
   const out=[];
   for(const s of chosen.filter(c=>M.srcs.includes(c))){ const seen=new Set();
-    for(const c of chosen){ if(c===s) continue; const t=UP_CAT[c]||c; if(t===s||seen.has(t)||!M.tgts.includes(t)) continue; seen.add(t); out.push({src:s,tgt:t}); } }
+    for(const c of to){ if(c===s) continue; const t=UP_CAT[c]||c; if(t===s||seen.has(t)||!M.tgts.includes(t)) continue; seen.add(t); out.push({src:s,tgt:t}); } }
   return out;
 }
 /* pooled over the months in range; a missing target row = nobody followed on, with the provider-month's eligible counts */
@@ -69,13 +69,13 @@ function pfCompute(M,{fromMk,toMk,pairs,minElig=10}){
 }
 const pfTl=t=>UP_LABEL[t]||label(t);
 const plVerdict=(v,d)=>({strong:'<span class="delta '+(d<0?'down':'up')+'">✓ Strong</span>',possible:'<span class="delta flat">~ Worth checking</span>',chance:'<span class="delta flat" style="opacity:.7">Could be chance</span>',none:'<span class="note">No peers</span>'})[v];
-function renderProvFollowon(chosen){
+function renderProvFollowon(chosen,to=chosen){
   const panel=document.getElementById('pfPanel'), msg=document.getElementById('pfMsg'), body=document.getElementById('pfBody');
   panel.hidden=false;
   const setMsg=h=>{ msg.innerHTML=h; msg.hidden=false; body.hidden=true; if(pfChart){ pfChart.destroy(); pfChart=null; } };
   if(!PF) return setMsg('This needs the provider follow-on export. Copy the SQL, run it in Metabase with no date filter, download the results as CSV and drop the file on the <strong>Data</strong> tab. <button class="btn" type="button" id="copySqlPf">Copy SQL</button>');
-  const pairs=pfPairs(chosen);
-  if(!pairs.length) return setMsg('Pick a doctor, nurse or physio service and at least one other service in the filter bar.');
+  const pairs=pfPairs(chosen,PF,to);
+  if(!pairs.length) return setMsg('Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.');
   const R=pfCompute(PF,{fromMk:monthKey(st.from),toMk:monthKey(st.to),pairs}), m0=PF.months[0], m1=PF.months[PF.months.length-1];
   if(!R.months.length) return setMsg('The provider follow-on export covers '+fmtM(m0)+' – '+fmtM(m1)+', outside this date range.');
   if(!R.rows.length) return setMsg('No provider has 10 or more patients whose 30-day window has passed in this range. Pick a longer or earlier range.');
@@ -163,7 +163,7 @@ function busyWeeksCompute(provW,catW,tgtW,opts={}){
   return {rows,tests,nW};
 }
 /* weekly inputs from the provider model (top filter applied by pvEach) and the orders cube; no DOM */
-function bwGather(chosen,a,b){
+function bwGather(chosen,a,b,to=chosen){
   const w0=weekStart(a)+(weekStart(a)<a?7:0), keys=[]; for(let w=w0; w+6<=b; w+=7) keys.push(w);
   const nW=keys.length, cats=chosen.filter(c=>PV.cats.includes(c)), catW={}, byP=new Map(), tot=new Map();
   if(!nW) return {keys,provW:[],catW,tgtW:[]};
@@ -173,15 +173,15 @@ function bwGather(chosen,a,b){
   const provW=[];
   cats.forEach(c=>[...tot.entries()].filter(([pi,t])=>PV.provs[pi].cat===c&&t>0).sort((x,y)=>y[1]-x[1]).slice(0,6)
     .forEach(([pi,t])=>provW.push({p:PV.provs[pi],name:pvName(PV.provs[pi]),cat:c,v:byP.get(pi),tot:t})));
-  return {keys,provW,catW,tgtW:chosen.map(c=>({c,v:weeklyOf(c,a,b).v.slice(0,nW)}))};
+  return {keys,provW,catW,tgtW:to.map(c=>({c,v:weeklyOf(c,a,b).v.slice(0,nW)}))};
 }
-function renderBusyWeeks(chosen,a,b){
+function renderBusyWeeks(chosen,a,b,to=chosen){
   const panel=document.getElementById('bwPanel'), msg=document.getElementById('bwMsg'), body=document.getElementById('bwBody');
   panel.hidden=false;
   const setMsg=h=>{ msg.innerHTML=h; msg.hidden=false; body.hidden=true; };
   if(!PV) return setMsg('This needs the provider export. Open the <strong>Data</strong> tab, copy the provider SQL, run it in Metabase and drop the CSV there.');
-  if(!chosen.some(c=>PV.cats.includes(c))||chosen.length<2) return setMsg('Pick a service with named providers (Doctor visit, Nursing or Physiotherapy) and at least one other service in the filter bar.');
-  const G=bwGather(chosen,a,b);
+  if(!chosen.some(c=>PV.cats.includes(c))||!to.some(c=>!PV.cats.includes(c)||!chosen.includes(c))) return setMsg('Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.');
+  const G=bwGather(chosen,a,b,to);
   if(G.keys.length<20) return setMsg('Pick a date range of at least 20 full weeks (Saturday to Friday). This one has '+G.keys.length+'.');
   const R=busyWeeksCompute(G.provW,G.catW,G.tgtW,{nW:G.keys.length});
   if(!R.rows.length) return setMsg('Not enough provider volume in this range to test.');
@@ -196,7 +196,7 @@ function renderBusyWeeks(chosen,a,b){
   tb.innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Their service</th><th class="nosort" style="text-align:left">Then</th><th class="nosort">Busy weeks</th><th class="nosort">Growth after busy weeks</th><th class="nosort">After other weeks</th><th class="nosort">Difference</th><th class="nosort">Over</th><th class="nosort">Verdict</th></tr></thead><tbody>'+
     bwRows.map((r,i)=>'<tr data-i="'+i+'" class="'+(i===bi?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(r.name)+'</td><td style="text-align:left">'+esc(label(r.cat))+'</td><td style="text-align:left">'+esc(label(r.tgt))+'</td><td>'+fmtInt(r.nBusy)+'</td><td>'+fmtPct(r.gBusy*100,1)+'</td><td>'+fmtPct(r.gOther*100,1)+'</td>'+
       '<td class="'+(r.verdict==='chance'?'':r.d>0?'pos':'neg')+'" title="p = '+(r.p<0.001?'< 0.001':r.p.toFixed(3))+' · '+r.nx+' busy and '+r.ny+' other weeks">'+fmtPct(r.diffPct*100,1)+'</td><td>'+wk(r.k)+'</td><td>'+plVerdict(r.verdict,r.d)+'</td></tr>').join('')+'</tbody>';
-  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ st.bwSel=bwKey(bwRows[+tr.dataset.i]); renderBusyWeeks(chosen,a,b); }));
+  tb.querySelectorAll('tbody tr').forEach(tr=>tr.addEventListener('click',()=>{ st.bwSel=bwKey(bwRows[+tr.dataset.i]); renderBusyWeeks(chosen,a,b,to); }));
   const top=R.rows[0], amt=v=>Math.abs(v*100).toFixed(Math.abs(v)<0.1?1:0)+'%';
   // shares in a service add up to 100%, so one provider's busy weeks are dips for colleagues: say so when the other side shows up too
   const mir=top.verdict!=='chance'&&R.rows.find(o=>o!==top&&o.cat===top.cat&&o.tgt===top.tgt&&o.verdict!=='chance'&&o.d*top.d<0);

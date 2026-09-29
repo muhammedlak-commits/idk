@@ -1,6 +1,6 @@
 /* ---------- render ---------- */
 /* four sections (plus Data & settings); each shows one or more of the module blocks in the page */
-const DRIVERS={patients:renderUnique, providers:()=>{ renderProviders(); renderGateway(); }, links:renderLinks, ads:renderAds,
+const DRIVERS={patients:renderUnique, providers:()=>{ renderProviders(); renderGateway(); renderGatewayNext(); }, links:renderLinks, ads:renderAds,
   calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderCompetitors(); renderSheetStatus(); }};
 const MODULES={
   summary:{mods:()=>['why'], draw:renderWhy},
@@ -43,18 +43,18 @@ function wireTabs(){
 function boot(reload){
   // files loaded in this browser are reused until a newer build of the page replaces them
   if(!reload){ try{ const m=JSON.parse(lsGet('spl.meta')||'{}'); let ch=false; for(const k in m) if(m[k]&&m[k].unsaved){ delete m[k]; ch=true; } if(ch) lsSet('spl.meta',JSON.stringify(m)); }catch(e){} }
-  if(!reload && lsGet('spl.build')===P.built){ ['services','servicesBooked','adsDaily','adsMonthly','map','uniquePatients','followon','providers','gateway','provFollowon'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
+  if(!reload && lsGet('spl.build')===P.built){ ['services','servicesBooked','adsDaily','adsMonthly','map','uniquePatients','followon','providers','gateway','gatewayNext','provFollowon'].forEach(k=>{ const v=lsGet('spl.'+k); if(v) P[k]=v; }); }
   if(!reload){ const al=lsGet('spl.align'); if(al==='greg'||al==='hijri') st.align=al; }
   if(!reload){ const b=lsGet('spl.basis'); if(b==='booked'&&P.servicesBooked) st.basis='booked'; }
   if(st.basis==='booked'&&!P.servicesBooked) st.basis='scheduled';
   const prevCats= S? new Set(S.catList) : null, prevStats= S? new Set(S.stList) : null;
   const wasAtEnd = reload && S && st.to===S.max;   // keep following the latest day when new days arrive
-  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); try{ PV=buildProviders(P.providers); }catch(e){ PV=null; } try{ GW=buildGateway(P.gateway); }catch(e){ GW=null; } try{ PF=buildProvFollowon(P.provFollowon); }catch(e){ PF=null; } loadEvents(); loadCompetitors();
+  S=buildServices(st.basis==='booked'? P.servicesBooked : P.services); A=buildAds(P.adsDaily,P.adsMonthly,P.map,P.adsAd,P.adMap); U=buildUnique(P.uniquePatients); F=buildFollowon(P.followon); try{ PV=buildProviders(P.providers); }catch(e){ PV=null; } try{ GW=buildGateway(P.gateway); }catch(e){ GW=null; } try{ GN=buildGatewayNext(P.gatewayNext); }catch(e){ GN=null; } try{ PF=buildProvFollowon(P.provFollowon); }catch(e){ PF=null; } loadEvents(); loadCompetitors();
   if(!reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(['line','bars','share','change','cum'].includes(v.chart)) st.chart=v.chart; if(v.perfTab) st.perfTab=v.perfTab; if(DRIVERS[v.drv]) st.drv=v.drv; if(v.mod) st.mod=resolveMod(v.mod); }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]||OLD_TABS[h]) st.mod=resolveMod(h);
-    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireGatewayNext(); wireLinkPick(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
     document.querySelectorAll('#lkSpan button').forEach(t=>t.addEventListener('click',()=>{ st.lkSpan=t.dataset.s; lsSet('spl.lkSpan',st.lkSpan); render(); }));
     { const ls=lsGet('spl.lkSpan'); if(['12w','26w','52w','all','range'].includes(ls)) st.lkSpan=ls; }

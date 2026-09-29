@@ -1,5 +1,5 @@
 /* ---------- data module: drag-and-drop / browse for the two Metabase exports ---------- */
-const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers, gateway:P.gateway, provFollowon:P.provFollowon};   // the data built into this page
+const ORIG={services:P.services, servicesBooked:P.servicesBooked, uniquePatients:P.uniquePatients, followon:P.followon, providers:P.providers, gateway:P.gateway, gatewayNext:P.gatewayNext, provFollowon:P.provFollowon};   // the data built into this page
 function dataMeta(){ try{ return JSON.parse(lsGet('spl.meta')||'{}'); }catch(e){ return {}; } }
 function setDataMeta(k,v){ const m=dataMeta(); if(v==null) delete m[k]; else m[k]=v; lsSet('spl.meta',JSON.stringify(m)); }
 function lsSave(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ try{ if(k!=='spl.build') localStorage.removeItem(k); }catch(e2){} return false; } }   // a failed save must not leave an older copy behind
@@ -50,6 +50,12 @@ const DROPS={
     wrong:'This file doesn\u2019t look like the gateway export. It needs the columns cohort_month, first_service, gateway_provider_name and new_patients.',
     apply(text,name){ if(!buildGateway(text)) throw new Error('No usable rows found in '+name+'.'); P.gateway=text; const saved=lsSave('spl.gateway',text); lsSave('spl.build',P.built); setDataMeta('gateway',{name,at:Date.now(),unsaved:!saved}); return saved; },
     reset(){ P.gateway=ORIG.gateway; lsDel('spl.gateway'); setDataMeta('gateway',null); }
+  },
+  gwnext:{
+    check:hdr=>/next_service/.test(hdr)&&/gateway_provider_name/.test(hdr),
+    wrong:'This file doesn\u2019t look like the gateway next-services export. It needs the columns cohort_month, first_service, gateway_provider_name, next_service, eligible_90d and patients_90d.',
+    apply(text,name){ if(!buildGatewayNext(text)) throw new Error('No usable rows found in '+name+'.'); P.gatewayNext=text; const saved=lsSave('spl.gatewayNext',text); lsSave('spl.build',P.built); setDataMeta('gwnext',{name,at:Date.now(),unsaved:!saved}); return saved; },
+    reset(){ P.gatewayNext=ORIG.gatewayNext; lsDel('spl.gatewayNext'); setDataMeta('gwnext',null); }
   },
   pfollow:{
     check:hdr=>/provider_service/.test(hdr)&&/target_service/.test(hdr)&&/followed_30d/.test(hdr),
@@ -128,11 +134,12 @@ function renderData(){
     document.getElementById('stat-'+key).innerHTML=row('Source', mm? esc(mm.name)+' <span class="note">('+fmtAt(mm.at)+')</span>' : (model?'Built into this page':'Nothing loaded yet'))+(model? extra(model) : '');
     document.getElementById('reset-'+key).hidden=!mm; };
   const monthsOf=mdl=>{ const ms=[...new Set(mdl.rows.map(r=>r.mk))].sort(); return ms.length? row('Months', fmtM(ms[0])+' – '+fmtM(ms[ms.length-1])+' ('+ms.length+')') : ''; };
-  let G_=null, F_=null; try{ G_=buildGateway(P.gateway); }catch(e){} try{ F_=buildProvFollowon(P.provFollowon); }catch(e){}
+  let G_=null, F_=null, N_=null; try{ N_=buildGatewayNext(P.gatewayNext); }catch(e){} try{ G_=buildGateway(P.gateway); }catch(e){} try{ F_=buildProvFollowon(P.provFollowon); }catch(e){}
   mstat('gateway','gateway',G_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
+  mstat('gwnext','gwnext',N_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length))+row('Next services', fmtInt(mdl.nexts.length)));
   mstat('pfollow','pfollow',F_,mdl=>monthsOf(mdl)+row('Rows', fmtInt(mdl.rows.length)));
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
-  if(SHEET&&SHEET.data&&window.claude) [['stat-orders',['services','servicesBooked']],['stat-patients',['uniquePatients']],['stat-links',['followon']],['stat-providers',['providers']],['stat-gateway',['gateway']],['stat-pfollow',['provFollowon']]].forEach(([id,keys])=>{
+  if(SHEET&&SHEET.data&&window.claude) [['stat-orders',['services','servicesBooked']],['stat-patients',['uniquePatients']],['stat-links',['followon']],['stat-providers',['providers']],['stat-gateway',['gateway']],['stat-gwnext',['gatewayNext']],['stat-pfollow',['provFollowon']]].forEach(([id,keys])=>{
     const el=document.getElementById(id); if(el) el.insertAdjacentHTML('beforeend', keys.map(k=>row(keys.length>1?(k==='services'?'Sheet, scheduled':'Sheet, booking'):'Google Sheet', feedText(k))).join('')); });
   renderSamples();
 }
@@ -198,6 +205,15 @@ SAMPLES.gateway={file:'saleem-gateway-providers-sample.csv',
          'Files without the basis column load as first visit only. orders_90d, other_service_90d and same_provider_90d are optional.',
          'Keep the column names as shown; their order doesn’t matter. Numbers can have thousands separators.','The Copy SQL query in this box produces exactly this layout.'],
   csv:'basis,cohort_month,first_service,gateway_provider_id,gateway_provider_name,specialty,new_patients,eligible_30d,returned_30d,eligible_90d,returned_90d,eligible_180d,returned_180d,orders_90d,other_service_90d,same_provider_90d\nfirst,2026-02,doctorVisit,u101,Dr. Ahmed Ali,Internal medicine,42,42,15,42,21,42,25,38,14,9\nfirst,2026-02,doctorVisit,u102,Dr. Sara Kareem,Pediatrics,18,18,5,18,8,18,10,11,4,3\nfirst,2026-02,nursing,u201,Zainab Hassan,,35,35,11,35,16,35,19,29,6,10\nfirst,2026-02,physiotherapy,u301,Omar Jasim,,20,20,12,20,14,20,15,61,3,12\nfirst,2026-02,labTest,,No named provider,,64,64,14,64,23,64,29,30,19,0\nfirst,2026-02,radiology,,No named provider,,11,11,2,11,3,11,4,4,5,0\nfirst,2026-08,doctorVisit,u101,Dr. Ahmed Ali,Internal medicine,47,20,6,0,0,0,0,0,0,0\ncreated,2026-02,doctorVisit,u101,Dr. Ahmed Ali,Internal medicine,39,39,14,39,20,39,23,36,13,8\n'};
+SAMPLES.gwnext={file:'saleem-gateway-next-services-sample.csv',
+  cols:[['basis','first = cohorts by the first visit’s month; created = by the month the record was created','first'],['cohort_month','Cohort month, YYYY-MM','2026-02'],
+        ['first_service','Category of the first visit','doctorVisit'],['gateway_provider_id','User id of the provider on that visit; empty when none','u101'],['gateway_provider_name','That provider’s name, or No named provider','Dr. Ahmed Ali'],
+        ['next_service','A service ordered after the first visit; (any) = any service','labTest, nursing, (any)'],
+        ['eligible_30d / 90d / 180d','The gateway’s new patients whose 30 / 90 / 180 days have passed (same on every row of the gateway)','42'],
+        ['patients_30d / 90d / 180d','Of them, patients who had next_service within 30 / 90 / 180 days','17'],['orders_90d','Orders with next_service within 90 days (tagged orders left out)','23']],
+  rules:['One row per basis, cohort month, first service, gateway provider and next service, plus one (any) row for every gateway, also when nobody went on.',
+         'The first and created rows hold the same patients, so don’t add them up. Export the full history with no date filter.','The Copy SQL query in this box produces exactly this layout.'],
+  csv:'basis,cohort_month,first_service,gateway_provider_id,gateway_provider_name,next_service,eligible_30d,patients_30d,eligible_90d,patients_90d,orders_90d,eligible_180d,patients_180d\nfirst,2026-02,doctorVisit,u101,Dr. Ahmed Ali,(any),42,15,42,24,38,42,27\nfirst,2026-02,doctorVisit,u101,Dr. Ahmed Ali,labTest,42,11,42,17,23,42,19\nfirst,2026-02,doctorVisit,u101,Dr. Ahmed Ali,nursing,42,3,42,6,9,42,8\nfirst,2026-02,nursing,u201,Zainab Hassan,(any),35,9,35,14,29,35,16\nfirst,2026-02,nursing,u201,Zainab Hassan,nursing,35,7,35,11,24,35,13\n'};
 SAMPLES.pfollow={file:'saleem-provider-followon-sample.csv',
   cols:[['month','Month of the provider’s visit, YYYY-MM','2026-07'],['provider_service','The provider’s service','doctorVisit, surgeries, nursing, physiotherapy, physiotherapy (b2b)'],
         ['provider_id','Provider’s user id (optional, keeps two people with the same name apart)','u101'],['provider_name','Provider’s name; Unassigned when none','Dr. Ahmed Ali'],
@@ -256,6 +272,7 @@ function wireData(){
   document.getElementById('copySqlBooked').addEventListener('click',()=>copy(P.sqlBooked,'Booking-time SQL'));
   document.getElementById('copySql4').addEventListener('click',()=>copy(P.providersSql,'Provider SQL'));
   document.getElementById('copySql5').addEventListener('click',()=>copy(P.gatewaySql,'Gateway SQL'));
+  document.getElementById('copySql7').addEventListener('click',()=>copy(P.gatewayNextSql,'Gateway next-services SQL'));
   document.getElementById('copySql6').addEventListener('click',()=>copy(P.provFollowonSql,'Provider follow-on SQL'));
   document.getElementById('copySql3').addEventListener('click',()=>navigator.clipboard.writeText(P.followonSql).then(()=>toast('Follow-on SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in the sql folder')));
   document.getElementById('copySql2').addEventListener('click',()=>navigator.clipboard.writeText(P.uniqueSql).then(()=>toast('SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/unique_patients_monthly.sql')));

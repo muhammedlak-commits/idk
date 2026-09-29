@@ -172,3 +172,109 @@ function renderGateway(){
 function wireGateway(){
   document.getElementById('copySqlGw').addEventListener('click',()=>navigator.clipboard.writeText(P.gatewaySql).then(()=>toast('Gateway SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/gateway_provider_monthly.sql')));
 }
+
+/* ---------- where each gateway's patients went next (optional export) ----------
+   From sql/gateway_next_services_monthly.sql: per basis, cohort month, first service, gateway provider and next service,
+   the patients (of those whose N days have passed) who had that service within N days of the first visit. The '(any)' row
+   carries every gateway's eligible counts, also when nobody went on. A share is compared with the other gateways of the
+   same first service pooled (two-proportion z); many cells are tested at once, so "worth checking" passes
+   Benjamini–Hochberg at 10% across every tested cell. */
+let GN=null, gnChart=null, gnSel='';
+const GN_ANY='(any)';
+function buildGatewayNext(text){
+  if(!text||!text.trim()) return null;
+  const hdr=splitCsv(text.trim().split(/\r?\n/)[0]).map(normHdr);
+  const need=['cohort_month','first_service','gateway_provider_name','next_service','eligible_90d','patients_90d'].filter(c=>!hdr.includes(c));
+  if(need.length) throw new Error('The gateway next-services export is missing the column'+(need.length>1?'s ':' ')+need.join(', ')+'. Run the query from Copy SQL again and download all of its columns.');
+  const rows=[], nexts=new Set();
+  for(const o of parseCsvObjects(text)){
+    const m=(o.cohort_month||'').match(/(\d{4})-(\d{2})/), cat=o.first_service, nx=o.next_service; if(!m||!cat||!nx) continue;
+    const name=o.gateway_provider_name||GW_NONE;
+    rows.push({basis:(o.basis||'').toLowerCase()==='created'?'created':'first',mk:m[1]+'-'+m[2],cat,pid:o.gateway_provider_id||'',name,none:name===GW_NONE,next:nx,
+      e30:num(o.eligible_30d),p30:num(o.patients_30d),e90:num(o.eligible_90d),p90:num(o.patients_90d),o90:num(o.orders_90d),e180:num(o.eligible_180d),p180:num(o.patients_180d)});
+    if(nx!==GN_ANY) nexts.add(nx);
+  }
+  return rows.length? {rows,nexts:[...nexts]} : null;
+}
+/* pure: shares per gateway row and next service for one window, against the same first service's other gateways */
+function gnCompute(M,{basis,fromMk,toMk,cats,win}){
+  const E=new Map(), rows=new Map(), catT=new Map(), eK='e'+win, pK='p'+win;
+  const blank=x=>({...x,E:0,any:0,P:{},O:{}});
+  for(const r of M.rows){ if(r.basis!==basis||r.mk<fromMk||r.mk>toMk||(cats&&!cats.has(r.cat))) continue;
+    const pk=r.none?'':(r.pid||r.name), key=r.cat+'|'+pk, gk=r.mk+'|'+key;
+    const row=rows.get(key)||rows.set(key,blank({key,cat:r.cat,pk,name:r.name,none:r.none})).get(key);
+    const ct=catT.get(r.cat)||catT.set(r.cat,blank({cat:r.cat})).get(r.cat);
+    // eligible patients belong to the gateway row and month, repeated on each of its rows: count them once
+    const e=r[eK]||0; if(e>(E.get(gk)||0)){ const add=e-(E.get(gk)||0); E.set(gk,e); row.E+=add; ct.E+=add; }
+    if(r.next===GN_ANY){ row.any+=r[pK]; ct.any+=r[pK]; continue; }
+    row.P[r.next]=(row.P[r.next]||0)+r[pK]; ct.P[r.next]=(ct.P[r.next]||0)+r[pK];
+    if(win===90){ row.O[r.next]=(row.O[r.next]||0)+r.o90; }
+  }
+  const R=[...rows.values()].filter(x=>x.E>0).sort((x,y)=>y.E-x.E);
+  const tot={}; R.forEach(x=>{ for(const k in x.P) tot[k]=(tot[k]||0)+x.P[k]; });
+  const nexts=Object.keys(tot).filter(k=>tot[k]>0).sort((a,b)=>tot[b]-tot[a]);
+  // each cell against the other gateways of the same first service
+  const cells=[];
+  R.forEach(x=>{ const c=catT.get(x.cat); x.cells={};
+    for(const k of [GN_ANY].concat(nexts)){ const p=k===GN_ANY?x.any:(x.P[k]||0), cp=k===GN_ANY?c.any:(c.P[k]||0), pe=c.E-x.E, pp=cp-p;
+      const cell={p,e:x.E,share:x.E>=10?p/x.E:null,peer:pe>=10?pp/pe:null,pe,z:null,flag:false};
+      if(!x.none&&x.E>=20&&pe>=20){ const q=(p+pp)/(x.E+pe), se=Math.sqrt(q*(1-q)*(1/x.E+1/pe)); if(se>0){ cell.z=(p/x.E-pp/pe)/se; cells.push(cell); } }
+      x.cells[k]=cell; } });
+  const cut=bhCut(cells.map(c=>normP(c.z)),cells.length,0.1); cells.forEach(c=>{ c.flag=normP(c.z)<=cut; });
+  const all={E:0,any:0}; catT.forEach(c=>{ all.E+=c.E; all.any+=c.any; });
+  return {rows:R,nexts,cats:catT,tested:cells.length,flagged:cells.filter(c=>c.flag).length,all,win};
+}
+function renderGatewayNext(){
+  const empty=document.getElementById('gnEmpty'), body=document.getElementById('gnBody');
+  if(!GN){ empty.hidden=false; body.hidden=true; if(gnChart){gnChart.destroy();gnChart=null;} return; }
+  empty.hidden=true; body.hidden=false;
+  if(st.gnShow==='o') st.gnWin=90;
+  document.querySelectorAll('#gnWin button').forEach(b=>{ b.classList.toggle('on',+b.dataset.w===st.gnWin); b.disabled=st.gnShow==='o'&&+b.dataset.w!==90; });
+  document.querySelectorAll('#gnShow button').forEach(b=>b.classList.toggle('on',b.dataset.s===st.gnShow));
+  const basis=st.newBasis==='created'&&GN.rows.some(r=>r.basis==='created')?'created':'first';
+  const R=gnCompute(GN,{basis,fromMk:monthKey(st.from),toMk:monthKey(st.to),cats:gwCats(),win:st.gnWin});
+  const svcName=c=>c===GN_ANY?'Any service':(UP_LABEL[c]||label(c)), pct=v=>v==null?'–':(v*100).toFixed(0)+'%', W=st.gnWin;
+  const cols=[GN_ANY].concat(R.nexts.slice(0,9)), rows=R.rows.slice(0,40);
+  if(gnSel&&!R.rows.some(x=>x.key===gnSel)) gnSel='';
+  const sel=R.rows.find(x=>x.key===gnSel)||R.rows.find(x=>!x.none)||R.rows[0];
+  const cellHtml=(x,k)=>{ const c=x.cells[k]; if(!c) return '<td>–</td>';
+    const d=c.share!=null&&c.peer!=null? (c.share-c.peer)*100 : null, a=d==null?0:Math.min(Math.abs(d),25)/25;
+    const bg=d==null||x.none? '' : d>=0? 'background:rgba(12,163,12,'+(0.04+a*0.26).toFixed(2)+')' : 'background:rgba(194,65,12,'+(0.04+a*0.26).toFixed(2)+')';
+    const txt= st.gnShow==='n'? fmtInt(c.p) : st.gnShow==='o'? (k===GN_ANY? fmtInt(Object.values(x.O).reduce((s,v)=>s+v,0)) : fmtInt(x.O[k]||0)) : pct(c.share);
+    const tip=fmtInt(c.p)+' of '+fmtInt(c.e)+' new patients past '+W+' days had '+svcName(k).toLowerCase()+' within '+W+' days'+(c.peer!=null&&!x.none?' ('+pct(c.share)+') · other '+svcName(x.cat).toLowerCase()+' gateways: '+pct(c.peer)+' of '+fmtInt(c.pe):'')+(c.z!=null?' · z = '+c.z.toFixed(2)+(c.flag?', worth checking':''):'')+(st.gnShow==='o'&&k!==GN_ANY?' · '+fmtInt(x.O[k]||0)+' orders with it in 90 days':'');
+    return '<td class="heat" style="'+bg+(c.flag?';box-shadow:inset 0 0 0 2px var(--ink-2)':'')+'" title="'+esc(tip)+'">'+txt+(c.flag?' •':'')+'</td>'; };
+  document.getElementById('gnTable').innerHTML='<thead><tr><th class="nosort" style="text-align:left">Gateway provider</th><th class="nosort" style="text-align:left">First service</th><th class="nosort" title="New patients whose '+W+' days have passed">Patients</th>'+cols.map(k=>'<th class="nosort">'+esc(svcName(k))+'</th>').join('')+'</tr></thead><tbody>'+
+    (rows.length? rows.map(x=>'<tr data-key="'+esc(x.key)+'" class="'+(sel&&x.key===sel.key?'sel':'')+'" style="cursor:pointer"><td dir="auto" style="text-align:left">'+esc(x.name)+'</td><td style="text-align:left">'+esc(svcName(x.cat))+'</td><td>'+fmtInt(x.E)+'</td>'+cols.map(k=>cellHtml(x,k)).join('')+'</tr>').join('')
+      : '<tr><td class="note" colspan="'+(cols.length+3)+'" style="text-align:left">No new patients past '+W+' days match the filters.</td></tr>')+'</tbody>';
+  document.querySelectorAll('#gnTable tbody tr[data-key]').forEach(tr=>tr.addEventListener('click',()=>{ gnSel=tr.dataset.key; renderGatewayNext(); }));
+  document.getElementById('gnNote').textContent=(R.rows.length>40?'The 40 gateways with most patients of '+R.rows.length+'. ':'')+
+    (R.nexts.length>9?'The 9 most-ordered next services of '+R.nexts.length+'. ':'')+
+    'Green: more of this gateway’s patients went on to that service than for the other gateways with the same first service; orange: fewer. '+
+    R.tested+' cells with 20+ patients on both sides tested; '+R.flagged+' worth checking (• and outlined), after allowing for testing that many. '+(st.gnShow==='o'?'Orders are distinct orders with that service in 90 days, so an order with two services counts under both.':'Hover a cell for the counts.');
+  // written read-out
+  const flags=[]; R.rows.forEach(x=>{ for(const k of R.nexts){ const c=x.cells[k]; if(c&&c.flag) flags.push({x,k,c}); } });
+  flags.sort((a,b)=>Math.abs(b.c.z)-Math.abs(a.c.z));
+  const allAny=R.all.E? R.all.any/R.all.E : null, topNext=R.nexts.slice(0,3).map(k=>{ let p=0; R.rows.forEach(x=>p+=x.P[k]||0); return svcName(k)+' '+pct(R.all.E?p/R.all.E:null); });
+  const lines=['<li>Of <strong>'+fmtInt(R.all.E)+'</strong> new patients whose '+W+' days have passed, <strong>'+pct(allAny)+'</strong> ordered another service within '+W+' days'+(topNext.length?': '+esc(topNext.join(', ')):'')+'.</li>'];
+  if(flags.length) flags.slice(0,4).forEach(f=>lines.push('<li><strong>'+esc(f.x.name)+'</strong> ('+esc(svcName(f.x.cat))+'): '+pct(f.c.share)+' of '+fmtInt(f.c.e)+' patients went on to '+esc(svcName(f.k).toLowerCase())+', against '+pct(f.c.peer)+' for the other '+esc(svcName(f.x.cat).toLowerCase())+' gateways.</li>'));
+  else lines.push('<li>No gateway stands out from the others with the same first service once the number of comparisons is allowed for. The colours show the direction, but gaps this size can come from chance.</li>');
+  document.getElementById('gnRead').innerHTML='<div class="head">Where new patients go after their first visit</div><ul>'+lines.join('')+'</ul>';
+  // the selected gateway against its peers, service by service
+  if(gnChart){ gnChart.destroy(); gnChart=null; }
+  const h=document.getElementById('gnSelH');
+  if(!sel){ h.textContent=''; document.getElementById('gnLegend').innerHTML=''; return; }
+  const ks=R.nexts.filter(k=>sel.cells[k]&&sel.cells[k].p>0||(sel.cells[k]&&sel.cells[k].peer>0)).slice(0,10);
+  h.textContent=sel.name+' ('+svcName(sel.cat)+'): what '+fmtInt(sel.E)+' new patients went on to within '+W+' days';
+  const ds=[{label:sel.name,data:ks.map(k=>sel.cells[k].share==null?null:sel.cells[k].share*100),backgroundColor:css('--accent'),borderRadius:3,maxBarThickness:18}];
+  if(!sel.none) ds.push({label:'Other '+svcName(sel.cat).toLowerCase()+' gateways',data:ks.map(k=>sel.cells[k].peer==null?null:sel.cells[k].peer*100),backgroundColor:css('--ghost'),borderRadius:3,maxBarThickness:18});
+  const o=baseOpts(); o.indexAxis='y'; o.scales.x.ticks.callback=v=>v+'%'; o.scales.x.grid={color:css('--grid')}; o.scales.y.grid={display:false}; o.scales.y.ticks.callback=function(v){ return this.getLabelForValue(v); };
+  o.plugins.tooltip.callbacks={label:it=>{ const c=sel.cells[ks[it.dataIndex]]; return ' '+it.dataset.label+': '+(it.parsed.x==null?'–':it.parsed.x.toFixed(1)+'%')+(it.datasetIndex===0?' ('+fmtInt(c.p)+' of '+fmtInt(c.e)+')':''); }};
+  gnChart=new Chart(document.getElementById('gnChart'),{type:'bar',data:{labels:ks.map(svcName),datasets:ds},options:o});
+  document.getElementById('gnChart').parentElement.style.height=Math.max(180,ks.length*34+60)+'px';
+  document.getElementById('gnLegend').innerHTML=ds.map(d=>'<span><i class="box" style="background:'+d.backgroundColor+'"></i>'+esc(d.label)+'</span>').join('')+'<span class="note">Click another row in the table to switch provider.</span>';
+}
+function wireGatewayNext(){
+  document.querySelectorAll('#gnWin button').forEach(b=>b.addEventListener('click',()=>{ st.gnWin=+b.dataset.w; renderGatewayNext(); }));
+  document.querySelectorAll('#gnShow button').forEach(b=>b.addEventListener('click',()=>{ st.gnShow=b.dataset.s; renderGatewayNext(); }));
+  document.getElementById('copySqlGn').addEventListener('click',()=>navigator.clipboard.writeText(P.gatewayNextSql).then(()=>toast('Next-services SQL copied')).catch(()=>toast('Copy was blocked by this browser; the query is in sql/gateway_next_services_monthly.sql')));
+}

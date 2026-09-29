@@ -26,7 +26,7 @@ function effN(xs,ys){ let f=1; for(let j=1;j<=3;j++) f+=2*acf(xs,j)*acf(ys,j); r
 /* weekly totals over full Saturday-to-Friday weeks inside the range */
 function weeklyOf(c,a,b){
   const w0=weekStart(a)+(weekStart(a)<a?7:0), out=[], keys=[];
-  const y=series(w0,b,st.measure,[c],selStats());
+  const y=series(w0,b,st.measure,Array.isArray(c)?c:[c],selStats());
   for(let w=w0; w+6<=b; w+=7){ let s=0; for(let n=w;n<=w+6;n++) s+=y[n-w0]; out.push(s); keys.push(w); }
   return {v:out,keys};
 }
@@ -58,23 +58,35 @@ function renderLinks(){
   // one sub-tab at a time: only the visible test is computed
   document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.lk===st.lkTab)));
   document.querySelectorAll('[data-lkpane]').forEach(p=>p.hidden=p.dataset.lkpane!==st.lkTab);
+  document.getElementById('lkPick').hidden=st.lkTab==='ad'; document.getElementById('lkGridBtn').hidden=st.lkTab!=='svc';
   if(st.lkTab==='ad') return renderAdLink(chosen,a,b);
-  if(st.lkTab==='drv'){ renderDrivers(chosen,a,b); renderProvFollowon(chosen); renderBusyWeeks(chosen,a,b); return; }
+  if(st.lkTab==='drv'){ lkPickSync(); const f=st.lkFrom, t=st.lkTo; renderDrivers(f,a,b,t); renderProvFollowon(f,t); renderBusyWeeks(f,a,b,t); return; }
   [a,b]=lkRange();
   document.querySelectorAll('#lkSpan button').forEach(x=>x.classList.toggle('on',x.dataset.s===st.lkSpan));
   document.getElementById('lkSpanNote').textContent=fmtD(a)+' – '+fmtD(b)+(st.lkSpan==='range'&&b-a<83?' · pick 12 weeks or more for the lead/lag test':'');
-  const all=S.catList.every(c=>st.svc.has(c));
-  if(chosen.length<2){ msg.innerHTML='Pick <strong>2 or 3 services</strong> in the filter bar above (click a chip to add or remove it; double-click to keep only that one) to see how they affect each other.'; msg.hidden=false; detail.hidden=true; matrix.hidden=true; return; }
-  if(chosen.length>3){
-    msg.innerHTML=(all?'All services are selected. ':'')+'This grid compares the '+Math.min(chosen.length,8)+' busiest selected services. Pick 2 or 3 services in the filter bar for the detailed view.'; msg.hidden=false; detail.hidden=true; matrix.hidden=false;
-    renderLinkMatrix(chosen.slice(0,8),a,b); return;
+  // From and To are picked here, not from the filter bar; the filter bar still sets statuses, patient view and measure
+  lkPickSync();
+  const from=st.lkFrom, to=st.lkTo;
+  if(st.lkGrid){
+    const all=S.catList.every(c=>st.svc.has(c)), grid=chosen.slice(0,8);
+    detail.hidden=true;
+    if(grid.length<2){ msg.innerHTML='Pick 2 or more services in the filter bar to see every pair at once.'; msg.hidden=false; matrix.hidden=true; return; }
+    msg.innerHTML=(all?'All services are selected in the filter bar. ':'')+'This grid compares the '+grid.length+' busiest services picked in the filter bar, every pair at once. Switch off Every pair to test one From → To link.'; msg.hidden=false; matrix.hidden=false;
+    renderLinkMatrix(grid,a,b); return;
   }
-  msg.hidden=true; matrix.hidden=true; detail.hidden=false;
-  const W=chosen.map(c=>({c,...weeklyOf(c,a,b)}));
+  matrix.hidden=true;
+  if(!from.length||!to.length){ msg.innerHTML='Pick at least one <strong>From</strong> and one <strong>To</strong> service above.'; msg.hidden=false; detail.hidden=true; return; }
+  msg.hidden=true; detail.hidden=false;
+  const nm=cs=>cs.length>3? label(cs[0])+' and '+(cs.length-1)+' more' : cs.map(label).join(' + ');
+  const colorOf=cs=>cs.length===1? css(S.colorOf[cs[0]].slice(4,-1)) : null;
+  // a group gets a palette colour that isn't the other side's
+  const spare=avoid=>['--s1','--s3','--s4','--s5','--s2'].map(css).find(c=>c!==avoid);
+  const cF=colorOf(from), cT=colorOf(to);
+  const W=[{c:from,name:nm(from),...weeklyOf(from,a,b)},{c:to,name:nm(to),...weeklyOf(to,a,b)}];
+  W[0].col=cF||spare(cT); W[1].col=cT&&cT!==W[0].col? cT : spare(W[0].col);
   const labels=W[0].keys.map(k=>fmtDs(k));
-  const colorOf=c=>css(S.colorOf[c].slice(4,-1));
   // 1. indexed weekly volume
-  const idx=W.map(w=>{ const m=w.v.reduce((s,x)=>s+x,0)/(w.v.length||1); return {label:label(w.c),data:w.v.map(x=>m?x/m*100:null),borderColor:colorOf(w.c),backgroundColor:colorOf(w.c),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}; });
+  const idx=W.map(w=>{ const m=w.v.reduce((s,x)=>s+x,0)/(w.v.length||1); return {label:w.name,data:w.v.map(x=>m?x/m*100:null),borderColor:w.col,backgroundColor:w.col,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25}; });
   const o1=baseOpts(); o1.scales.y.beginAtZero=false; o1.plugins.tooltip.callbacks={title:it=>'Week of '+fmtD(W[0].keys[it[0].dataIndex]),label:it=>' '+it.dataset.label+': '+Math.round(it.parsed.y)+' (= '+fmtVal(W[it.datasetIndex].v[it.dataIndex])+' '+MLABEL[st.measure].toLowerCase()+')'};
   if(lkIdx) lkIdx.destroy(); lkIdx=new Chart(document.getElementById('lkIdxChart'),{type:'line',data:{labels,datasets:idx},options:o1});
   document.getElementById('lkIdxLegend').innerHTML=idx.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
@@ -84,32 +96,32 @@ function renderLinks(){
   const ks=lagSets[0].lags.map(l=>l.k);
   const pairColor=['--s1','--s2','--s3'];
   const o2=baseOpts(); o2.scales.y.beginAtZero=true; o2.scales.y.min=-1; o2.scales.y.max=1; o2.interaction={mode:'nearest',intersect:true};
-  o2.scales.x.title={display:true,text:'Weeks the second service lags the first (negative = it moves first)',color:css('--muted'),font:{size:11}};
-  o2.plugins.tooltip.callbacks={title:it=>{const k=ks[it[0].dataIndex]; return k===0?'Same week':k>0?'Second service '+k+' week'+(k>1?'s':'')+' later':'Second service '+(-k)+' week'+(k<-1?'s':'')+' earlier';},label:it=>' '+it.dataset.label+': r = '+(it.parsed.y==null?'–':it.parsed.y.toFixed(2))};
+  o2.scales.x.title={display:true,text:'Weeks To comes after From (negative = To moves first)',color:css('--muted'),font:{size:11}};
+  o2.plugins.tooltip.callbacks={title:it=>{const k=ks[it[0].dataIndex]; return k===0?'Same week':k>0?'To '+k+' week'+(k>1?'s':'')+' after From':'To '+(-k)+' week'+(k<-1?'s':'')+' before From';},label:it=>' '+it.dataset.label+': r = '+(it.parsed.y==null?'–':it.parsed.y.toFixed(2))};
   if(lkLag) lkLag.destroy();
-  lkLag=new Chart(document.getElementById('lkLagChart'),{type:'bar',data:{labels:ks.map(k=>k>0?'+'+k:String(k)),datasets:lagSets.map((p,i)=>({label:label(p.A.c)+' → '+label(p.B.c),data:p.lags.map(l=>l.r),backgroundColor:css(pairColor[i]),borderRadius:3,maxBarThickness:22}))},options:o2});
-  document.getElementById('lkLagLegend').innerHTML=lagSets.map((p,i)=>'<span><i class="box" style="background:'+css(pairColor[i])+'"></i>'+esc(label(p.A.c)+' → '+label(p.B.c))+'</span>').join('');
-  document.getElementById('lkFindings').innerHTML=lagSets.map(p=>'<li>'+esc(describeLag(p.lags,label(p.A.c),label(p.B.c)).text)+'</li>').join('');
-  // 3. ratio by month: the smaller service per 100 of the larger
+  lkLag=new Chart(document.getElementById('lkLagChart'),{type:'bar',data:{labels:ks.map(k=>k>0?'+'+k:String(k)),datasets:lagSets.map((p,i)=>({label:p.A.name+' → '+p.B.name,data:p.lags.map(l=>l.r),backgroundColor:css(pairColor[i]),borderRadius:3,maxBarThickness:22}))},options:o2});
+  document.getElementById('lkLagLegend').innerHTML=lagSets.map((p,i)=>'<span><i class="box" style="background:'+css(pairColor[i])+'"></i>'+esc(p.A.name+' → '+p.B.name)+'</span>').join('');
+  document.getElementById('lkFindings').innerHTML=lagSets.map(p=>'<li>'+esc(describeLag(p.lags,p.A.name,p.B.name).text)+'</li>').join('');
+  // 3. ratio by month: To per 100 From
   const months=[]; for(let mk=monthKey(a); mk<=monthKey(b); mk=addMonths(mk,1)) months.push(mk);
-  const mTot=(c,mk)=>{const s=Math.max(toN(mk+'-01'),a,S.min), e=Math.min(toN(mk+'-01')+daysInMonth(mk)-1,b,S.max); return e<s?null:total(s,e,st.measure,[c],selStats());};
-  const ratios=pairs.map(([A,B],i)=>{ const tA=A.v.reduce((s,x)=>s+x,0), tB=B.v.reduce((s,x)=>s+x,0); const [big,small]= tA>=tB?[A,B]:[B,A];
+  const mTot=(c,mk)=>{const s=Math.max(toN(mk+'-01'),a,S.min), e=Math.min(toN(mk+'-01')+daysInMonth(mk)-1,b,S.max); return e-s<6?null:total(s,e,st.measure,Array.isArray(c)?c:[c],selStats());};   // a month with under a week in the period is left out
+  const ratios=pairs.map(([A,B],i)=>{ const big=A, small=B;
     const data=months.map(mk=>{const x=mTot(big.c,mk), y=mTot(small.c,mk); return x?y/x*100:null;});
-    return {label:label(small.c)+' per 100 '+label(big.c),data,borderColor:css(pairColor[i]),backgroundColor:css(pairColor[i]),borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:.25,big:big.c,small:small.c}; });
+    return {label:small.name+' per 100 '+big.name,data,borderColor:css(pairColor[i]),backgroundColor:css(pairColor[i]),borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:.25,big:big.name,small:small.name}; });
   const o3=baseOpts(); o3.plugins.tooltip.callbacks={label:it=>' '+it.dataset.label+': '+(it.parsed.y==null?'–':it.parsed.y.toFixed(1))};
   if(lkRatio) lkRatio.destroy(); lkRatio=new Chart(document.getElementById('lkRatioChart'),{type:'line',data:{labels:months.map(fmtM),datasets:ratios},options:o3});
   document.getElementById('lkRatioLegend').innerHTML=ratios.map(d=>'<span><i style="background:'+d.borderColor+'"></i>'+esc(d.label)+'</span>').join('');
   // 4. patient follow-on (optional export)
-  renderFollowon(chosen,months);
+  renderFollowon(from,to,months);
   renderLinkRead(W,lagSets,ratios,months);
-  document.getElementById('lkDesc').textContent=chosen.map(label).join(', ')+viewLabel()+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
+  document.getElementById('lkDesc').textContent=W[0].name+' → '+W[1].name+viewLabel()+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
 }
-function renderFollowon(chosen,months){
+function renderFollowon(from,to,months){
   const box=document.getElementById('lkFollowBody'), empty=document.getElementById('lkFollowEmpty');
   if(!F){ box.hidden=true; empty.hidden=false; if(lkFollow){lkFollow.destroy();lkFollow=null;} return; }
-  const cats=[...new Set(chosen.map(c=>UP_CAT[c]).filter(Boolean))];
-  const pairs=[]; cats.forEach(x=>cats.forEach(y=>{ if(x!==y && F.by[x+'|'+y]) pairs.push([x,y]); }));
-  if(!pairs.length){ box.hidden=true; empty.hidden=false; empty.innerHTML='The follow-on export has no pairs for these services'+(cats.length<2?' (they share one service type in the database)':'')+'.'; return; }
+  const fc=[...new Set(from.map(c=>UP_CAT[c]).filter(Boolean))], tc=[...new Set(to.map(c=>UP_CAT[c]).filter(Boolean))];
+  const pairs=[]; fc.forEach(x=>tc.forEach(y=>{ if(x!==y && F.by[x+'|'+y]) pairs.push([x,y]); }));
+  if(!pairs.length){ box.hidden=true; empty.hidden=false; empty.innerHTML='The follow-on export has no From → To pairs for these services'+(fc.some(x=>tc.includes(x))?' (some share one service type in the database)':'')+'.'; return; }
   empty.hidden=true; box.hidden=false;
   const inRange=months.filter(mk=>F.months.includes(mk));
   const colors=['--s1','--s2','--s3','--s4','--s5','--s7'];
@@ -220,26 +232,47 @@ function renderLinkRead(W,lagSets,ratios,months){
   if(n<6){ el.innerHTML='<p class="note" style="margin:0">Only '+n+' full week'+(n===1?'':'s')+' in this period, too few to read. Pick 12 weeks or more above.</p>'; return; }
   const pc=v=>'<span class="'+(v>=0?'pos':'neg')+'">'+fmtPct(v*100,1)+'</span>';
   // 1. growth of each, from a trend line so one odd week doesn't decide it
-  const T=W.map(w=>({c:w.c,t:linkTrend(w.v)})).filter(x=>x.t);
-  T.forEach(x=>{ const steady=Math.abs(x.t.t)>=2; out.push('<li><strong>'+esc(label(x.c))+'</strong>: '+(steady? (x.t.total>=0?'grew ':'fell ')+pc(x.t.total)+' over the '+n+' weeks on the trend line ('+fmtPct(x.t.g*100,1)+' a week)' : 'no clear trend over the '+n+' weeks ('+fmtPct(x.t.total*100,1)+' on the trend line, within normal week-to-week swings)')+'.</li>'); });
+  const T=W.map(w=>({c:w.c,name:w.name,t:linkTrend(w.v)})).filter(x=>x.t);
+  T.forEach(x=>{ const steady=Math.abs(x.t.t)>=2; out.push('<li><strong>'+esc(x.name)+'</strong>: '+(steady? (x.t.total>=0?'grew ':'fell ')+pc(x.t.total)+' over the '+n+' weeks on the trend line ('+fmtPct(x.t.g*100,1)+' a week)' : 'no clear trend over the '+n+' weeks ('+fmtPct(x.t.total*100,1)+' on the trend line, within normal week-to-week swings)')+'.</li>'); });
   let head='';
   if(T.length>=2){ const s_=T.slice().sort((p,q)=>q.t.total-p.t.total), f=s_[0], l=s_[s_.length-1], gap=f.t.total-l.t.total;
-    head= gap>=0.05? esc(label(f.c))+' is growing faster than '+esc(label(l.c)) : 'They are growing at about the same pace'; }
+    head= gap>=0.05? esc(f.name)+' is growing faster than '+esc(l.name) : 'They are growing at about the same pace'; }
   // 2. mix: the smaller per 100 of the larger, first full month against the last
   ratios.forEach(r=>{ const pts=r.data.map((v,i)=>({v,mk:months[i]})).filter(x=>x.v!=null);
     if(pts.length>=2){ const f=pts[0], l=pts[pts.length-1], ch=l.v/f.v-1;
-      out.push('<li><strong>Mix</strong>: '+esc(label(r.small))+' per 100 '+esc(label(r.big))+' went from '+f.v.toFixed(1)+' in '+fmtM(f.mk)+' to '+l.v.toFixed(1)+' in '+fmtM(l.mk)+' ('+pc(ch)+(Math.abs(ch)<0.05?', roughly steady':'')+').</li>'); } });
+      out.push('<li><strong>Mix</strong>: '+esc(r.small)+' per 100 '+esc(r.big)+' went from '+f.v.toFixed(1)+' in '+fmtM(f.mk)+' to '+l.v.toFixed(1)+' in '+fmtM(l.mk)+' ('+pc(ch)+(Math.abs(ch)<0.05?', roughly steady':'')+').</li>'); } });
   // 3. timing: does one lead the other
-  lagSets.forEach(p=>{ const d=describeLag(p.lags,label(p.A.c),label(p.B.c)); out.push('<li><strong>Timing</strong>: '+esc(d.text)+(d.best&&d.best.k===0&&Math.abs(d.best.r)>1.96/Math.sqrt(d.best.ne)?' A same-week link is usually a shared cause (holidays, ads, salary days) rather than one service feeding the other.':'')+'</li>'); });
+  lagSets.forEach(p=>{ const d=describeLag(p.lags,p.A.name,p.B.name); out.push('<li><strong>Timing</strong>: '+esc(d.text)+(d.best&&d.best.k===0&&Math.abs(d.best.r)>1.96/Math.sqrt(d.best.ne)?' A same-week link is usually a shared cause (holidays, ads, salary days) rather than one service feeding the other.':'')+'</li>'); });
   // 4. weeks where they pulled apart
   if(W.length>=2){ const [A,B]=W, split=[];
     for(let i=1;i<n;i++){ const x=A.v[i-1]? A.v[i]/A.v[i-1]-1 : null, y=B.v[i-1]? B.v[i]/B.v[i-1]-1 : null; if(x==null||y==null) continue;
       if((x>=0.1&&y<=-0.1)||(x<=-0.1&&y>=0.1)) split.push({k:A.keys[i],x,y}); }
     if(split.length){ const l=split[split.length-1];
-      out.push('<li><strong>Pulled apart</strong> in '+split.length+' of '+(n-1)+' weeks (one up 10% or more while the other fell 10% or more). Latest: week of '+fmtDs(l.k)+', '+esc(label(A.c))+' '+fmtPct(l.x*100,0)+', '+esc(label(B.c))+' '+fmtPct(l.y*100,0)+(()=>{ const h=new Set(); for(let d=l.k-7;d<=l.k+6;d++) holsOn(d).forEach(x=>h.add(x)); return h.size? ' ('+[...h].join(', ')+' in that week or the one before, which can shift bookings between services)' : ''; })()+'.</li>'); }
+      out.push('<li><strong>Pulled apart</strong> in '+split.length+' of '+(n-1)+' weeks (one up 10% or more while the other fell 10% or more). Latest: week of '+fmtDs(l.k)+', '+esc(A.name)+' '+fmtPct(l.x*100,0)+', '+esc(B.name)+' '+fmtPct(l.y*100,0)+(()=>{ const h=new Set(); for(let d=l.k-7;d<=l.k+6;d++) holsOn(d).forEach(x=>h.add(x)); return h.size? ' ('+[...h].join(', ')+' in that week or the one before, which can shift bookings between services)' : ''; })()+'.</li>'); }
     else out.push('<li><strong>Never pulled apart</strong>: no week where one rose 10% or more while the other fell 10% or more.</li>'); }
   // 5. the last 4 weeks against each service's own normal week
-  const recent=W.map(w=>{ const m=w.v.reduce((t,x)=>t+x,0)/n, r=w.v.slice(-4), rm=r.reduce((t,x)=>t+x,0)/r.length; return {c:w.c,d:m? rm/m-1 : null}; }).filter(x=>x.d!=null);
-  if(recent.length) out.push('<li><strong>Last 4 weeks</strong> against their average week in this period: '+recent.map(x=>esc(label(x.c))+' '+pc(x.d)).join(', ')+'.</li>');
+  const recent=W.map(w=>{ const m=w.v.reduce((t,x)=>t+x,0)/n, r=w.v.slice(-4), rm=r.reduce((t,x)=>t+x,0)/r.length; return {c:w.c,name:w.name,d:m? rm/m-1 : null}; }).filter(x=>x.d!=null);
+  if(recent.length) out.push('<li><strong>Last 4 weeks</strong> against their average week in this period: '+recent.map(x=>esc(x.name)+' '+pc(x.d)).join(', ')+'.</li>');
   el.innerHTML=(head?'<div class="head">'+head+'</div>':'')+'<ul>'+out.join('')+'</ul>';
+}
+
+/* ---------- From / To picker ---------- */
+function lkPickSync(){
+  const ok=c=>S.catList.includes(c), ranked=S.order.map(i=>S.catList[i]);
+  if(!st.lkFrom){ try{ const v=JSON.parse(lsGet('spl.lkPick')||'null'); if(v){ st.lkFrom=(v.from||[]).filter(ok); st.lkTo=(v.to||[]).filter(ok); } }catch(e){} }
+  if(!st.lkFrom||(!st.lkFrom.length&&!st.lkTo.length)){ st.lkFrom=ok('doctorVisit')?['doctorVisit']:ranked.slice(0,1); st.lkTo=ok('labTest')?['labTest']:ranked.slice(1,2); }
+  st.lkFrom=st.lkFrom.filter(ok); st.lkTo=st.lkTo.filter(ok);
+  const chips=(id,side)=>{ const el=document.getElementById(id), on=new Set(side==='from'?st.lkFrom:st.lkTo), other=new Set(side==='from'?st.lkTo:st.lkFrom);
+    el.innerHTML=ranked.map(c=>'<button type="button" class="chip '+(on.has(c)?'on':'off')+'" data-c="'+esc(c)+'" aria-pressed="'+on.has(c)+'"'+(other.has(c)?' title="Picked on the other side; clicking moves it here"':'')+'><span class="sw" style="background:'+S.colorOf[c]+'"></span>'+esc(label(c))+'</button>').join('');
+    el.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{ const c=b.dataset.c, mine=side==='from'?'lkFrom':'lkTo', theirs=side==='from'?'lkTo':'lkFrom';
+      st[mine]= st[mine].includes(c)? st[mine].filter(x=>x!==c) : st[mine].concat(c);
+      st[theirs]=st[theirs].filter(x=>x!==c);
+      lsSet('spl.lkPick',JSON.stringify({from:st.lkFrom,to:st.lkTo})); st.lkGrid=false; renderLinks(); })); };
+  chips('lkFrom','from'); chips('lkTo','to');
+  const g=document.getElementById('lkGridBtn'); g.setAttribute('aria-pressed',String(st.lkGrid)); g.classList.toggle('primary',st.lkGrid);
+  document.getElementById('lkFrom').closest('.lkpick').classList.toggle('dim',st.lkGrid&&st.lkTab==='svc');
+}
+function wireLinkPick(){
+  document.getElementById('lkSwap').addEventListener('click',()=>{ [st.lkFrom,st.lkTo]=[st.lkTo,st.lkFrom]; lsSet('spl.lkPick',JSON.stringify({from:st.lkFrom,to:st.lkTo})); st.lkGrid=false; renderLinks(); });
+  document.getElementById('lkGridBtn').addEventListener('click',()=>{ st.lkGrid=!st.lkGrid; renderLinks(); });
 }
