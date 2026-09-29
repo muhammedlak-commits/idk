@@ -365,6 +365,15 @@
             <div class="kpis" id="lkCmpKpis"></div>
             <div class="lkread" id="lkCmpRead" style="margin-top:14px"></div>
             <div id="lkCmpSpecWrap" hidden><h3 class="h3sm" id="lkCmpSpecH" style="margin-top:14px">Cases or doctors</h3><div class="tablewrap"><table id="lkCmpSpec"></table></div></div>
+            <details class="how" id="lkCmpKey"><summary>What the columns mean</summary><div class="howtxt">
+              <p><strong>Cases B / A</strong>: patients seen a day under From (e.g. doctor-visit patients) in period B and period A, from the daily provider export.</p>
+              <p><strong>Mix B / A</strong>: each row’s share of all those cases. A falling mix means that specialty or doctor made up less of the patients.</p>
+              <p><strong>Went on B / A</strong>: the patients who had a To service (e.g. a lab test) within the window after their visit, <em>out of</em> the patients whose window has passed, counted over each period’s months in the follow-on export.</p>
+              <p><strong>Sent on B / A</strong>: the same as a share, Went on ÷ patients. It is how often that specialty or doctor’s patients go on to the To service. * = under 10 patients, so the overall share is used instead.</p>
+              <p><strong>Cases effect</strong>: patients going on a day that the row gained or lost because it saw more or fewer patients, at its B share: (Cases A − Cases B) × Sent on B. Summed over the rows it is the “fewer patients” and “different mix” parts of the read-out.</p>
+              <p><strong>Doctors effect</strong>: patients going on a day that the row gained or lost because its share changed, for the patients it saw in A: Cases A × (Sent on A − Sent on B). Summed, it is the “doctors sending a different share” part.</p>
+              <p>A large negative cases effect with a small doctors effect means the drop came from the patients (fewer, or a different mix), not from doctors sending fewer patients on.</p>
+            </div></details>
             <h3 class="h3sm" id="lkCmpProvH" style="margin-top:14px"></h3>
             <div class="tablewrap" style="max-height:440px;overflow:auto"><table id="lkCmpProv"></table></div>
             <p class="note" id="lkCmpNote" style="margin:8px 0 0"></p>
