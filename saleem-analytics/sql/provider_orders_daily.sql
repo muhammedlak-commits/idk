@@ -4,11 +4,7 @@
 -- nursing and physiotherapy. Categories follow the same rules as the orders export, so the top filter matches.
 -- Services with no provider assigned yet come out as provider_name = 'Unassigned'.
 --
--- SPECIALTY: the specialty column isn't in the schema notes yet. Until it is filled in below, specialty
--- comes out empty and the dashboard only shows providers. To find it, run:
---   SELECT table_name, column_name, data_type FROM information_schema.columns
---   WHERE table_schema = 'public' AND (column_name ILIKE '%special%' OR table_name ILIKE '%special%')
---   ORDER BY 1, 2;
+-- SPECIALTY: the doctor's specialty comes from DoctorInfo.speciality (joined on DoctorInfo.userId = the doctor's user id).
 WITH tagged_orders AS (
     SELECT DISTINCT o.id AS order_id
     FROM "public"."Tag" t
@@ -60,11 +56,13 @@ SELECT
   b.visit_status,
   b.provider_id,
   COALESCE(p."name", 'Unassigned')                               AS provider_name,
-  NULL::text                                                     AS specialty,   -- <- replace NULL::text with the doctor's specialty column
+  sp.specialty                                                   AS specialty,   -- DoctorInfo.speciality; empty for nurses and physiotherapists
   COUNT(DISTINCT b.service_id)                                   AS services_delivered,
   COUNT(DISTINCT CASE WHEN NOT b.is_tagged THEN b.order_id END)  AS distinct_orders,
   COUNT(DISTINCT b.patient_id)                                   AS distinct_patients
 FROM      base b
 LEFT JOIN "public"."User" p ON p.id = b.provider_id
+LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                   WHERE di."userId" = b.provider_id LIMIT 1) sp ON TRUE   -- one row per doctor, so counts never double
 GROUP BY 1, 2, 3, 4, 5, 6
 ORDER BY 1, 2, 3, 5;

@@ -236,14 +236,14 @@ function renderSamples(){
   for(const [kind,s] of Object.entries(SAMPLES)){
     const box=document.getElementById('sample-'+kind); if(box.dataset.done) continue; box.dataset.done='1';
     const lines=s.csv.trim().split('\n'), hdr=lines[0].split(',');
-    box.innerHTML='<h3>How the file should look</h3>'+
+    box.innerHTML='<details class="samplefold"><summary>How the file should look <span class="note">· columns and a sample</span></summary>'+
       '<div class="tablewrap"><table class="coltable"><thead><tr><th class="nosort">Column</th><th class="nosort">What it holds</th><th class="nosort">Example</th></tr></thead><tbody>'+
       s.cols.map(c=>'<tr><td><code>'+esc(c[0])+'</code></td><td>'+esc(c[1])+'</td><td>'+esc(c[2])+'</td></tr>').join('')+'</tbody></table></div>'+
       '<ul class="assume">'+s.rules.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul>'+
       '<p class="note" style="margin:12px 0 4px">Sample file (example values, not your data):</p>'+
       '<div class="tablewrap"><table class="sampletable"><thead><tr>'+hdr.map(h=>'<th class="nosort">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
       lines.slice(1).map(l=>'<tr>'+splitCsv(l).map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'+
-      '<div class="frow" style="margin-top:10px"><button class="btn" type="button" data-save="'+kind+'" hidden>Save sample file</button><button class="btn" type="button" data-copy="'+kind+'">Copy sample</button></div>';
+      '<div class="frow" style="margin-top:10px"><button class="btn" type="button" data-save="'+kind+'" hidden>Save sample file</button><button class="btn" type="button" data-copy="'+kind+'">Copy sample</button></div></details>';
     box.querySelector('[data-copy]').addEventListener('click',()=>navigator.clipboard.writeText(s.csv).then(()=>toast('Sample copied. Paste it into a text file saved as .csv')).catch(()=>toast('Copy was blocked by this browser')));
     box.querySelector('[data-save]').addEventListener('click',async()=>{
       try{ await downloadsApi.save({filename:s.file,data:s.csv}); toast('Sample saved'); }

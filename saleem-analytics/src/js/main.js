@@ -54,7 +54,7 @@ function boot(reload){
     st.svc=new Set(S.catList); st.status=new Set(S.stList.filter(s=>s!=='cancelled'));
     try{ const v=JSON.parse(lsGet('spl.view')||'{}'); if(v.measure) st.measure=v.measure; if(v.trend) st.trend=v.trend; if(['line','bars','share','change','cum'].includes(v.chart)) st.chart=v.chart; if(v.perfTab) st.perfTab=v.perfTab; if(DRIVERS[v.drv]) st.drv=v.drv; if(v.mod) st.mod=resolveMod(v.mod); }catch(e){}
     const h=location.hash.slice(1); if(MODULES[h]||OLD_TABS[h]) st.mod=resolveMod(h);
-    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireGatewayNext(); wireLinkPick(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
+    buildChips(); buildAdChips(); wireFilters(); wireEvents(); wireFiles(); wireUnique(); wireProjections(); wireData(); wireProviders(); wireGateway(); wireGatewayNext(); wireLinkPick(); wireLinkPeriods(); wireProvFollowon(); wireWhy(); wirePerf(); wireWeekday(); wireContext(); wireTabs();
     document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.addEventListener('click',()=>{ st.lkTab=t.dataset.lk; render(); }));
     document.querySelectorAll('#lkSpan button').forEach(t=>t.addEventListener('click',()=>{ st.lkSpan=t.dataset.s; lsSet('spl.lkSpan',st.lkSpan); render(); }));
     { const ls=lsGet('spl.lkSpan'); if(['12w','26w','52w','all','range'].includes(ls)) st.lkSpan=ls; }

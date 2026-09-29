@@ -20,7 +20,7 @@ function buildProvFollowon(text){
     const src=(f[iS]||'').trim(), tgt=(f[iT]||'').trim(); if(!src||!tgt) continue;
     const name=(f[iN]||'').trim()||'Unassigned', id=iId>=0&&(f[iId]||'').trim()? f[iId].trim() : name, key=src+'|'+id;
     let p=provs.get(key); if(!p){ p={i:provs.size,id,name,cat:src,spec:''}; provs.set(key,p); }
-    const sp=iSp>=0?(f[iSp]||'').trim():''; if(sp) p.spec=sp;
+    const sp=iSp>=0?prettySpec((f[iSp]||'').trim()):''; if(sp) p.spec=sp;
     const r={mk,p:p.i,src,tgt,pat:g(f,iP),e7:g(f,iE7),f7:g(f,iF7),e30:g(f,iE30),f30:g(f,iF30),o30:g(f,iO)};
     rows.push(r); months.add(mk); srcs.add(src);
     if(tgt==='(any)') base.set(p.i+'|'+mk,r); else { tgts.add(tgt); cell.set(p.i+'|'+mk+'|'+tgt,r); }

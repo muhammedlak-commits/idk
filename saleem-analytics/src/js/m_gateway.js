@@ -22,7 +22,7 @@ function buildGateway(text){
   for(const o of parseCsvObjects(text)){
     const m=(o.cohort_month||'').match(/(\d{4})-(\d{2})/), cat=o.first_service; if(!m||!cat) continue;
     const mk=m[1]+'-'+m[2], basis=(o.basis||'').toLowerCase()==='created'?'created':'first', name=o.gateway_provider_name||GW_NONE;
-    const r={basis,mk,cat,pid:o.gateway_provider_id||'',name,none:name===GW_NONE,spec:o.specialty||''};
+    const r={basis,mk,cat,pid:o.gateway_provider_id||'',name,none:name===GW_NONE,spec:prettySpec(o.specialty||'')};
     GW_F.forEach(k=>r[k]= k in has&&!has[k]? 0 : num(o[GW_COL[k]]));
     if(r.spec) hasSpec=true; cats.add(cat); rows.push(r);
     const s=span[basis]||(span[basis]={min:mk,max:mk}); if(mk<s.min) s.min=mk; if(mk>s.max) s.max=mk;

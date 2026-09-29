@@ -356,6 +356,21 @@
           <div class="legend" id="lkIdxLegend"></div>
           <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p></details>
         </section>
+        <section class="panel" id="lkCmpPanel" aria-labelledby="lkCmpH">
+          <div class="phead"><div><h2 id="lkCmpH">Compare two periods</h2><div class="desc" id="lkCmpDesc"></div></div>
+            <div class="ctrls"><div class="seg wrapseg" id="lkCmp" aria-label="Periods"><button data-c="w4" class="on">Last 4 weeks vs the 4 before</button><button data-c="mtd">This month so far vs last month</button><button data-c="month">Last full month vs the one before</button><button data-c="ly">Last full month vs a year before</button><button data-c="custom">Custom</button></div></div></div>
+          <div class="frow" id="lkCmpCustom" hidden style="margin:0 0 12px;gap:8px"><span class="note">A</span><input type="date" id="lkA0" aria-label="Period A from"><span class="note">to</span><input type="date" id="lkA1" aria-label="Period A to"><span class="note" style="margin-left:12px">B</span><input type="date" id="lkB0" aria-label="Period B from"><span class="note">to</span><input type="date" id="lkB1" aria-label="Period B to"></div>
+          <p class="callout" id="lkCmpMsg" hidden></p>
+          <div id="lkCmpBody">
+            <div class="kpis" id="lkCmpKpis"></div>
+            <div class="lkread" id="lkCmpRead" style="margin-top:14px"></div>
+            <h3 class="h3sm" id="lkCmpProvH" style="margin-top:14px"></h3>
+            <div class="tablewrap" style="max-height:440px;overflow:auto"><table id="lkCmpProv"></table></div>
+            <div id="lkCmpSpecWrap" hidden><h3 class="h3sm" style="margin-top:14px">By doctor specialty</h3><div class="tablewrap"><table id="lkCmpSpec"></table></div></div>
+            <p class="note" id="lkCmpNote" style="margin:8px 0 0"></p>
+            <details class="how"><summary>How this is worked out</summary><div class="howtxt"><p>Everything is per day, so a 31-day month and a 28-day month compare fairly. The change in To is split into <strong>volume</strong>, what From’s own change gives if every From order led to To as often as in B, and <strong>rate</strong>, the change in To per 100 From.</p><p>The provider table uses the provider follow-on export when it’s loaded. For each doctor, nurse or physiotherapist under From, it shows the patients they saw and how many went on to a To service within 30 days, as a monthly average over each period’s months. It splits the change into seeing more or fewer patients (at B’s share) and a different share going on. When the latest month’s 30 days haven’t passed yet, it uses the 7-day window instead. Without that export, it shows each provider’s From orders a day from the provider export.</p></div></details>
+          </div>
+        </section>
         <div class="grid2">
           <section class="panel" aria-labelledby="lkLH">
             <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes in From and To, with To shifted later (positive weeks) or earlier. <details class="how inline"><summary>How this is worked out</summary>A bar well above zero at +1 means a rise in From is usually followed by a rise in To a week later.</details></div></div></div>

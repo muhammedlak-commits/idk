@@ -18,7 +18,7 @@
 --   first_service         : category of the first visit (same categories as the orders export)
 --   gateway_provider_id   : user id of the provider on the first visit (empty when there is none)
 --   gateway_provider_name : that provider's name, or 'No named provider'
---   specialty             : the gateway doctor's specialty (empty until the column is filled in, see below)
+--   specialty             : the gateway doctor's specialty (DoctorInfo.speciality; empty for nurses and physiotherapists)
 --   new_patients          : patients whose first visit falls in this row
 --   eligible_30d          : of them, patients whose first visit was at least 30 days ago
 --   returned_30d          : of eligible_30d, patients with a real service in a different order within 30 days after the first visit
@@ -31,11 +31,7 @@
 --   same_provider_90d     : of eligible_90d, patients with a real service by the gateway provider in a different order within 90 days after the first visit; 0 without a named provider
 -- Retention rate = returned_Nd / eligible_Nd (worked out in the dashboard). The 'first' and 'created' rows hold the same patients; don't add them up.
 --
--- SPECIALTY: the specialty column isn't in the schema notes yet. Until it is filled in below, specialty
--- comes out empty and the dashboard only shows providers. To find it, run:
---   SELECT table_name, column_name, data_type FROM information_schema.columns
---   WHERE table_schema = 'public' AND (column_name ILIKE '%special%' OR table_name ILIKE '%special%')
---   ORDER BY 1, 2;
+-- SPECIALTY: the doctor's specialty comes from DoctorInfo.speciality (joined on DoctorInfo.userId = the doctor's user id).
 -- Export the full history (no date filter), so every patient's first visit is right.
 WITH tagged_orders AS (
     SELECT DISTINCT o.id AS order_id
@@ -133,7 +129,7 @@ SELECT
   f.first_service,
   f.gateway_id                                                   AS gateway_provider_id,
   COALESCE(p."name", 'No named provider')                        AS gateway_provider_name,
-  NULL::text                                                     AS specialty,   -- <- replace NULL::text with the doctor's specialty column
+  sp.specialty                                                   AS specialty,   -- DoctorInfo.speciality; empty for nurses and physiotherapists
   COUNT(DISTINCT f.patient_id)                                                        AS new_patients,
   COUNT(DISTINCT CASE WHEN f.eligible_30d  THEN f.patient_id END)                     AS eligible_30d,
   COUNT(DISTINCT CASE WHEN f.eligible_30d  AND a.returned_30d  THEN f.patient_id END) AS returned_30d,
@@ -149,5 +145,7 @@ CROSS JOIN LATERAL (VALUES ('first',   f.first_month),         -- two rows per p
                            ('created', f.created_month)) AS c(basis, cohort_month)
 LEFT JOIN  after_first    a ON a.patient_id = f.patient_id
 LEFT JOIN  "public"."User" p ON p.id = f.gateway_id
+LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                   WHERE di."userId" = f.gateway_id LIMIT 1) sp ON TRUE   -- one row per doctor, so counts never double
 GROUP BY 1, 2, 3, 4, 5, 6
 ORDER BY 1, 2, 3, 7 DESC, 5;

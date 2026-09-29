@@ -18,7 +18,7 @@
 --   provider_service  : category of the provider's service (doctorVisit, surgeries, nursing, physiotherapy, physiotherapy (b2b))
 --   provider_id       : User id of the doctor, nurse or physiotherapist (empty when unassigned)
 --   provider_name     : the provider's name, or 'Unassigned'
---   specialty         : the doctor's specialty (empty until filled in, see below)
+--   specialty         : the doctor's specialty (DoctorInfo.speciality; empty for nurses and physiotherapists)
 --   target_service    : category of the follow-on service; '(any)' = a follow-on of any category
 --   patients          : distinct patients the provider served that month in provider_service
 --   eligible_7d       : of patients, those whose anchor was at least 7 days ago (the 7-day window has fully passed)
@@ -30,11 +30,7 @@
 -- Every provider-month has a '(any)' row; rows of a single target service are left out when nobody followed on.
 -- Export the full history (no date filter).
 --
--- SPECIALTY: the specialty column isn't in the schema notes yet. Until it is filled in below, specialty
--- comes out empty and the dashboard only shows providers. To find it, run:
---   SELECT table_name, column_name, data_type FROM information_schema.columns
---   WHERE table_schema = 'public' AND (column_name ILIKE '%special%' OR table_name ILIKE '%special%')
---   ORDER BY 1, 2;
+-- SPECIALTY: the doctor's specialty comes from DoctorInfo.speciality (joined on DoctorInfo.userId = the doctor's user id).
 WITH tagged_orders AS (
     SELECT DISTINCT o.id AS order_id
     FROM "public"."Tag" t
@@ -148,7 +144,7 @@ SELECT
   c.provider_service,
   c.provider_id,
   COALESCE(p."name", 'Unassigned')                               AS provider_name,
-  NULL::text                                                     AS specialty,   -- <- replace NULL::text with the doctor's specialty column
+  sp.specialty                                                   AS specialty,   -- DoctorInfo.speciality; empty for nurses and physiotherapists
   c.target_service,
   MAX(CASE WHEN c.target_service = '(any)' THEN c.patients     END) OVER pm AS patients,       -- taken from the '(any)' row
   MAX(CASE WHEN c.target_service = '(any)' THEN c.eligible_7d  END) OVER pm AS eligible_7d,
@@ -158,6 +154,8 @@ SELECT
   c.target_orders_30d
 FROM      counts c
 LEFT JOIN "public"."User" p ON p.id = c.provider_id
+LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                   WHERE di."userId" = c.provider_id LIMIT 1) sp ON TRUE   -- one row per doctor, so counts never double
 WHERE c.target_service = '(any)'                                 -- always kept
    OR c.followed_7d  > 0                                         -- target rows only when someone followed on
    OR c.followed_30d > 0                                         -- (this also drops the group of the anchors' empty rows)

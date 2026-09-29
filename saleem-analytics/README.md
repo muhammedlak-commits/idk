@@ -72,13 +72,13 @@ Service → service and Specialties & providers use the **From** and **To** serv
 - To per 100 From, by month (months with under a week in the period left out)
 - the patient-level view (same patient, a To service within 7 or 30 days of a From service), which needs `sql/service_followon_monthly.sql`
 
-It has its own period (12, 26 or 52 weeks, all data or the date range). **Every pair** shows a grid of every pair among the services picked in the filter bar instead.
+It has its own period (12, 26 or 52 weeks, all data or the date range). **Compare two periods** puts period A (last 4 weeks, this month so far, last full month, or custom) against period B: From and To a day, To per 100 From, the change in To split into From's volume and the To-per-From rate, and, with the provider exports, which From providers and specialties the change came from (patients seen, share going on to To, split into volume and rate). **Every pair** shows a grid of every pair among the services picked in the filter bar instead.
 
 ## Providers and doctor specialties
 
 Needs the provider export (`sql/provider_orders_daily.sql`, dropped on the Providers box in the Data tab). One row per day, service, visit status and provider for doctor visits, nursing and physiotherapy, dated by scheduled time. The Providers module follows the filter bar and shows active providers, the top-5 share, a sortable table of each provider against the previous period and last year, the busiest providers over time, active providers per service, and doctor visits by specialty.
 
-The specialty column isn't in the schema notes yet: the query returns it empty until `NULL::text AS specialty` is replaced with the real column (the query's comment has an `information_schema` search to find it).
+Specialty comes from `DoctorInfo.speciality`, joined on the doctor's user id (one row per doctor, so counts never double) in the provider, provider follow-on and gateway queries. It is empty for nurses and physiotherapists, and shown with a capital and spaces (internist → Internist).
 
 In Service links, "What inside a service moves the others?" tests each doctor specialty and the busiest doctors, nurses and physiotherapists against the other selected services at 0–4 weeks' lag. "Strong" is corrected for every pair and lag tested (Bonferroni); "possible" is the single-test 5% bar.
 

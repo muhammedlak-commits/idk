@@ -18,7 +18,7 @@ function buildProviders(text){
     const cat=f[iC].trim(), name=(f[iN]||'').trim()||'Unassigned', id=iId>=0&&(f[iId]||'').trim()? f[iId].trim() : name;
     const key=cat+'|'+id; let p=provs.get(key);
     if(!p){ p={i:provs.size,id,name,cat,spec:''}; provs.set(key,p); }
-    const sp=iSp>=0? (f[iSp]||'').trim() : ''; if(sp){ p.spec=sp; specs.add(sp); }
+    const sp=iSp>=0? prettySpec((f[iSp]||'').trim()) : ''; if(sp){ p.spec=sp; specs.add(sp); }
     cats.add(cat);
     rows.push({n,p:p.i,cat,st:iS>=0?f[iS].trim():'finished',sp,v:[num(f[iSv]),num(f[iO]),iP>=0?num(f[iP]):0]});
     if(n<min) min=n; if(n>max) max=n;

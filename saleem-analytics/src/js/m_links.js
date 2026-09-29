@@ -114,6 +114,7 @@ function renderLinks(){
   // 4. patient follow-on (optional export)
   renderFollowon(from,to,months);
   renderLinkRead(W,lagSets,ratios,months);
+  renderLinkPeriods(from,to);
   document.getElementById('lkDesc').textContent=W[0].name+' → '+W[1].name+viewLabel()+' · '+fmtD(a)+' – '+fmtD(b)+' · '+W[0].v.length+' full weeks';
 }
 function renderFollowon(from,to,months){

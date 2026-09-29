@@ -327,3 +327,9 @@ details.how[open]{display:block;color:var(--ink-2)}
 @media (max-width:640px){ .lkarrow{display:none} .lkact{flex-direction:row} }
 .lkpick.dim .lkside{opacity:.5}
 .lkpick[hidden]{display:none}
+
+/* Data tab: the file guides fold shut */
+.samplefold>summary{cursor:pointer;list-style:none;font-weight:600;font-size:13px;color:var(--accent);padding:6px 0}
+.samplefold>summary::-webkit-details-marker{display:none}
+.samplefold>summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.samplefold[open]>summary::before{transform:rotate(90deg)}
