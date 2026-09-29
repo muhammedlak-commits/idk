@@ -23,6 +23,8 @@
         <div class="seg wrapseg" id="presets">
           <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
         </div>
+        <div class="frow" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="flabel" style="min-width:0">Compare with</span><div class="seg wrapseg" id="cmpBase"><button data-b="auto" class="on" title="A month, or a month so far, against the same days of the month before; any other range against the same number of days just before">Fairest</button><button data-b="month" title="The same days of the month before, e.g. 1–28 Sep vs 1–28 Aug">Same days last month</button><button data-b="prev" title="The same number of days just before">The days just before</button><button data-b="ly" title="The same dates a year earlier (Hijri or weekday-aligned, under More settings)">Same dates last year</button></div></div>
+        <p class="note" id="cmpBaseNote" style="margin:6px 0 0"></p>
         <div class="frow" style="margin-top:10px"><label class="flabel" for="dFrom" style="min-width:0">From</label><input type="date" id="dFrom"><label class="flabel" for="dTo" style="min-width:0">to</label><input type="date" id="dTo"></div>
       </div>
     </div>
@@ -60,6 +62,7 @@
 <main>
   <div class="wrap">
     <section class="module" data-mod="why" id="why" data-sec="summary">
+    <div class="mtdline" id="mtd-why" aria-live="polite"></div>
     <section class="panel" aria-labelledby="whyH">
       <div class="phead">
         <div><h2 id="whyH">What changed</h2><div class="desc" id="whyDesc"></div></div>
@@ -85,6 +88,7 @@
     </section>
 
     <section class="module" data-mod="overview" id="overview" data-sec="performance" hidden>
+    <div class="mtdline" id="mtd-perf" aria-live="polite"></div>
     <div class="kpis" id="kpis" hidden></div>
 
     <section class="panel" aria-labelledby="trendH">
@@ -167,6 +171,7 @@
     </section>
 
     <section class="module" data-mod="providers" id="providers" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-prov" aria-live="polite"></div>
       <div id="pvEmpty" class="callout">
         <p style="margin:0 0 6px"><strong>This module needs the provider export.</strong> It shows which doctors, nurses and physiotherapists take the orders, and orders by doctor specialty.</p>
         <ol style="margin:0 0 8px;padding-left:18px">
@@ -408,6 +413,7 @@
     </section>
 
     <section class="module" data-mod="patients" id="patients" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-pat" aria-live="polite"></div>
     <section class="panel" aria-labelledby="upH">
       <div class="phead">
         <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. <details class="how inline"><summary>How this is worked out</summary>New patients follow <strong>More filters › New patient means</strong>: first-ever visit in that month, or patient record created in that month. Returning = everyone else served that month.</details></div></div>
@@ -432,6 +438,7 @@
     </section>
 
     <section class="module" data-mod="ads" id="ads" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-ads" aria-live="polite"></div>
     <section class="panel" aria-labelledby="adsH">
       <div class="phead">
         <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>

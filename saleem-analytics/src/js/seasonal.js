@@ -65,3 +65,28 @@ function usualChip(U,label){
   const tip='This period vs the one before: '+fmtPct(U.now*100,1)+' ('+fmtPct(U.nowAdj*100,1)+' after weekdays and holidays). The same move '+(U.past.length>1?'in the last two years':'last year')+': '+U.past.map(x=>fmtPct(x.raw*100,1)+' ('+fmtPct(x.adj*100,1)+' adjusted)').join(', ')+'. Last year lined up by '+ALIGN_LABEL[st.align]+'.';
   return '<span class="delta '+cls+'" title="'+esc(tip)+'">'+arrow+' '+(p>0?'+':'')+p.toFixed(1)+' pts '+label+'</span>';
 }
+
+/* ---------- what a period is compared with (Compare with, in the date picker) ----------
+   auto (fairest): a range that starts on the 1st and stays inside one month (a month, or a month so far) is
+   compared with the same days of the month before (1–28 Sep vs 1–28 Aug; a whole month vs the whole month before);
+   any other range with the same number of days just before. month: always the same days a month earlier.
+   prev: the days just before. ly: the same dates a year earlier (Hijri or weekday-aligned, as set). */
+const CMP_BASE_LABEL={auto:'Fairest',prev:'The days just before',month:'Same days last month',ly:'Same dates last year'};
+function monthBack(n,k=1){ const s=toS(n), mk=addMonths(s.slice(0,7),-k), d=Math.min(+s.slice(8,10),daysInMonth(mk)); return toN(mk+'-'+String(d).padStart(2,'0')); }
+const isMonthEnd=n=>toS(n+1).slice(8,10)==='01';
+function cmpMode(a,b){ if(st.cmpBase&&st.cmpBase!=='auto') return st.cmpBase; return toS(a).slice(8,10)==='01'&&monthKey(a)===monthKey(b)? 'month' : 'prev'; }
+function cmpRange(a,b){
+  const m=cmpMode(a,b);
+  if(m==='ly'){ const s=lyShift(a); return {pa:a-s,pb:b-s,m}; }
+  if(m==='month'){ const pa=monthBack(a); let pb=monthBack(b);
+    // a whole month (or one ending on the last day) against the whole month before, whatever its length
+    if(isMonthEnd(b)&&toS(a).slice(8,10)==='01') pb=toN(monthKey(pa)+'-01')+daysInMonth(monthKey(pa))-1;
+    return {pa,pb,m}; }
+  const len=b-a+1; return {pa:a-len,pb:a-1,m:'prev'};
+}
+function cmpText(a,b){ const {pa,pb,m}=cmpRange(a,b);
+  const whole=m==='month'&&toS(a).slice(8,10)==='01'&&isMonthEnd(b)&&toS(pa).slice(8,10)==='01'&&isMonthEnd(pb);
+  return {pa,pb,m,long: whole? 'the month before ('+fmtMonthName(monthKey(pa))+')' : m==='month'? 'the same days last month ('+fmtDs(pa)+' – '+fmtDs(pb)+')' : m==='ly'? 'the same dates last year ('+fmtDs(pa)+' – '+fmtD(pb)+')' : 'the '+(b-a+1)+' days before ('+fmtDs(pa)+' – '+fmtDs(pb)+')',
+    short: m==='month'? 'last month' : m==='ly'? 'last year' : 'before'}; }
+/* a value of a period with a different number of days, scaled to this period's length (per-day fair) */
+const perLen=(v,pa,pb,a,b)=> v==null? null : v*(b-a+1)/(pb-pa+1);

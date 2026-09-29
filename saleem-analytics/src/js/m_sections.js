@@ -11,20 +11,21 @@ function totalView(view,a,b,m,cats,stats){ const keep=st.pview; st.pview=view; t
 function summaryTiles(R){
   const {P:P_,cur,base,m,cats,stats}=R, len=P_.b-P_.a+1, M=MLABEL[m].replace(' (IQD)','');
   const tiles=[], tile=(lab,val,chips,sub,hero)=>tiles.push('<div class="kpi'+(hero?' hero':'')+'"><span class="lab">'+lab+'</span><span class="val">'+val+'</span><div class="deltas">'+chips.join('')+'</div>'+(sub?'<span class="sub">'+sub+'</span>':'')+'</div>');
-  const pct=(x,y)=> y>0? (x-y)/y*100 : null, short=P_.short==='last year'?'last year':'before';
+  const pct=(x,y)=> y>0? (x-y)/y*100 : null, short=P_.short==='last year'?'last year':/last month/.test(P_.short)?'last month':'before';
   // 1. the measure: judged against the chosen comparison, plus the plain change
-  const U= covered(P_.a-len,P_.a-1)? usualMove(P_.a,P_.b,P_.a-len,P_.a-1,cats,stats,m) : null;
+  const U= P_.short!=='last year'&&covered(P_.pa,P_.pb)? usualMove(P_.a,P_.b,P_.pa,P_.pb,cats,stats,m) : null;
+  const sc=v=>perLen(v,P_.pa,P_.pb,P_.a,P_.b);   // the comparison period scaled to this one's length
   const main=[]; if(U&&U.gap!=null) main.push(chip((U.gap>0?'+':'')+(U.gap*100).toFixed(1)+' pts vs usual',tone(U.gap*100)));
-  main.push('<span class="delta plain">'+fmtPct(pct(cur,base),1)+' vs '+esc(short)+'</span>');
+  main.push('<span class="delta plain">'+fmtPct(pct(cur,sc(base)),1)+' vs '+esc(short)+'</span>');
   tile(esc(M)+viewLabel(' · '),fmtVal(cur,m),main,fmtVal(cur/len,m)+' a day'+(U&&U.gap!=null?' · moved '+fmtPct(U.nowAdj*100,1)+', the same weeks '+(U.past.length>1?'usually move ':'last year moved ')+fmtPct(U.usual*100,1):''),true);
   // 2. revenue, or orders when a money measure is picked
   const m2= MONEY.has(m)? 'ord' : (S.hasRev? 'rev' : 'svc');
-  const x2=total(P_.a,P_.b,m2,cats,stats), y2=total(P_.pa,P_.pb,m2,cats,stats), p2=pct(x2,y2);
+  const x2=total(P_.a,P_.b,m2,cats,stats), y2=sc(total(P_.pa,P_.pb,m2,cats,stats)), p2=pct(x2,y2);
   const sales=S.hasRev? total(P_.a,P_.b,'sales',cats,stats) : 0;
   tile(esc(MLABEL[m2].replace(' (IQD)','')),fmtVal(x2,m2),[chip(fmtPct(p2,1)+' vs '+esc(short),tone(p2))], m2==='rev'&&sales? Math.round(x2/sales*100)+'% of sales' : '');
   // 3. returning-patient orders
-  if(S.hasNew){ const x3=totalView('ret',P_.a,P_.b,'ord',cats,stats), y3=totalView('ret',P_.pa,P_.pb,'ord',cats,stats), p3=pct(x3,y3);
-    const n3=totalView('new',P_.a,P_.b,'ord',cats,stats), nb=totalView('new',P_.pa,P_.pb,'ord',cats,stats);
+  if(S.hasNew){ const x3=totalView('ret',P_.a,P_.b,'ord',cats,stats), y3=sc(totalView('ret',P_.pa,P_.pb,'ord',cats,stats)), p3=pct(x3,y3);
+    const n3=totalView('new',P_.a,P_.b,'ord',cats,stats), nb=sc(totalView('new',P_.pa,P_.pb,'ord',cats,stats));
     tile('Returning-patient orders',fmtInt(x3),[chip(fmtPct(p3,1)+' vs '+esc(short),tone(p3))],'New-patient orders '+fmtPct(pct(n3,nb),1)); }
   // 4. cancellations
   const canc=S.stList.filter(s=>s==='cancelled');
@@ -58,8 +59,8 @@ function whyAttention(R){
       add(Math.abs(r1-rl)*3,r1<rl,(r1>rl?'More':'Fewer')+' cancellations than a year ago',r1.toFixed(1)+'% of orders, against '+rl.toFixed(1)+'% in the same weeks last year.','performance','svc','See services'); } }
   // the service furthest from its usual move (5% share or more)
   const len=P_.b-P_.a+1;
-  if(covered(P_.a-len,P_.a-1)){ const tot=total(P_.a,P_.b,'ord',cats,stats); let worst=null;
-    for(const c of cats){ const v=total(P_.a,P_.b,'ord',[c],stats); if(!tot||v/tot<0.05) continue; const U=usualMove(P_.a,P_.b,P_.a-len,P_.a-1,[c],stats,'ord'); if(!U||U.gap==null) continue; if(!worst||U.gap<worst.g) worst={c,g:U.gap}; }
+  if(P_.short!=='last year'&&covered(P_.pa,P_.pb)){ const tot=total(P_.a,P_.b,'ord',cats,stats); let worst=null;
+    for(const c of cats){ const v=total(P_.a,P_.b,'ord',[c],stats); if(!tot||v/tot<0.05) continue; const U=usualMove(P_.a,P_.b,P_.pa,P_.pb,[c],stats,'ord'); if(!U||U.gap==null) continue; if(!worst||U.gap<worst.g) worst={c,g:U.gap}; }
     if(worst&&worst.g<=-0.10) add(Math.abs(worst.g)*100*0.8,false,label(worst.c)+' fell short of its usual move',Math.abs(worst.g*100).toFixed(1)+' points under how the same weeks usually move.','performance','svc','See services'); }
   // company revenue as a share of sales
   if(S.hasRev){ const sh=(a,b)=>{ const s_=total(a,b,'sales',cats,stats); return s_>0? total(a,b,'rev',cats,stats)/s_*100 : null; }, s1=sh(P_.a,P_.b), s0=sh(P_.pa,P_.pb);

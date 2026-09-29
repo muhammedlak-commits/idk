@@ -1,10 +1,10 @@
 /* ---------- render ---------- */
 /* four sections (plus Data & settings); each shows one or more of the module blocks in the page */
-const DRIVERS={patients:renderUnique, providers:()=>{ renderProviders(); renderGateway(); renderGatewayNext(); }, links:renderLinks, ads:renderAds,
+const DRIVERS={patients:()=>{ renderMtd('pat'); renderUnique(); }, providers:()=>{ renderMtd('prov'); renderProviders(); renderGateway(); renderGatewayNext(); }, links:renderLinks, ads:()=>{ renderMtd('ads'); renderAds(); },
   calendar:()=>{ renderHolidays(); renderFactorEffects(); renderEvents(); renderCompetitors(); renderSheetStatus(); }};
 const MODULES={
-  summary:{mods:()=>['why'], draw:renderWhy},
-  performance:{mods:()=>['overview','perf',st.perfTab==='month'?'monthly':st.perfTab==='wd'?'weekday':'services'], draw:()=>{ renderTrend(); renderPerfStrip(); if(st.perfTab==='month') renderMom(); else if(st.perfTab==='wd') renderWeekday(); else renderSvcTable(); }},
+  summary:{mods:()=>['why'], draw:()=>{ renderMtd('why'); renderWhy(); }},
+  performance:{mods:()=>['overview','perf',st.perfTab==='month'?'monthly':st.perfTab==='wd'?'weekday':'services'], draw:()=>{ renderMtd('perf'); renderTrend(); renderPerfStrip(); if(st.perfTab==='month') renderMom(); else if(st.perfTab==='wd') renderWeekday(); else renderSvcTable(); }},
   drivers:{mods:()=>['drv',st.drv], draw:()=>{ renderDrvCards(); DRIVERS[st.drv](); }},
   plan:{mods:()=>['projections'], draw:renderProjections},
   data:{mods:()=>['data'], draw:renderData}

@@ -54,8 +54,8 @@ function renderProviders(){
   if(st.pview!=='all'&&S.hasNew) notes.push('The provider export has all patients, so the New / Returning switch doesn’t change this module.');
   if(a<PV.min||b>PV.max) notes.push('The provider export covers '+fmtD(PV.min)+' – '+fmtD(PV.max)+'; days outside that count as zero.');
   msg.textContent=notes.join(' '); msg.hidden=!notes.length; body.hidden=false;
-  const hasP=a-len>=PV.min, hasY=a-364>=PV.min;
-  const cur=pvTotals(a,b,r=>r.p), prev=hasP?pvTotals(a-len,a-1,r=>r.p):new Map(), ly=hasY?pvTotals(a-364,b-364,r=>r.p):new Map();
+  const CR=cmpText(a,b), hasP=CR.pa>=PV.min&&CR.m!=='ly', hasY=a-364>=PV.min, sc=v=>perLen(v,CR.pa,CR.pb,a,b);
+  const cur=pvTotals(a,b,r=>r.p), prev=hasP?new Map([...pvTotals(CR.pa,CR.pb,r=>r.p)].map(([k,v])=>[k,sc(v)])):new Map(), ly=hasY?pvTotals(a-364,b-364,r=>r.p):new Map();
   const catTot={}; for(const [pi,v] of cur){ const c=PV.provs[pi].cat; catTot[c]=(catTot[c]||0)+v; }
   const active=[...cur.entries()].filter(([pi,v])=>v>0&&PV.provs[pi].name!=='Unassigned');
   const activePrev=[...prev.entries()].filter(([pi,v])=>v>0&&PV.provs[pi].name!=='Unassigned').length;
@@ -63,7 +63,7 @@ function renderProviders(){
   const top5=active.map(x=>x[1]).sort((x,y)=>y-x).slice(0,5).reduce((s,v)=>s+v,0);
   const newProv=hasP? active.filter(([pi])=>!(prev.get(pi)>0)).length : null;
   const tiles=[
-    {lab:'Active providers',val:fmtInt(active.length),sub:hasP?'Previous period: '+fmtInt(activePrev)+(newProv!=null?' · '+fmtInt(newProv)+' not active before':''):'At least one '+M.toLowerCase().replace(/s$/,'')+' in the range'},
+    {lab:'Active providers',val:fmtInt(active.length),sub:hasP?'Compared period: '+fmtInt(activePrev)+(newProv!=null?' · '+fmtInt(newProv)+' not active before':''):'At least one '+M.toLowerCase().replace(/s$/,'')+' in the range'},
     {lab:M+' per active provider',val:active.length?(active.reduce((s,x)=>s+x[1],0)/active.length).toFixed(1):'–',sub:fmtD(a)+' – '+fmtD(b)},
     {lab:'Top 5 providers’ share',val:grand?(top5/grand*100).toFixed(0)+'%':'–',sub:'Of all '+M.toLowerCase()+' for '+cats.map(label).join(', ')},
     {lab:'Unassigned',val:grand?(([...cur.entries()].filter(([pi])=>PV.provs[pi].name==='Unassigned').reduce((s,x)=>s+x[1],0))/grand*100).toFixed(1)+'%':'–',sub:'No provider on the service yet'}];
@@ -75,13 +75,13 @@ function renderProviders(){
   const k=st.pvSort.k, dir=st.pvSort.dir, val=r=>k==='name'?pvName(r.p).toLowerCase():k==='spec'?(r.p.spec||'~'):r[k];
   rows.sort((x,y)=>{ const u=val(x), w=val(y); if(u==null) return 1; if(w==null) return -1; return (u<w?-1:u>w?1:0)*dir; });
   const showSpec=PV.hasSpec&&cats.some(isDoctorCat);
-  const cols=[['name','Provider'],['cat','Service']].concat(showSpec?[['spec','Specialty']]:[]).concat([['cur',M],['share','Share of service'],['prev','Previous period'],['diff','Change'],['chg','Change %'],['ly','vs last year']]);
+  const cols=[['name','Provider'],['cat','Service']].concat(showSpec?[['spec','Specialty']]:[]).concat([['cur',M],['share','Share of service'],['prev',(CR.m==='month'?'Same days last month':'Previous period')],['diff','Change'],['chg','Change %'],['ly','vs last year']]);
   const t=document.getElementById('pvTable');
   t.innerHTML='<thead><tr>'+cols.map(([key,l])=>'<th data-k="'+key+'"'+(key==='name'||key==='cat'||key==='spec'?' style="text-align:left"':'')+'>'+l+(k===key?(dir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+
     rows.slice(0,60).map(r=>'<tr><td dir="auto" style="text-align:left">'+esc(pvName(r.p))+'</td><td style="text-align:left">'+esc(label(r.p.cat))+'</td>'+(showSpec?'<td style="text-align:left">'+esc(isDoctorCat(r.p.cat)?(r.p.spec||'–'):'')+'</td>':'')+
       '<td>'+fmtInt(r.cur)+'</td><td>'+r.share.toFixed(1)+'%</td><td>'+(r.prev==null?'–':fmtInt(r.prev))+'</td><td class="'+cls(r.diff)+'">'+(r.diff==null?'–':(r.diff>0?'+':'')+fmtInt(r.diff))+'</td><td class="'+cls(r.chg)+'">'+fmtPct(r.chg,0)+'</td><td class="'+cls(r.ly)+'">'+fmtPct(r.ly,0)+'</td></tr>').join('')+'</tbody>';
   t.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{ const key=th.dataset.k; st.pvSort= st.pvSort.k===key? {k:key,dir:-st.pvSort.dir} : {k:key,dir:key==='name'||key==='cat'||key==='spec'?1:-1}; renderProviders(); }));
-  document.getElementById('pvTableNote').textContent=(rows.length>60?'Top 60 of '+rows.length+' providers by the sorted column. ':'')+'Previous period = the same number of days just before. Change % needs at least 5 in the previous period.';
+  document.getElementById('pvTableNote').textContent=(rows.length>60?'Top 60 of '+rows.length+' providers by the sorted column. ':'')+'Compared with '+CR.long+(CR.pb-CR.pa!==b-a?', scaled to the same number of days':'')+'. Change % needs at least 5 in the compared period.';
   document.getElementById('pvDesc').textContent=pvMoneyNote()+cats.map(label).join(', ')+' · '+fmtD(a)+' – '+fmtD(b)+' · '+M;
   // trend of the busiest providers
   const B=buckets(a,b,st.gran), labels=B.keys.map(x=>bucketLabel(x.k,st.gran));
@@ -102,6 +102,7 @@ function renderProviders(){
   renderSpecialties(a,b,B,labels,hasP,hasY,len);
 }
 function renderSpecialties(a,b,B,labels,hasP,hasY,len){
+  const CR=cmpText(a,b), sc=v=>perLen(v,CR.pa,CR.pb,a,b);
   const panel=document.getElementById('spPanel'), none=document.getElementById('spNone'), sbody=document.getElementById('spBody');
   const docCats=pvSelCats().filter(isDoctorCat);
   if(!docCats.length){ panel.hidden=true; return; }
@@ -109,7 +110,7 @@ function renderSpecialties(a,b,B,labels,hasP,hasY,len){
   if(!PV.hasSpec){ none.hidden=false; sbody.hidden=true; return; }
   none.hidden=true; sbody.hidden=false;
   const onlyDoc=r=>isDoctorCat(r.cat), M=MLABEL[pvMeasure()];
-  const cur=pvTotals(a,b,specOf,onlyDoc), prev=hasP?pvTotals(a-len,a-1,specOf,onlyDoc):new Map(), ly=hasY?pvTotals(a-364,b-364,specOf,onlyDoc):new Map();
+  const cur=pvTotals(a,b,specOf,onlyDoc), prev=hasP?new Map([...pvTotals(CR.pa,CR.pb,specOf,onlyDoc)].map(([k,v])=>[k,sc(v)])):new Map(), ly=hasY?pvTotals(a-364,b-364,specOf,onlyDoc):new Map();
   const grand=[...cur.values()].reduce((s,v)=>s+v,0);
   const specs=[...cur.keys()].sort((x,y)=>cur.get(y)-cur.get(x));
   const pc=(x,y)=>y>=5?(x-y)/y*100:null, cls=v=>v==null?'':v>0.5?'pos':v<-0.5?'neg':'';

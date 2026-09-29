@@ -6,7 +6,7 @@ function deltaChip(cur,prev,label,upGood=true){
 }
 function renderKpis(){
   const cats=selCats(), stats=selStats(), a=st.from, b=st.to, len=b-a+1;
-  const pa=a-len, pb=a-1, ys=lyShift(a), ya=a-ys, yb=b-ys;
+  const {pa,pb}=cmpRange(a,b), ys=lyShift(a), ya=a-ys, yb=b-ys;
   const hasP=covered(pa,pb), hasY=covered(ya,yb);
   const m=st.measure;
   const cur=total(a,b,m,cats,stats), prev=hasP?total(pa,pb,m,cats,stats):null, ly=hasY?total(ya,yb,m,cats,stats):null;

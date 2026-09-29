@@ -181,13 +181,13 @@ const SAMPLES={
           ['returning_patients','Of those, served before','830'],
           ['services','Services delivered to them','3,900'],
           ['new_by_created','Of those, patients whose record was created that month','385'],
-          ['accounts_created','Only on all rows: patient records created that month, visited or not','520']],
+          ['accounts_created','Only on all rows: patient records created that month, visited or not','520'],['mtd_day','The day of the month the data reaches (same on every row)','28'],['unique_patients_mtd / new_patients_mtd / new_by_created_mtd','The same counts, only up to mtd_day of each month, for fair month-to-date comparisons','1116']],
     rules:['One row per month and category, plus one row per month with category all.',
            'new_patients + returning_patients = unique_patients on every row.',
            'Export the full history with no date filter, otherwise “new” is wrong for the early months.',
            'Older exports without new_by_created still load; Account created then falls back to first order.',
            'The Copy SQL query produces exactly this layout.'],
-    csv:'month,category,unique_patients,new_patients,returning_patients,services,new_by_created,accounts_created\n2026-08,all,1240,410,830,3900,385,520\n2026-08,physiotherapy,420,120,300,1410,110,\n2026-08,nursing,380,140,240,1680,131,\n2026-08,doctorVisit,310,130,180,480,122,\n2026-09,all,1180,360,820,3300,340,470\n2026-09,physiotherapy,400,105,295,1030,98,\n2026-09,nursing,370,125,245,1330,117,\n2026-09,doctorVisit,290,115,175,330,108,\n'}
+    csv:'month,category,unique_patients,new_patients,returning_patients,services,new_by_created,accounts_created,mtd_day,unique_patients_mtd,new_patients_mtd,new_by_created_mtd\n2026-08,all,1240,410,830,3900,385,520,28,1116,369,346\n2026-08,physiotherapy,420,120,300,1410,110,,28,378,108,99\n2026-08,nursing,380,140,240,1680,131,,28,342,126,117\n2026-08,doctorVisit,310,130,180,480,122,,28,279,117,109\n2026-09,all,1180,360,820,3300,340,470,28,1062,324,306\n2026-09,physiotherapy,400,105,295,1030,98,,28,360,94,88\n2026-09,nursing,370,125,245,1330,117,,28,333,112,105\n2026-09,doctorVisit,290,115,175,330,108,,28,261,103,97\n'}
 };
 SAMPLES.links={file:'saleem-service-followon-sample.csv',
   cols:[['month','Month of the first service, YYYY-MM','2026-08'],['service_a','The first service','doctorVisit'],['service_b','The service that may follow','labTest'],['patients_a','Patients who had service A that month','310'],['followed_7d','Of them, had service B within 7 days after','96'],['followed_30d','Of them, had service B within 30 days after','131']],

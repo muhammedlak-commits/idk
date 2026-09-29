@@ -11,7 +11,9 @@ let whyChart=null;
 function whyPeriods(){
   const a=st.from, b=st.to, len=b-a+1;
   if(st.whyCmp==='ly'){ const s_=lyShift(a); return {a,b,pa:a-s_,pb:b-s_,lab:'the same '+(st.align==='hijri'?'Hijri dates':'weekdays')+' last year',short:'last year'}; }
-  return {a,b,pa:a-len,pb:a-1,lab:'the '+len+' days before',short:'the period before',usual:st.whyCmp==='usual'};
+  const c=cmpText(a,b);
+  if(c.m==='ly') return {a,b,pa:c.pa,pb:c.pb,lab:c.long,short:'last year'};
+  return {a,b,pa:c.pa,pb:c.pb,lab:c.long,short:c.m==='month'?'the same days last month':'the period before',usual:st.whyCmp==='usual'};
 }
 const whyClamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
 
