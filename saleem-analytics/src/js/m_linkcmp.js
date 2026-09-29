@@ -77,8 +77,19 @@ function renderLinkPeriods(from,to){
       pfRows.sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
     }
   }
+  // cases or doctors: fewer cases, a different case mix, or doctors sending a different share
+  const SPL= pfRows.length? lkcSplit(A,B,pfSrc,pfTgt,pfMonths.A,pfMonths.B,pfWin) : null;
+  if(SPL&&SPL.R.length){ const S_=SPL, tot=S_.cases+S_.mix+S_.docs, f2=v=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(Math.abs(v)<10?1:0), grp=S_.useSpec?'specialties':'doctors';
+    const caseSide=S_.cases+S_.mix, verdict= Math.abs(caseSide)>=2*Math.abs(S_.docs)? 'Mostly the cases, not the doctors: '+(S_.cases*S_.mix>=0||Math.abs(S_.cases)>Math.abs(S_.mix)? (S_.cases<0?'fewer':'more')+' patients'+(Math.abs(S_.mix)>=0.25*Math.abs(caseSide)?', and a mix shifted toward '+grp+' that send '+(S_.mix<0?'fewer':'more')+' on':'') : 'the mix of '+grp+' shifted')+'.'
+      : Math.abs(S_.docs)>=2*Math.abs(caseSide)? 'Mostly the doctors: the same kinds of patients were sent on '+(S_.docs<0?'less':'more')+' often.' : 'Both: the cases and the share sent on each moved it.';
+    lines.push('<li><strong>Cases or doctors?</strong> '+esc(fN)+' patients going on to '+esc(tN.toLowerCase())+' ('+pfWin+'-day): about '+S_.oB.toFixed(1)+' a day in B, '+S_.oA.toFixed(1)+' in A ('+f2(tot)+'). <strong>'+f2(S_.cases)+'</strong> from '+(S_.cases<0?'fewer':'more')+' patients overall, <strong>'+f2(S_.mix)+'</strong> from a different mix of '+grp+', <strong>'+f2(S_.docs)+'</strong> from doctors sending a '+(S_.docs<0?'smaller':'larger')+' share on within the same '+(S_.useSpec?'specialty':'doctor')+'. '+verdict+'</li>');
+    const mixTop=S_.R.slice().sort((x,y)=>Math.abs(y.vol)-Math.abs(x.vol))[0], docTop=S_.R.slice().sort((x,y)=>Math.abs(y.doc)-Math.abs(x.doc))[0];
+    if(mixTop&&Math.abs(mixTop.vol)>0.05) lines.push('<li>'+esc(mixTop.name)+': '+mixTop.nB.toFixed(1)+' → '+mixTop.nA.toFixed(1)+' patients a day ('+(S_.NB?(mixTop.nB/S_.NB*100).toFixed(0):'–')+'% → '+(S_.NA?(mixTop.nA/S_.NA*100).toFixed(0):'–')+'% of cases), and '+(mixTop.rB*100).toFixed(0)+'% of them usually go on: the biggest case effect ('+f2(mixTop.vol)+' a day).</li>');
+    if(docTop&&docTop!==mixTop&&Math.abs(docTop.doc)>0.05||docTop===mixTop&&Math.abs(docTop.doc)>Math.abs(docTop.vol)) lines.push('<li>'+esc(docTop.name)+': the share sent on went '+(docTop.rB*100).toFixed(0)+'% → '+(docTop.rA*100).toFixed(0)+'%'+(docTop.estA&&docTop.estB?'':' (few patients, so pooled)')+': the biggest doctor effect ('+f2(docTop.doc)+' a day).</li>');
+  }
   // provider lines for the read-out
-  if(pfRows.length){ const tot=pfRows.reduce((s,r)=>s+r.d,0), vol_=pfRows.reduce((s,r)=>s+r.vol,0), rate_=pfRows.reduce((s,r)=>s+r.rate,0), top=pfRows.slice(0,3);
+  if(SPL&&SPL.R.length){}
+  else if(pfRows.length){ const tot=pfRows.reduce((s,r)=>s+r.d,0), vol_=pfRows.reduce((s,r)=>s+r.vol,0), rate_=pfRows.reduce((s,r)=>s+r.rate,0), top=pfRows.slice(0,3);
     lines.push('<li><strong>By provider</strong> ('+pfWin+'-day follow-on, a month on average): '+esc(fN.toLowerCase())+' patients going on to '+esc(tN.toLowerCase())+' changed by <strong>'+sgn(tot)+'</strong> a month: '+sgn(vol_)+' from providers seeing '+(vol_<0?'fewer':'more')+' patients, '+sgn(rate_)+' from a '+(rate_<0?'smaller':'larger')+' share of them going on.</li>');
     top.forEach(r=>lines.push('<li>'+esc(r.name)+': '+sgn(r.d)+' patients going on a month ('+fmtInt(r.eB)+' → '+fmtInt(r.eA)+' patients seen'+(r.rA!=null&&r.rB!=null?', '+(r.rB*100).toFixed(0)+'% → '+(r.rA*100).toFixed(0)+'% going on':'')+'); '+(Math.abs(r.vol)>=Math.abs(r.rate)?'mostly fewer or more patients seen':'mostly a change in how many went on')+'.</li>')); }
   else if(pvRows.length){ const top=pvRows.slice(0,3).filter(r=>Math.abs(r.d)>0.05);
@@ -97,20 +108,23 @@ function renderLinkPeriods(from,to){
     el('lkCmpProv').innerHTML='<thead><tr><th class="nosort" style="text-align:left">Provider</th><th class="nosort" style="text-align:left">Service</th>'+(showSpec?'<th class="nosort" style="text-align:left">Specialty</th>':'')+'<th class="nosort">B</th><th class="nosort">A</th><th class="nosort">Change a day</th><th class="nosort">Share of the change</th></tr></thead><tbody>'+
       pvRows.slice(0,25).map(r=>'<tr><td dir="auto" style="text-align:left">'+esc(r.name)+'</td><td style="text-align:left">'+esc(label(r.cat))+'</td>'+(showSpec?'<td dir="auto" style="text-align:left">'+esc(r.spec||'–')+'</td>':'')+'<td>'+r.b.toFixed(1)+'</td><td>'+r.a.toFixed(1)+'</td>'+tv(r.d,2)+'<td>'+(r.share==null?'–':(r.share*100).toFixed(0)+'%')+'</td></tr>').join('')+'</tbody>';
   } else { el('lkCmpProvH').textContent=''; el('lkCmpProv').innerHTML=''; }
-  // by specialty
-  const src=pfRows.length? pfRows : pvRows, bySp=new Map();
-  if(showSpec) src.forEach(r=>{ if(!isDoctorCat(r.cat)) return; const k=r.spec||'No specialty'; const o=bySp.get(k)||bySp.set(k,{k,a:0,b:0,eA:0,eB:0,vol:0,rate:0,d:0}).get(k);
-    if(pfRows.length){ o.eA+=r.eA; o.eB+=r.eB; o.a+=r.fA; o.b+=r.fB; o.vol+=r.vol; o.rate+=r.rate; o.d+=r.d; } else { o.a+=r.a; o.b+=r.b; o.d+=r.d; } });
-  const SP=[...bySp.values()].sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
-  el('lkCmpSpecWrap').hidden=!SP.length;
-  if(SP.length) el('lkCmpSpec').innerHTML= pfRows.length?
-    '<thead><tr><th class="nosort" style="text-align:left">Specialty</th><th class="nosort">Patients seen B</th><th class="nosort">A</th><th class="nosort">Went on B</th><th class="nosort">A</th><th class="nosort">Change</th><th class="nosort">Volume</th><th class="nosort">Rate</th></tr></thead><tbody>'+SP.map(o=>'<tr><td dir="auto" style="text-align:left">'+esc(o.k)+'</td><td>'+fmtInt(o.eB)+'</td><td>'+fmtInt(o.eA)+'</td><td>'+fmtInt(o.b)+(o.eB?' <span class="note">'+(o.b/o.eB*100).toFixed(0)+'%</span>':'')+'</td><td>'+fmtInt(o.a)+(o.eA?' <span class="note">'+(o.a/o.eA*100).toFixed(0)+'%</span>':'')+'</td>'+tv(o.d)+tv(o.vol)+tv(o.rate)+'</tr>').join('')+'</tbody>'
-    : '<thead><tr><th class="nosort" style="text-align:left">Specialty</th><th class="nosort">B</th><th class="nosort">A</th><th class="nosort">Change a day</th></tr></thead><tbody>'+SP.map(o=>'<tr><td dir="auto" style="text-align:left">'+esc(o.k)+'</td><td>'+o.b.toFixed(1)+'</td><td>'+o.a.toFixed(1)+'</td>'+tv(o.d,2)+'</tr>').join('')+'</tbody>';
+  // the split, group by group, and the same by doctor for the provider table
+  const splitTable=(X,what)=>{ const pct=v=>(v*100).toFixed(0)+'%';
+    return '<thead><tr><th class="nosort" style="text-align:left">'+what+'</th>'+(what==='Doctor'&&X.R.some(o=>o.spec)?'<th class="nosort" style="text-align:left">Specialty</th>':'')+'<th class="nosort" title="Patients a day">Cases B</th><th class="nosort">A</th><th class="nosort" title="Share of all cases">Mix B</th><th class="nosort">A</th><th class="nosort" title="Share of patients who went on">Sent on B</th><th class="nosort">A</th><th class="nosort" title="Effect of this group’s cases changing, at B’s share sent on">Cases effect</th><th class="nosort" title="Effect of this group sending a different share on">Doctors effect</th></tr></thead><tbody>'+
+      X.R.slice().sort((x,y)=>Math.abs(y.vol+y.doc)-Math.abs(x.vol+x.doc)).slice(0,25).map(o=>'<tr><td dir="auto" style="text-align:left">'+esc(o.name)+'</td>'+(what==='Doctor'&&X.R.some(q=>q.spec)?'<td dir="auto" style="text-align:left">'+esc(o.spec||'–')+'</td>':'')+'<td>'+o.nB.toFixed(1)+'</td><td>'+o.nA.toFixed(1)+'</td><td>'+(X.NB?pct(o.nB/X.NB):'–')+'</td><td>'+(X.NA?pct(o.nA/X.NA):'–')+'</td><td>'+pct(o.rB)+(o.estB?'':'<span class="note">*</span>')+'</td><td>'+pct(o.rA)+(o.estA?'':'<span class="note">*</span>')+'</td>'+tv(o.vol,2)+tv(o.doc,2)+'</tr>').join('')+
+      '<tr class="total"><td style="text-align:left">All</td>'+(what==='Doctor'&&X.R.some(o=>o.spec)?'<td></td>':'')+'<td>'+X.NB.toFixed(1)+'</td><td>'+X.NA.toFixed(1)+'</td><td>100%</td><td>100%</td><td>'+pct(X.rbB)+'</td><td>'+pct(X.rbA)+'</td>'+tv(X.cases+X.mix,2)+tv(X.docs,2)+'</tr></tbody>'; };
+  const hasSplit=!!(SPL&&SPL.R.length);
+  el('lkCmpSpecWrap').hidden=!(hasSplit&&SPL.useSpec);
+  if(hasSplit&&SPL.useSpec){ el('lkCmpSpecH').textContent='Cases or doctors, by specialty ('+pfWin+'-day follow-on, a day)'; el('lkCmpSpec').innerHTML=splitTable(SPL,'Specialty'); }
+  if(hasSplit){ const SD=SPL.useSpec? lkcSplit(A,B,pfSrc,pfTgt,pfMonths.A,pfMonths.B,pfWin,true) : SPL;
+    el('lkCmpProvH').textContent='Cases or doctors, by doctor ('+pfWin+'-day follow-on, a day)'; el('lkCmpProv').innerHTML=splitTable(SD,'Doctor'); }
   const notes=[];
   if(pfMonths) notes.push('Follow-on uses the months '+(pfMonths.B.map(fmtM).join(', ')||'none')+' (B) and '+(pfMonths.A.map(fmtM).join(', ')||'none')+' (A) from the provider follow-on export'+(pfWin===7?'; A’s 30 days haven’t passed for everyone yet, so the 7-day window is used':'')+'.');
   if(!PF) notes.push('Load the provider follow-on export to see whose patients went on to '+tN.toLowerCase()+'.');
   if(!PV) notes.push('Load the provider export to see '+fN.toLowerCase()+' orders by provider.');
-  if(!showSpec&&(PV||PF)) notes.push('No specialty in the exports yet, so there is no specialty table.');
+  if(SPL&&SPL.R.length){ notes.push('Cases a day come from '+(SPL.src==='pv'?'the daily provider export (exact dates)':'the follow-on export’s patients per day of its months, so a month exported part-way through reads low; load the provider export for exact counts')+'. * = under 10 patients, so the share uses everyone’s.');
+    if(!SPL.useSpec) notes.push('The exports have no doctor specialty, so this groups by doctor. Run the updated provider and provider follow-on queries (Copy SQL in Data & settings) to group by specialty.'); }
+  else if(!showSpec&&(PV||PF)) notes.push('No specialty in the exports yet. Run the updated queries (Copy SQL in Data & settings) to add it.');
   el('lkCmpNote').textContent=notes.join(' ');
 }
 function wireLinkPeriods(){
@@ -118,4 +132,32 @@ function wireLinkPeriods(){
     if(st.lkCmp==='custom'&&!st.lkA){ const p=lkcPeriods(); st.lkA=p.A; st.lkB=p.B; } renderLinks(); }));
   ['lkA0','lkA1','lkB0','lkB1'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{ const v=id=>toN(document.getElementById(id).value);
     const a=[v('lkA0'),v('lkA1')], b=[v('lkB0'),v('lkB1')]; if([...a,...b].every(isFinite)){ st.lkA=a; st.lkB=b; renderLinks(); } }));
+}
+
+/* Cases or doctors. Groups are doctor specialties (or single doctors when the exports carry no specialty).
+   n = cases a day (patients seen), r = share of them who had a To service within the window (provider follow-on export).
+   Follow-on a day = Σ n·r. Its change splits exactly into
+     cases  = (N_A − N_B)·r̄_B                  fewer or more patients overall, at B's average share
+     mix    = Σ n_A·r_B − N_A·r̄_B              the same number of patients spread differently across groups
+     doctors= Σ n_A·(r_A − r_B)                 each group sending a different share on
+   A group with under 10 eligible patients in a period takes that period's pooled share. */
+function lkcSplit(A,B,pfSrc,pfTgt,mA,mB,win,byDoctor){
+  const eK='e'+win, fK='f'+win;
+  const useSpec=!byDoctor&&(PF.provs.some(p=>pfSrc.includes(p.cat)&&p.spec)||(!!PV&&PV.provs.some(p=>pfSrc.includes(p.cat)&&p.spec)));
+  const gk=(cat,spec,id)=> useSpec? (isDoctorCat(cat)? (spec||'No specialty') : label(cat)) : cat+'|'+id;
+  const G=new Map(), g=(k,name)=>G.get(k)||G.set(k,{k,name,eA:0,fA:0,eB:0,fB:0,pA:0,pB:0,nA:0,nB:0}).get(k);
+  PF.provs.forEach(p=>{ if(!pfSrc.includes(p.cat)) return; const k=gk(p.cat,p.spec,p.id), o=g(k,useSpec?k:p.name+(p.name==='Unassigned'?' ('+label(p.cat)+')':'')); if(!useSpec&&p.spec) o.spec=p.spec;
+    [[mA,'A'],[mB,'B']].forEach(([ms,x])=>ms.forEach(mk=>{ const b=PF.base.get(p.i+'|'+mk); if(!b) return; let ff=0; pfTgt.forEach(t=>{ const c=PF.cell.get(p.i+'|'+mk+'|'+t); if(c) ff+=c[fK]; });
+      o['e'+x]+=b[eK]; o['f'+x]+=Math.min(ff,b[eK]); o['p'+x]+=b.pat; })); });
+  let src='pf';
+  if(PV&&PV.min<=B[0]&&PV.max>=A[1]){ src='pv'; const dA=A[1]-A[0]+1, dB=B[1]-B[0]+1;
+    for(const r of PV.rows){ if(!pfSrc.includes(r.cat)||!st.status.has(r.st)) continue; const x=r.n>=A[0]&&r.n<=A[1]?'nA':r.n>=B[0]&&r.n<=B[1]?'nB':null; if(!x) continue;
+      const p=PV.provs[r.p], k=gk(r.cat,r.sp||p.spec,p.id); g(k,useSpec?k:pvName(p))[x]+=r.v[2]/(x==='nA'?dA:dB); } }
+  else { const days=ms=>ms.reduce((t,mk)=>t+daysInMonth(mk),0), dA=days(mA)||1, dB=days(mB)||1; G.forEach(o=>{ o.nA=o.pA/dA; o.nB=o.pB/dB; }); }
+  const R=[...G.values()].filter(o=>o.nA+o.nB>0), sum=(f)=>R.reduce((t,o)=>t+f(o),0);
+  const RA=sum(o=>o.eA)?sum(o=>o.fA)/sum(o=>o.eA):0, RB=sum(o=>o.eB)?sum(o=>o.fB)/sum(o=>o.eB):0;
+  R.forEach(o=>{ o.estA=o.eA>=10; o.estB=o.eB>=10; o.rA=o.estA?o.fA/o.eA:RA; o.rB=o.estB?o.fB/o.eB:RB; o.vol=(o.nA-o.nB)*o.rB; o.doc=o.nA*(o.rA-o.rB); });
+  const NA=sum(o=>o.nA), NB=sum(o=>o.nB), oA=sum(o=>o.nA*o.rA), oB=sum(o=>o.nB*o.rB), rbB=NB?oB/NB:0, rbA=NA?oA/NA:0;
+  const cases=(NA-NB)*rbB, mix=sum(o=>o.nA*o.rB)-NA*rbB, docs=sum(o=>o.doc);
+  return {R,NA,NB,oA,oB,rbA,rbB,cases,mix,docs,useSpec,src};
 }
