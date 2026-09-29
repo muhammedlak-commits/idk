@@ -1,0 +1,468 @@
+month,campaign_id,campaign_name,objective,spend_usd,impressions,reach,clicks,link_clicks,result_type,results
+2024-03,120206279824710641,CBO | Testing Campaign | Whatsapp | Mar 13 2024,OUTCOME_ENGAGEMENT,93.66,86669,47238,5923,336,onsite_conversion.messaging_conversation_started_7d,264
+2024-03,120206661180810641,Awareness 2024,OUTCOME_AWARENESS,23.92,276423,267859,208,63,reach,267859
+2024-03,120206662557710641,Scaling | Physiotherapy,OUTCOME_ENGAGEMENT,79.88,85119,42308,5979,279,onsite_conversion.messaging_conversation_started_7d,280
+2024-03,120206662819920641,Creative Testing Hub,OUTCOME_ENGAGEMENT,89.15,65513,26745,4510,461,onsite_conversion.messaging_conversation_started_7d,239
+2024-04,120206661180810641,Awareness 2024,OUTCOME_AWARENESS,35.15,460239,384905,407,122,reach,384905
+2024-04,120206662557710641,Scaling | Physiotherapy,OUTCOME_ENGAGEMENT,357.02,404688,171735,20549,906,onsite_conversion.messaging_conversation_started_7d,602
+2024-04,120206662819920641,Creative Testing Hub,OUTCOME_ENGAGEMENT,353.46,486315,151274,20450,4485,onsite_conversion.messaging_conversation_started_7d,759
+2024-04,120207484168300641,Engagement Campaign,OUTCOME_ENGAGEMENT,22.2,121839,85040,340,90,post_engagement,41916
+2024-04,120207512748190641,App Engagment,OUTCOME_ENGAGEMENT,23.63,13555,9540,458,42,post_engagement,2518
+2024-04,120207562967710641,Slaes Objective | Physio,OUTCOME_SALES,10.25,10105,7272,350,20,onsite_conversion.messaging_conversation_started_7d,9
+2024-04,120207719672750641,CALLS CTA,OUTCOME_ENGAGEMENT,1.59,3837,3482,66,47,click_to_call_native_call_placed,
+2024-04,120207749462600641,Physiotherapy | Full Advantage+ | 2024/4/29,OUTCOME_ENGAGEMENT,19.86,23173,17996,883,63,onsite_conversion.messaging_conversation_started_7d,30
+2024-04,120207749526440641,Physiotherapy | Original Audience | 2024/4/29,OUTCOME_ENGAGEMENT,29.51,29783,23208,1344,121,onsite_conversion.messaging_conversation_started_7d,67
+2024-05,120207484168300641,Engagement Campaign,OUTCOME_ENGAGEMENT,13.86,40515,39702,90,24,post_engagement,14856
+2024-05,120207512748190641,App Engagment,OUTCOME_ENGAGEMENT,5.12,6390,5609,164,19,post_engagement,717
+2024-05,120207749462600641,Physiotherapy | Full Advantage+ | 2024/4/29,OUTCOME_ENGAGEMENT,236.1,131852,69898,5542,658,onsite_conversion.messaging_conversation_started_7d,270
+2024-05,120207749526440641,Physiotherapy | Original Audience | 2024/4/29,OUTCOME_ENGAGEMENT,442.81,322231,131169,12378,1277,onsite_conversion.messaging_conversation_started_7d,519
+2024-05,120207889875270641,App Awareness | Link Click | Android | 2024/5/4,OUTCOME_APP_PROMOTION,45.23,104232,68547,5636,5702,link_click,5702
+2024-05,120207890948560641,App Traffic (Linktree) 2024/5/4,OUTCOME_TRAFFIC,0.9,2443,2088,176,138,link_click,138
+2024-05,120208006821180641,Nursing | Advantage+ | Targeted Cities | Tailored messages campaign | 2024/5/8,OUTCOME_ENGAGEMENT,14.52,11730,7648,334,67,onsite_conversion.messaging_conversation_started_7d,6
+2024-05,120208008060280641,Nursing | Original Audience | Feed Only | 2024/5/8,OUTCOME_ENGAGEMENT,14.65,10619,6111,352,61,onsite_conversion.messaging_conversation_started_7d,6
+2024-05,120208187492930641,IPR | Original Audince | CBO | 2024/5/13,OUTCOME_ENGAGEMENT,57.25,45949,15993,3146,318,onsite_conversion.messaging_conversation_started_7d,135
+2024-05,120208209680880641,Nursing | $5 | WA & Msgr | Rich PPL | 2024/5/13,OUTCOME_ENGAGEMENT,30.78,25194,13228,916,138,onsite_conversion.messaging_conversation_started_7d,31
+2024-05,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,129.47,121182,71578,6692,682,onsite_conversion.messaging_conversation_started_7d,332
+2024-05,120208586907690641,Lab Test | Original Audince | 2024/5/22,OUTCOME_ENGAGEMENT,50.37,18339,10074,862,121,onsite_conversion.messaging_conversation_started_7d,41
+2024-05,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,26.7,51508,31317,1319,1123,mobile_app_install,725
+2024-05,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,26.42,55879,36771,1580,772,mobile_app_install,436
+2024-05,120208838386040641,Physiotherapy | LAL | 2024 May 30,OUTCOME_ENGAGEMENT,21.14,19119,15708,597,28,onsite_conversion.messaging_conversation_started_7d,15
+2024-05,120208838386070641,Physiotherapy | Full Advantage+ | 2024 May 30,OUTCOME_ENGAGEMENT,9.38,6153,5833,242,19,onsite_conversion.messaging_conversation_started_7d,8
+2024-05,120208838386110641,Physiotherapy | Original Audience | 2024 May 30,OUTCOME_ENGAGEMENT,28.25,18335,14216,722,70,onsite_conversion.messaging_conversation_started_7d,26
+2024-05,120208838433360641,Nursing | Instant Forms | 2024 May 30,OUTCOME_LEADS,8.65,6920,6142,261,75,leadgen.other,1
+2024-06,120207749462600641,Physiotherapy | Full Advantage+ | 2024/4/29,OUTCOME_ENGAGEMENT,1.58,938,904,49,6,onsite_conversion.messaging_conversation_started_7d,1
+2024-06,120207749526440641,Physiotherapy | Original Audience | 2024/4/29,OUTCOME_ENGAGEMENT,1.54,866,803,39,5,onsite_conversion.messaging_conversation_started_7d,
+2024-06,120208187492930641,IPR | Original Audince | CBO | 2024/5/13,OUTCOME_ENGAGEMENT,39.66,29328,10913,1558,160,onsite_conversion.messaging_conversation_started_7d,63
+2024-06,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,299.55,267709,159273,11929,1568,onsite_conversion.messaging_conversation_started_7d,726
+2024-06,120208586907690641,Lab Test | Original Audince | 2024/5/22,OUTCOME_ENGAGEMENT,128.06,35749,17129,1679,423,onsite_conversion.messaging_conversation_started_7d,103
+2024-06,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,180.12,410759,163642,7491,6404,mobile_app_install,3807
+2024-06,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,178.32,465603,195620,10408,4512,mobile_app_install,2118
+2024-06,120208838386040641,Physiotherapy | LAL | 2024 May 30,OUTCOME_ENGAGEMENT,256.78,351389,177625,8346,1610,onsite_conversion.messaging_conversation_started_7d,427
+2024-06,120208838386070641,Physiotherapy | Full Advantage+ | 2024 May 30,OUTCOME_ENGAGEMENT,128.53,123906,81405,3366,676,onsite_conversion.messaging_conversation_started_7d,238
+2024-06,120208838386110641,Physiotherapy | Original Audience | 2024 May 30,OUTCOME_ENGAGEMENT,386.37,459418,205328,11623,2265,onsite_conversion.messaging_conversation_started_7d,668
+2024-06,120208838433360641,Nursing | Instant Forms | 2024 May 30,OUTCOME_LEADS,4.57,3615,3329,140,35,leadgen.other,
+2024-06,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,85.94,50979,23058,2009,396,onsite_conversion.messaging_conversation_started_7d,134
+2024-06,120208900779870641,Hiring Campaign,OUTCOME_ENGAGEMENT,7.98,7265,4211,551,161,onsite_conversion.messaging_conversation_started_7d,87
+2024-06,120208901761200641,Nursing | Testing,OUTCOME_ENGAGEMENT,83.99,49013,21238,1550,234,onsite_conversion.messaging_conversation_started_7d,61
+2024-06,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,296.45,2608284,685221,7014,1408,reach,685221
+2024-07,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,597.55,477464,250985,22899,2300,onsite_conversion.messaging_conversation_started_7d,878
+2024-07,120208586907690641,Lab Test | Original Audince | 2024/5/22,OUTCOME_ENGAGEMENT,155.41,40113,20097,2193,569,onsite_conversion.messaging_conversation_started_7d,138
+2024-07,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,185.65,422182,196596,6756,5167,mobile_app_install,2910
+2024-07,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,183.71,457376,229712,8201,3684,mobile_app_install,1720
+2024-07,120208838386040641,Physiotherapy | LAL | 2024 May 30,OUTCOME_ENGAGEMENT,141.39,150413,89666,3253,717,onsite_conversion.messaging_conversation_started_7d,236
+2024-07,120208838386070641,Physiotherapy | Full Advantage+ | 2024 May 30,OUTCOME_ENGAGEMENT,70.71,55497,39327,1401,343,onsite_conversion.messaging_conversation_started_7d,111
+2024-07,120208838386110641,Physiotherapy | Original Audience | 2024 May 30,OUTCOME_ENGAGEMENT,211.75,281181,154188,5747,1389,onsite_conversion.messaging_conversation_started_7d,359
+2024-07,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,150.41,115185,44063,3960,709,onsite_conversion.messaging_conversation_started_7d,211
+2024-07,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,368.44,3406195,861894,7203,1716,reach,861894
+2024-07,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,255.23,273785,116650,11163,1744,onsite_conversion.messaging_conversation_started_7d,614
+2024-07,120209528715310641,Imaging Services | $8 | 2024 Jul 7,OUTCOME_ENGAGEMENT,146.05,214575,99575,16562,1009,onsite_conversion.messaging_conversation_started_7d,787
+2024-07,120209654211350641,Physiotherapy | Original Audience | 2024 Jul 15,OUTCOME_ENGAGEMENT,255.62,333271,169506,6382,1366,onsite_conversion.messaging_conversation_started_7d,386
+2024-07,120209655369130641,Physiotherapy | $10 | LAL | 2024 Jul 15,OUTCOME_ENGAGEMENT,85.11,71917,45478,2071,426,onsite_conversion.messaging_conversation_started_7d,124
+2024-07,120209655369140641,Physiotherapy | $10 | +A | 2024 Jul 15,OUTCOME_ENGAGEMENT,170.31,182759,106273,3813,833,onsite_conversion.messaging_conversation_started_7d,231
+2024-08,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,619.77,488584,248319,15243,2382,onsite_conversion.messaging_conversation_started_7d,947
+2024-08,120208586907690641,Lab Test | Original Audince | 2024/5/22,OUTCOME_ENGAGEMENT,65.61,15850,8610,885,219,onsite_conversion.messaging_conversation_started_7d,55
+2024-08,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,186.24,433417,203561,6119,4821,mobile_app_install,2663
+2024-08,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,186.29,474838,230620,6403,3507,mobile_app_install,1432
+2024-08,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,185.54,132951,63059,6831,764,onsite_conversion.messaging_conversation_started_7d,280
+2024-08,120208900779870641,Hiring Campaign,OUTCOME_ENGAGEMENT,39.42,54691,22400,3273,802,onsite_conversion.messaging_conversation_started_7d,457
+2024-08,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,371.44,3418174,888007,7552,1611,reach,888007
+2024-08,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,158.35,125190,77634,4212,765,onsite_conversion.messaging_conversation_started_7d,291
+2024-08,120209528715310641,Imaging Services | $8 | 2024 Jul 7,OUTCOME_ENGAGEMENT,246.43,391902,184603,24060,1470,onsite_conversion.messaging_conversation_started_7d,967
+2024-08,120209654211350641,Physiotherapy | Original Audience | 2024 Jul 15,OUTCOME_ENGAGEMENT,198.65,276344,154667,5228,1105,onsite_conversion.messaging_conversation_started_7d,286
+2024-08,120209655369130641,Physiotherapy | $10 | LAL | 2024 Jul 15,OUTCOME_ENGAGEMENT,66.4,58185,37841,1454,303,onsite_conversion.messaging_conversation_started_7d,103
+2024-08,120209655369140641,Physiotherapy | $10 | +A | 2024 Jul 15,OUTCOME_ENGAGEMENT,132.6,128056,79114,2695,578,onsite_conversion.messaging_conversation_started_7d,184
+2024-08,120210030896530641,Dr Visit | $15 | Original Audience | 2024/8/1,OUTCOME_ENGAGEMENT,453.93,455845,209208,14687,2706,onsite_conversion.messaging_conversation_started_7d,786
+2024-08,120210069184820641,IPR | Original Audince | 2024/8/3 | 10$,OUTCOME_ENGAGEMENT,21.7,20385,9188,1236,157,onsite_conversion.messaging_conversation_started_7d,133
+2024-08,120210069714370641,B2B | Medical Field | 2024/8/3 | $5,OUTCOME_ENGAGEMENT,5.98,4161,2634,132,20,onsite_conversion.messaging_conversation_started_7d,5
+2024-08,120210069884170641,Aster Dr. Rafi,OUTCOME_ENGAGEMENT,45.76,29533,15706,1160,155,onsite_conversion.messaging_conversation_started_7d,53
+2024-08,120210230455380641,B2B | Businesses | $10 | 2024/8/12,OUTCOME_ENGAGEMENT,43.59,17431,8641,566,98,onsite_conversion.messaging_conversation_started_7d,37
+2024-08,120210231454980641,Physiotherapy Course | $10 | CBO | 2024/8/12,OUTCOME_ENGAGEMENT,198.77,193709,63943,6400,1148,onsite_conversion.messaging_conversation_started_7d,435
+2024-08,120210280533550641,Physiotherapy | $10 | +A | 2024 Aug 14,OUTCOME_ENGAGEMENT,179.03,228670,124736,5277,1005,onsite_conversion.messaging_conversation_started_7d,271
+2024-08,120210280533560641,Physiotherapy | $5 | LAL | 2024 Aug 14,OUTCOME_ENGAGEMENT,89.52,116935,73114,2826,516,onsite_conversion.messaging_conversation_started_7d,120
+2024-08,120210280533570641,Physiotherapy | $15 | Original Audience | 2024 Aug 14,OUTCOME_ENGAGEMENT,268.56,487125,258028,9606,2025,onsite_conversion.messaging_conversation_started_7d,458
+2024-08,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,89.39,106598,56970,4086,413,onsite_conversion.messaging_conversation_started_7d,190
+2024-09,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,600.96,457601,223213,12398,1823,onsite_conversion.messaging_conversation_started_7d,702
+2024-09,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,179.98,362183,181699,4788,4330,mobile_app_install,2081
+2024-09,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,179.21,373222,193679,4482,2896,mobile_app_install,945
+2024-09,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,180.69,108758,42240,3399,706,onsite_conversion.messaging_conversation_started_7d,199
+2024-09,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,357.66,2986759,782785,6277,1317,reach,782785
+2024-09,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,150.4,100053,49199,2907,547,onsite_conversion.messaging_conversation_started_7d,145
+2024-09,120209528715310641,Imaging Services | $8 | 2024 Jul 7,OUTCOME_ENGAGEMENT,17.19,18012,15279,1013,86,onsite_conversion.messaging_conversation_started_7d,51
+2024-09,120210030896530641,Dr Visit | $15 | Original Audience | 2024/8/1,OUTCOME_ENGAGEMENT,33.35,24094,19341,689,129,onsite_conversion.messaging_conversation_started_7d,43
+2024-09,120210231454980641,Physiotherapy Course | $10 | CBO | 2024/8/12,OUTCOME_ENGAGEMENT,75.93,79744,40906,1570,232,onsite_conversion.messaging_conversation_started_7d,128
+2024-09,120210280533550641,Physiotherapy | $10 | +A | 2024 Aug 14,OUTCOME_ENGAGEMENT,0.97,496,479,18,4,onsite_conversion.messaging_conversation_started_7d,1
+2024-09,120210280533560641,Physiotherapy | $5 | LAL | 2024 Aug 14,OUTCOME_ENGAGEMENT,0.39,316,307,7,1,onsite_conversion.messaging_conversation_started_7d,1
+2024-09,120210280533570641,Physiotherapy | $15 | Original Audience | 2024 Aug 14,OUTCOME_ENGAGEMENT,2.04,2189,2090,36,8,onsite_conversion.messaging_conversation_started_7d,1
+2024-09,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,150.69,124944,69986,5707,511,onsite_conversion.messaging_conversation_started_7d,204
+2024-09,120210671340250641,Physiotherapy | $15 | Original Audience | 2024 Sep 1,OUTCOME_ENGAGEMENT,34.08,390474,316467,850,363,onsite_conversion.messaging_conversation_started_7d,55
+2024-09,120210671340350641,Physiotherapy | $5 | LAL | 2024 Sep 1,OUTCOME_ENGAGEMENT,31.54,191714,144483,773,241,onsite_conversion.messaging_conversation_started_7d,37
+2024-09,120210671340420641,Physiotherapy | $10 | +A | 2024 Sep 1,OUTCOME_ENGAGEMENT,30.13,573953,472098,785,393,onsite_conversion.messaging_conversation_started_7d,56
+2024-09,120210706603890641,Physiotherapy | $15 | Original Audience | 2024 Sep 3,OUTCOME_ENGAGEMENT,46.58,55641,41414,1112,261,onsite_conversion.messaging_conversation_started_7d,66
+2024-09,120210706603990641,Physiotherapy | $5 | LAL | 2024 Sep 3,OUTCOME_ENGAGEMENT,15.62,15942,13415,376,70,onsite_conversion.messaging_conversation_started_7d,19
+2024-09,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,223.49,328755,180889,18177,1041,onsite_conversion.messaging_conversation_started_7d,722
+2024-09,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,419.73,309718,162484,8699,1662,onsite_conversion.messaging_conversation_started_7d,490
+2024-09,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,375.6,315219,169092,7051,1562,onsite_conversion.messaging_conversation_started_7d,413
+2024-09,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,125.12,104212,62673,3096,570,onsite_conversion.messaging_conversation_started_7d,197
+2024-09,120210851637240641,Physiotherapy | Video Only | $15 | Original Audience | 2024 Sep 9,OUTCOME_ENGAGEMENT,166.51,150515,84433,10643,672,onsite_conversion.messaging_conversation_started_7d,303
+2024-09,120211120211460641,Physiotherapy | $10 | PRICE | Original Audience | 2024 Sep 20,OUTCOME_ENGAGEMENT,54.05,42427,26198,783,211,onsite_conversion.messaging_conversation_started_7d,47
+2024-10,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,676.14,588189,296709,14470,2276,onsite_conversion.messaging_conversation_started_7d,757
+2024-10,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,185.73,394787,198786,5227,4865,mobile_app_install,2021
+2024-10,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,185.45,423811,213506,5854,2812,mobile_app_install,1003
+2024-10,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,184.42,215930,121893,4726,976,onsite_conversion.messaging_conversation_started_7d,366
+2024-10,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,364.6,2920356,757405,5935,1425,reach,757405
+2024-10,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,75.45,41145,23193,1167,229,onsite_conversion.messaging_conversation_started_7d,58
+2024-10,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,154.74,91891,50447,3718,725,onsite_conversion.messaging_conversation_started_7d,172
+2024-10,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,348.11,398838,197801,18213,1790,onsite_conversion.messaging_conversation_started_7d,951
+2024-10,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,548.19,367106,184477,9225,2099,onsite_conversion.messaging_conversation_started_7d,576
+2024-10,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,465.06,514964,280166,9900,1837,onsite_conversion.messaging_conversation_started_7d,678
+2024-10,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,154.75,210409,130263,3661,702,onsite_conversion.messaging_conversation_started_7d,300
+2024-10,120211593344760641,Nursing TESTING CBO 2024/10/10,OUTCOME_ENGAGEMENT,52.79,25516,13246,705,123,onsite_conversion.messaging_conversation_started_7d,29
+2024-10,120211749809770641,Brace | Messaging | TESTING CBO | 2024/10/16,OUTCOME_ENGAGEMENT,26.12,19646,11369,849,212,onsite_conversion.messaging_conversation_started_7d,145
+2024-10,120211750161900641,Eye Exam Messages | TESTING CBO | 2024/10/16,OUTCOME_ENGAGEMENT,29.58,14718,9355,476,113,onsite_conversion.messaging_conversation_started_7d,37
+2024-10,120211830163520641,Brace | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,130.61,166218,122093,3382,1285,leadgen.other,143
+2024-10,120211861521690641,Physiotherapy | 10$ | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,46.4,33442,24302,515,131,leadgen.other,11
+2024-10,120211977092830641,IPR | Original Audince | 2024/10/25 | 5$,OUTCOME_ENGAGEMENT,32.33,11638,6325,586,105,onsite_conversion.messaging_conversation_started_7d,18
+2024-11,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,748.03,794994,389715,14692,2662,onsite_conversion.messaging_conversation_started_7d,1315
+2024-11,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,180.2,384786,201757,6379,5290,mobile_app_install,1823
+2024-11,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,180.5,395937,210811,5039,2591,mobile_app_install,846
+2024-11,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,178.92,207443,161228,3818,822,onsite_conversion.messaging_conversation_started_7d,495
+2024-11,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,360.4,2956291,770429,6250,1545,reach,770429
+2024-11,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,269.6,307184,199960,9465,1635,onsite_conversion.messaging_conversation_started_7d,1214
+2024-11,120210069184820641,IPR | Original Audince | 2024/8/3 | 10$,OUTCOME_ENGAGEMENT,67.3,25437,11523,1069,176,onsite_conversion.messaging_conversation_started_7d,33
+2024-11,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,149.49,99239,62181,4782,575,onsite_conversion.messaging_conversation_started_7d,343
+2024-11,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,580.75,729170,336694,29565,2368,onsite_conversion.messaging_conversation_started_7d,2390
+2024-11,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,597.29,595729,332480,16634,3135,onsite_conversion.messaging_conversation_started_7d,2399
+2024-11,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,448.35,585285,374621,9172,1492,onsite_conversion.messaging_conversation_started_7d,975
+2024-11,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,149.05,295802,194854,3231,642,onsite_conversion.messaging_conversation_started_7d,357
+2024-11,120211830163520641,Brace | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,299.38,446767,270321,6599,2431,leadgen.other,266
+2024-11,120211977092830641,IPR | Original Audince | 2024/10/25 | 5$,OUTCOME_ENGAGEMENT,111.03,64216,28874,1729,357,onsite_conversion.messaging_conversation_started_7d,269
+2024-11,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,287.44,180717,89060,6553,653,onsite_conversion.messaging_conversation_started_7d,297
+2024-11,120212225436330641,Second Opinion B2C | 2024/11/5 | 10$,OUTCOME_ENGAGEMENT,143.11,54410,22295,2481,376,onsite_conversion.messaging_conversation_started_7d,266
+2024-11,120212331723170641,Nursing Testing 2024/11/10,OUTCOME_ENGAGEMENT,313.98,303781,177649,5552,1196,onsite_conversion.messaging_conversation_started_7d,898
+2024-11,120212698323840641,B2B Expert-i | 2024 Nov 25,OUTCOME_ENGAGEMENT,51.7,51525,26360,1051,159,onsite_conversion.messaging_conversation_started_7d,170
+2024-11,120212724291700641,IPR | Original Audince | 2024/10/25 | 5$ - Copy,OUTCOME_LEADS,49.25,46998,31491,798,194,leadgen.other,42
+2024-12,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,777.03,717694,332823,14192,2490,onsite_conversion.messaging_conversation_started_7d,761
+2024-12,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,186.09,403559,210402,5869,4366,mobile_app_install,1586
+2024-12,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,185.13,414819,217533,4599,2454,mobile_app_install,712
+2024-12,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,186.74,188561,138959,3647,606,onsite_conversion.messaging_conversation_started_7d,266
+2024-12,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,369.82,3299233,808420,6046,1534,reach,808420
+2024-12,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,310.73,371282,250322,11538,1655,onsite_conversion.messaging_conversation_started_7d,793
+2024-12,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,155.47,121239,74050,5610,496,onsite_conversion.messaging_conversation_started_7d,186
+2024-12,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,777.6,916775,382654,30441,2632,onsite_conversion.messaging_conversation_started_7d,1396
+2024-12,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,621.62,667575,390286,20805,3004,onsite_conversion.messaging_conversation_started_7d,1448
+2024-12,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,467.39,599105,378684,9596,1338,onsite_conversion.messaging_conversation_started_7d,663
+2024-12,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,154.79,211756,142386,3201,536,onsite_conversion.messaging_conversation_started_7d,217
+2024-12,120211830163520641,Brace | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,311.23,467652,280283,6396,2288,leadgen.other,208
+2024-12,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,357.97,209152,100147,6650,687,onsite_conversion.messaging_conversation_started_7d,175
+2024-12,120212331723170641,Nursing Testing 2024/11/10,OUTCOME_ENGAGEMENT,466.34,441619,227925,7408,1586,onsite_conversion.messaging_conversation_started_7d,592
+2024-12,120212724291700641,IPR | Original Audince | 2024/10/25 | 5$ - Copy,OUTCOME_LEADS,311.26,304000,135348,4592,1062,leadgen.other,218
+2025-01,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,774.47,795072,374805,16584,2828,onsite_conversion.messaging_conversation_started_7d,716
+2025-01,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,184.21,394588,198019,4948,4475,mobile_app_install,794
+2025-01,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,181.88,376237,194432,4022,2188,mobile_app_install,332
+2025-01,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,185.73,196214,130029,4294,581,onsite_conversion.messaging_conversation_started_7d,222
+2025-01,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,366.93,3967921,892789,8009,1777,reach,892789
+2025-01,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,310.18,384141,261239,11006,1408,onsite_conversion.messaging_conversation_started_7d,540
+2025-01,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,225.14,180494,97953,6849,890,onsite_conversion.messaging_conversation_started_7d,343
+2025-01,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,773.73,1085273,421242,34689,2708,onsite_conversion.messaging_conversation_started_7d,1206
+2025-01,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,620.02,650195,392454,18527,2547,onsite_conversion.messaging_conversation_started_7d,1029
+2025-01,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,464.26,643679,367857,10983,1458,onsite_conversion.messaging_conversation_started_7d,575
+2025-01,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,138.94,196424,137609,3101,505,onsite_conversion.messaging_conversation_started_7d,182
+2025-01,120211830163520641,Brace | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,309.45,521440,313592,5457,2135,leadgen.other,165
+2025-01,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,356.49,260760,132716,7288,881,onsite_conversion.messaging_conversation_started_7d,161
+2025-01,120212331723170641,Nursing Testing 2024/11/10,OUTCOME_ENGAGEMENT,464.87,498747,245315,8519,1581,onsite_conversion.messaging_conversation_started_7d,461
+2025-01,120212724291700641,IPR | Original Audince | 2024/10/25 | 5$ - Copy,OUTCOME_LEADS,309.46,328053,147330,4427,1096,leadgen.other,220
+2025-02,120208466688490641,Nursing CBO 2024/5/19,OUTCOME_ENGAGEMENT,606.01,621500,282860,11169,2160,onsite_conversion.messaging_conversation_started_7d,540
+2025-02,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,167.84,330728,155373,2670,2526,mobile_app_install,
+2025-02,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,165.56,249447,121579,4026,2808,mobile_app_install,
+2025-02,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,167.8,240339,148453,4374,568,onsite_conversion.messaging_conversation_started_7d,201
+2025-02,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,335.12,3302253,810417,5891,1462,reach,810417
+2025-02,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,279.51,310054,215855,7862,1168,onsite_conversion.messaging_conversation_started_7d,426
+2025-02,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,419.3,322158,156472,9440,1443,onsite_conversion.messaging_conversation_started_7d,770
+2025-02,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,819.23,1012435,414144,27929,3159,onsite_conversion.messaging_conversation_started_7d,1013
+2025-02,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,559.53,556238,337197,12842,2022,onsite_conversion.messaging_conversation_started_7d,763
+2025-02,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,662.59,689400,329304,13996,2072,onsite_conversion.messaging_conversation_started_7d,780
+2025-02,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,262.67,301490,196724,5266,916,onsite_conversion.messaging_conversation_started_7d,309
+2025-02,120211830163520641,Brace | Leads Form | TESTING CBO | 2024/10/18,OUTCOME_LEADS,129.17,207628,145590,2297,797,leadgen.other,65
+2025-02,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,320.76,186116,91684,4600,687,onsite_conversion.messaging_conversation_started_7d,118
+2025-02,120212331723170641,Nursing Testing 2024/11/10,OUTCOME_ENGAGEMENT,406.17,513472,301709,8092,1445,onsite_conversion.messaging_conversation_started_7d,322
+2025-02,120212724291700641,IPR | Original Audince | 2024/10/25 | 5$ - Copy,OUTCOME_LEADS,144.09,164937,87731,1993,519,leadgen.other,97
+2025-02,120214772973230641,Surgery | Leads | 2025.2.1 | $6,OUTCOME_LEADS,168.58,164542,61114,6316,996,leadgen.other,190
+2025-02,120215691416470641,X-Ray TESTING WHATSAPP API,OUTCOME_ENGAGEMENT,19.14,12942,10516,512,53,onsite_conversion.messaging_conversation_started_7d,
+2025-02,120216196569370641,Nursing | 3O CBO | $35 | 2025/2/25,OUTCOME_ENGAGEMENT,111.6,112087,85113,1864,367,onsite_conversion.messaging_conversation_started_7d,119
+2025-02,120216529181230641,Eye Exam | CBO | 2025/2/28,OUTCOME_ENGAGEMENT,10.17,11364,9234,411,50,onsite_conversion.messaging_conversation_started_7d,25
+2025-03,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,180.86,477633,236782,3265,3130,mobile_app_install,
+2025-03,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,171.63,367255,177906,4769,3353,mobile_app_install,
+2025-03,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,186.3,208196,127325,3731,559,onsite_conversion.messaging_conversation_started_7d,202
+2025-03,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,367.97,3370024,861673,5461,1393,reach,861673
+2025-03,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,310.48,367119,203919,7698,1262,onsite_conversion.messaging_conversation_started_7d,366
+2025-03,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,553.77,286584,128678,11345,2008,onsite_conversion.messaging_conversation_started_7d,830
+2025-03,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,932.1,1160060,484505,30222,3486,onsite_conversion.messaging_conversation_started_7d,1303
+2025-03,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,120.68,128246,84105,3041,339,onsite_conversion.messaging_conversation_started_7d,120
+2025-03,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,1010.93,867513,350411,17065,3544,onsite_conversion.messaging_conversation_started_7d,1002
+2025-03,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,310.91,474687,288987,6807,1441,onsite_conversion.messaging_conversation_started_7d,395
+2025-03,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,357.27,184849,79380,7157,1170,onsite_conversion.messaging_conversation_started_7d,179
+2025-03,120214772973230641,Surgery | Leads | 2025.2.1 | $6,OUTCOME_LEADS,260.81,216259,81752,7882,1142,leadgen.other,209
+2025-03,120216196569370641,Nursing | 3O CBO | $35 | 2025/2/25,OUTCOME_ENGAGEMENT,125.95,148799,106784,3611,584,onsite_conversion.messaging_conversation_started_7d,163
+2025-03,120216529181230641,Eye Exam | CBO | 2025/2/28,OUTCOME_ENGAGEMENT,113.38,149310,73465,3613,410,onsite_conversion.messaging_conversation_started_7d,174
+2025-03,120216723498230641,Nursing | 3O | $37 | 2025/3/4,OUTCOME_ENGAGEMENT,1126.67,1168070,487338,23983,3917,onsite_conversion.messaging_conversation_started_7d,984
+2025-03,120216838023660641,Dr Visit | 3O | 2025/3/7,OUTCOME_ENGAGEMENT,953.71,1017820,454777,22180,3276,onsite_conversion.messaging_conversation_started_7d,1002
+2025-03,120216881835510641,Ramadan Awareness Campaign,OUTCOME_AWARENESS,840.6,9914239,2213702,10210,2812,mixed,
+2025-03,120217584669180641,Hiring | Wati | march 25,OUTCOME_ENGAGEMENT,30.83,31879,14672,1163,256,onsite_conversion.messaging_conversation_started_7d,95
+2025-04,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,179.87,724682,385958,5218,5178,mobile_app_install,
+2025-04,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,179.36,366345,174413,5782,4179,mobile_app_install,
+2025-04,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,179.91,260010,118486,4899,972,onsite_conversion.messaging_conversation_started_7d,374
+2025-04,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,356.08,3549357,917587,5672,1527,reach,917587
+2025-04,120209505761140641,Dr Visit | $5 | Testing,OUTCOME_ENGAGEMENT,240.39,218395,152353,4676,802,onsite_conversion.messaging_conversation_started_7d,229
+2025-04,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,302.5,103479,59469,4704,818,onsite_conversion.messaging_conversation_started_7d,277
+2025-04,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,782.56,1003433,441597,23660,3414,onsite_conversion.messaging_conversation_started_7d,1123
+2025-04,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,72.72,65487,49599,1171,213,onsite_conversion.messaging_conversation_started_7d,55
+2025-04,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,1046.15,875905,449482,17036,4189,onsite_conversion.messaging_conversation_started_7d,950
+2025-04,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,299.51,421950,268760,6764,1555,onsite_conversion.messaging_conversation_started_7d,395
+2025-04,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,354.12,184879,74411,5406,1032,onsite_conversion.messaging_conversation_started_7d,154
+2025-04,120214772973230641,Surgery | Leads | 2025.2.1 | $6,OUTCOME_LEADS,164.38,120418,56682,3607,631,leadgen.other,91
+2025-04,120216723498230641,Nursing | 3O | $37 | 2025/3/4,OUTCOME_ENGAGEMENT,725.3,706641,309237,13414,2627,onsite_conversion.messaging_conversation_started_7d,576
+2025-04,120216838023660641,Dr Visit | 3O | 2025/3/7,OUTCOME_ENGAGEMENT,684.43,642320,308891,12529,2039,onsite_conversion.messaging_conversation_started_7d,573
+2025-04,120216881835510641,Ramadan Awareness Campaign,OUTCOME_AWARENESS,109.27,1875793,982107,1922,498,mixed,
+2025-04,120217584669180641,Hiring | Wati | march 25,OUTCOME_ENGAGEMENT,120.59,156776,56805,5596,1184,onsite_conversion.messaging_conversation_started_7d,440
+2025-04,120219022528740641,TOF | Website | Baghdad Rich Areas,OUTCOME_LEADS,188.07,135952,95515,2130,856,conversions:offsite_conversion.fb_pixel_custom.ServiceBookingCompleted,9
+2025-04,120220236537300641,MOF | Website | BRA | CBO $20,OUTCOME_LEADS,55.49,46395,33192,598,165,conversions:offsite_conversion.fb_pixel_custom.ServiceBookingCompleted,2
+2025-04,120220660081950641,TOF | Whatsapp | Website | Baghdad Rich Areas,OUTCOME_ENGAGEMENT,100.88,97467,80556,1026,275,onsite_conversion.messaging_conversation_started_7d,101
+2025-04,120220666264530641,MOF | Whatsapp | BRA | CBO $25,OUTCOME_ENGAGEMENT,257.36,379755,226739,4256,967,onsite_conversion.messaging_conversation_started_7d,211
+2025-04,120220813947310641,📍Nursing | $35,OUTCOME_ENGAGEMENT,264.46,177919,135130,3360,568,onsite_conversion.messaging_conversation_started_7d,95
+2025-04,120220820768680641,Dr Visit,OUTCOME_ENGAGEMENT,167.09,207516,135982,3372,648,onsite_conversion.messaging_conversation_started_7d,142
+2025-05,120208780726700641,App Installs | Android | 2024 May 27,OUTCOME_APP_PROMOTION,5.9,21146,16971,175,214,mobile_app_install,
+2025-05,120208780823020641,App Installs | iOS | 2024 May 27,OUTCOME_APP_PROMOTION,6.32,8507,7600,102,32,mobile_app_install,
+2025-05,120208900306680641,📍Physiotherapy | $6 | Testing,OUTCOME_ENGAGEMENT,159.76,249039,152380,3493,811,onsite_conversion.messaging_conversation_started_7d,215
+2025-05,120208943174270641,Omni Awareness Campaign,OUTCOME_AWARENESS,105.62,1025363,409601,1385,431,reach,409601
+2025-05,120210280693630641,📍Lab Test | Original Audince | 2024 Aug 14,OUTCOME_ENGAGEMENT,285.19,179600,102525,4290,916,onsite_conversion.messaging_conversation_started_7d,380
+2025-05,120210706668880641,📍Imaging Services | $8 | 2024 Sep 3,OUTCOME_ENGAGEMENT,671.6,879552,421851,19765,3596,onsite_conversion.messaging_conversation_started_7d,867
+2025-05,120210706674940641,📍Dr Visit Main | $35,OUTCOME_ENGAGEMENT,1116.85,854360,348162,16688,3257,onsite_conversion.messaging_conversation_started_7d,700
+2025-05,120210789115000641,📍🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6,OUTCOME_ENGAGEMENT,751.49,599177,297261,10644,2753,onsite_conversion.messaging_conversation_started_7d,613
+2025-05,120210789294890641,📍🌟Physiotherapy | $10 | LAL | 2024 Sep 6,OUTCOME_ENGAGEMENT,271.71,328438,203637,4853,1340,onsite_conversion.messaging_conversation_started_7d,256
+2025-05,120212225335390641,📍Wound Care | 2024/11/5,OUTCOME_ENGAGEMENT,453.03,384645,177569,11085,2085,onsite_conversion.messaging_conversation_started_7d,224
+2025-05,120220660081950641,TOF | Whatsapp | Website | Baghdad Rich Areas,OUTCOME_ENGAGEMENT,8.83,10238,9746,76,15,onsite_conversion.messaging_conversation_started_7d,6
+2025-05,120220666264530641,MOF | Whatsapp | BRA | CBO $25,OUTCOME_ENGAGEMENT,22.52,32065,28919,299,93,onsite_conversion.messaging_conversation_started_7d,15
+2025-05,120220813947310641,📍Nursing | $35,OUTCOME_ENGAGEMENT,1142.55,1260261,515556,23434,4571,onsite_conversion.messaging_conversation_started_7d,907
+2025-05,120221855998800641,Profile Traffic Campaign (Followers) | $12 | May 1,OUTCOME_TRAFFIC,69.75,198030,139653,3312,3395,profile_visit_view,3352
+2025-05,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,425.11,846464,446071,17734,17641,mixed,
+2025-05,120223118964430641,📍Physiotherapy Main | Sales Objective,OUTCOME_SALES,370.6,425227,228891,5797,1392,onsite_conversion.messaging_conversation_started_7d,291
+2025-05,120223432964300641,Saleem Bag $15,OUTCOME_SALES,80.4,59477,37747,1979,761,offsite_conversion.fb_pixel_purchase,6
+2025-05,120224400085400641,Dr Visit Main | $35 - Copy,OUTCOME_ENGAGEMENT,123.96,80574,53141,1570,281,onsite_conversion.messaging_conversation_started_7d,57
+2025-05,120224400085510641,Lab Test | Original Audince | 2024 Aug 14 - Copy,OUTCOME_ENGAGEMENT,35.32,22206,16598,511,84,onsite_conversion.messaging_conversation_started_7d,31
+2025-05,120224400085540641,Physiotherapy Main | Sales Objective - Copy,OUTCOME_SALES,71.02,177227,101190,8127,7767,link_click,7767
+2025-05,120224400085590641,Imaging Services | $8 | 2024 Sep 3 - Copy,OUTCOME_ENGAGEMENT,80.2,82452,61425,1787,347,onsite_conversion.messaging_conversation_started_7d,70
+2025-05,120224400085600641,Physiotherapy | $6 | Testing - Copy,OUTCOME_ENGAGEMENT,21.28,24999,20150,375,107,onsite_conversion.messaging_conversation_started_7d,19
+2025-05,120224400085610641,🌟Physiotherapy | $10 | LAL | 2024 Sep 6 - Copy,OUTCOME_ENGAGEMENT,35.41,33014,24911,515,147,onsite_conversion.messaging_conversation_started_7d,20
+2025-05,120224400085620641,Wound Care | 2024/11/5 - Copy,OUTCOME_ENGAGEMENT,62.05,35730,23129,1046,178,onsite_conversion.messaging_conversation_started_7d,17
+2025-05,120224400085640641,Nursing | $35 - Copy,OUTCOME_ENGAGEMENT,124.14,121801,86480,2266,450,onsite_conversion.messaging_conversation_started_7d,89
+2025-05,120224400085780641,🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6 - Copy,OUTCOME_ENGAGEMENT,88.71,79202,52551,1122,330,onsite_conversion.messaging_conversation_started_7d,57
+2025-06,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,535.9,1498875,625945,27533,27280,mixed,
+2025-06,120224400085400641,Dr Visit Main | $35 - Copy,OUTCOME_ENGAGEMENT,506.27,356396,151063,7210,1372,onsite_conversion.messaging_conversation_started_7d,361
+2025-06,120224400085510641,Lab Test | Original Audince | 2024 Aug 14 - Copy,OUTCOME_ENGAGEMENT,144.27,111150,62458,2366,478,onsite_conversion.messaging_conversation_started_7d,242
+2025-06,120224400085540641,Physiotherapy Main | Sales Objective - Copy,OUTCOME_SALES,102.41,344005,165313,12143,11541,link_click,11541
+2025-06,120224400085590641,Imaging Services | $8 | 2024 Sep 3 - Copy,OUTCOME_ENGAGEMENT,325.72,417467,222035,7753,1561,onsite_conversion.messaging_conversation_started_7d,371
+2025-06,120224400085600641,Physiotherapy | $6 | Testing - Copy,OUTCOME_ENGAGEMENT,86.39,137076,83117,1911,535,onsite_conversion.messaging_conversation_started_7d,95
+2025-06,120224400085610641,🌟Physiotherapy | $10 | LAL | 2024 Sep 6 - Copy,OUTCOME_ENGAGEMENT,144.23,238302,149718,3025,880,onsite_conversion.messaging_conversation_started_7d,114
+2025-06,120224400085620641,Wound Care | 2024/11/5 - Copy,OUTCOME_ENGAGEMENT,253.21,164229,69725,4171,880,onsite_conversion.messaging_conversation_started_7d,112
+2025-06,120224400085640641,Nursing | $35 - Copy,OUTCOME_ENGAGEMENT,504.56,653772,339832,12109,2553,onsite_conversion.messaging_conversation_started_7d,458
+2025-06,120224400085780641,🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6 - Copy,OUTCOME_ENGAGEMENT,361.79,378500,194680,5136,1547,onsite_conversion.messaging_conversation_started_7d,271
+2025-06,120225607512910641,mini TVCs 2025,OUTCOME_ENGAGEMENT,569.19,395493,201052,27717,3653,onsite_conversion.messaging_conversation_started_7d,879
+2025-06,120225660544580641,🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6 - Respond.io,OUTCOME_ENGAGEMENT,253.2,303045,173562,4262,975,onsite_conversion.messaging_conversation_started_7d,230
+2025-06,120225660544600641,Dr Visit - Respond.io,OUTCOME_ENGAGEMENT,350.87,272588,133729,5885,934,onsite_conversion.messaging_conversation_started_7d,281
+2025-06,120225660545140641,Lab Test - Respond.io,OUTCOME_ENGAGEMENT,101.1,95114,62933,1650,333,onsite_conversion.messaging_conversation_started_7d,152
+2025-06,120225660545330641,Wound Care - Respond.io,OUTCOME_ENGAGEMENT,176.18,111999,58182,2689,567,onsite_conversion.messaging_conversation_started_7d,63
+2025-06,120225660545340641,Imaging Services | $8 | 2024 Sep 3 - Respond.io,OUTCOME_ENGAGEMENT,226.66,298828,198602,6222,916,onsite_conversion.messaging_conversation_started_7d,305
+2025-06,120225660545360641,Nursing | $35 - Respond.io,OUTCOME_ENGAGEMENT,351.12,398058,215451,7498,1473,onsite_conversion.messaging_conversation_started_7d,392
+2025-06,120225660545370641,🌟Physiotherapy | $10 | LAL | 2024 Sep 6 - Respond.io,OUTCOME_ENGAGEMENT,101.98,107457,79232,1340,360,onsite_conversion.messaging_conversation_started_7d,65
+2025-06,120225660545520641,Physiotherapy | $6 | Testing - Respond.io,OUTCOME_ENGAGEMENT,60.42,100942,64865,1404,279,onsite_conversion.messaging_conversation_started_7d,92
+2025-06,120226320691760641,Physiotherapy | $6 | Testing - Respond.io - Copy,OUTCOME_ENGAGEMENT,36.4,54567,39142,852,210,onsite_conversion.messaging_conversation_started_7d,61
+2025-06,120226320691790641,Wound Care - Respond.io - Copy,OUTCOME_ENGAGEMENT,106.64,68620,35829,1610,297,onsite_conversion.messaging_conversation_started_7d,43
+2025-06,120226320691810641,Nursing | $35 - Respond.io - Copy,OUTCOME_ENGAGEMENT,212.53,263273,168273,4407,861,onsite_conversion.messaging_conversation_started_7d,204
+2025-06,120226320691820641,🌟Physiotherapy | $10 | LAL | 2024 Sep 6 - Respond.io - Copy,OUTCOME_ENGAGEMENT,60.52,94005,71563,1161,258,onsite_conversion.messaging_conversation_started_7d,49
+2025-06,120226320691830641,Imaging Services | $8 | 2024 Sep 3 - Respond.io - Copy,OUTCOME_ENGAGEMENT,136.09,153720,101831,3570,610,onsite_conversion.messaging_conversation_started_7d,207
+2025-06,120226320691840641,Dr Visit - Respond.io - Copy,OUTCOME_ENGAGEMENT,219.5,161078,90770,4221,645,onsite_conversion.messaging_conversation_started_7d,168
+2025-06,120226320691860641,Lab Test - Respond.io - Copy,OUTCOME_ENGAGEMENT,60.28,49558,36333,1091,203,onsite_conversion.messaging_conversation_started_7d,104
+2025-06,120226320691880641,🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6 - Respond.io - Copy,OUTCOME_ENGAGEMENT,152.57,183750,131052,2515,557,onsite_conversion.messaging_conversation_started_7d,122
+2025-07,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,557.2,1546808,703297,29415,26788,mixed,
+2025-07,120225607512910641,mini TVCs 2025,OUTCOME_ENGAGEMENT,829.03,635977,345544,31824,5519,onsite_conversion.messaging_conversation_started_7d,987
+2025-07,120226320691760641,Physiotherapy | $6 | Testing - Respond.io - Copy,OUTCOME_ENGAGEMENT,59.85,78598,51044,1435,323,onsite_conversion.messaging_conversation_started_7d,83
+2025-07,120226320691790641,Wound Care - Respond.io - Copy,OUTCOME_ENGAGEMENT,82.03,55502,29395,1421,359,onsite_conversion.messaging_conversation_started_7d,48
+2025-07,120226320691810641,Nursing | $35 - Respond.io - Copy,OUTCOME_ENGAGEMENT,349.5,478029,282533,8454,1589,onsite_conversion.messaging_conversation_started_7d,292
+2025-07,120226320691820641,🌟Physiotherapy | $10 | LAL | 2024 Sep 6 - Respond.io - Copy,OUTCOME_ENGAGEMENT,99.77,199003,139689,1988,509,onsite_conversion.messaging_conversation_started_7d,88
+2025-07,120226320691830641,Imaging Services | $8 | 2024 Sep 3 - Respond.io - Copy,OUTCOME_ENGAGEMENT,226.62,276270,187268,5640,1000,onsite_conversion.messaging_conversation_started_7d,344
+2025-07,120226320691840641,Dr Visit - Respond.io - Copy,OUTCOME_ENGAGEMENT,412.6,333150,151021,6912,1135,onsite_conversion.messaging_conversation_started_7d,282
+2025-07,120226320691860641,Lab Test - Respond.io - Copy,OUTCOME_ENGAGEMENT,124.31,101292,65138,2211,472,onsite_conversion.messaging_conversation_started_7d,220
+2025-07,120226320691880641,🌟Physiotherapy | $25 | Original Audience | 2024 Sep 6 - Respond.io - Copy,OUTCOME_ENGAGEMENT,249.4,346258,233926,3922,1062,onsite_conversion.messaging_conversation_started_7d,192
+2025-07,120227060315070641,B2B | Leads,OUTCOME_LEADS,31,25458,20105,912,150,leadgen.other,2
+2025-07,120227303716570641,Imaging Services | $8 | Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,46.31,63876,52660,1186,236,onsite_conversion.messaging_conversation_started_7d,83
+2025-07,120227303716680641,Physiotherapy | $6 | Testing - Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,11.72,12156,10195,223,81,onsite_conversion.messaging_conversation_started_7d,7
+2025-07,120227303716690641,Wound Care - Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,13.3,10156,7978,230,39,onsite_conversion.messaging_conversation_started_7d,4
+2025-07,120227303716700641,Dr Visit - Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,83.83,75672,53334,1721,265,onsite_conversion.messaging_conversation_started_7d,55
+2025-07,120227303716710641,Lab Test - Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,40,31059,25465,718,162,onsite_conversion.messaging_conversation_started_7d,78
+2025-07,120227303716720641,Physiotherapy | Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,72.32,91106,70328,1144,296,onsite_conversion.messaging_conversation_started_7d,59
+2025-07,120227303717360641,Nursing | $35 - Respond.io 2025Jul10,OUTCOME_ENGAGEMENT,72.56,81890,60795,1326,321,onsite_conversion.messaging_conversation_started_7d,62
+2025-07,120227412239930641,Dr Visit - Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,36.23,32994,25595,852,118,onsite_conversion.purchase,
+2025-07,120227412239950641,Imaging Services | $8 | Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,18.39,31069,28143,663,94,onsite_conversion.purchase,
+2025-07,120227412239960641,Lab Test - Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,10.83,10876,10130,211,46,onsite_conversion.purchase,
+2025-07,120227412239980641,Physiotherapy | $6 | Testing - Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,4.77,4345,3804,89,31,onsite_conversion.purchase,
+2025-07,120227412240000641,Nursing | $35 - Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,29.79,44970,39237,903,131,onsite_conversion.purchase,
+2025-07,120227412240020641,Physiotherapy | Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,31.73,49310,41805,745,189,onsite_conversion.purchase,1
+2025-07,120227412240720641,Wound Care - Respond.io 2025Jul13,OUTCOME_ENGAGEMENT,5.49,5591,5018,195,24,onsite_conversion.purchase,
+2025-07,120227445417210641,Dr Visit - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,677.15,452472,178861,10040,1688,onsite_conversion.messaging_conversation_started_7d,400
+2025-07,120227445417220641,Imaging Services | $8 | Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,406.4,542302,270258,10005,1707,onsite_conversion.messaging_conversation_started_7d,499
+2025-07,120227445417230641,Physiotherapy | Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,658.2,803878,376978,9917,2560,onsite_conversion.messaging_conversation_started_7d,481
+2025-07,120227445417250641,Nursing | $35 - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,629.05,717341,292849,11082,2358,onsite_conversion.messaging_conversation_started_7d,427
+2025-07,120227445417310641,Physiotherapy | $6 | Testing - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,75.28,71953,43460,1543,497,onsite_conversion.messaging_conversation_started_7d,70
+2025-07,120227445417320641,Wound Care - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,171.02,114118,43265,2605,503,onsite_conversion.messaging_conversation_started_7d,61
+2025-07,120227445417350641,Lab Test - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,352.22,265272,131459,5968,1051,onsite_conversion.messaging_conversation_started_7d,419
+2025-08,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,340.38,733517,401084,17444,16462,mixed,
+2025-08,120225607512910641,mini TVCs 2025,OUTCOME_ENGAGEMENT,620.89,377036,210788,16476,2647,onsite_conversion.messaging_conversation_started_7d,398
+2025-08,120227445417210641,Dr Visit - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,14.65,11295,10092,258,68,onsite_conversion.messaging_conversation_started_7d,21
+2025-08,120227445417220641,Imaging Services | $8 | Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,10.04,9388,8375,213,52,onsite_conversion.messaging_conversation_started_7d,11
+2025-08,120227445417230641,Physiotherapy | Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,16.74,16042,12942,255,80,onsite_conversion.messaging_conversation_started_7d,19
+2025-08,120227445417250641,Nursing | $35 - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,14.84,14996,12731,208,52,onsite_conversion.messaging_conversation_started_7d,9
+2025-08,120227445417320641,Wound Care - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,4.22,2100,1578,59,15,onsite_conversion.messaging_conversation_started_7d,3
+2025-08,120227445417350641,Lab Test - Respond.io 2025Jul13 - Copy,OUTCOME_ENGAGEMENT,6.42,2852,2567,61,11,onsite_conversion.messaging_conversation_started_7d,3
+2025-08,120228579427670641,Imaging Services - ABO - 2025Aug1,OUTCOME_ENGAGEMENT,792.95,786724,338009,15065,2959,mixed,
+2025-08,120228579427710641,Dr Visit - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,505.98,429955,184954,10478,2294,onsite_conversion.messaging_conversation_started_7d,465
+2025-08,120228579427740641,Nursing - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,506.77,497799,183961,8369,2050,onsite_conversion.messaging_conversation_started_7d,310
+2025-08,120228579427750641,Physiotherapy - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,570.64,691527,250411,13300,3007,onsite_conversion.messaging_conversation_started_7d,682
+2025-08,120228579427760641,Wound Care - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,303.37,177936,54866,4104,1328,onsite_conversion.messaging_conversation_started_7d,124
+2025-08,120228579427770641,Lab Test - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,762.09,470712,213239,7755,1544,onsite_conversion.messaging_conversation_started_7d,749
+2025-08,120229306970220641,Physiotherapy - 2025Aug15,OUTCOME_ENGAGEMENT,632.8,484504,177004,9344,2036,onsite_conversion.messaging_conversation_started_7d,514
+2025-08,120229325762870641,Nursing - 2025Aug15,OUTCOME_ENGAGEMENT,625.25,506215,180590,6525,1728,onsite_conversion.messaging_conversation_started_7d,241
+2025-08,120229326433050641,Dr Visit - 2025Aug15,OUTCOME_ENGAGEMENT,271.79,247175,126087,5154,1032,onsite_conversion.messaging_conversation_started_7d,192
+2025-08,120229775957540641,Recruiting,OUTCOME_LEADS,4.9,4727,3329,44,21,leadgen.other,2
+2025-08,120229843415210641,Recruiting Messages,OUTCOME_ENGAGEMENT,74.19,77044,33005,969,223,onsite_conversion.messaging_conversation_started_7d,108
+2025-09,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,300.18,556968,313602,13032,12814,mixed,
+2025-09,120225607512910641,mini TVCs 2025,OUTCOME_ENGAGEMENT,178.32,100914,71200,4351,804,onsite_conversion.messaging_conversation_started_7d,89
+2025-09,120228579427670641,Imaging Services - ABO - 2025Aug1,OUTCOME_ENGAGEMENT,1032.09,950921,373434,18930,4417,mixed,
+2025-09,120228579427760641,Wound Care - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,301.21,175096,64222,3137,1085,onsite_conversion.messaging_conversation_started_7d,80
+2025-09,120228579427770641,Lab Test - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,754.14,307485,135190,5242,1051,onsite_conversion.messaging_conversation_started_7d,497
+2025-09,120229306970220641,Physiotherapy - 2025Aug15,OUTCOME_ENGAGEMENT,537.86,476092,222900,7116,1485,onsite_conversion.messaging_conversation_started_7d,392
+2025-09,120229325762870641,Nursing - 2025Aug15,OUTCOME_ENGAGEMENT,1206.28,1035689,360760,14667,4612,onsite_conversion.messaging_conversation_started_7d,606
+2025-09,120229843415210641,Recruiting Messages,OUTCOME_ENGAGEMENT,27.92,32296,17651,293,75,onsite_conversion.messaging_conversation_started_7d,26
+2025-09,120230441426230641,DrVisit - 2025Sep3,OUTCOME_ENGAGEMENT,495.59,362315,153899,6781,2009,onsite_conversion.messaging_conversation_started_7d,310
+2025-09,120230714232220641,Physio Offer 20$/day,OUTCOME_ENGAGEMENT,94.29,37118,21496,800,193,onsite_conversion.messaging_conversation_started_7d,51
+2025-09,120230752385950641,SALES | DrVisit | FB Only,OUTCOME_SALES,936.24,999411,413373,31264,6636,mixed,
+2025-09,120230908749470641,SALES | Physiotherapy | 25.9.11 | CBO $40,OUTCOME_SALES,856.24,1201845,580262,23598,3065,onsite_conversion.purchase,43
+2025-09,120231141591010641,Sales | General,OUTCOME_SALES,232.99,152672,79168,3449,965,onsite_conversion.messaging_conversation_started_7d,166
+2025-10,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,309.16,493125,293817,13370,13341,mixed,
+2025-10,120228579427670641,Imaging Services - ABO - 2025Aug1,OUTCOME_ENGAGEMENT,277.73,240970,140269,4988,1169,mixed,
+2025-10,120228579427760641,Wound Care - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,89.74,54560,28211,1135,321,onsite_conversion.messaging_conversation_started_7d,25
+2025-10,120228579427770641,Lab Test - CBO - 2025Aug1,OUTCOME_ENGAGEMENT,221.28,85505,50560,1540,348,onsite_conversion.messaging_conversation_started_7d,172
+2025-10,120229325762870641,Nursing - 2025Aug15,OUTCOME_ENGAGEMENT,355.47,304066,154633,4978,1809,onsite_conversion.messaging_conversation_started_7d,240
+2025-10,120230752385950641,SALES | DrVisit | FB Only,OUTCOME_SALES,539.84,483469,254252,17890,4056,mixed,
+2025-10,120230908749470641,SALES | Physiotherapy | 25.9.11 | CBO $40,OUTCOME_SALES,405.99,507625,281925,9628,1413,onsite_conversion.purchase,17
+2025-10,120231141591010641,Sales | General,OUTCOME_SALES,616.5,488765,244388,12237,3861,onsite_conversion.messaging_conversation_started_7d,735
+2025-10,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,4918.06,7778304,1642503,236059,90180,mixed,
+2025-10,120232737782800641,Bag Sales | Rozenama,OUTCOME_SALES,565.98,301344,105752,10534,7135,offsite_conversion.fb_pixel_purchase,28
+2025-10,120233369396810641,Arab Therapy Leads,OUTCOME_LEADS,81.97,83777,51689,1842,756,leadgen.other,60
+2025-11,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,300.73,454686,276066,12862,12135,mixed,
+2025-11,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,8751.09,9295229,1921412,216275,68496,mixed,
+2025-11,120232737782800641,Bag Sales | Rozenama,OUTCOME_SALES,695.97,344528,155543,26014,23396,offsite_conversion.fb_pixel_purchase,10
+2025-11,120234966687040641,Arab Therapy | 2025.11.16 | $20,OUTCOME_SALES,74.74,38167,21749,2632,1083,offsite_conversion.fb_pixel_purchase,
+2025-11,120235078370530641,Bags Sales,OUTCOME_SALES,0.52,413,378,20,5,onsite_conversion.purchase,
+2025-11,120235078931080641,Bags Sales - msg,OUTCOME_ENGAGEMENT,18.69,12262,7636,433,136,onsite_conversion.messaging_conversation_started_7d,82
+2025-12,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,309.56,554021,267328,12758,12273,mixed,
+2025-12,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,9222.54,4419289,795556,93580,20277,mixed,
+2025-12,120232737782800641,Bag Sales | Rozenama,OUTCOME_SALES,247.35,95621,40062,2568,1777,offsite_conversion.fb_pixel_purchase,4
+2025-12,120236657763920641,iOS App Installs,OUTCOME_APP_PROMOTION,47.37,111773,61581,3489,367,mobile_app_install,
+2025-12,120236657895780641,Android App Installs,OUTCOME_APP_PROMOTION,47.43,126133,59003,2454,2557,mobile_app_install,
+2026-01,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,309.67,793659,352956,14731,14118,mixed,
+2026-01,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,8105.35,4287683,840671,106679,24397,mixed,
+2026-01,120238023250780641,Dr Visit | Andromed CPAS,OUTCOME_SALES,460.34,216696,82993,18147,2165,onsite_conversion.purchase,5
+2026-01,120238560005370641,Messages Campaign | Jan 2026,OUTCOME_ENGAGEMENT,153.75,208520,119994,3260,772,onsite_conversion.messaging_conversation_started_7d,200
+2026-01,120238675409770641,Nursing | $61 | CBO TOFU | Engagement Msgs,OUTCOME_SALES,115.04,106431,61058,1413,577,onsite_conversion.purchase,2
+2026-02,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,279.73,601437,249467,12457,12305,mixed,
+2026-02,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,7732.3,7139908,1421140,188645,42851,mixed,
+2026-02,120236657763920641,iOS App Installs,OUTCOME_APP_PROMOTION,50.9,89781,51549,1877,726,mobile_app_install,
+2026-02,120236657895780641,Android App Installs,OUTCOME_APP_PROMOTION,47.99,469887,172071,6441,6968,mobile_app_install,2
+2026-02,120238560005370641,Messages Campaign | Jan 2026,OUTCOME_ENGAGEMENT,1119.96,1121037,455509,16402,5390,onsite_conversion.messaging_conversation_started_7d,956
+2026-02,120238675409770641,Nursing | $61 | CBO TOFU | Engagement Msgs,OUTCOME_SALES,288.99,310997,149451,5588,1674,onsite_conversion.purchase,4
+2026-02,120239705080970641,Ramadan 2026 Sales Campaign,OUTCOME_SALES,166.94,88380,44034,877,297,onsite_conversion.messaging_conversation_started_7d,55
+2026-03,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,310.59,889616,371312,15265,14893,mixed,
+2026-03,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,9283.33,7473248,1476262,152592,38449,mixed,
+2026-03,120236657763920641,iOS App Installs,OUTCOME_APP_PROMOTION,147.49,339845,160409,7368,2295,mobile_app_install,
+2026-03,120236657895780641,Android App Installs,OUTCOME_APP_PROMOTION,148.44,1461952,470553,21260,22749,mobile_app_install,3
+2026-03,120238560005370641,Messages Campaign | Jan 2026,OUTCOME_ENGAGEMENT,1370.82,1507739,590233,20646,5267,onsite_conversion.messaging_conversation_started_7d,1096
+2026-03,120239705080970641,Ramadan 2026 Sales Campaign,OUTCOME_SALES,999.98,782188,281497,9759,4527,onsite_conversion.messaging_conversation_started_7d,641
+2026-04,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,483.72,1145238,614073,30442,24453,mixed,
+2026-04,120232492438500641,Purchase | Andromeda | 25.10.9,OUTCOME_SALES,2332.9,1833702,541991,39470,9080,mixed,
+2026-04,120238560005370641,Messages Campaign | Jan 2026,OUTCOME_ENGAGEMENT,486.34,516269,282036,5533,1316,onsite_conversion.messaging_conversation_started_7d,347
+2026-04,120241966264500641,TESTING ABO | All Services,OUTCOME_ENGAGEMENT,796.87,872049,274852,24128,4342,onsite_conversion.purchase,13
+2026-04,120242051468850641,Physiotherapy | WINNERS CBO,OUTCOME_SALES,511.03,481939,179327,13405,1658,onsite_conversion.purchase,13
+2026-04,120242062940210641,Nursing | WINNERS CBO,OUTCOME_SALES,399.71,488987,195902,19071,1244,onsite_conversion.purchase,4
+2026-04,120242062962520641,Lab Test | WINNERS CBO,OUTCOME_SALES,144.07,101853,55400,1786,386,onsite_conversion.purchase,
+2026-04,120242062962530641,DrVisit | WINNERS CBO,OUTCOME_SALES,409.45,413955,181395,9849,1269,onsite_conversion.purchase,5
+2026-04,120242225844470641,TESTING | Msg Vol | All Services,OUTCOME_ENGAGEMENT,1373.74,1055732,382410,15568,4966,mixed,
+2026-04,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,314.6,829245,395539,16462,8829,mobile_app_install,854
+2026-04,120242398643690641,Android Installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,360.77,1060589,492622,10398,8901,mobile_app_install,2562
+2026-04,120242543666780641,DrVisit | Msg Vol | WINNERS CBO,OUTCOME_ENGAGEMENT,527.96,354812,200086,5485,1769,onsite_conversion.messaging_conversation_started_7d,428
+2026-04,120242543867550641,Physiotherapy | Msg Vol | WINNERS CBO,OUTCOME_ENGAGEMENT,719.07,774469,407173,10860,2932,onsite_conversion.messaging_conversation_started_7d,742
+2026-04,120242544210890641,Nursing | Msg Vol | WINNERS CBO,OUTCOME_SALES,24.18,20798,16856,694,102,onsite_conversion.purchase,
+2026-04,120242545277010641,Lab Test | Msg Vol | WINNERS CBO,OUTCOME_ENGAGEMENT,131.41,70627,51169,1316,289,onsite_conversion.messaging_conversation_started_7d,165
+2026-04,120242571085330641,Nursing | Msg Vol | WINNERS CBO - Copy,OUTCOME_ENGAGEMENT,589.7,535747,285412,5206,1735,onsite_conversion.messaging_conversation_started_7d,385
+2026-05,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,777.9,1531718,824105,48757,45801,mixed,
+2026-05,120242225844470641,TESTING | Msg Vol | All Services,OUTCOME_ENGAGEMENT,3706.49,2386855,702711,35570,10415,mixed,
+2026-05,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,772.36,1529967,599976,28559,14769,mobile_app_install,1172
+2026-05,120242398643690641,Android Installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,934.57,2157937,782499,23791,22562,mobile_app_install,3954
+2026-05,120242543666780641,DrVisit | Msg Vol | WINNERS CBO,OUTCOME_ENGAGEMENT,531.38,341240,175478,4763,2172,onsite_conversion.messaging_conversation_started_7d,417
+2026-05,120242543867550641,Physiotherapy | Msg Vol | WINNERS CBO,OUTCOME_ENGAGEMENT,660.28,626326,325626,7588,2378,onsite_conversion.messaging_conversation_started_7d,527
+2026-05,120242571085330641,Nursing | Msg Vol | WINNERS CBO - Copy,OUTCOME_ENGAGEMENT,733.31,654229,342308,5873,2119,onsite_conversion.messaging_conversation_started_7d,430
+2026-05,120243699693650641,Friday Campaign,OUTCOME_ENGAGEMENT,550.29,307292,173423,3645,1839,onsite_conversion.messaging_conversation_started_7d,316
+2026-05,120243794810700641,Nursing | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,1836.97,1378285,462321,16685,9201,onsite_conversion.messaging_conversation_started_7d,1518
+2026-05,120243795563080641,Physiotherapy | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,1683.63,1187214,463984,15733,6598,onsite_conversion.messaging_conversation_started_7d,1234
+2026-05,120243797074370641,DrVisit | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,997.67,619301,296067,7758,3843,onsite_conversion.messaging_conversation_started_7d,689
+2026-05,120243987229290641,B2B | Msg Vol | 2026 May 14,OUTCOME_ENGAGEMENT,116.35,543491,267223,9505,8796,link_click,8796
+2026-05,120244454826100641,Retargeting CBO | All customers list,OUTCOME_SALES,115.87,33909,4443,504,110,onsite_conversion.purchase,1
+2026-05,120244465663740641,Calls Test,OUTCOME_SALES,285.15,158532,64887,2831,370,click_to_call_native_call_placed,104
+2026-06,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,747.17,1248629,677242,45064,43666,mixed,
+2026-06,120242225844470641,TESTING | Msg Vol | All Services,OUTCOME_ENGAGEMENT,2218.5,1701276,559853,27856,6444,mixed,
+2026-06,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,741.17,1337351,576788,22580,12714,mobile_app_install,734
+2026-06,120242398643690641,Android Installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,895.5,1573214,686423,19226,18830,mobile_app_install,2803
+2026-06,120243699693650641,Friday Campaign,OUTCOME_ENGAGEMENT,348.18,189396,93488,2929,1277,onsite_conversion.messaging_conversation_started_7d,224
+2026-06,120243794810700641,Nursing | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,2706.73,2135944,669825,25097,11195,onsite_conversion.messaging_conversation_started_7d,1364
+2026-06,120243795563080641,Physiotherapy | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,295.1,196008,114377,2583,1082,onsite_conversion.messaging_conversation_started_7d,198
+2026-06,120243797074370641,DrVisit | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,1451.23,1128425,381674,13654,6257,onsite_conversion.messaging_conversation_started_7d,861
+2026-06,120244454826100641,Retargeting CBO | All customers list,OUTCOME_SALES,196.38,78285,6282,826,204,onsite_conversion.purchase,1
+2026-06,120244465663740641,Calls Test,OUTCOME_SALES,584.27,395049,151463,7834,2058,click_to_call_native_call_placed,300
+2026-06,120245547322430641,Physiotherapy New Test,OUTCOME_SALES,1705.1,1093389,363539,35904,19470,onsite_conversion.purchase,28
+2026-07,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,772.91,1270879,638344,45379,43432,mixed,
+2026-07,120242225844470641,TESTING | Msg Vol | All Services,OUTCOME_ENGAGEMENT,2565.07,1899354,550953,30998,9807,mixed,
+2026-07,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,908.33,2233187,613390,33938,29006,mobile_app_install,1599
+2026-07,120242398643690641,Android Installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,937.75,2494963,642849,31035,31153,mobile_app_install,5668
+2026-07,120243699693650641,Friday Campaign,OUTCOME_ENGAGEMENT,306.16,171836,81292,2776,1307,onsite_conversion.messaging_conversation_started_7d,175
+2026-07,120243794810700641,Nursing | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,3534.5,3029449,808254,33139,16528,onsite_conversion.messaging_conversation_started_7d,1253
+2026-07,120243795563080641,Physiotherapy | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,950.02,1017762,332892,12614,5735,onsite_conversion.messaging_conversation_started_7d,575
+2026-07,120243797074370641,DrVisit | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,2769.12,1969690,597758,33263,10043,onsite_conversion.messaging_conversation_started_7d,1592
+2026-07,120245547322430641,Physiotherapy New Test,OUTCOME_SALES,1869.49,1000820,278854,21108,4411,onsite_conversion.purchase,43
+2026-07,120247539219840641,App Reg RT | Android | 2026/7/1,OUTCOME_APP_PROMOTION,29.57,23901,1906,571,621,app_custom_event.fb_mobile_complete_registration,
+2026-08,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,778.38,1417705,699692,45238,43550,mixed,
+2026-08,120242225844470641,TESTING | Msg Vol | All Services,OUTCOME_ENGAGEMENT,977.35,877056,376445,13379,6359,mixed,
+2026-08,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,932.01,2312981,676415,33658,28295,mobile_app_install,1522
+2026-08,120242398643690641,Android Installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,338.72,1528318,617376,17363,16887,mobile_app_install,2723
+2026-08,120243699693650641,Friday Campaign,OUTCOME_ENGAGEMENT,311.98,208906,100905,2973,1301,onsite_conversion.messaging_conversation_started_7d,200
+2026-08,120243794810700641,Nursing | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,1603.71,1480134,563868,14274,6484,onsite_conversion.messaging_conversation_started_7d,629
+2026-08,120243795563080641,Physiotherapy | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,1028.68,1093091,387014,13491,6870,onsite_conversion.messaging_conversation_started_7d,618
+2026-08,120243797074370641,DrVisit | Msg Vol | WINNERS ABO,OUTCOME_ENGAGEMENT,613.29,533154,293484,9266,2397,onsite_conversion.messaging_conversation_started_7d,406
+2026-08,120248648659640641,Physiotherapy | Pur through Msg | 2026 Aug 11,OUTCOME_ENGAGEMENT,2279.91,1039801,266297,17502,8203,onsite_conversion.purchase,30
+2026-08,120248650558730641,Nursing | Pur through Msg | 2026 Aug 11,OUTCOME_ENGAGEMENT,2579.05,1163989,379985,15179,6582,onsite_conversion.purchase,35
+2026-08,120248651251340641,Dr Visit | Pur through Msg | 2026 Aug 11,OUTCOME_ENGAGEMENT,2341.14,1060690,325908,18867,7558,onsite_conversion.purchase,20
+2026-08,120248671987100641,Android App Purchase | AF | 2026/8/12,OUTCOME_APP_PROMOTION,585.32,929214,298290,16261,15597,app_custom_event.fb_mobile_purchase,16
+2026-08,120248822994440641,Hillah Physiotherapy,OUTCOME_ENGAGEMENT,313.67,362000,131002,13334,1757,onsite_conversion.messaging_conversation_started_7d,838
+2026-08,120248963572680641,Dr Visit | 2026 Aug 29,OUTCOME_ENGAGEMENT,462.72,399297,220616,7013,2483,onsite_conversion.messaging_conversation_started_7d,240
+2026-08,120248963701120641,Nursing | 2026 Aug 29,OUTCOME_ENGAGEMENT,408.91,393479,214930,3939,1995,onsite_conversion.messaging_conversation_started_7d,154
+2026-08,120248963774150641,Physiotherapy | 2026 Aug 29,OUTCOME_ENGAGEMENT,427.08,381738,209554,5359,2560,onsite_conversion.messaging_conversation_started_7d,259
+2026-09,120222834173730641,Profile Traffic Campaign (Followers) | $12 | May 7,OUTCOME_TRAFFIC,623.92,941082,499660,32180,31046,mixed,
+2026-09,120242398107390641,iOS installs | AF | 2026/4/17,OUTCOME_APP_PROMOTION,752.12,1517138,526141,32546,29899,mobile_app_install,857
+2026-09,120243699693650641,Friday Campaign,OUTCOME_ENGAGEMENT,247.17,139551,79841,1928,946,onsite_conversion.messaging_conversation_started_7d,137
+2026-09,120248671987100641,Android App Purchase | AF | 2026/8/12,OUTCOME_APP_PROMOTION,751.34,1912035,351404,25440,25420,app_custom_event.fb_mobile_purchase,30
+2026-09,120248673438050641,Android App Purchase | LAB TEST | AF | 2026/8/12,OUTCOME_APP_PROMOTION,407.51,488344,144041,18214,19266,app_custom_event.fb_mobile_purchase,3
+2026-09,120248822994440641,Hillah Physiotherapy,OUTCOME_ENGAGEMENT,170.03,198368,83054,4814,791,onsite_conversion.messaging_conversation_started_7d,309
+2026-09,120248963572680641,Dr Visit | 2026 Aug 29,OUTCOME_ENGAGEMENT,2920.74,2633798,665982,34142,15644,onsite_conversion.messaging_conversation_started_7d,1704
+2026-09,120248963701120641,Nursing | 2026 Aug 29,OUTCOME_ENGAGEMENT,2452.85,2009445,626913,21342,9925,onsite_conversion.messaging_conversation_started_7d,1082
+2026-09,120248963774150641,Physiotherapy | 2026 Aug 29,OUTCOME_ENGAGEMENT,3395.45,2635579,643645,37870,15447,onsite_conversion.messaging_conversation_started_7d,2300
+2026-09,120249117919650641,Ultrasound + Doppler,OUTCOME_ENGAGEMENT,148.12,143998,83386,3055,431,onsite_conversion.messaging_conversation_started_7d,165
+2026-09,120249191330680641,Staff,OUTCOME_LEADS,16.53,19059,17335,441,291,offsite_conversion.fb_pixel_lead,52
+2026-09,120249272891680641,Physiotherapy Leads,OUTCOME_LEADS,31.3,19245,15878,797,721,offsite_conversion.fb_pixel_lead,

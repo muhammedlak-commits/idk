@@ -1,0 +1,634 @@
+<header class="top">
+  <div class="wrap bar">
+    <div class="brand"><h1>Saleem Performance Lab</h1></div>
+    <nav class="tabs" aria-label="Sections" role="tablist">
+      <button role="tab" data-mod="summary" title="What changed, why, and what needs attention">Summary</button>
+      <button role="tab" data-mod="performance" title="Trend, months and services">Performance</button>
+      <button role="tab" data-mod="drivers" title="Patients, providers, service links, ads and the calendar">Drivers</button>
+      <button role="tab" data-mod="plan" title="Projections">Plan</button>
+    </nav>
+    <div class="top-actions">
+      <span class="meta" id="dataMeta"></span>
+      <button class="btn" type="button" id="dataBtn" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Data &amp; settings</button>
+    </div>
+  </div>
+</header>
+
+<section class="filters" aria-label="Filters">
+  <div class="wrap ctxline"><span class="ctxlab">Showing</span><button class="ctxsent" type="button" id="ctxSentence" aria-expanded="false" aria-controls="ctxRow"></button><button class="btn primary" type="button" id="ctxChange" aria-expanded="false" aria-controls="ctxRow">Change</button><button class="btn icon" type="button" id="ctxMin" aria-pressed="false" title="Shrink this bar to one line" aria-label="Shrink the filter bar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+  <div class="wrap ctx" id="ctxRow" hidden>
+    <div class="pop">
+      <button class="pill" type="button" id="datePill" aria-expanded="false" aria-controls="datePop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span id="datePillTxt"></span></button>
+      <div class="popover" id="datePop" hidden>
+        <div class="seg wrapseg" id="presets">
+          <button data-p="30d">30 days</button><button data-p="90d">90 days</button><button data-p="mtd">This month</button><button data-p="lastm">Last month</button><button data-p="ytd">This year</button><button data-p="12m">12 months</button><button data-p="all">All</button>
+        </div>
+        <div class="frow" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="flabel" style="min-width:0">Compare with</span><div class="seg wrapseg" id="cmpBase"><button data-b="auto" class="on" title="A month, or a month so far, against the same days of the month before; any other range against the same number of days just before">Fairest</button><button data-b="month" title="The same days of the month before, e.g. 1–28 Sep vs 1–28 Aug">Same days last month</button><button data-b="prev" title="The same number of days just before">The days just before</button><button data-b="ly" title="The same dates a year earlier (Hijri or weekday-aligned, under More settings)">Same dates last year</button></div></div>
+        <p class="note" id="cmpBaseNote" style="margin:6px 0 0"></p>
+        <div class="frow" style="margin-top:10px"><label class="flabel" for="dFrom" style="min-width:0">From</label><input type="date" id="dFrom"><label class="flabel" for="dTo" style="min-width:0">to</label><input type="date" id="dTo"></div>
+      </div>
+    </div>
+    <div class="pop">
+      <button class="pill" type="button" id="svcPill" aria-expanded="false" aria-controls="svcPop"><span id="svcPillTxt"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="popover wide" id="svcPop" hidden>
+        <div class="frow"><span class="flabel" style="min-width:0">Quick</span>
+          <button class="linkbtn" data-q="all">All</button><button class="linkbtn" data-q="core">Core 4</button><button class="linkbtn" data-q="clinical">Clinical only</button><button class="linkbtn" data-q="imaging">Imaging</button><button class="linkbtn" data-q="b2b">B2B</button><button class="linkbtn" data-q="none">None</button></div>
+        <div class="chips" id="svcChips" style="margin-top:10px"></div>
+        <p class="note" style="margin:10px 0 0">Click to add or remove a service. Double-click to keep only that one.</p>
+      </div>
+    </div>
+    <div class="seg" id="pview" aria-label="Patients"><button data-v="all" class="on">All patients</button><button data-v="new">New</button><button data-v="ret">Returning</button></div>
+    <div class="seg" id="measure" aria-label="Measure"><button data-m="ord" class="on">Orders</button><button data-m="svc">Services</button><button data-m="pat" title="Each patient counted once per day and service they were served. For unique patients see the Patients tab.">Patient-days</button><button data-m="sales" title="Sales: the services’ final prices, in IQD">Sales</button><button data-m="rev" title="Company revenue: sales minus provider shares, in IQD">Revenue</button></div>
+    <div class="seg" id="gran" aria-label="Group by"><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
+    <span class="grow"></span>
+    <button class="pill" type="button" id="moreBtn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>More filters<span class="count" id="moreCount" hidden></span></button>
+  </div>
+</section>
+<div class="drawer-back" id="drawerBack" hidden></div>
+<aside class="drawer" id="drawer" aria-label="More filters" hidden>
+  <div class="dhead"><h2>More settings</h2><button class="iconbtn" type="button" id="drawerClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dbody">
+    <div class="dsec"><h3>Judge each period against</h3><div class="seg" id="cmpWith" title="Used by the Summary"><button data-c="usual" class="on" title="The period before, and whether that move beats the same move in past years">The usual move</button><button data-c="prev" title="The same number of days just before">The period before</button><button data-c="ly" title="The same dates last year">Last year</button></div></div>
+    <div class="dsec"><h3>Dates by</h3><div class="seg" id="basis" title="Which date each order counts on"><button data-b="scheduled" class="on" title="The day the visit is scheduled for">Scheduled time</button><button data-b="booked" title="The day the order was booked">Booking time</button></div></div>
+    <div class="dsec"><h3>Visit status</h3><div class="chips" id="stChips"></div></div>
+    <div class="dsec"><h3>Last year lines up by</h3><div class="seg" id="align" title="How every “last year” comparison picks its days"><button data-al="hijri" class="on" title="The same Hijri dates a Hijri year earlier (354 or 355 days), so Ramadan, the Eids and Arbaeen line up">Hijri dates</button><button data-al="greg" title="364 days earlier, so weekdays line up">Same weekdays</button></div></div>
+    <div class="dsec"><h3>New patient means</h3><div class="seg" id="newBasis" title="How the Patients module counts a new patient"><button data-n="first" class="on" title="Month of their first-ever real visit">First order</button><button data-n="created" title="Month their patient record was created">Account created</button></div></div>
+    <div class="dsec"><h3>Ad spend counts</h3><div class="seg" id="adMode" title="Which ads count as ad spend in every module"><button data-a="match" class="on" title="Only ads matched to the selected services">Matching ads</button><button data-a="all" title="Every ad, whatever service it promotes; orders still follow the selected services">All ads</button><button data-a="pick" title="Only the ad groups you pick">Pick ad groups</button></div>
+      <div class="chips" id="agChips" hidden style="margin-top:10px"></div></div>
+  </div>
+  <div class="dfoot"><button class="btn" type="button" id="drawerReset">Reset to defaults</button><span class="grow"></span><button class="btn primary" type="button" id="drawerDone">Done</button></div>
+</aside>
+
+<main>
+  <div class="wrap">
+    <section class="module" data-mod="why" id="why" data-sec="summary">
+    <div class="mtdline" id="mtd-why" aria-live="polite"></div>
+    <section class="panel" aria-labelledby="whyH">
+      <div class="phead">
+        <div><h2 id="whyH">What changed</h2><div class="desc" id="whyDesc"></div></div>
+        <div class="ctrls"><div class="seg" id="whyRange" aria-label="Quick range"><button data-r="month" title="The last complete month">Last month</button><button data-r="4w" title="The last four full weeks (Saturday to Friday)">Last 4 weeks</button><button data-r="q" title="The last three complete months">Last 3 months</button></div><div class="seg" id="whyCmp" aria-label="Compare with"><button data-c="usual" class="on" title="Against the period before, and whether that move beats the same move in past years (Hijri-aligned, holiday-adjusted)">vs usual move</button><button data-c="prev">vs period before</button><button data-c="ly">vs last year</button></div></div>
+      </div>
+      <p class="dmsg bad" id="whyErr" hidden></p>
+      <div id="whyBody">
+        <p class="whysum" id="whySummary"></p>
+        <div class="kpis" id="whyKpis"></div>
+        <div class="whygrid">
+          <div>
+            <h3 class="wh" id="whyChartH">Why it moved</h3>
+            <div class="chart"><canvas id="whyChart" aria-label="Change split into calendar, events, the usual move, ads and everything else"></canvas></div>
+            <details class="how"><summary>How each step is worked out</summary><dl class="dstat wsteps" id="whySteps"></dl>
+              <details class="how"><summary>How this is worked out</summary><p class="note">The calendar and events steps use effects measured on past holidays and events, and an event in this period counts toward its own category’s average. The usual move is how the same weeks moved in past years, lined up by Hijri date unless set otherwise. The ads step is an estimate from how spend and this measure have moved together week to week; it shows timing, not proof that the ads caused it.</p></details></details>
+          </div>
+          <div><h3 class="wh">Worth your attention</h3><div class="attn" id="whyAttn"></div></div>
+        </div>
+        <h3 class="wh" style="margin-top:18px">Where it landed</h3>
+        <div class="wwhere" id="whyWhere"></div>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="overview" id="overview" data-sec="performance" hidden>
+    <div class="mtdline" id="mtd-perf" aria-live="polite"></div>
+    <div class="kpis" id="kpis" hidden></div>
+
+    <section class="panel" aria-labelledby="trendH">
+      <div class="phead">
+        <div><h2 id="trendH">Orders over time</h2><div class="desc" id="trendDesc"></div></div>
+        <div class="ctrls">
+          <div class="seg" id="chartType" aria-label="Chart type"><button data-c="line" class="on">Line</button><button data-c="bars">Bars</button><button data-c="share">Share</button><button data-c="change">Change %</button><button data-c="cum">Running total</button></div>
+          <div class="seg" id="trendSpan" aria-label="Chart range"><button data-s="12m" class="on" title="The 12 months to the end of the range">12 months</button><button data-s="range" title="The date range above">Date range</button></div>
+          <div class="seg" id="trendMode"><button data-t="total" class="on">Total</button><button data-t="split">By service</button></div>
+          <label class="chip on" id="lyToggle"><input type="checkbox" id="lyChk" checked hidden>Same period last year</label>
+          <label class="chip on" id="holToggle"><input type="checkbox" id="holChk" checked hidden>Holidays</label>
+          <label class="chip on" id="evtToggle"><input type="checkbox" id="evtChk" checked hidden>Events</label>
+          <label class="chip on" id="cmpToggle"><input type="checkbox" checked hidden>Competitors</label>
+        </div>
+      </div>
+      <div class="chart"><canvas id="trendChart" aria-label="Trend chart"></canvas></div>
+      <div class="legend" id="trendLegend"></div>
+      <details class="how" id="trendHow"><summary>How to read this chart</summary><div id="trendHowTxt" class="howtxt"></div></details>
+      <div style="margin-top:14px">
+        <div class="phead" style="margin-bottom:4px"><div><h3 style="font-size:13.5px;font-weight:600">Meta ad spend (USD)</h3><div class="desc" id="spendDesc"></div></div></div>
+        <div class="chart sm"><canvas id="spendChart" aria-label="Ad spend chart"></canvas></div>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="perf" id="perf" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="stripH">
+      <div class="phead"><div><h2 id="stripH">Each month against its usual move</h2><div class="desc">Each box: the month’s move against the month before (top), the same move last year on the same Hijri dates (middle; <em>usual</em> when it’s the average of the last two years), and the gap in points (bottom). Weekdays and holidays are taken out of both years. Green beat last year’s move, orange fell short.</div></div></div>
+      <div class="mstrip" id="perfStrip"></div>
+    </section>
+    <div class="frow" style="margin:16px 0 10px"><div class="seg" id="perfTab" aria-label="Table"><button data-t="svc" class="on">By service</button><button data-t="month">By month</button><button data-t="wd">By weekday</button></div></div>
+    </section>
+
+    <section class="module" data-mod="monthly" id="monthly" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="momH">
+      <div class="phead">
+        <div><h2 id="momH">Month by month</h2><div class="desc">MoM and YoY use orders per day, so months of different length and the current partial month compare fairly. <details class="how inline"><summary>How this is worked out</summary>The orange tag shows how many Ramadan days fell in that month, since Ramadan moves about 11 days earlier each year and distorts YoY. <strong>MoM vs last year’s MoM</strong> shows this month’s change against last month on top and, below it, the same change over the same Hijri dates a year earlier (the average of two years when both exist), with weekdays and holidays taken out of both. The colour is the gap between them: green when this year moved better than last year did. Hover a cell for the raw moves and the gap in points.</details></div></div>
+        <div class="ctrls"><div class="seg" id="momMode"><button data-v="val" class="on">Total</button><button data-v="perday">Per day</button><button data-v="mom">MoM %</button><button data-v="usual" title="This month’s change against last month, next to the same change a year earlier (Hijri-aligned, weekdays and holidays taken out)">MoM vs last year’s MoM</button><button data-v="yoy">YoY %</button></div></div>
+      </div>
+      <div class="tablewrap"><table id="momTable"></table></div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="weekday" id="weekday" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="wdH">
+      <div class="phead">
+        <div><h2 id="wdH">By weekday</h2><div class="desc" id="wdDesc"></div></div>
+        <div class="ctrls">
+          <div class="seg" id="wdSpan" aria-label="Weekday range"><button data-s="12w" class="on" title="The 12 weeks to the end of the range">12 weeks</button><button data-s="26w" title="The 26 weeks to the end of the range">26 weeks</button><button data-s="range" title="The date range above">Date range</button></div>
+          <label class="chip on" id="wdHolToggle" title="Holiday days bend the weekday shape, so they are left out by default">Leave out holidays</label>
+        </div>
+      </div>
+      <div class="chart"><canvas id="wdChart" aria-label="Average per day by weekday"></canvas></div>
+      <div class="legend" id="wdLegend"></div>
+      <div class="tablewrap" style="margin-top:14px"><table id="wdTable"></table></div>
+      <details class="how"><summary>How to read this</summary><div class="howtxt"><p><strong>Bars</strong>: the average day for each weekday in these weeks (dark), in the same number of weeks just before (light), and a year earlier (grey, same Hijri dates or same weekdays, as set under More settings). Averages rather than totals, so a weekday that happens to fall five times in a month doesn’t look bigger.</p><p><strong>Table</strong>: <em>vs before</em> is the change in that weekday’s average against the weeks just before. <em>Same move last year</em> is the same change a year earlier; if both say −5%, nothing unusual happened to that weekday. <em>Share of the week</em> is how much of an average week that day carries.</p><p><strong>Grid</strong>: one row per week, Saturday to Friday. The lightest cell is the quietest day in the grid and the darkest the busiest. Dotted cells are holidays. Read down a column to see whether a weekday is drifting, across a row to see an odd week.</p></div></details>
+    </section>
+    <section class="panel" aria-labelledby="wdGridH" style="margin-top:16px">
+      <div class="phead"><div><h2 id="wdGridH">Week by week</h2><div class="desc" id="wdGridDesc"></div></div></div>
+      <div class="tablewrap"><table class="wdgrid" id="wdGrid"></table></div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="services" id="services" data-sec="performance" hidden>
+    <section class="panel" aria-labelledby="svcH">
+      <div class="phead">
+        <div><h2 id="svcH">Service breakdown</h2><div class="desc" id="svcDesc"></div></div>
+        <div class="ctrls"><button class="btn" type="button" id="svcMoreBtn" aria-pressed="false">More columns</button></div>
+      </div>
+      <div class="tablewrap"><table id="svcTable"></table></div>
+      <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Previous period = the same number of days immediately before. Last year = the same dates shifted back 364 days, so weekdays line up. Each row's ad spend is for ads matched to that service. The All selected row follows <strong>More filters › Ad spend counts</strong> (matching ads, all ads, or chosen ad groups).</p></details>
+    </section>
+    </section>
+
+    <section class="module" data-mod="drv" id="drv" data-sec="drivers" hidden>
+    <div class="drvcards" id="drvCards"></div>
+    <div class="subtabs" role="tablist" aria-label="Drivers" id="drvTabs" style="margin:18px 0 14px">
+      <button role="tab" data-d="patients">Patients</button><button role="tab" data-d="providers">Providers</button><button role="tab" data-d="links">Service links</button><button role="tab" data-d="ads">Meta ads</button><button role="tab" data-d="calendar">Calendar</button>
+    </div>
+    </section>
+
+    <section class="module" data-mod="providers" id="providers" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-prov" aria-live="polite"></div>
+      <div id="pvEmpty" class="callout">
+        <p style="margin:0 0 6px"><strong>This module needs the provider export.</strong> It shows which doctors, nurses and physiotherapists take the orders, and orders by doctor specialty.</p>
+        <ol style="margin:0 0 8px;padding-left:18px">
+          <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+          <li>Run it with no date filter, then download the results as CSV.</li>
+          <li>Open the <strong>Data</strong> tab and drop the file on the providers box.</li>
+        </ol>
+        <button class="btn" type="button" id="copySqlPv">Copy SQL</button>
+      </div>
+      <p class="callout" id="pvMsg" hidden></p>
+      <div id="pvBody" hidden>
+        <div class="kpis" id="pvKpis"></div>
+        <section class="panel" aria-labelledby="pvH">
+          <div class="phead"><div><h2 id="pvH">Orders by provider</h2><div class="desc" id="pvDesc"></div></div></div>
+          <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="pvTable"></table></div>
+          <p class="note" id="pvTableNote" style="margin:8px 0 0"></p>
+        </section>
+        <div class="grid2">
+          <section class="panel" aria-labelledby="pvTrendH">
+            <div class="phead"><div><h2 id="pvTrendH">Busiest providers</h2><div class="desc">The six providers with the most in the range, over time. A provider picking up a larger share, or dropping out, can move a whole service.</div></div></div>
+            <div class="chart md"><canvas id="pvTrendChart" aria-label="Orders of the busiest providers over time"></canvas></div>
+            <div class="legend" id="pvTrendLegend"></div>
+          </section>
+          <section class="panel" aria-labelledby="pvAH">
+            <div class="phead"><div><h2 id="pvAH">Active providers</h2><div class="desc">Providers with at least one in each period, per service. Fewer active providers can cap how many orders a service can take.</div></div></div>
+            <div class="chart md"><canvas id="pvActiveChart" aria-label="Active providers over time"></canvas></div>
+            <div class="legend" id="pvActiveLegend"></div>
+          </section>
+        </div>
+        <section class="panel" id="spPanel" aria-labelledby="spH">
+          <div class="phead"><div><h2 id="spH">Doctor visits by specialty</h2><div class="desc" id="spDesc"></div></div></div>
+          <p class="callout" id="spNone">The provider export has no specialty yet. In <code>sql/provider_orders_daily.sql</code>, replace <code>NULL::text AS specialty</code> with the column that holds the doctor’s specialty (the query’s comment has a search to find it), then load the export again.</p>
+          <div id="spBody" hidden>
+            <div class="chart md"><canvas id="spChart" aria-label="Doctor visits by specialty over time"></canvas></div>
+            <div class="legend" id="spLegend"></div>
+            <div class="tablewrap" style="margin-top:12px"><table id="spTable"></table></div>
+            <p class="note" style="margin:8px 0 0">To test whether a specialty moves another service, for example internal medicine and lab tests, open <strong>Service links</strong> with Doctor visit under From and Lab tests under To.</p>
+          </div>
+        </section>
+      </div>
+      <section class="panel" id="gwPanel" aria-labelledby="gwH">
+        <div class="phead"><div><h2 id="gwH">Gateway providers: who new patients start with, and do they come back</h2><div class="desc" id="gwDesc"></div></div></div>
+        <div id="gwEmpty" class="callout">
+          <p style="margin:0 0 6px"><strong>This needs the gateway export.</strong> It shows which provider served each new patient’s first visit, and how many of those patients came back within 30, 90 and 180 days.</p>
+          <ol style="margin:0 0 8px;padding-left:18px">
+            <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+            <li>Run it with no date filter, then download the results as CSV.</li>
+            <li>Open the <strong>Data</strong> tab and drop the file on the gateway box.</li>
+          </ol>
+          <button class="btn" type="button" id="copySqlGw">Copy SQL</button>
+        </div>
+        <div id="gwBody" hidden>
+          <div class="kpis" id="gwKpis"></div>
+          <h3 class="h3sm" style="margin-top:16px">By gateway provider and first service</h3>
+          <div class="tablewrap" style="max-height:460px;overflow:auto"><table id="gwTable"></table></div>
+          <p class="note" id="gwTableNote" style="margin:8px 0 0"></p>
+          <section id="gnPanel" style="margin-top:20px" aria-labelledby="gnH">
+            <div class="phead"><div><h3 class="h3sm" id="gnH" style="font-size:15px">What each gateway’s patients ordered next</h3><div class="desc">For each gateway provider: of their new patients, the share who went on to each service within the window, against the other gateways with the same first service.</div></div>
+              <div class="ctrls"><div class="seg" id="gnWin" aria-label="Window"><button data-w="30">30 days</button><button data-w="90" class="on">90 days</button><button data-w="180">180 days</button></div>
+                <div class="seg" id="gnShow" aria-label="Show"><button data-s="pct" class="on">% of patients</button><button data-s="n">Patients</button><button data-s="o" title="Orders with that service within 90 days">Orders</button></div></div></div>
+            <div id="gnEmpty" class="callout">
+              <p style="margin:0 0 6px"><strong>This needs one more export: gateway next services.</strong> It lists, for every gateway provider, which services their new patients ordered afterwards and how many.</p>
+              <ol style="margin:0 0 8px;padding-left:18px"><li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li><li>Run it with no date filter, then download the results as CSV.</li><li>Open <strong>Data &amp; settings</strong> and drop the file on the gateway next-services box.</li></ol>
+              <button class="btn" type="button" id="copySqlGn">Copy SQL</button>
+            </div>
+            <div id="gnBody" hidden>
+              <div class="lkread" id="gnRead"></div>
+              <div class="tablewrap" style="max-height:480px;overflow:auto"><table id="gnTable"></table></div>
+              <p class="note" id="gnNote" style="margin:8px 0 0"></p>
+              <h3 class="h3sm" id="gnSelH" style="margin-top:16px"></h3>
+              <div class="chart" style="height:260px"><canvas id="gnChart" aria-label="Next services for the selected gateway against its peers"></canvas></div>
+              <div class="legend" id="gnLegend"></div>
+              <details class="how"><summary>How this is worked out</summary><div class="howtxt"><p>The gateway is the provider on a new patient’s first-ever real visit, as in the table above. A next service is any real service within the window after that visit: other services in the same first order count, and so does the first service coming back in a later order. A patient only counts once their window has passed, so recent months have fewer patients.</p><p>Each share is compared with all the other gateways of the same first service put together. With this many cells some gaps turn up by chance, so a cell is only marked worth checking when it passes the Benjamini–Hochberg test at 10% across every cell tested (20+ patients on both sides).</p></div></details>
+            </div>
+          </section>
+          <div class="grid2" style="margin-top:16px">
+            <div><h3 class="h3sm" id="gwMonthH">New patients per month, by gateway provider</h3><div class="chart md"><canvas id="gwMonthChart" aria-label="New patients per month by gateway provider"></canvas></div><div class="legend" id="gwMonthLegend"></div></div>
+            <div><h3 class="h3sm" id="gwRetH">Back within 90 days, by cohort month</h3><div class="chart md"><canvas id="gwRetChart" aria-label="90-day return rate by cohort month"></canvas></div><div class="legend" id="gwRetLegend"></div></div>
+          </div>
+          <h3 class="h3sm" style="margin-top:16px">By first service</h3>
+          <div class="tablewrap"><table id="gwSvcTable"></table></div>
+          <p class="note" id="gwNote" style="margin:8px 0 0"></p>
+          <details class="more"><summary>How this is worked out</summary>
+            <ul class="assume">
+              <li>The gateway is the provider on a patient’s first-ever real visit (started, finished or reviewed). Services with no provider, like most lab tests, show as No named provider.</li>
+              <li>Back within 30, 90 or 180 days: the patient had a real service in another order within that many days after the first visit. A patient only counts once that many days have passed.</li>
+              <li>vs typical: the provider’s 90-day return minus the median provider’s with the same first service, so one very large or very good provider doesn’t make everyone else look worse. With only one or two providers tested, they’re compared with the others together. Providers with fewer than 20 patients past 90 days aren’t tested. When providers differ from each other more than chance allows, the bar is raised to match.</li>
+              <li>Strong: passes the strict bar, 5% shared across every provider tested. Possible: passes the usual 5% bar for one test only, so with many providers a few turn up by chance. Treat them as leads.</li>
+                            <li>A provider can look better because of the patients they get (area, age, reason for the visit), not only how they treat them.</li>
+              <li>The services and dates in the filter bar pick the first service and the cohort month. New patient means (under More filters) picks first visit or account created. Visit status and measure don’t apply here.</li>
+            </ul>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <section class="module" data-mod="links" id="links" data-sec="drivers" hidden>
+      <div class="subtabs" role="tablist" aria-label="Link tests" id="lkTabs">
+        <button type="button" role="tab" data-lk="ad" aria-selected="true">Ad spend → orders</button>
+        <button type="button" role="tab" data-lk="svc" aria-selected="false">Service → service</button>
+        <button type="button" role="tab" data-lk="drv" aria-selected="false">Specialties &amp; providers</button>
+      </div>
+      <div class="lkpick" id="lkPick">
+        <div class="lkside"><div class="lklab">From <span class="note">the service that may lead</span></div><div class="lkchips" id="lkFrom" role="group" aria-label="From services"></div></div>
+        <div class="lkarrow" aria-hidden="true">→</div>
+        <div class="lkside"><div class="lklab">To <span class="note">the service that may follow</span></div><div class="lkchips" id="lkTo" role="group" aria-label="To services"></div></div>
+        <div class="lkact"><button class="btn" type="button" id="lkSwap" title="Swap From and To">⇄ Swap</button><button class="btn" type="button" id="lkGridBtn" aria-pressed="false" title="Every pair among the services picked in the filter bar">Every pair</button></div>
+      </div>
+      <div class="frow lkspan" id="lkSpanRow"><span class="note">Period</span><div class="seg" id="lkSpan" aria-label="Period for service links"><button data-s="12w">12 weeks</button><button data-s="26w" class="on">26 weeks</button><button data-s="52w">52 weeks</button><button data-s="all">All data</button><button data-s="range">Date range above</button></div><span class="note" id="lkSpanNote"></span></div>
+      <div data-lkpane="ad">
+      <section class="panel" aria-labelledby="alH">
+        <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">The ads counted under <strong>More filters › Ad spend counts</strong>, against orders for the services picked above. <details class="how inline"><summary>How this is worked out</summary>To test physio ads against lab tests: pick the Physiotherapy ad group there and choose only Lab tests in Services.</details></div></div></div>
+        <p class="callout" id="alMsg" hidden></p>
+        <div id="alBody">
+          <div class="answer" id="alAnswer"></div>
+          <div class="grid2">
+            <div><h3 class="h3sm" id="alSpendH">Weekly ad spend</h3><div class="chart sm"><canvas id="alSpendChart" aria-label="Weekly ad spend"></canvas></div></div>
+            <div><h3 class="h3sm" id="alOrdH">Weekly orders</h3><div class="chart sm"><canvas id="alOrdChart" aria-label="Weekly orders"></canvas></div></div>
+          </div>
+          <details class="more"><summary id="alAdsH">Ads with the most spend in the weeks where the effect shows up</summary>
+            <p class="note" id="alWeeks" style="margin:2px 0 6px"></p>
+            <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="alAds"></table></div>
+          </details>
+          <details class="more"><summary>Statistics and method <span class="note">· correlation by lag, the bars used</span></summary>
+            <div class="grid2">
+              <div><h3 class="h3sm">Change in spend vs change in orders, 0 to 4 weeks later</h3><div class="chart sm"><canvas id="alLagChart" aria-label="Correlation by lag"></canvas></div>
+                <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Passes the bar</span><span><i class="box" style="background:var(--ghost)"></i>Could be chance</span></div></div>
+              <div><div class="tablewrap"><table id="alLagTable"></table></div><p class="callout" id="alFinding" style="margin-top:10px"></p></div>
+            </div>
+            <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">"Strong" passes the 1% bar, which allows for five lags being checked; "possible" passes the usual 5% bar. Both bars are corrected for week-to-week swings (Bartlett). Weekly spend per ad is its monthly spend spread by the account's daily spend, so a single week can be approximate. Correlation shows timing that lines up, not proof that one causes the other.</p></details>
+            <p class="note" id="alDesc" style="margin:4px 0 0"></p>
+          </details>
+        </div>
+      </section>
+      </div>
+      <div data-lkpane="drv" hidden>
+      <section class="panel" id="pfPanel" aria-labelledby="pfH">
+        <div class="phead"><div><h2 id="pfH">Do a provider’s patients go on to other services?</h2><div class="desc">For each doctor, nurse and physiotherapist among the selected services: of the patients they saw, the share who had one of the other selected services within 7 and 30 days, against the typical (median) provider of the same service. <details class="how inline"><summary>How this is worked out</summary>For example, how many of a doctor’s patients had a lab test afterwards.</details></div><div class="desc" id="pfDesc"></div></div></div>
+        <p class="callout" id="pfMsg" hidden></p>
+        <div id="pfBody" hidden>
+          <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="pfTable"></table></div>
+          <h3 class="h3sm" id="pfChartH" style="margin-top:14px">30-day follow-on by month</h3>
+          <div class="chart md"><canvas id="pfChart" aria-label="Share of each provider’s patients with the other service within 30 days, by month"></canvas></div>
+          <div class="legend" id="pfLegend"></div>
+          <p class="note" id="pfNote" style="margin:8px 0 0"></p>
+        </div>
+      </section>
+      <section class="panel" id="bwPanel" aria-labelledby="bwH">
+        <div class="phead"><div><h2 id="bwH">Busy weeks and what followed</h2><div class="desc">When a doctor, nurse or physiotherapist takes an unusually large share of their service in a week, do the other selected services grow faster in the 2 to 4 weeks after? <details class="how inline"><summary>How this is worked out</summary>Click a row to see both series.</details></div><div class="desc" id="bwDesc"></div></div></div>
+        <p class="callout" id="bwMsg" hidden></p>
+        <div id="bwBody" hidden>
+          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="bwTable"></table></div>
+          <p class="callout" id="bwFinding" style="margin-top:10px"></p>
+          <div class="grid2" style="margin-top:14px">
+            <div><h3 class="h3sm" id="bwShareH">Weekly share</h3><div class="chart sm"><canvas id="bwShareChart" aria-label="The provider’s weekly share of their service"></canvas></div>
+              <div class="legend"><span><i class="box" style="background:var(--accent)"></i>Busy week</span><span><i class="box" style="background:var(--ghost)"></i>Other week</span></div></div>
+            <div><h3 class="h3sm" id="bwTgtH">Service</h3><div class="chart sm"><canvas id="bwTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
+          </div>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Full Saturday-to-Friday weeks in the date range. A provider’s share is their week divided by their whole service’s, unassigned included, so a week when everyone is busy doesn’t count as busy. A busy week is at or above the provider’s own 80th percentile, about 1 week in 5. Growth after a week compares the other service’s average over the next 2 (or 4) weeks with its average over that week and the 3 before. Busy weeks are compared with the provider’s other weeks (Welch t-test; the windows overlap, so each group counts as half or a quarter as many weeks). “Strong” passes a 5% bar corrected for every row and both horizons; “worth checking” passes a false-discovery check (Benjamini–Hochberg, 10%) across rows, so about 1 in 10 of those can still be chance. Each row shows the horizon with the smaller p. Shares within a service add up to 100%, so a colleague’s busy weeks can show the same result reversed. Timing that lines up is not proof that one causes the other.</p></details>
+        </div>
+      </section>
+      <section class="panel" id="pdPanel" aria-labelledby="pdH">
+        <div class="phead"><div><h2 id="pdH">What inside a service moves the others?</h2><div class="desc">Each doctor specialty and the busiest doctors, nurses and physiotherapists among the selected services, tested against the other selected services: do changes in, say, internal medicine visits line up with changes in lab tests 0 to 4 weeks later? <details class="how inline"><summary>How this is worked out</summary>Click a row to see both series.</details></div><div class="desc" id="pdDesc"></div></div></div>
+        <p class="callout" id="pdMsg" hidden></p>
+        <div id="pdBody" hidden>
+          <div class="tablewrap" style="max-height:360px;overflow:auto"><table id="pdTable"></table></div>
+          <p class="callout" id="pdFinding" style="margin-top:10px"></p>
+          <div class="grid2" style="margin-top:14px">
+            <div><h3 class="h3sm" id="pdDrvH">Driver</h3><div class="chart sm"><canvas id="pdDrvChart" aria-label="Weekly volume of the driver"></canvas></div></div>
+            <div><h3 class="h3sm" id="pdTgtH">Service</h3><div class="chart sm"><canvas id="pdTgtChart" aria-label="Weekly volume of the other service"></canvas></div></div>
+          </div>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">"Strong" passes a 5% bar corrected for every pair and lag tested at once, so a chance result rarely passes; "worth checking" passes a false-discovery check (Benjamini–Hochberg, 10%), so about 1 in 10 of those can still be chance. Each row shows its best lag. Correlation shows timing that lines up, not proof that one causes the other.</p></details>
+        </div>
+      </section>
+      </div>
+      <div data-lkpane="svc" hidden>
+      <p class="callout" id="lkMsg"></p>
+      <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
+        <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). <details class="how inline"><summary>How this is worked out</summary>A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</details></div></div></div>
+        <div class="tablewrap"><table id="lkMatrixTable"></table></div>
+      </section>
+      <div id="lkDetail" hidden>
+        <section class="panel" aria-labelledby="lkH">
+          <div class="phead"><div><h2 id="lkH">Weekly volume side by side</h2><div class="desc" id="lkDesc"></div></div></div>
+          <div class="lkread" id="lkRead"></div>
+          <div class="chart md"><canvas id="lkIdxChart" aria-label="Weekly volume indexed to each service's average"></canvas></div>
+          <div class="legend" id="lkIdxLegend"></div>
+          <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each service is shown as a share of its own weekly average (100 = a normal week), so services of very different size can be compared on one scale. Hover for the actual numbers.</p></details>
+        </section>
+        <section class="panel" id="lkCmpPanel" aria-labelledby="lkCmpH">
+          <div class="phead"><div><h2 id="lkCmpH">Compare two periods</h2><div class="desc" id="lkCmpDesc"></div></div>
+            <div class="ctrls"><div class="seg wrapseg" id="lkCmp" aria-label="Periods"><button data-c="w4" class="on">Last 4 weeks vs the 4 before</button><button data-c="mtd">This month so far vs last month</button><button data-c="month">Last full month vs the one before</button><button data-c="ly">Last full month vs a year before</button><button data-c="custom">Custom</button></div></div></div>
+          <div class="frow" id="lkCmpCustom" hidden style="margin:0 0 12px;gap:8px"><span class="note">A</span><input type="date" id="lkA0" aria-label="Period A from"><span class="note">to</span><input type="date" id="lkA1" aria-label="Period A to"><span class="note" style="margin-left:12px">B</span><input type="date" id="lkB0" aria-label="Period B from"><span class="note">to</span><input type="date" id="lkB1" aria-label="Period B to"></div>
+          <p class="callout" id="lkCmpMsg" hidden></p>
+          <div id="lkCmpBody">
+            <div class="kpis" id="lkCmpKpis"></div>
+            <div class="lkread" id="lkCmpRead" style="margin-top:14px"></div>
+            <div id="lkCmpSpecWrap" hidden><h3 class="h3sm" id="lkCmpSpecH" style="margin-top:14px">Cases or doctors</h3><div class="tablewrap"><table id="lkCmpSpec"></table></div></div>
+            <details class="how" id="lkCmpKey"><summary>What the columns mean</summary><div class="howtxt">
+              <p><strong>Cases B / A</strong>: patients seen a day under From (e.g. doctor-visit patients) in period B and period A, from the daily provider export.</p>
+              <p><strong>Mix B / A</strong>: each row’s share of all those cases. A falling mix means that specialty or doctor made up less of the patients.</p>
+              <p><strong>Went on B / A</strong>: the patients who had a To service (e.g. a lab test) within the window after their visit, <em>out of</em> the patients whose window has passed, counted over each period’s months in the follow-on export.</p>
+              <p><strong>Sent on B / A</strong>: the same as a share, Went on ÷ patients. It is how often that specialty or doctor’s patients go on to the To service. * = under 10 patients, so the overall share is used instead.</p>
+              <p><strong>Cases effect</strong>: patients going on a day that the row gained or lost because it saw more or fewer patients, at its B share: (Cases A − Cases B) × Sent on B. Summed over the rows it is the “fewer patients” and “different mix” parts of the read-out.</p>
+              <p><strong>Doctors effect</strong>: patients going on a day that the row gained or lost because its share changed, for the patients it saw in A: Cases A × (Sent on A − Sent on B). Summed, it is the “doctors sending a different share” part.</p>
+              <p>A large negative cases effect with a small doctors effect means the drop came from the patients (fewer, or a different mix), not from doctors sending fewer patients on.</p>
+            </div></details>
+            <h3 class="h3sm" id="lkCmpProvH" style="margin-top:14px"></h3>
+            <div class="tablewrap" style="max-height:440px;overflow:auto"><table id="lkCmpProv"></table></div>
+            <p class="note" id="lkCmpNote" style="margin:8px 0 0"></p>
+            <details class="how"><summary>How this is worked out</summary><div class="howtxt"><p>Everything is per day, so a 31-day month and a 28-day month compare fairly. The change in To is split into <strong>volume</strong>, what From’s own change gives if every From order led to To as often as in B, and <strong>rate</strong>, the change in To per 100 From.</p><p>The provider table uses the provider follow-on export when it’s loaded. For each doctor, nurse or physiotherapist under From, it shows the patients they saw and how many went on to a To service within 30 days, as a monthly average over each period’s months. It splits the change into seeing more or fewer patients (at B’s share) and a different share going on.</p><p><strong>Cases or doctors?</strong> The follow-on to To is split three ways, by doctor specialty: <em>cases</em> (more or fewer patients overall, at B’s average share sent on), <em>mix</em> (the same number of patients spread differently across specialties, for example fewer internal medicine patients, who usually go on to lab tests), and <em>doctors</em> (a specialty sending a different share of its patients on). If the drop is mostly cases and mix, it came from the patients, not from the doctors ordering fewer tests. Cases a day come from the daily provider export when it’s loaded (exact dates); the share sent on comes from the provider follow-on export. When the latest month’s 30 days haven’t passed yet, it uses the 7-day window instead. Without that export, it shows each provider’s From orders a day from the provider export.</p></div></details>
+          </div>
+        </section>
+        <div class="grid2">
+          <section class="panel" aria-labelledby="lkLH">
+            <div class="phead"><div><h2 id="lkLH">Does one lead the other?</h2><div class="desc">Correlation of week-over-week changes in From and To, with To shifted later (positive weeks) or earlier. <details class="how inline"><summary>How this is worked out</summary>A bar well above zero at +1 means a rise in From is usually followed by a rise in To a week later.</details></div></div></div>
+            <div class="chart md"><canvas id="lkLagChart" aria-label="Lead and lag correlations"></canvas></div>
+            <div class="legend" id="lkLagLegend"></div>
+            <ul class="assume" id="lkFindings"></ul>
+            <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Same-week links are often shared causes (holidays, ad pushes, salary days) rather than one service driving the other. A link that shows up one or two weeks later is the better sign of one service feeding another. Correlation is not proof of cause.</p></details>
+          </section>
+          <section class="panel" aria-labelledby="lkRH">
+            <div class="phead"><div><h2 id="lkRH">To per 100 From</h2><div class="desc">How many To orders there are for every 100 From orders, by month. <details class="how inline"><summary>How this is worked out</summary>A rising line means To is growing faster than From, for example more lab tests for every 100 doctor visits.</details></div></div></div>
+            <div class="chart md"><canvas id="lkRatioChart" aria-label="Ratio between services by month"></canvas></div>
+            <div class="legend" id="lkRatioLegend"></div>
+          </section>
+        </div>
+        <section class="panel" aria-labelledby="lkFH">
+          <div class="phead"><div><h2 id="lkFH">Same patients, next service</h2><div class="desc">Share of patients who had a From service in a month and then a To service within 30 days. <details class="how inline"><summary>How this is worked out</summary>This is the direct measure of one service leading to another.</details></div></div></div>
+          <p class="callout" id="lkFollowEmpty">This needs the service follow-on export. Open the <strong>Data</strong> tab, copy the follow-on SQL, run it in Metabase and drop the CSV there.</p>
+          <div id="lkFollowBody" hidden>
+            <div class="chart md"><canvas id="lkFollowChart" aria-label="Follow-on share by month"></canvas></div>
+            <div class="legend" id="lkFollowLegend"></div>
+            <div class="tablewrap" style="margin-top:12px"><table id="lkFollowTable"></table></div>
+          </div>
+        </section>
+      </div>
+      </div>
+    </section>
+
+    <section class="module" data-mod="patients" id="patients" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-pat" aria-live="polite"></div>
+    <section class="panel" aria-labelledby="upH">
+      <div class="phead">
+        <div><h2 id="upH">Unique patients</h2><div class="desc">Each patient counted once per month, by the month of their visit (scheduled time) whatever Dates by is set to. <details class="how inline"><summary>How this is worked out</summary>New patients follow <strong>More filters › New patient means</strong>: first-ever visit in that month, or patient record created in that month. Returning = everyone else served that month.</details></div></div>
+      </div>
+      <div id="upEmpty" class="callout">
+        <p style="margin:0 0 6px"><strong>This section needs one extra Metabase export.</strong> The main export counts patients per day, so unique patients can't be worked out from it.</p>
+        <ol style="margin:0 0 8px;padding-left:18px">
+          <li>In Metabase, create a new SQL question and paste the query (Copy SQL below).</li>
+          <li>Run it with no date filter, then download the results as CSV.</li>
+          <li>Open the <strong>Data</strong> tab and drop the file on the patients box.</li>
+        </ol>
+        <button class="btn" type="button" id="copySql">Copy SQL</button>
+      </div>
+      <p class="callout" id="upNote" hidden></p>
+      <div id="upBody" hidden>
+        <div class="chart md"><canvas id="upChart" aria-label="New and returning patients by month"></canvas></div>
+        <div class="legend" id="upLegend"></div>
+        <div class="tablewrap" style="margin-top:12px"><table id="upTable"></table></div>
+        <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Unique patients can't be added across months or categories: someone treated in both March and April counts once in each month. For a longer period, compare month by month.</p></details>
+      </div>
+    </section>
+    </section>
+
+    <section class="module" data-mod="ads" id="ads" data-sec="drivers" hidden>
+    <div class="mtdline" id="mtd-ads" aria-live="polite"></div>
+    <section class="panel" aria-labelledby="adsH">
+      <div class="phead">
+        <div><h2 id="adsH">Meta ads</h2><div class="desc" id="adsDesc"></div></div>
+        <div class="ctrls"><div class="seg" id="adView"><button data-v="ad" class="on">Ads</button><button data-v="campaign">Campaigns</button></div><input type="search" id="adQuery" placeholder="Search names" aria-label="Search ads and campaigns" style="border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface);font-size:12.5px;width:170px"></div>
+      </div>
+      <div class="chart md"><canvas id="adGroupChart" aria-label="Monthly spend by ad group"></canvas></div>
+      <div class="legend" id="adLegend"></div>
+      <div class="tablewrap" style="margin-top:14px;max-height:420px;overflow:auto"><table id="campTable"></table></div>
+      <details class="how"><summary>How this is worked out</summary><p class="note" style="margin:8px 0 0">Each ad is matched to the service it promotes by its name: first its code (PT, NS, DRV, LT…), then words in the ad name, the ad set name, and finally the campaign name. Recruitment, app-install and awareness campaigns keep their own groups. Corrections go in ad_service_map.csv. Results are counted the way each campaign's objective defines them: WhatsApp conversations for message campaigns, purchases, installs or leads for the others. Cost per order divides spend by orders for the matching services in the same dates, so it is a rough efficiency signal, not attribution.</p></details>
+    </section>
+    </section>
+
+    <section class="module" data-mod="projections" id="projections" data-sec="plan" hidden>
+      <p class="note" id="pjScope" style="margin:0"></p>
+      <p class="callout" id="pjEmpty" hidden>Select at least one service and status.</p>
+      <div id="pjBody" class="module">
+      <div class="kpis" id="pjKpis"></div>
+      <section class="panel" aria-labelledby="pjH">
+        <div class="phead">
+          <div><h2 id="pjH">Projected orders</h2><div class="desc" id="pjDesc"></div></div>
+          <div class="ctrls">
+            <div class="seg" id="pjHorizon" aria-label="How far ahead"><button data-h="30">30 days</button><button data-h="60">60 days</button><button data-h="90" class="on">90 days</button><button data-h="180">6 months</button><button data-h="365">1 year</button></div>
+          </div>
+        </div>
+        <div class="chart"><canvas id="pjChart" aria-label="Actual and projected orders"></canvas></div>
+        <div class="legend" id="pjLegend"></div>
+      </section>
+      <section class="panel" aria-labelledby="pjFH">
+        <div class="phead">
+          <div><h2 id="pjFH">What goes into the projection</h2><div class="desc">Tick a factor to include it. <details class="how inline"><summary>How this is worked out</summary>Each row shows what it measured in your data and how much it changes the projection. The ticked growth rates are averaged into one.</details></div></div>
+          <div class="ctrls"><span class="flabel" style="min-width:0">Growth pace</span><div class="seg" id="pjPace"><button data-p="damped" title="The growth rate fades, roughly halving every 10 weeks">Slowing</button><button data-p="constant" title="The growth rate holds for the whole horizon">Constant</button></div><button class="btn" type="button" id="pjReset">Reset factors</button></div>
+        </div>
+        <div class="tablewrap"><table id="pjFactors" class="fxtable"></table></div>
+      </section>
+      <div class="module">
+        <section class="panel" aria-labelledby="pjPH">
+          <div class="phead"><div><h2 id="pjPH">By period</h2><div class="desc">Periods in progress combine what has happened so far with the projection for the rest.</div></div></div>
+          <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="pjMonth"></table></div>
+        </section>
+        <section class="panel" aria-labelledby="pjSH">
+          <div class="phead"><div><h2 id="pjSH">By service</h2><div class="desc" id="pjSDesc"></div></div></div>
+          <div class="tablewrap"><table id="pjSvc"></table></div>
+        </section>
+      </div>
+      <details class="more"><summary>How accurate is this mix? <span class="note">· past checks and the likely range</span></summary>
+        <p class="note" id="pjAccNote" style="margin:0 0 8px"></p>
+        <div class="tablewrap"><table id="pjAcc"></table></div>
+      </details>
+      </div>
+    </section>
+
+    <section class="module" data-mod="calendar" id="calendar" data-sec="drivers" hidden>
+    <div class="grid2">
+      <section class="panel" aria-labelledby="holH">
+        <div class="phead"><div><h2 id="holH">Holiday effects</h2><div class="desc">Orders per day during each holiday compared with the same weekdays in the four weeks before and after. <details class="how inline"><summary>How this is worked out</summary>Uses the services and statuses selected above and all available history. Grey years had too little volume to count toward the average.</details></div></div></div>
+        <div class="tablewrap"><table id="holTable"></table></div>
+      </section>
+      <section class="panel" aria-labelledby="fxH">
+        <div class="phead"><div><h2 id="fxH">Outside factor effects</h2><div class="desc">Events from the Google Sheet (sudden holidays, salary windows, security and economic events), measured the same way as holidays: orders per day during the event against the same weekdays in the four weeks around it. <details class="how inline"><summary>How this is worked out</summary>Campaign launches and events longer than two weeks aren't measured.</details></div></div></div>
+        <div class="tablewrap"><table id="fxTable"></table></div>
+        <div class="tablewrap" style="margin-top:12px;max-height:320px;overflow:auto"><table id="fxEvents"></table></div>
+      </section>
+      <section class="panel" aria-labelledby="evH">
+        <div class="phead">
+          <div><h2 id="evH">Events log</h2><div class="desc">Everything in the Saleem Outside Factors Google Sheet except official holidays, which come from the calendar. <details class="how inline"><summary>How this is worked out</summary>These are the markers on the trend chart. Add new events to the sheet; ask Claude to check the news and it will add them there too.</details></div><p class="sheetstatus" id="sheetStatus"></p></div>
+          <div class="ctrls"><select id="evCat" aria-label="Event category"><option value="">All categories</option></select></div>
+        </div>
+        <div class="evlist" id="evList"></div>
+        <form class="evform" id="evForm">
+          <input type="date" id="evStart" required aria-label="Event date">
+          <select id="evNewCat" aria-label="New event category"><option>Internal</option><option>Marketing</option><option>Political</option><option>Economic</option><option>Health</option></select>
+          <input type="text" id="evTitle" placeholder="What happened, e.g. physio price change" required aria-label="Event title">
+          <button class="btn" type="submit">Add event</button>
+          <button class="btn" type="button" id="evCopy">Copy as CSV</button>
+        </form>
+        <p class="note" style="margin:6px 0 0">Events you add are saved in this browser only. Use "Copy as CSV" and send them to Claude to make them permanent.</p>
+      </section>
+      <section class="panel" aria-labelledby="cmpH">
+        <div class="phead"><div><h2 id="cmpH">Competitor milestones</h2><div class="desc">From the Competitors tab of the Saleem Outside Factors sheet. <details class="how inline"><summary>How this is worked out</summary>After is the 4 weeks from the milestone against the 4 weeks before it, for the services picked above, compared with the usual 4-week change over the half year before; negative means orders grew less than usual.</details></div></div></div>
+        <p class="callout" id="cmpEmpty" hidden>No competitor milestones yet. Add rows to the Competitors tab of the sheet (date, competitor, milestone, type, services, city, status, source, notes), or ask Claude to research them.</p>
+        <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="cmpTable"></table></div>
+        <div class="tablewrap" style="margin-top:12px"><table id="cmpSummary"></table></div>
+      </section>
+    </div>
+    </section>
+
+    <section class="module" data-mod="data" id="data" data-sec="data" hidden>
+      <p class="callout" id="cloudLine" style="margin:0 0 8px"></p>
+      <p class="dhealth" id="healthSum" style="margin:0 0 12px"></p>
+      <div class="frow"><h2 style="font-size:18px;flex:1">Data</h2><span class="note">Ads CSVs and other exports can also be loaded here:</span><button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button><input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden></div>
+      <div class="grid3">
+        <section class="panel" aria-labelledby="dOH">
+          <div class="phead"><div><h2 id="dOH">Orders</h2><div class="desc">The Metabase service performance export, with the columns day, service_category, visit_status, services_delivered, distinct_orders and distinct_patients.</div></div></div>
+          <div class="drop" id="drop-orders" role="button" tabindex="0" aria-label="Drop the orders CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the orders CSV here</strong><span>or click to choose a file · you can drop several at once</span>
+          </div>
+          <input type="file" id="file-orders" accept=".csv,text/csv" multiple hidden>
+          <div class="frow" style="margin-top:10px"><span class="flabel" style="min-width:0">This file is dated by</span>
+            <div class="seg" id="loadBasis"><button data-b="scheduled">Scheduled time</button><button data-b="booked">Booking time</button></div></div>
+          <div class="frow" style="margin-top:6px"><span class="flabel" style="min-width:0">When loading</span>
+            <div class="seg" id="ordersMode"><button data-m="merge" title="Days in the new file replace the same days; other days are kept">Add or update days</button><button data-m="replace" title="Use only the new file">Replace everything</button></div></div>
+          <div class="frow" style="margin-top:6px"><span class="note">Need the export? Run one of these in Metabase:</span><button class="btn" type="button" id="copySqlSched">Copy SQL · scheduled time</button><button class="btn" type="button" id="copySqlBooked">Copy SQL · booking time</button></div>
+          <p class="dmsg" id="msg-orders" hidden></p>
+          <dl class="dstat" id="stat-orders"></dl>
+          <button class="btn" type="button" id="reset-orders" hidden>Go back to built-in orders data</button>
+          <div class="sample" id="sample-orders"></div>
+        </section>
+        <section class="panel" aria-labelledby="dPH">
+          <div class="phead"><div><h2 id="dPH">Unique patients</h2><div class="desc">The monthly unique patients export, with the columns month, category, unique_patients, new_patients, returning_patients and services. <details class="how inline"><summary>How this is worked out</summary>Loading it fills the Patients module.</details></div></div></div>
+          <div class="drop" id="drop-patients" role="button" tabindex="0" aria-label="Drop the unique patients CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the patients CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-patients" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Don’t have it yet? Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql2">Copy SQL</button></div>
+          <p class="dmsg" id="msg-patients" hidden></p>
+          <dl class="dstat" id="stat-patients"></dl>
+          <button class="btn" type="button" id="reset-patients" hidden>Remove loaded patients data</button>
+          <div class="sample" id="sample-patients"></div>
+        </section>
+        <section class="panel" aria-labelledby="dLH">
+          <div class="phead"><div><h2 id="dLH">Service follow-on</h2><div class="desc">Which patients go on to a second service within 7 or 30 days, for example lab tests after a doctor visit. <details class="how inline"><summary>How this is worked out</summary>Loading it adds the patient-level view to the Service links module.</details></div></div></div>
+          <div class="drop" id="drop-links" role="button" tabindex="0" aria-label="Drop the service follow-on CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-links" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql3">Copy SQL</button></div>
+          <p class="dmsg" id="msg-links" hidden></p>
+          <dl class="dstat" id="stat-links"></dl>
+          <button class="btn" type="button" id="reset-links" hidden>Remove loaded follow-on data</button>
+          <div class="sample" id="sample-links"></div>
+        </section>
+        <section class="panel" aria-labelledby="dVH">
+          <div class="phead"><div><h2 id="dVH">Providers</h2><div class="desc">Orders per day for each doctor, nurse and physiotherapist, with the doctor’s specialty. <details class="how inline"><summary>How this is worked out</summary>Loading it fills the Providers module and the specialty test in Service links.</details></div></div></div>
+          <div class="drop" id="drop-providers" role="button" tabindex="0" aria-label="Drop the provider CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the providers CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-providers" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql4">Copy SQL</button></div>
+          <p class="dmsg" id="msg-providers" hidden></p>
+          <dl class="dstat" id="stat-providers"></dl>
+          <button class="btn" type="button" id="reset-providers" hidden>Remove loaded provider data</button>
+          <div class="sample" id="sample-providers"></div>
+        </section>
+        <section class="panel" aria-labelledby="dGH">
+          <div class="phead"><div><h2 id="dGH">Gateway providers</h2><div class="desc">Which provider served each new patient first, and how many came back within 30, 90 and 180 days. Fills the gateway section of the Providers module.</div></div></div>
+          <div class="drop" id="drop-gateway" role="button" tabindex="0" aria-label="Drop the gateway CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the gateway CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-gateway" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql5">Copy SQL</button></div>
+          <p class="dmsg" id="msg-gateway" hidden></p>
+          <dl class="dstat" id="stat-gateway"></dl>
+          <button class="btn" type="button" id="reset-gateway" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-gateway"></div>
+        </section>
+        <section class="panel" aria-labelledby="dGNH">
+          <div class="phead"><div><h2 id="dGNH">Gateway next services</h2><div class="desc">For each gateway provider, which services their new patients ordered afterwards, within 30, 90 and 180 days. Fills “What each gateway’s patients ordered next” in Drivers › Providers.</div></div></div>
+          <div class="drop" id="drop-gwnext" role="button" tabindex="0" aria-label="Drop the gateway next-services CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the gateway next-services CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-gwnext" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql7">Copy SQL</button></div>
+          <p class="dmsg" id="msg-gwnext" hidden></p>
+          <dl class="dstat" id="stat-gwnext"></dl>
+          <button class="btn" type="button" id="reset-gwnext" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-gwnext"></div>
+        </section>
+        <section class="panel" aria-labelledby="dFH">
+          <div class="phead"><div><h2 id="dFH">Provider follow-on</h2><div class="desc">For each provider and month, how many of their patients went on to each other service within 7 and 30 days. <details class="how inline"><summary>How this is worked out</summary>Fills the first panel of Service links › Specialties &amp; providers.</details></div></div></div>
+          <div class="drop" id="drop-pfollow" role="button" tabindex="0" aria-label="Drop the provider follow-on CSV here or press Enter to choose a file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <strong>Drop the provider follow-on CSV here</strong><span>or click to choose a file · replaces the previous one</span>
+          </div>
+          <input type="file" id="file-pfollow" accept=".csv,text/csv" hidden>
+          <div class="frow" style="margin-top:10px"><span class="note">Run this query in Metabase with no date filter.</span><button class="btn" type="button" id="copySql6">Copy SQL</button></div>
+          <p class="dmsg" id="msg-pfollow" hidden></p>
+          <dl class="dstat" id="stat-pfollow"></dl>
+          <button class="btn" type="button" id="reset-pfollow" hidden>Remove loaded data</button>
+          <div class="sample" id="sample-pfollow"></div>
+        </section>
+      </div>
+      <details class="how"><summary>How this is worked out</summary><p class="note">Files are read in your browser. When you can edit this dashboard in claude.ai, each file you load is also saved with the dashboard (visible to the people it is shared with), so it opens on any device and stays when the page is updated; Remove loaded data deletes that saved copy. If a later version of the page ships newer built-in data for an export, the built-in data is used and the saved copy is listed as not used. Outside claude.ai, files stay in this browser only. Meta ads data is refreshed by asking Claude, and the ads and events CSVs can still be loaded with Load CSV at the top.</p></details>
+    </section>
+
+    <footer id="foot"></footer>
+  </div>
+</main>
