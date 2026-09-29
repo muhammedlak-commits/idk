@@ -51,6 +51,9 @@ function describeLag(lags,a,b){
 /* Service ↔ service has its own period: week-to-week links need months of weeks, more than a one-month range gives */
 function lkRange(){ const b=st.to; if(st.lkSpan==='range') return [st.from,b]; if(st.lkSpan==='all') return [S.min,b];
   const w={'12w':12,'26w':26,'52w':52}[st.lkSpan]||26; return [Math.max(S.min,b-7*w+1),b]; }
+function lkSpanSync(a,b){ document.querySelectorAll('#lkSpan button').forEach(x=>x.classList.toggle('on',x.dataset.s===st.lkSpan));
+  const w=Math.floor((b-a+1)/7), need=st.lkTab==='drv'?20:12;
+  document.getElementById('lkSpanNote').textContent=fmtD(a)+' – '+fmtD(b)+' ('+w+' weeks)'+(w<need?' · pick '+need+' weeks or more: '+(st.lkTab==='drv'?'busy weeks need 20, the lag test 14':'the lead/lag test needs 12'):''); }
 function renderLinks(){
   let a=st.from, b=st.to;
   const chosen=S.order.map(i=>S.catList[i]).filter(c=>st.svc.has(c));
@@ -58,12 +61,10 @@ function renderLinks(){
   // one sub-tab at a time: only the visible test is computed
   document.querySelectorAll('#lkTabs [data-lk]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.lk===st.lkTab)));
   document.querySelectorAll('[data-lkpane]').forEach(p=>p.hidden=p.dataset.lkpane!==st.lkTab);
-  document.getElementById('lkPick').hidden=st.lkTab==='ad'; document.getElementById('lkGridBtn').hidden=st.lkTab!=='svc';
+  document.getElementById('lkPick').hidden=st.lkTab==='ad'; document.getElementById('lkSpanRow').hidden=st.lkTab==='ad'; document.getElementById('lkGridBtn').hidden=st.lkTab!=='svc';
   if(st.lkTab==='ad') return renderAdLink(chosen,a,b);
-  if(st.lkTab==='drv'){ lkPickSync(); const f=st.lkFrom, t=st.lkTo; renderDrivers(f,a,b,t); renderProvFollowon(f,t); renderBusyWeeks(f,a,b,t); return; }
-  [a,b]=lkRange();
-  document.querySelectorAll('#lkSpan button').forEach(x=>x.classList.toggle('on',x.dataset.s===st.lkSpan));
-  document.getElementById('lkSpanNote').textContent=fmtD(a)+' – '+fmtD(b)+(st.lkSpan==='range'&&b-a<83?' · pick 12 weeks or more for the lead/lag test':'');
+  if(st.lkTab==='drv'){ lkPickSync(); [a,b]=lkRange(); lkSpanSync(a,b); const f=st.lkFrom, t=st.lkTo; renderDrivers(f,a,b,t); renderProvFollowon(f,t,a,b); renderBusyWeeks(f,a,b,t); return; }
+  [a,b]=lkRange(); lkSpanSync(a,b);
   // From and To are picked here, not from the filter bar; the filter bar still sets statuses, patient view and measure
   lkPickSync();
   const from=st.lkFrom, to=st.lkTo;

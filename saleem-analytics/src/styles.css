@@ -333,3 +333,11 @@ details.how[open]{display:block;color:var(--ink-2)}
 .samplefold>summary::-webkit-details-marker{display:none}
 .samplefold>summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
 .samplefold[open]>summary::before{transform:rotate(90deg)}
+
+/* export health, per Data box and on the Data & settings button */
+.dhealth{margin:0 0 10px;padding:7px 10px;border-radius:8px;font-size:12.5px;line-height:1.45}
+.dhealth.ok{background:var(--good-bg);color:var(--good)}
+.dhealth.warn{background:var(--bad-bg);color:var(--bad);font-weight:500}
+.dhealth.none{background:var(--surface-2);color:var(--muted)}
+#dataBtn.needs{position:relative}
+#dataBtn.needs::after{content:attr(data-n);position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10.5px;font-weight:700;line-height:16px;text-align:center;padding:0 3px}

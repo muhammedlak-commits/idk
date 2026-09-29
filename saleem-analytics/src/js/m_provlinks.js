@@ -69,16 +69,16 @@ function pfCompute(M,{fromMk,toMk,pairs,minElig=10}){
 }
 const pfTl=t=>UP_LABEL[t]||label(t);
 const plVerdict=(v,d)=>({strong:'<span class="delta '+(d<0?'down':'up')+'">✓ Strong</span>',possible:'<span class="delta flat">~ Worth checking</span>',chance:'<span class="delta flat" style="opacity:.7">Could be chance</span>',none:'<span class="note">No peers</span>'})[v];
-function renderProvFollowon(chosen,to=chosen){
+function renderProvFollowon(chosen,to=chosen,a=st.from,b=st.to){
   const panel=document.getElementById('pfPanel'), msg=document.getElementById('pfMsg'), body=document.getElementById('pfBody');
   panel.hidden=false;
   const setMsg=h=>{ msg.innerHTML=h; msg.hidden=false; body.hidden=true; if(pfChart){ pfChart.destroy(); pfChart=null; } };
   if(!PF) return setMsg('This needs the provider follow-on export. Copy the SQL, run it in Metabase with no date filter, download the results as CSV and drop the file on the <strong>Data</strong> tab. <button class="btn" type="button" id="copySqlPf">Copy SQL</button>');
   const pairs=pfPairs(chosen,PF,to);
   if(!pairs.length) return setMsg('Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.');
-  const R=pfCompute(PF,{fromMk:monthKey(st.from),toMk:monthKey(st.to),pairs}), m0=PF.months[0], m1=PF.months[PF.months.length-1];
-  if(!R.months.length) return setMsg('The provider follow-on export covers '+fmtM(m0)+' – '+fmtM(m1)+', outside this date range.');
-  if(!R.rows.length) return setMsg('No provider has 10 or more patients whose 30-day window has passed in this range. Pick a longer or earlier range.');
+  const R=pfCompute(PF,{fromMk:monthKey(a),toMk:monthKey(b),pairs}), m0=PF.months[0], m1=PF.months[PF.months.length-1];
+  if(!R.months.length) return setMsg('The provider follow-on export covers '+fmtM(m0)+' – '+fmtM(m1)+', outside this period. Pick another period above.');
+  if(!R.rows.length) return setMsg('No provider has 10 or more patients whose 30-day window has passed in this period. Pick a longer or earlier period above.');
   msg.hidden=true; body.hidden=false;
   const nS=R.rows.filter(r=>r.verdict==='strong').length, nP=R.rows.filter(r=>r.verdict==='possible').length, chance=0;
   const bySrc=new Map(); pairs.forEach(p=>{ if(!bySrc.has(p.src)) bySrc.set(p.src,[]); bySrc.get(p.src).push(pfTl(p.tgt)); });
@@ -182,7 +182,7 @@ function renderBusyWeeks(chosen,a,b,to=chosen){
   if(!PV) return setMsg('This needs the provider export. Open the <strong>Data</strong> tab, copy the provider SQL, run it in Metabase and drop the CSV there.');
   if(!chosen.some(c=>PV.cats.includes(c))||!to.some(c=>!PV.cats.includes(c)||!chosen.includes(c))) return setMsg('Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.');
   const G=bwGather(chosen,a,b,to);
-  if(G.keys.length<20) return setMsg('Pick a date range of at least 20 full weeks (Saturday to Friday). This one has '+G.keys.length+'.');
+  if(G.keys.length<20) return setMsg('Pick a period of at least 20 full weeks (Saturday to Friday) in the Period switch above. This one has '+G.keys.length+'.');
   const R=busyWeeksCompute(G.provW,G.catW,G.tgtW,{nW:G.keys.length});
   if(!R.rows.length) return setMsg('Not enough provider volume in this range to test.');
   msg.hidden=true; body.hidden=false;

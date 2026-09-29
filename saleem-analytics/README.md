@@ -144,6 +144,10 @@ In the Data tab, choose *This file is dated by: Booking time* before dropping th
 
 Holidays are computed in the page from the Umm al-Qura Hijri calendar plus Iraq's fixed public holidays.
 
+## Is each export complete?
+
+Every box in Data & settings says whether its export is complete, needs a new upload, or isn't loaded, and the Data & settings button shows how many need one. An export needs a new upload when it lacks a column the current query has (its sample file lists them), when its specialty column is there but empty (made before specialty was added), or when it's out of date: a daily export more than 3 days behind today, or a monthly one without the current month.
+
 ## Saved uploads
 
 In claude.ai, every export loaded in Data & settings (or with Load CSV) is saved with the dashboard: the file as an asset of the artifact, and a `saved/<export>` document pointing at it. On open the page loads the saved files over the built-in data, so they survive new versions of the page and open on any device. Only people who can edit the dashboard save files; everyone it's shared with sees them. Remove loaded data deletes the saved copy, and loading a newer file replaces it. When a later version of the page ships different built-in data for an export, the built-in data is used and the saved copy is listed as not used. Outside claude.ai, files stay in the browser as before.

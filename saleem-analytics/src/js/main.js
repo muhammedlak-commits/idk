@@ -69,6 +69,7 @@ function boot(reload){
     buildChips(); st.to= wasAtEnd? S.max : Math.min(Math.max(st.to,S.min),S.max); st.from=Math.min(Math.max(st.from,S.min),st.to); }
   const dm=document.getElementById('dataMeta'); dm.textContent='Data to '+fmtD(S.max); document.getElementById('dataBtn').title='Data to '+fmtD(S.max)+'. Load or check the exports.'; dm.title='Orders by '+(st.basis==='booked'?'booking':'scheduled')+' time to '+fmtD(S.max)+' · Ads to '+fmtD(A.maxDay);
   document.getElementById('foot').textContent='Service data: Metabase export dated by '+(st.basis==='booked'?'booking time (order created)':'scheduled time (visit date)')+', '+fmtD(S.min)+' – '+fmtD(S.max)+' ('+S.rowCount.toLocaleString('en-US')+' rows). Meta ads: Saleem Ad Account, '+fmtD(A.minDay)+' – '+fmtD(A.maxDay)+', USD. Orders are distinct orders per service per day, so an order with two services counts once in each. Patient-days are distinct patients per service per day added up, so they are not unique patients; that needs a separate export. Holidays use the Umm al-Qura calendar; Iraq sometimes starts a day later on moon sighting. Built '+P.built+'.';
+  try{ computeHealth(); }catch(e){}
   showModule(st.mod,false);
 }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());

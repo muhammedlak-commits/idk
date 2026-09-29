@@ -169,7 +169,7 @@ function renderDrivers(chosen,a,b,to=chosen){
       : 'Under <strong>From</strong>, pick a service with named providers (Doctor visit, Nursing or Physiotherapy); under <strong>To</strong>, pick the services it may lead to.';
     msg.hidden=false; body.hidden=true; return; }
   const w0=weekStart(a)+(weekStart(a)<a?7:0), keys=[]; for(let w=w0; w+6<=b; w+=7) keys.push(w);
-  if(keys.length<14){ msg.textContent='Pick a date range of at least 14 weeks.'; msg.hidden=false; body.hidden=true; return; }
+  if(keys.length<14){ msg.textContent='Pick a period of at least 14 weeks in the Period switch above.'; msg.hidden=false; body.hidden=true; return; }
   const end=keys[keys.length-1]+6, nW=keys.length, wi=n=>Math.floor((n-w0)/7);
   // driver series
   const drivers=[];

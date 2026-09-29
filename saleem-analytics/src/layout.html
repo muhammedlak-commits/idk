@@ -275,6 +275,7 @@
         <div class="lkside"><div class="lklab">To <span class="note">the service that may follow</span></div><div class="lkchips" id="lkTo" role="group" aria-label="To services"></div></div>
         <div class="lkact"><button class="btn" type="button" id="lkSwap" title="Swap From and To">⇄ Swap</button><button class="btn" type="button" id="lkGridBtn" aria-pressed="false" title="Every pair among the services picked in the filter bar">Every pair</button></div>
       </div>
+      <div class="frow lkspan" id="lkSpanRow"><span class="note">Period</span><div class="seg" id="lkSpan" aria-label="Period for service links"><button data-s="12w">12 weeks</button><button data-s="26w" class="on">26 weeks</button><button data-s="52w">52 weeks</button><button data-s="all">All data</button><button data-s="range">Date range above</button></div><span class="note" id="lkSpanNote"></span></div>
       <div data-lkpane="ad">
       <section class="panel" aria-labelledby="alH">
         <div class="phead"><div><h2 id="alH">Does ad spend move orders?</h2><div class="desc">The ads counted under <strong>More filters › Ad spend counts</strong>, against orders for the services picked above. <details class="how inline"><summary>How this is worked out</summary>To test physio ads against lab tests: pick the Physiotherapy ad group there and choose only Lab tests in Services.</details></div></div></div>
@@ -342,7 +343,6 @@
       </section>
       </div>
       <div data-lkpane="svc" hidden>
-      <div class="frow lkspan"><span class="note">Period</span><div class="seg" id="lkSpan" aria-label="Period for service links"><button data-s="12w">12 weeks</button><button data-s="26w" class="on">26 weeks</button><button data-s="52w">52 weeks</button><button data-s="all">All data</button><button data-s="range">Date range above</button></div><span class="note" id="lkSpanNote"></span></div>
       <p class="callout" id="lkMsg"></p>
       <section class="panel" id="lkMatrix" hidden aria-labelledby="lkMH">
         <div class="phead"><div><h2 id="lkMH">How the selected services move together</h2><div class="desc">Each cell is the correlation of week-to-week changes between the row and the column service, in the same week (1 = always together, 0 = unrelated, negative = opposite). <details class="how inline"><summary>How this is worked out</summary>A note shows when the column service moves a few weeks after or before the row service more strongly than in the same week.</details></div></div></div>
@@ -510,7 +510,8 @@
     </section>
 
     <section class="module" data-mod="data" id="data" data-sec="data" hidden>
-      <p class="callout" id="cloudLine" style="margin:0 0 12px"></p>
+      <p class="callout" id="cloudLine" style="margin:0 0 8px"></p>
+      <p class="dhealth" id="healthSum" style="margin:0 0 12px"></p>
       <div class="frow"><h2 style="font-size:18px;flex:1">Data</h2><span class="note">Ads CSVs and other exports can also be loaded here:</span><button class="btn" id="loadBtn" title="Load a newer Metabase export or ads CSV">Load CSV</button><input type="file" id="fileInput" accept=".csv,text/csv" multiple hidden></div>
       <div class="grid3">
         <section class="panel" aria-labelledby="dOH">

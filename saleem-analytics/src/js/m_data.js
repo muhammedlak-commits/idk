@@ -144,6 +144,7 @@ function renderData(){
   document.querySelectorAll('#ordersMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===st.ordersMode));
   if(SHEET&&SHEET.data&&window.claude) [['stat-orders',['services','servicesBooked']],['stat-patients',['uniquePatients']],['stat-links',['followon']],['stat-providers',['providers']],['stat-gateway',['gateway']],['stat-gwnext',['gatewayNext']],['stat-pfollow',['provFollowon']]].forEach(([id,keys])=>{
     const el=document.getElementById(id); if(el) el.insertAdjacentHTML('beforeend', keys.map(k=>row(keys.length>1?(k==='services'?'Sheet, scheduled':'Sheet, booking'):'Google Sheet', feedText(k))).join('')); });
+  renderHealth();
   // what is saved to the dashboard, per export box
   const CL=document.getElementById('cloudLine'); if(CL) CL.textContent=cloudLine();
   const box={services:'stat-orders',servicesBooked:'stat-orders',uniquePatients:'stat-patients',followon:'stat-links',providers:'stat-providers',gateway:'stat-gateway',gatewayNext:'stat-gwnext',provFollowon:'stat-pfollow'};
@@ -287,4 +288,51 @@ function wireData(){
   // a file dropped anywhere else shouldn't make the browser navigate away from the dashboard
   window.addEventListener('dragover',e=>{ if(!e.target.closest||!e.target.closest('.drop')) e.preventDefault(); });
   window.addEventListener('drop',e=>{ if(!e.target.closest||!e.target.closest('.drop')){ e.preventDefault(); if(e.dataTransfer&&e.dataTransfer.files.length) toast('Drop files on one of the boxes in the Data tab'); } });
+}
+
+/* ---------- is each export complete? ----------
+   Each box is checked against what the current query produces: the columns of its sample file (kept in step with
+   the SQL), a specialty column that is there but empty (it came from a query before specialty was filled in), and how
+   recent the data is (daily exports: within 3 days of today; monthly ones: the current month present). */
+const HEALTH_KEYS={orders:['services','servicesBooked'],patients:['uniquePatients'],links:['followon'],providers:['providers'],gateway:['gateway'],gwnext:['gatewayNext'],pfollow:['provFollowon']};
+const HEALTH_NAME={orders:'Orders',patients:'Unique patients',links:'Service follow-on',providers:'Providers',gateway:'Gateway providers',gwnext:'Gateway next services',pfollow:'Provider follow-on'};
+let HEALTH={};
+function exportEnd(text){
+  const lines=text.trim().split(/\r?\n/), hdr=splitCsv(lines[0]).map(normHdr);
+  let i=hdr.indexOf('day'), daily=true; if(i<0){ i=hdr.indexOf('cohort_month'); daily=false; } if(i<0){ i=hdr.indexOf('month'); daily=false; } if(i<0) return null;
+  let max=''; for(let k=1;k<lines.length;k++){ const c=lines[k].indexOf(',')<0? lines[k] : splitCsv(lines[k])[i]||''; const v=(c.match(/\d{4}-\d{2}(-\d{2})?/)||[''])[0]; if(v>max) max=v; }
+  return max? {daily, max: daily? toN(max.slice(0,10)) : max.slice(0,7)} : null;
+}
+function computeHealth(){
+  const today=toN(new Date().toISOString().slice(0,10)), thisMonth=monthKey(today), out={};
+  const noSpec={providers:()=>PV&&!PV.hasSpec, gateway:()=>GW&&!GW.hasSpec, pfollow:()=>PF&&!PF.provs.some(p=>isDoctorCat(p.cat)&&p.spec)};
+  for(const [kind,keys] of Object.entries(HEALTH_KEYS)){
+    const want=SAMPLES[kind]? splitCsv(SAMPLES[kind].csv.split('\n')[0]).map(normHdr) : [], issues=[]; let any=false, end=null;
+    keys.forEach((k,j)=>{ const text=P[k]; if(!text||!text.trim()) return; any=true; const pre=keys.length>1?(j?'Booking time: ':'Scheduled time: '):'';
+      const have=splitCsv(text.trim().split(/\r?\n/)[0]).map(normHdr), miss=want.filter(c=>!have.includes(c));
+      if(miss.length) issues.push(pre+'missing '+miss.join(', ')+' (the query has changed since this file was made)');
+      const e=exportEnd(text); if(e){ if(j===0) end=e;
+        if(e.daily&&today-e.max>3) issues.push(pre+'ends '+fmtD(e.max)+', '+(today-e.max)+' days ago');
+        if(!e.daily&&e.max<thisMonth) issues.push(pre+'ends '+fmtM(e.max)+'; '+fmtM(thisMonth)+' isn’t in it yet'); } });
+    if(any&&noSpec[kind]&&noSpec[kind]()&&!issues.some(t=>/specialty/.test(t))) issues.push('no doctor specialty (made with the query from before specialty was added)');
+    const endTxt=end? (end.daily? 'up to '+fmtD(end.max) : 'up to '+fmtM(end.max)) : '';
+    out[kind]= !any? {lvl:'none',text:'Not loaded yet, so the sections that use it stay empty.'}
+      : issues.length? {lvl:'warn',text:'Needs a new upload: '+issues.join('; ')+'. Copy the SQL below, run it and drop the file here.',endTxt}
+      : {lvl:'ok',text:'Complete: every column the current query has'+(endTxt?', '+endTxt:'')+'.'};
+  }
+  HEALTH=out;
+  const warn=Object.keys(out).filter(k=>out[k].lvl==='warn'), db=document.getElementById('dataBtn');
+  if(db){ db.classList.toggle('needs',warn.length>0); db.dataset.n=warn.length||''; }
+  return out;
+}
+function renderHealth(){
+  const H=computeHealth();
+  for(const kind of Object.keys(HEALTH_KEYS)){
+    const zone=document.getElementById('drop-'+kind); if(!zone) continue;
+    let el=document.getElementById('health-'+kind);
+    if(!el){ el=document.createElement('p'); el.id='health-'+kind; el.setAttribute('role','status'); zone.parentElement.insertBefore(el,zone); }
+    const h=H[kind]; el.className='dhealth '+h.lvl; el.textContent=(h.lvl==='ok'?'✓ ':h.lvl==='warn'?'! ':'– ')+h.text;
+  }
+  const warn=Object.keys(H).filter(k=>H[k].lvl==='warn'), sum=document.getElementById('healthSum');
+  if(sum){ sum.className='dhealth '+(warn.length?'warn':'ok'); sum.textContent= warn.length? warn.length+' export'+(warn.length>1?'s need':' needs')+' a new upload: '+warn.map(k=>HEALTH_NAME[k]).join(', ')+'. Each box says why.' : 'Every loaded export is complete and up to date.'; }
 }
