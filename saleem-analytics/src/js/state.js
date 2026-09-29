@@ -27,6 +27,9 @@ const sum = arr => { let s=0; for(const v of arr) s+=v; return s; };
 function total(a,b,m,cats,stats){ return sum(series(a,b,m,cats,stats)); }
 function covered(a,b){ return a>=S.min && b<=S.max; }
 const selCats = () => S.catList.filter(c=>st.svc.has(c));
+/* follow-up visits (internist visits under 100,000 IQD) are their own category in the newer exports; while the orders
+   export has none, they go with the Doctor visit choice so provider, patient and gateway files stay in step */
+const svcOn = c => st.svc.has(c) || (c==='followUp' && !S.catList.includes('followUp') && st.svc.has('doctorVisit'));
 const selStats = () => S.stList.filter(s=>st.status.has(s));
 
 /* ad spend per day for a set of groups */

@@ -1,4 +1,5 @@
 -- Daily orders export for the Saleem Performance Lab, dated by booking time (the day the order was created).
+-- FOLLOW-UPS: an internist's doctor visit under 100,000 IQD is a follow-up and comes out as its own category, 'followUp'.
 -- One row per day x service category x visit status, in the layout the Data tab expects.
 -- Includes orders still waiting for their visit (status scheduled), since they were booked that day; the Status filter can hide them.
 -- Order counts leave out the accounting/adjustment tags; services and patients don't depend on them.
@@ -41,6 +42,8 @@ base AS (
   SELECT
     date_trunc('day', o."createdAt")::date                                                   AS day,
     CASE
+      WHEN s."serviceType"::text = 'doctorVisit' AND lower(fu.specialty) = 'internist'
+           AND s."finalPriceAmount" < 100000                      THEN 'followUp'   -- an internist's follow-up visit
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                     THEN 'surgeries'
       WHEN s."serviceType"::text = 'physiotherapy'
@@ -71,6 +74,8 @@ base AS (
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                     WHERE di."userId" = s."doctorUserId" LIMIT 1) fu ON TRUE   -- for follow-up visits
   LEFT JOIN  "public"."RevenueShare" rs_physio  ON rs_physio.id  = s."physiotherapistRevenueShareId"
   LEFT JOIN  "public"."RevenueShare" rs_doc     ON rs_doc.id     = s."doctorRevenueShareId"
   LEFT JOIN  "public"."RevenueShare" rs_nurse   ON rs_nurse.id   = s."nurseRevenueShareId"

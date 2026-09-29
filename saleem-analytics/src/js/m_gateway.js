@@ -31,7 +31,7 @@ function buildGateway(text){
   return {rows,span,has,hasSpec,hasCreated:!!span.created,cats:[...cats]};
 }
 /* top-filter services -> the database service types the export uses; null = every service */
-function gwCats(){ return S.catList.every(c=>st.svc.has(c))? null : new Set(selCats().map(c=>UP_CAT[c]||c)); }
+function gwCats(){ return S.catList.every(c=>st.svc.has(c))? null : new Set(selCats().concat(svcOn('followUp')?['followUp']:[]).map(c=>UP_CAT[c]||c)); }
 const gwRate=(r,e,min=10)=> e>=min? r/e : null;
 /* pure: filter by basis, cohort months [fromMk,toMk] and first services, then aggregate and test */
 function gwCompute(M,{basis,fromMk,toMk,cats}){

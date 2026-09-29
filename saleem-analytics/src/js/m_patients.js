@@ -2,9 +2,9 @@
    Follows the top filter: all services selected -> the "all" rows (each patient once);
    otherwise the export category of each selected service. Unique patients can't be added
    across categories, so several categories are shown side by side, never summed. */
-const UP_LABEL={all:'All services',physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',labTest:'Lab tests',radiology:'Radiology',surgeries:'Surgeries',booking:'Booking',eyeExam:'Eye exam',ambulance:'Ambulance',vendor:'Products'};
+const UP_LABEL={all:'All services',physiotherapy:'Physiotherapy','physiotherapy (b2b)':'Physiotherapy B2B',nursing:'Nursing',doctorVisit:'Doctor visit',followUp:'Follow-up visit',labTest:'Lab tests',radiology:'Radiology',surgeries:'Surgeries',booking:'Booking',eyeExam:'Eye exam',ambulance:'Ambulance',vendor:'Products'};
 /* dashboard service -> the category the patients export uses (service types in the database) */
-const UP_CAT={physiotherapy:'physiotherapy','physiotherapy (b2b)':'physiotherapy (b2b)',nursing:'nursing',doctorVisit:'doctorVisit',labTest:'labTest',
+const UP_CAT={physiotherapy:'physiotherapy','physiotherapy (b2b)':'physiotherapy (b2b)',nursing:'nursing',doctorVisit:'doctorVisit',followUp:'followUp',labTest:'labTest',
   xRay:'radiology',ultrasound:'radiology',echocardiogram:'radiology',doppler:'radiology',surgeries:'surgeries',booking:'booking',eyeExam:'eyeExam',ambulance:'ambulance',productPurchase:'vendor',radiology:'radiology',vendor:'vendor'};   // radiology/vendor: exports that use database service types
 let U=null, upChart=null;
 function buildUnique(text){
@@ -26,6 +26,7 @@ function upCategories(){
   const cats=selCats(); if(!cats.length) return {list:[],missing:[]};
   if(S.catList.every(c=>st.svc.has(c))) return {list:U.by.all?['all']:[],missing:[]};
   const list=[], missing=[];
+  if(svcOn('followUp')&&!cats.includes('followUp')&&U.by.followUp) list.push('followUp');
   cats.forEach(c=>{ const k=UP_CAT[c]; if(k&&U.by[k]){ if(!list.includes(k)) list.push(k); } else missing.push(c); });
   return {list,missing};
 }

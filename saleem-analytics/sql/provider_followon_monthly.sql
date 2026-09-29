@@ -1,4 +1,5 @@
 -- Follow-on per provider and month, for Service links › Specialties & providers (Saleem Performance Lab).
+-- FOLLOW-UPS: an internist's doctor visit under 100,000 IQD is a follow-up and comes out as its own category, 'followUp'.
 -- For each provider and month: of the patients they served, how many went on to each service
 -- (their own included) within 7 and 30 days. Shows which doctors, nurses and physiotherapists lead
 -- patients on to lab tests, doctor visits and the rest.
@@ -15,7 +16,7 @@
 --
 -- Columns:
 --   month             : month of the anchor visit's scheduled time (YYYY-MM)
---   provider_service  : category of the provider's service (doctorVisit, surgeries, nursing, physiotherapy, physiotherapy (b2b))
+--   provider_service  : category of the provider's service (doctorVisit, followUp, surgeries, nursing, physiotherapy, physiotherapy (b2b))
 --   provider_id       : User id of the doctor, nurse or physiotherapist (empty when unassigned)
 --   provider_name     : the provider's name, or 'Unassigned'
 --   specialty         : the doctor's specialty (DoctorInfo.speciality; empty for nurses and physiotherapists)
@@ -50,6 +51,8 @@ svc AS (       -- one slim row per real service of a patient, every category (bu
     v."scheduledTime"                                            AS ts,
     floor(extract(epoch FROM v."scheduledTime") / (31 * 86400))::int AS slot,   -- 31-day slot: a visit up to 30 days later is in the same slot or the next
     CASE
+      WHEN s."serviceType"::text = 'doctorVisit' AND lower(fu.specialty) = 'internist'
+           AND s."finalPriceAmount" < 100000                      THEN 'followUp'   -- an internist's follow-up visit
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                     THEN 'surgeries'
       WHEN s."serviceType"::text = 'physiotherapy'
@@ -68,6 +71,8 @@ svc AS (       -- one slim row per real service of a patient, every category (bu
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                     WHERE di."userId" = s."doctorUserId" LIMIT 1) fu ON TRUE   -- for follow-up visits
   WHERE s."deletedAt" IS NULL
     AND o."deletedAt" IS NULL
     AND v."deletedAt" IS NULL

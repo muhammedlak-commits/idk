@@ -29,18 +29,18 @@ function buildProviders(text){
 }
 const pvName=p=> p.name+(p.name==='Unassigned'?' ('+label(p.cat)+')':'');
 const specOf=r=> r.sp || PV.provs[r.p].spec || PV_NOSPEC;
-const isDoctorCat=c=> c==='doctorVisit'||c==='surgeries';
+const isDoctorCat=c=> c==='doctorVisit'||c==='followUp'||c==='surgeries';
 /* rows inside [a,b] that pass the top filter; rows are sorted by day, so find the start by bisection */
 function pvEach(a,b,fn,extra){
   const R=PV.rows; let lo=0, hi=R.length; while(lo<hi){ const m=(lo+hi)>>1; if(R[m].n<a) lo=m+1; else hi=m; }
   const mi=MI[pvMeasure()];
-  for(let i=lo;i<R.length&&R[i].n<=b;i++){ const r=R[i]; if(!st.svc.has(r.cat)||!st.status.has(r.st)) continue; if(extra&&!extra(r)) continue; fn(r,r.v[mi]); }
+  for(let i=lo;i<R.length&&R[i].n<=b;i++){ const r=R[i]; if(!svcOn(r.cat)||!st.status.has(r.st)) continue; if(extra&&!extra(r)) continue; fn(r,r.v[mi]); }
 }
 function pvTotals(a,b,keyFn,extra){ const m=new Map(); pvEach(a,b,(r,v)=>{ const k=keyFn(r); m.set(k,(m.get(k)||0)+v); },extra); return m; }
 /* the provider export has counts only, so money measures fall back to orders there */
 const pvMeasure=()=> MONEY.has(st.measure)? 'ord' : st.measure;
 const pvMoneyNote=()=> MONEY.has(st.measure)? 'The provider export has no sales, so this section shows orders. ' : '';
-function pvSelCats(){ return PV? PV.cats.filter(c=>st.svc.has(c)) : []; }
+function pvSelCats(){ return PV? PV.cats.filter(svcOn) : []; }
 
 function renderProviders(){
   const empty=document.getElementById('pvEmpty'), body=document.getElementById('pvBody'), msg=document.getElementById('pvMsg');

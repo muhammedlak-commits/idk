@@ -1,4 +1,5 @@
 -- Gateway providers per month, for the gateway section of the Providers module (Saleem Performance Lab).
+-- FOLLOW-UPS: an internist's doctor visit under 100,000 IQD is a follow-up and comes out as its own category, 'followUp'.
 -- For every new patient: which provider served their first-ever real visit (the gateway), and how much
 -- the patient kept ordering after it. One row per basis x cohort month x first service x gateway provider.
 -- First visit: the patient's earliest real service (started, finished or reviewed) by scheduled time, in any service.
@@ -52,6 +53,8 @@ svc AS (          -- every real service of every patient, built once
     v."scheduledTime"                                            AS ts,
     s."serviceType"::text                                        AS service_type,
     CASE
+      WHEN s."serviceType"::text = 'doctorVisit' AND lower(fu.specialty) = 'internist'
+           AND s."finalPriceAmount" < 100000                      THEN 'followUp'   -- an internist's follow-up visit
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                     THEN 'surgeries'
       WHEN s."serviceType"::text = 'physiotherapy'
@@ -70,6 +73,8 @@ svc AS (          -- every real service of every patient, built once
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                     WHERE di."userId" = s."doctorUserId" LIMIT 1) fu ON TRUE   -- for follow-up visits
   WHERE s."deletedAt" IS NULL
     AND o."deletedAt" IS NULL
     AND v."deletedAt" IS NULL

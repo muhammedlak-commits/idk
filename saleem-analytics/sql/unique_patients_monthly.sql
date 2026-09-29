@@ -1,4 +1,5 @@
 -- Unique, new and returning patients per month and service category.
+-- FOLLOW-UPS: an internist's doctor visit under 100,000 IQD is a follow-up and comes out as its own category, 'followUp'.
 -- Export the full history (no date filter), so "new" is right for every month.
 -- Two definitions of "new", chosen in the dashboard's filter bar:
 --   new_patients     : the patient's first-ever real visit with Saleem was in this month
@@ -18,6 +19,8 @@ WITH svc AS (
     v."scheduledTime"::date                            AS day,
     date_trunc('month', pi."createdAt")::date          AS created_month,
     CASE
+      WHEN s."serviceType"::text = 'doctorVisit' AND lower(fu.specialty) = 'internist'
+           AND s."finalPriceAmount" < 100000                      THEN 'followUp'   -- an internist's follow-up visit
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                        THEN 'surgeries'
       WHEN s."serviceType"::text = 'physiotherapy'
@@ -29,6 +32,8 @@ WITH svc AS (
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                     WHERE di."userId" = s."doctorUserId" LIMIT 1) fu ON TRUE   -- for follow-up visits
   WHERE s."deletedAt" IS NULL
     AND o."deletedAt" IS NULL
     AND v."deletedAt" IS NULL

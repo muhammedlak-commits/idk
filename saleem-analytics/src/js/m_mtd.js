@@ -45,7 +45,7 @@ function renderMtd(key){
     html=mtdHtml(M,mtdLabel(M),parts, same? 'Each month counted up to day '+day+', the day the patients export reaches.' : '');
   } else if(key==='prov'){
     if(!PV){ el.innerHTML=''; return; }
-    const mi=MI[pvMeasure()], sum_=(a,b)=>{ const t=new Map(); for(const r of PV.rows){ if(r.n<a||r.n>b||!st.svc.has(r.cat)||!st.status.has(r.st)) continue; t.set(r.p,(t.get(r.p)||0)+r.v[mi]); } return t; };
+    const mi=MI[pvMeasure()], sum_=(a,b)=>{ const t=new Map(); for(const r of PV.rows){ if(r.n<a||r.n>b||!svcOn(r.cat)||!st.status.has(r.st)) continue; t.set(r.p,(t.get(r.p)||0)+r.v[mi]); } return t; };
     M=mtdPeriods(Math.min(S.max,PV.max));
     const A_=sum_(M.a,M.b), B_=sum_(M.pa,M.pb), L_=sum_(M.la,M.lb), tot=mp=>[...mp.values()].reduce((s,v)=>s+v,0), sc=v=>perLen(v,M.pa,M.pb,M.a,M.b);
     const mv=[...new Set([...A_.keys(),...B_.keys()])].map(p=>({p,d:(A_.get(p)||0)-sc(B_.get(p)||0)})).filter(o=>PV.provs[o.p].name!=='Unassigned').sort((x,y)=>Math.abs(y.d)-Math.abs(x.d)).slice(0,3);

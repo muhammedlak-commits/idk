@@ -166,7 +166,9 @@ In claude.ai, every export loaded in Data & settings (or with Load CSV) is saved
 ## How numbers are calculated
 
 - Main measure is `distinct_orders`; cancelled orders are excluded unless the Cancelled status is switched on.
-- Previous period = same number of days just before the range. Last year = the range shifted back 364 days so weekdays match.
+- Services: a doctor visit (or booking) of 500,000 IQD or more is a surgery; an internist's doctor visit under 100,000 IQD is a follow-up visit (`followUp`), kept apart so first visits and follow-ups can be read separately. The Doctor visit ad group covers both.
+- Compare with (in the date picker): Fairest by default. A range that starts on the 1st within one month is compared with the same days last month; any other range with the same number of days just before it. Same days last month, the days just before, and same dates last year (shifted 364 days so weekdays match) can be picked. When the two periods differ in length, percentage moves are scaled to the same number of days.
+- Month so far: Summary, Performance, Drivers › Patients, Providers and Meta ads open with this month from the 1st to the latest day, against the same days last month and last year.
 - Month table MoM/YoY compares orders per day, so short months and the current partial month compare fairly.
 - Ads are matched to services one by one: the ad's code (PT, NS, DRV, LT, US, OLC, TX, GA…), then words in the ad name, ad set name and campaign name; recruitment, app-install and awareness campaigns keep their own groups.
 - Daily ad spend by service = each ad's monthly spend spread over the month in proportion to the account's daily spend.

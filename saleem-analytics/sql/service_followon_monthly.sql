@@ -1,4 +1,5 @@
 -- Follow-on between services, per month, for the Service links module.
+-- FOLLOW-UPS: an internist's doctor visit under 100,000 IQD is a follow-up and comes out as its own category, 'followUp'.
 -- For every patient's first real visit of service A in a month, did the same patient
 -- have a real visit of service B in the 7 / 30 days after it?
 --   patients_a   : patients who had service A that month
@@ -10,6 +11,8 @@ WITH svc AS (
     pi."user_id"                                               AS patient_id,
     v."scheduledTime"                                          AS ts,
     CASE
+      WHEN s."serviceType"::text = 'doctorVisit' AND lower(fu.specialty) = 'internist'
+           AND s."finalPriceAmount" < 100000                      THEN 'followUp'   -- an internist's follow-up visit
       WHEN s."serviceType"::text IN ('doctorVisit', 'booking')
            AND s."finalPriceAmount" >= 500000                   THEN 'surgeries'
       WHEN s."serviceType"::text = 'physiotherapy'
@@ -21,6 +24,8 @@ WITH svc AS (
   JOIN       "public"."Order"       o  ON o.id  = s."orderId"
   JOIN       "public"."PatientInfo" pi ON pi.id = s."servicesReceiverPatientId"
   JOIN       "public"."User"        u  ON u.id  = pi."user_id"
+  LEFT JOIN LATERAL (SELECT di."speciality"::text AS specialty FROM "public"."DoctorInfo" di
+                     WHERE di."userId" = s."doctorUserId" LIMIT 1) fu ON TRUE   -- for follow-up visits
   WHERE s."deletedAt" IS NULL
     AND o."deletedAt" IS NULL
     AND v."deletedAt" IS NULL
