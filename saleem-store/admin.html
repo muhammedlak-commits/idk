@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>لوحة متجر سليم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#003260;--navy2:#002444;--blue:#1C75BC;--blue50:#EDF6FD;--or:#F47B20;--or2:#D9611A;--or50:#FFF3E9;
+  --green:#12806F;--green50:#E8F6F3;--red:#C0392B;--red50:#FBEBE9;--amber:#9A6700;--amber50:#FFF8E1;--purple:#5B3A85;--purple50:#F3EDF9;
+  --ink:#10222F;--mut:#58708A;--line:#DDE6EE;--paper:#F4F8FB;--r:12px;--shadow:0 12px 32px rgba(0,36,68,.14)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:500 14px/1.55 Montserrat,system-ui,sans-serif;min-width:320px}
+html[lang=ar] body{font-family:Cairo,system-ui,sans-serif;font-weight:600}
+a{color:var(--blue)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:3px solid rgba(28,117,188,.4);outline-offset:2px}
+.wrap{width:min(100% - 32px,1280px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+h1,h2,h3{margin:0;color:var(--navy2);line-height:1.3}
+
+/* gate */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(155deg,#002444,#003260 50%,#00558E)}
+.gateCard{width:min(100%,380px);background:#fff;border-radius:20px;padding:30px 26px;box-shadow:0 30px 80px rgba(0,0,0,.3);text-align:center}
+.gateCard img{height:42px;margin-bottom:12px}
+.gateCard h1{font-size:20px}
+.gateCard p{color:var(--mut);margin:6px 0 18px;font-size:13.5px}
+.code{width:100%;height:56px;border:1px solid #C9D7E3;border-radius:12px;text-align:center;font:800 26px Montserrat,monospace;letter-spacing:.4em;padding-inline-start:.4em}
+.code:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(28,117,188,.15)}
+.gateErr{min-height:20px;color:var(--red);font-size:13px;margin:10px 0 4px}
+.gateCard .btn{width:100%;margin-top:6px}
+.gateLang{margin-top:14px;background:none;border:0;color:var(--mut);font-weight:800}
+
+/* chrome */
+.bar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line)}
+.bar .wrap{height:60px;display:flex;align-items:center;gap:12px}
+.bar img{height:30px}
+.bar b{color:var(--navy);font-size:14px}
+.sp{flex:1}
+.mode{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.mode.local{background:var(--amber50);color:var(--amber)}
+.mode.sheet{background:var(--green50);color:var(--green)}
+.mode i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.tabs{position:sticky;top:60px;z-index:29;background:#fff;border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tab{display:flex;align-items:center;gap:7px;padding:13px 14px;color:var(--mut);font-weight:800;font-size:14px;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-current=page]{color:var(--navy);border-color:var(--or)}
+.tab .n{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--or);color:#fff;font:800 11px/20px Montserrat,sans-serif;text-align:center}
+main{padding:20px 0 60px}
+
+.btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 15px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--navy);font-weight:800;font-size:13.5px;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--blue)}
+.btn.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.navy:hover{background:var(--navy2)}
+.btn.or{background:var(--or);border-color:var(--or);color:#fff}
+.btn.or:hover{background:var(--or2)}
+.btn.red{color:var(--red)}
+.btn.red:hover{border-color:var(--red);background:var(--red50)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:12.5px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.panel h2{font-size:17px;display:flex;align-items:center;gap:10px}
+.panel h2 .step{width:26px;height:26px;border-radius:8px;background:var(--navy);color:#fff;display:grid;place-items:center;font:800 13px Montserrat,sans-serif}
+.panel>p,.lead{color:var(--mut);margin:6px 0 14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.note{display:flex;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;margin:10px 0}
+.note .ic{margin-top:1px}
+.note.info{background:var(--blue50);color:#24435C}
+.note.warn{background:var(--amber50);color:#6B4A00}
+.note.ok{background:var(--green50);color:#0E5D51}
+.note.bad{background:var(--red50);color:#8E2A20}
+.head{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;margin-bottom:14px}
+.head h1{font-size:22px}
+.head p{margin:3px 0 0;color:var(--mut)}
+
+/* products list */
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tools input,.tools select,.field input,.field select,.field textarea,.inp{height:40px;border:1px solid #C9D7E3;border-radius:10px;background:#fff;padding:0 11px;font-size:13.5px}
+.tools input[type=search]{flex:1;min-width:200px}
+.tools label.btn{gap:8px;height:40px}
+.tools label.btn input{width:16px;height:16px;accent-color:var(--navy)}
+.inp:focus,.tools input:focus,.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,117,188,.12)}
+.list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.li{display:grid;grid-template-columns:64px 48px minmax(180px,2fr) minmax(140px,1.2fr) 110px minmax(120px,1fr) 96px;gap:12px;align-items:center;padding:8px 14px;border-top:1px solid var(--line);cursor:pointer;position:relative}
+.li:first-child{border-top:0}
+.li:hover{background:#FAFCFE}
+.li.hd{cursor:default;background:#FBFDFF;padding:8px 14px;font:800 10.5px Montserrat,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+html[lang=ar] .li.hd{font-family:Cairo,sans-serif;letter-spacing:0;font-size:12px}
+.li.hd:hover{background:#FBFDFF}
+.li .id{font:700 12px Montserrat,sans-serif;color:var(--mut)}
+.li b{display:block;font-size:13.5px;color:var(--ink)}
+.li small{display:block;color:var(--mut);font-size:12px}
+.li .dot{position:absolute;inset-inline-start:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--or)}
+.thumb{position:relative;width:64px;height:48px;border-radius:8px;border:1px solid var(--line);background:linear-gradient(145deg,#F8FBFD,#EAF2F8);overflow:hidden}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.thumb.noimg img{display:none}
+.thumb .tag{position:absolute;inset-inline-end:2px;bottom:2px;z-index:1;padding:0 4px;border-radius:4px;background:rgba(0,36,68,.72);color:#fff;font:700 9px/14px Montserrat,sans-serif}
+.thumb .tag.own{background:var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:800;white-space:nowrap}
+.c-rent{background:var(--or50);color:var(--or2)}.c-refill{background:var(--green50);color:var(--green)}.c-b2b{background:var(--purple50);color:var(--purple)}
+.st{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:800}
+.st-available{background:var(--green50);color:var(--green)}.st-out{background:var(--red50);color:var(--red)}.st-hidden{background:#EEF2F6;color:#4A6478}
+.price{font:700 12.5px Montserrat,sans-serif;color:var(--navy)}
+.muted{color:#A9B9C8}
+.count{color:var(--mut);font-size:13px;margin:0 0 10px}
+
+/* editor drawer */
+.shade{position:fixed;inset:0;z-index:50;background:rgba(0,24,45,.55);border:0}
+.drawer{position:fixed;z-index:51;top:0;bottom:0;inset-inline-end:0;width:min(640px,100%);background:#fff;display:flex;flex-direction:column;box-shadow:0 20px 80px rgba(0,36,68,.35)}
+.dHead{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.dHead h2{font-size:17px;flex:1}
+.dBody{flex:1;overflow:auto;padding:18px 20px}
+.dFoot{display:flex;gap:8px;padding:12px 20px;border-top:1px solid var(--line);background:#FBFDFF}
+.x{width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;display:grid;place-items:center}
+.photoBox{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start;margin-bottom:16px}
+.bigThumb{position:relative;width:200px;aspect-ratio:4/3;border-radius:12px;border:2px dashed var(--line);background:linear-gradient(145deg,#F8FBFD,#EAF2F8);overflow:hidden;display:grid;place-items:center;color:var(--mut);font-size:12px;text-align:center}
+.bigThumb.drag{border-color:var(--blue);background:var(--blue50)}
+.bigThumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.bigThumb.noimg img{display:none}
+.bigThumb .tag{position:absolute;inset-inline-start:6px;top:6px;z-index:1;padding:2px 7px;border-radius:6px;background:rgba(0,36,68,.78);color:#fff;font-size:11px;font-weight:800}
+.bigThumb .tag.own{background:var(--green)}
+.photoBox .row{margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:block;margin-bottom:12px}
+.field>span{display:block;font-size:12.5px;font-weight:800;color:var(--navy2);margin-bottom:4px}
+.field>span i{font-style:normal;color:var(--mut);font-weight:600}
+.field input,.field select,.field textarea{width:100%}
+.field textarea{height:auto;min-height:72px;padding:9px 11px;resize:vertical}
+.field.bad input,.field.bad select{border-color:var(--red)}
+.field .err{display:none;color:var(--red);font-size:12px;margin-top:3px}
+.field.bad .err{display:block}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 12px}
+.checks label{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
+.checks input{width:17px;height:17px;accent-color:var(--navy)}
+fieldset{border:0;padding:0;margin:0}
+legend{font-size:12.5px;font-weight:800;color:var(--navy2);margin-bottom:4px;padding:0}
+
+/* bulk + photos */
+.drop{display:block;border:2px dashed #BFD0E0;border-radius:14px;padding:30px 20px;text-align:center;background:#FBFDFF;color:var(--mut);cursor:pointer;transition:.15s}
+.drop:hover,.drop.drag{border-color:var(--blue);background:var(--blue50);color:var(--navy)}
+.drop strong{display:block;color:var(--navy2);font-size:15px;margin:6px 0 2px}
+.drop .ic{width:34px;height:34px;color:var(--blue);stroke-width:1.5}
+.sum{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.sum button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;text-align:start;min-width:110px}
+.sum button[aria-pressed=true]{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.sum b{display:block;font:800 20px Montserrat,sans-serif}
+.sum span{font-size:12px;font-weight:800}
+.k-new b{color:var(--green)}.k-update b{color:var(--blue)}.k-same b{color:var(--mut)}.k-error b{color:var(--red)}
+.plan{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;max-height:520px;overflow-y:auto}
+.pr{display:grid;grid-template-columns:56px 86px 56px minmax(160px,1fr) 2fr;gap:10px;padding:8px 12px;border-top:1px solid var(--line);font-size:13px;align-items:start}
+.pr:first-child{border-top:0}
+.pr.hd{position:sticky;top:0;background:#FBFDFF;font-weight:800;color:var(--mut);font-size:12px;z-index:1}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:800}
+.p-new{background:var(--green50);color:var(--green)}.p-update{background:var(--blue50);color:var(--blue)}.p-same{background:#EEF2F6;color:var(--mut)}.p-error{background:var(--red50);color:var(--red)}
+.chg{display:block;font-size:12.5px}
+.chg em{font-style:normal;color:var(--mut);text-decoration:line-through}
+.chg strong{color:var(--navy)}
+.errs{color:var(--red);font-size:12.5px}
+.warns{color:var(--amber);font-size:12.5px}
+.guide{width:100%;border-collapse:collapse;font-size:13px}
+.guide td,.guide th{padding:6px 8px;border-top:1px solid var(--line);text-align:start;vertical-align:top}
+.guide code{font:700 12px Montserrat,monospace;color:var(--navy);background:var(--paper);padding:1px 5px;border-radius:4px}
+details summary{cursor:pointer;color:var(--blue);font-weight:800;margin-top:6px}
+textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radius:10px;padding:10px;font:500 12.5px/1.5 Montserrat,monospace;direction:ltr}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.pt{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.pt .thumb{width:100%;height:auto;aspect-ratio:4/3;border:0;border-radius:0;border-bottom:1px solid var(--line)}
+.pt .thumb.drag{outline:3px solid var(--blue);outline-offset:-3px}
+.pt div.t{padding:8px 10px;flex:1}
+.pt div.t b{display:block;font-size:12.5px;line-height:1.35}
+.pt div.t small{color:var(--mut);font:700 11px Montserrat,sans-serif}
+.pt .row{padding:0 10px 10px}
+.match{display:grid;grid-template-columns:56px 1fr minmax(180px,1.4fr);gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.match img{width:56px;height:42px;object-fit:cover;border-radius:7px;border:1px solid var(--line)}
+.match .inp{width:100%}
+.stat{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.stat div{background:var(--paper);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font:800 22px Montserrat,sans-serif;color:var(--navy)}
+.stat span{font-size:12px;color:var(--mut);font-weight:800}
+.steps{margin:6px 0 0;padding-inline-start:20px;color:#3C566C}
+.steps li{margin:4px 0}
+.mono{font-family:Montserrat,monospace;direction:ltr;unicode-bidi:embed}
+.toast{position:fixed;z-index:80;inset-inline:0;bottom:24px;margin:auto;width:max-content;max-width:calc(100% - 32px);padding:11px 16px;border-radius:12px;background:var(--navy2);color:#fff;font-weight:700;box-shadow:var(--shadow);transform:translateY(150%);opacity:0;transition:.2s}
+.toast.on{transform:none;opacity:1}
+.toast.bad{background:var(--red)}
+.busy{position:fixed;inset:0;z-index:90;background:rgba(255,255,255,.7);display:grid;place-items:center;font-weight:800;color:var(--navy)}
+.busy div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 24px;box-shadow:var(--shadow)}
+
+@media(max-width:860px){
+  .li.hd{display:none}
+  .li{grid-template-columns:64px 1fr auto;gap:4px 12px;padding:10px 14px}
+  .li>.thumb{grid-row:span 3}
+  .li .id{display:none}
+  .li>.c-dept,.li>.c-price,.li>.c-opts{grid-column:2}
+  .li>.c-status{grid-column:3;grid-row:1}
+  .pr{grid-template-columns:70px 1fr;gap:4px 10px}
+  .pr.hd{display:none}
+  .pr>:nth-child(n+3){grid-column:2}
+  .photoBox{grid-template-columns:1fr}
+  .bigThumb{width:100%}
+  .grid2{grid-template-columns:1fr}
+  .bar .hideSm{display:none}
+  .bar .wrap{gap:8px}
+  .bar img{height:26px}
+  .match{grid-template-columns:56px 1fr}
+  .match .inp{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-3"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 16v3a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-3"/></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 16l-5-5-8.5 8.5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+  <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M4 9h16M4 14.5h16M10 9v11.5"/></symbol>
+</svg>
+
+<!-- ─── the code screen ─── -->
+<section class="gate" id="gate">
+  <form class="gateCard" id="gateForm" autocomplete="off">
+    <img src="assets/logo-saleem.png" alt="Saleem">
+    <h1 data-t="gateT"></h1>
+    <p data-t="gateP"></p>
+    <label class="sr" for="code" data-t="gateLbl"></label>
+    <input class="code" id="code" type="password" inputmode="numeric" maxlength="12" autocomplete="off" required>
+    <div class="gateErr" id="gateErr" role="alert"></div>
+    <button class="btn navy" type="submit"><svg class="ic"><use href="#i-lock"/></svg><span data-t="unlock"></span></button>
+    <button class="gateLang" type="button" data-lang></button>
+  </form>
+</section>
+
+<!-- ─── the portal ─── -->
+<div id="app" hidden>
+  <header class="bar"><div class="wrap">
+    <img src="assets/logo-saleem.png" alt="Saleem"><b class="hideSm" data-t="title"></b>
+    <span class="mode" id="mode"><i></i><span></span></span>
+    <span class="sp"></span>
+    <a class="btn sm hideSm" id="toShop" target="_blank" rel="noopener"><svg class="ic"><use href="#i-eye"/></svg><span data-t="openShop"></span></a>
+    <button class="btn sm" type="button" data-lang></button>
+    <button class="btn sm" type="button" id="lockBtn"><svg class="ic"><use href="#i-lock"/></svg><span class="hideSm" data-t="lock"></span></button>
+  </div></header>
+  <nav class="tabs"><div class="wrap">
+    <a class="tab" href="#/products" data-tab="products"><svg class="ic"><use href="#i-list"/></svg><span data-t="tProducts"></span></a>
+    <a class="tab" href="#/bulk" data-tab="bulk"><svg class="ic"><use href="#i-up"/></svg><span data-t="tBulk"></span></a>
+    <a class="tab" href="#/photos" data-tab="photos"><svg class="ic"><use href="#i-img"/></svg><span data-t="tPhotos"></span></a>
+    <a class="tab" href="#/publish" data-tab="publish"><svg class="ic"><use href="#i-send"/></svg><span data-t="tPublish"></span><b class="n" id="pendingN" hidden></b></a>
+  </div></nav>
+  <main class="wrap" id="view"></main>
+</div>
+
+<button class="shade" id="shade" hidden aria-label="Close"></button>
+<aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle"></aside>
+<input type="file" id="pickOne" accept="image/*" hidden>
+<input type="file" id="pickMany" accept="image/*" multiple hidden>
+<input type="file" id="pickSheet" accept=".xlsx,.csv,.tsv,.txt,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="busy" id="busy" hidden><div id="busyText"></div></div>
+
+<script src="config.js"></script>
+<script src="data/products.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/admin-lib.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ⚙️  ADMIN SETTINGS
+   ═══════════════════════════════════════════════════════════ */
+const ADMIN = {
+  // SHA-256 of the admin code (335500). This only decides whether the page
+  // opens — anyone can read a web page's source, so on its own it protects
+  // nothing. What protects the live catalog is the same code checked again by
+  // the Google Sheet (ADMIN_CODE in apps-script/Code.gs) on every save.
+  // To change the code:  echo -n NEWCODE | shasum -a 256  → paste here, and
+  // change ADMIN_CODE in Code.gs to match.
+  codeHash   : '969a8998ec525d4ae03dd32b3abd03940b6c3742104c1bfa3dae6f35bf6f488b',
+  shopUrl    : 'index.html',
+  idleMinutes: 30,          // locks itself after this long without use
+};
+
+/* ═══════════════════════════════════════════════════════════
+   COPY
+   ═══════════════════════════════════════════════════════════ */
+const T = {
+  ar: {
+    _title:'لوحة متجر سليم', title:'لوحة إدارة المتجر', gateT:'لوحة إدارة متجر سليم', gateP:'اكتب رمز الدخول.', gateLbl:'رمز الدخول', unlock:'دخول',
+    wrong:'الرمز غلط.', wait:'محاولات كثيرة. انتظر {s} ثانية.', sheetWrong:'الرمز صحيح هنا، بس الشيت رفضه: {e}', lang:'English',
+    openShop:'فتح المتجر', lock:'قفل', tProducts:'المنتجات', tBulk:'رفع جماعي', tPhotos:'الصور', tPublish:'النشر والربط',
+    modeLocal:'مسودة محلية', modeSheet:'مربوط بالشيت',
+    // products
+    prodT:'المنتجات', prodP:'اضغط على أي منتج حتى تعدّله.', add:'منتج جديد', search:'ابحث بالاسم أو الرقم…',
+    allDepts:'كل الأقسام', allStatus:'كل الحالات', allPhotos:'كل الصور', withPhoto:'صورة مرفوعة', placeholder:'صورة Bing مؤقتة', changedOnly:'المعدّلة فقط',
+    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة',
+    st:{available:'متوفر', out:'غير متوفر', hidden:'مخفي'}, oRent:'إيجار', oRefill:'شهري', oB2b:'عيادات', perMonth:'/شهر', noPrice:'—',
+    // editor
+    edT:'تعديل منتج', newT:'منتج جديد', photo:'الصورة', upload:'رفع صورة', link:'رابط صورة', removePhoto:'حذف الصورة', linkAsk:'الصق رابط الصورة (يبدأ بـ https://)',
+    dropHere:'اسحب صورة هنا', bingTag:'Bing — مؤقتة', ownTag:'مرفوعة', pendingTag:'جديدة — تنحفظ مع المنتج',
+    photoHelp:'بدون صورة مرفوعة، المتجر يعرض صورة من بحث Bing على الاسم الإنكليزي كصورة مؤقتة.',
+    nameEn:'الاسم بالإنكليزي', nameAr:'الاسم بالعربي', dept:'القسم', sub:'القسم الفرعي', tier:'الأهمية (داخلي)', tiers:{1:'1 — إلزامي',2:'2 — مفيد',3:'3 — إضافي'},
+    price:'سعر الشراء (د.ع)', rentPrice:'الإيجار الشهري (د.ع)', optional:'(اختياري)', sell:'طرق البيع', rent:'إيجار', refill:'توصيل شهري', b2b:'للعيادات فقط (عرض سعر)',
+    services:'يطلبه عادةً', svc:{doctor:'زيارة طبيب', nursing:'تمريض', physio:'علاج طبيعي', lab:'مختبر', direct:'طلب مباشر'},
+    status:'الحالة', whyEn:'ليش يحتاجه المريض (إنكليزي)', whyAr:'ليش يحتاجه المريض (عربي)',
+    save:'حفظ', cancel:'إلغاء', del:'حذف', delAsk:'تحذف «{n}» نهائياً؟\nإذا تريد تشيله من المتجر بس، خلّي الحالة «مخفي».',
+    eName:'اكتب اسم واحد على الأقل', eDept:'اختار القسم', eSub:'اختار القسم الفرعي', ePrice:'رقم صحيح بالدينار',
+    savedLocal:'انحفظ بالمسودة', savedSheet:'انحفظ بالشيت', deleted:'انحذف',
+    // bulk
+    bulkT:'رفع جماعي', bulkP:'عدّل المنتجات بملف Excel أو CSV — أسعار، أقسام، حالات، منتجات جديدة — وارفعه مرة وحدة.',
+    s1:'نزّل الملف', s1p:'فيه كل المنتجات الحالية. عدّله بـ Excel أو Google Sheets وخلّي صف العناوين مثل ما هو.',
+    xlsx:'Excel ‏(.xlsx)', csv:'CSV', blank:'قالب فارغ',
+    rules:'القواعد: خانة فارغة = يبقى مثل ما هو · <code>-</code> = يمسح القيمة · بدون رقم <code>id</code> = منتج جديد · تكدر تحذف أعمدة ما تحتاجها (لازم يبقى id).',
+    guide:'شرح الأعمدة', colCol:'العمود', colMeans:'شنو يعني',
+    s2:'ارفع الملف', s2p:'Excel ‏(.xlsx) أو CSV.', dropSheet:'اسحب الملف هنا أو اضغط للاختيار', pasteT:'أو الصق صفوف من Excel / Google Sheets', check:'افحص الصفوف',
+    s3:'راجع قبل التطبيق', kinds:{new:'جديد', update:'تعديل', same:'بدون تغيير', error:'خطأ'},
+    hLine:'الصف', hKind:'النتيجة', hId:'#', hProduct:'المنتج', hWhat:'التغييرات',
+    missingT:'{n} منتج موجود بالكتالوج بس مو بالملف:', keepMissing:'خلّيهم مثل ما هم', hideMissing:'أخفيهم من المتجر',
+    ignoredCols:'أعمدة تم تجاهلها: {c}', errSkip:'الصفوف اللي بيها أخطاء ما راح تنطبق. صلّحها بالملف وارفعه مرة ثانية.',
+    apply:'طبّق {n} تغيير', nothing:'ماكو تغييرات تنطبق.', applied:'انطبق: {n} تغيير', reupload:'ملف ثاني',
+    // photos
+    phT:'الصور', phP:'ارفع صور المنتجات. أي منتج بدون صورة يعرض صورة Bing مؤقتة.',
+    dropMany:'اسحب صور كثيرة مرة وحدة', dropManyP:'سمّي كل ملف برقم المنتج — مثلاً 23.jpg أو 23-front.png — أو باسمه الإنكليزي، وتنربط تلقائياً.',
+    matched:'{n} صورة انربطت', unmatched:'{n} صورة ما انربطت — اختار المنتج', pickProduct:'اكتب رقم أو اسم المنتج…', savePhotos:'احفظ {n} صورة', clear:'إلغاء',
+    fAll:'الكل', fOwn:'مرفوعة', fWeb:'مؤقتة (Bing)', replace:'تغيير', photosSaved:'انحفظت {n} صورة',
+    // publish
+    pubT:'النشر والربط', pubLocalP:'التعديلات محفوظة بهذا المتصفح بس، لحد ما تنشرها.',
+    pending:'تعديلات غير منشورة', edited:'معدّل', added:'جديد', removed:'محذوف', photosN:'صور جديدة',
+    preview:'معاينة بالمتجر', previewP:'يفتح المتجر بتعديلاتك — محد يشوفها غيرك.', download:'نزّل التحديث (.zip)', discard:'تجاهل كل التعديلات', discardAsk:'تمسح كل التعديلات غير المنشورة وترجع للكتالوج المنشور؟',
+    howPub:'شلون أنشر؟', howPubSteps:['نزّل ملف التحديث.','فكّه داخل مجلد saleem-store — يبدّل data/products.js ويضيف الصور بـ assets/products/.','ارفع المجلد للاستضافة (أو سوّي commit)، والمتجر يتحدّث.'],
+    noPending:'ماكو تعديلات غير منشورة.',
+    sheetT:'ربط Google Sheet', sheetP:'بدل تنزيل الملفات، المنتجات والصور تنحفظ بالشيت والمتجر يقرأها مباشرة — بدون إعادة نشر. الخطوات بـ apps-script/SETUP.md.',
+    urlLbl:'رابط Apps Script ‏(/exec)', test:'فحص', connect:'ربط', disconnect:'فك الربط', connected:'مربوط — {n} منتج بالشيت.',
+    testOk:'الرابط شغّال — {n} منتج ظاهر بالمتجر.', testBad:'ما اشتغل: {e}', thisBrowser:'الربط هنا يخص هذا المتصفح. حتى المتجر يقرأ من الشيت، حط نفس الرابط بـ config.js ← catalogUrl.',
+    seed:'انسخ الكتالوج للشيت', seedP:'يبدّل محتوى الشيت بكل المنتجات الحالية (مع صورك المرفوعة). يُستخدم أول مرة.', seedAsk:'هذا يبدّل كل محتوى الشيت بـ {n} منتج. نكمل؟', seeded:'الشيت صار بيه {n} منتج',
+    shopReads:'المتجر حالياً يقرأ من: {s}', srcFile:'الملف data/products.js', srcSheet:'Google Sheet',
+    working:'جاري العمل…', uploading:'رفع الصور {i} من {n}…', fail:'فشل: {e}', locked:'انقفلت اللوحة.',
+  },
+  en: {
+    _title:'Saleem Store admin', title:'Store admin', gateT:'Saleem Store admin', gateP:'Enter the access code.', gateLbl:'Access code', unlock:'Unlock',
+    wrong:'Wrong code.', wait:'Too many attempts. Wait {s} seconds.', sheetWrong:'Code accepted here, but the Sheet refused it: {e}', lang:'العربية',
+    openShop:'Open shop', lock:'Lock', tProducts:'Products', tBulk:'Bulk upload', tPhotos:'Photos', tPublish:'Publish & connect',
+    modeLocal:'Local draft', modeSheet:'Connected to Sheet',
+    prodT:'Products', prodP:'Click any product to edit it.', add:'New product', search:'Search by name or number…',
+    allDepts:'All departments', allStatus:'Any status', allPhotos:'Any photo', withPhoto:'Photo uploaded', placeholder:'Bing placeholder', changedOnly:'Changed only',
+    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status',
+    st:{available:'Available', out:'Out of stock', hidden:'Hidden'}, oRent:'Rent', oRefill:'Monthly', oB2b:'Clinic', perMonth:'/mo', noPrice:'—',
+    edT:'Edit product', newT:'New product', photo:'Photo', upload:'Upload photo', link:'Photo link', removePhoto:'Remove photo', linkAsk:'Paste the photo link (starts with https://)',
+    dropHere:'Drop a photo here', bingTag:'Bing — placeholder', ownTag:'Uploaded', pendingTag:'New — saved with the product',
+    photoHelp:'With no uploaded photo, the shop shows a Bing image search on the English name as a placeholder.',
+    nameEn:'Name in English', nameAr:'Name in Arabic', dept:'Department', sub:'Section', tier:'Priority (internal)', tiers:{1:'1 — Mandatory',2:'2 — Useful',3:'3 — Bonus'},
+    price:'Buy price (IQD)', rentPrice:'Monthly rent (IQD)', optional:'(optional)', sell:'Sold as', rent:'Rentable', refill:'Monthly refill', b2b:'Clinics only (quote)',
+    services:'Usually requested with', svc:{doctor:'Doctor visit', nursing:'Nursing', physio:'Physiotherapy', lab:'Lab', direct:'Direct order'},
+    status:'Status', whyEn:'Why a patient needs it (English)', whyAr:'Why a patient needs it (Arabic)',
+    save:'Save', cancel:'Cancel', del:'Delete', delAsk:'Delete “{n}” for good?\nTo just take it off the shop, set its status to Hidden.',
+    eName:'Enter at least one name', eDept:'Choose a department', eSub:'Choose a section', ePrice:'A whole number in IQD',
+    savedLocal:'Saved to the draft', savedSheet:'Saved to the Sheet', deleted:'Deleted',
+    bulkT:'Bulk upload', bulkP:'Change many products at once with an Excel or CSV file — prices, departments, status, new products.',
+    s1:'Download the spreadsheet', s1p:'It holds every current product. Edit it in Excel or Google Sheets and keep the heading row as it is.',
+    xlsx:'Excel (.xlsx)', csv:'CSV', blank:'Blank template',
+    rules:'Rules: blank cell = leave as is · <code>-</code> = clear it · no <code>id</code> = new product · you can delete columns you don’t need (keep id).',
+    guide:'Column guide', colCol:'Column', colMeans:'What it means',
+    s2:'Upload it', s2p:'Excel (.xlsx) or CSV.', dropSheet:'Drop the file here, or click to choose', pasteT:'Or paste rows copied from Excel / Google Sheets', check:'Check rows',
+    s3:'Review before applying', kinds:{new:'New', update:'Updated', same:'Unchanged', error:'Error'},
+    hLine:'Row', hKind:'Result', hId:'#', hProduct:'Product', hWhat:'Changes',
+    missingT:'{n} products are in the catalog but not in the file:', keepMissing:'Leave them as they are', hideMissing:'Hide them from the shop',
+    ignoredCols:'Columns ignored: {c}', errSkip:'Rows with errors won’t be applied. Fix them in the file and upload it again.',
+    apply:'Apply {n} changes', nothing:'Nothing to apply.', applied:'Applied {n} changes', reupload:'Another file',
+    phT:'Photos', phP:'Upload product photos. Any product without one shows a Bing placeholder.',
+    dropMany:'Drop many photos at once', dropManyP:'Name each file with the product number — 23.jpg, 23-front.png — or its English name, and it’s matched automatically.',
+    matched:'{n} photos matched', unmatched:'{n} photos not matched — choose the product', pickProduct:'Type a number or name…', savePhotos:'Save {n} photos', clear:'Cancel',
+    fAll:'All', fOwn:'Uploaded', fWeb:'Placeholder (Bing)', replace:'Replace', photosSaved:'Saved {n} photos',
+    pubT:'Publish & connect', pubLocalP:'Your changes are saved in this browser only, until you publish them.',
+    pending:'Unpublished changes', edited:'Edited', added:'New', removed:'Deleted', photosN:'New photos',
+    preview:'Preview in the shop', previewP:'Opens the shop with your changes — nobody else sees them.', download:'Download the update (.zip)', discard:'Discard all changes', discardAsk:'Throw away every unpublished change and go back to the published catalog?',
+    howPub:'How do I publish?', howPubSteps:['Download the update.','Unzip it inside the saleem-store folder — it replaces data/products.js and adds photos under assets/products/.','Upload the folder to your host (or commit it), and the shop updates.'],
+    noPending:'No unpublished changes.',
+    sheetT:'Connect a Google Sheet', sheetP:'Instead of downloading files, products and photos save to a Sheet and the shop reads it directly — no re-publishing. Steps in apps-script/SETUP.md.',
+    urlLbl:'Apps Script URL (/exec)', test:'Test', connect:'Connect', disconnect:'Disconnect', connected:'Connected — {n} products in the Sheet.',
+    testOk:'The link works — {n} products visible in the shop.', testBad:'Didn’t work: {e}', thisBrowser:'Connecting here applies to this browser. For the shop to read the Sheet, put the same URL in config.js → catalogUrl.',
+    seed:'Copy the catalog into the Sheet', seedP:'Replaces the Sheet’s contents with every current product (and your uploaded photos). For the first time.', seedAsk:'This replaces everything in the Sheet with {n} products. Continue?', seeded:'The Sheet now has {n} products',
+    shopReads:'The shop currently reads from: {s}', srcFile:'data/products.js', srcSheet:'the Google Sheet',
+    working:'Working…', uploading:'Uploading photo {i} of {n}…', fail:'Failed: {e}', locked:'Locked.',
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════ */
+const C = SaleemCatalog, LIB = SaleemAdminLib;
+const DEPTS = C.bundled.departments, DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
+const PUBLISHED = C.bundled.products.map(C.clean);
+const ls = {
+  get(k, fb){ try{ const v = localStorage.getItem('saleem-admin:' + k); return v == null ? fb : JSON.parse(v); }catch(e){ return fb; } },
+  set(k, v){ try{ localStorage.setItem('saleem-admin:' + k, JSON.stringify(v)); }catch(e){} },
+};
+const ss = {
+  get(k){ try{ return JSON.parse(sessionStorage.getItem('saleem-admin:' + k) || 'null'); }catch(e){ return null; } },
+  set(k, v){ try{ sessionStorage.setItem('saleem-admin:' + k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ sessionStorage.removeItem('saleem-admin:' + k); }catch(e){} },
+};
+let lang = ls.get('lang', 'ar') === 'en' ? 'en' : 'ar';
+let backend = ls.get('backend', '') || C.config.catalogUrl || '';
+let session = null;          // { code, at }
+let products = [];           // what this portal is editing
+let filters = { q:'', dept:'', status:'', photo:'', changed:false };
+let plan = null, planShow = 'changes', planMissing = 'keep';
+let pendingPhotos = [];      // [{ file, dataUrl, id }]
+let photoFilter = 'all';
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════ */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const t = (k, v) => { let s = T[lang][k] ?? T.en[k] ?? k; if(v && typeof s === 'string') for(const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const L = o => o ? (lang === 'ar' ? o.ar : o.en) : '';
+const icon = id => `<svg class="ic"><use href="#${id}"/></svg>`;
+const pName = p => (lang === 'ar' ? p.ar || p.en : p.en || p.ar) || '#' + p.id;
+const subOf = p => DEPT[p.dept] && DEPT[p.dept].subs.find(s => s.key === p.sub);
+const iqd = n => n == null ? '' : n.toLocaleString('en-US');
+const sheetMode = () => !!backend;
+const same = (a, b) => JSON.stringify(C.clean(a)) === JSON.stringify(C.clean(b));
+
+let toastT;
+function toast(msg, bad){ const el = $('#toast'); el.textContent = msg; el.classList.toggle('bad', !!bad); el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), bad ? 5000 : 2400); }
+function busy(msg){ $('#busy').hidden = !msg; $('#busyText').textContent = msg || ''; }
+function download(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
+const stamp = () => new Date().toISOString().slice(0, 10);
+
+function thumb(p, w, cls = 'thumb'){
+  const ph = C.photo(p, w);
+  const tag = ph.placeholder ? (ph.src ? `<span class="tag">Bing</span>` : '') : `<span class="tag own">✓</span>`;
+  return `<div class="${cls} ${ph.src ? '' : 'noimg'}">${tag}${ph.src ? `<img src="${esc(ph.src)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}</div>`;
+}
+document.addEventListener('error', e => { if(e.target.tagName === 'IMG'){ const b = e.target.closest('.thumb,.bigThumb'); if(b) b.classList.add('noimg'); } }, true);
+
+/* SHA-256 — crypto.subtle is missing on some file:// pages, so there's a small fallback */
+async function sha256(str){
+  if(window.crypto && crypto.subtle){ try{ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }catch(e){} }
+  const K = [], H = [], isP = n => { for(let i = 2; i * i <= n; i++) if(n % i === 0) return false; return true; };
+  for(let n = 2, c = 0; c < 64; n++) if(isP(n)){ if(c < 8) H[c] = (Math.pow(n, 1/2) * 2**32) | 0; K[c++] = (Math.pow(n, 1/3) * 2**32) | 0; }
+  const m = [...new TextEncoder().encode(str)], l = m.length * 8; m.push(0x80); while(m.length % 64 !== 56) m.push(0);
+  for(let i = 7; i >= 0; i--) m.push(i > 3 ? 0 : (l >>> (i * 8)) & 255);
+  const r = (x, n) => (x >>> n) | (x << (32 - n)), h = H.slice();
+  for(let o = 0; o < m.length; o += 64){
+    const w = []; for(let i = 0; i < 16; i++) w[i] = (m[o+i*4] << 24) | (m[o+i*4+1] << 16) | (m[o+i*4+2] << 8) | m[o+i*4+3];
+    for(let i = 16; i < 64; i++){ const s0 = r(w[i-15],7) ^ r(w[i-15],18) ^ (w[i-15] >>> 3), s1 = r(w[i-2],17) ^ r(w[i-2],19) ^ (w[i-2] >>> 10); w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0; }
+    let [a,b,c,d,e,f,g,k] = h;
+    for(let i = 0; i < 64; i++){ const t1 = (k + (r(e,6) ^ r(e,11) ^ r(e,25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0, t2 = ((r(a,2) ^ r(a,13) ^ r(a,22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0; k = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0; }
+    [a,b,c,d,e,f,g,k].forEach((v, i) => h[i] = (h[i] + v) | 0);
+  }
+  return h.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DATA — a local draft, or the Google Sheet
+   ═══════════════════════════════════════════════════════════ */
+async function api(action, body){
+  let r;
+  try{
+    r = await fetch(backend, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, code: session && session.code }, body || {})) });
+  }catch(e){ const x = new Error(lang === 'ar' ? 'ما وصلنا للشيت — تأكد من الرابط والإنترنت' : 'Couldn’t reach the Sheet — check the link and your connection'); x.network = true; throw x; }
+  let j; try{ j = await r.json(); }catch(e){ throw new Error('The Sheet sent back something unexpected (HTTP ' + r.status + ')'); }
+  if(!j.ok) throw new Error(j.error || 'Failed');
+  return j;
+}
+
+async function loadProducts(){
+  if(sheetMode()){
+    const j = await api('list');
+    products = j.products.map(C.clean);
+  } else {
+    const d = await C.kv.get('draft');
+    products = d && Array.isArray(d.products) ? d.products.map(C.clean) : PUBLISHED.map(p => Object.assign({}, p));
+  }
+}
+async function saveDraft(){ await C.kv.set('draft', { products, updatedAt: new Date().toISOString() }); paintPending(); }
+
+// what differs from the published file (local mode only)
+function pendingChanges(){
+  const pub = new Map(PUBLISHED.map(p => [p.id, p])), now = new Map(products.map(p => [p.id, p]));
+  const out = { edited: [], added: [], removed: [], photos: [] };
+  products.forEach(p => { const o = pub.get(p.id); if(!o) out.added.push(p); else if(!same(o, p)) out.edited.push(p); if(/^data:/.test(p.img)) out.photos.push(p); });
+  PUBLISHED.forEach(p => { if(!now.has(p.id)) out.removed.push(p); });
+  out.total = out.edited.length + out.added.length + out.removed.length;
+  return out;
+}
+function paintPending(){
+  const n = sheetMode() ? 0 : pendingChanges().total, b = $('#pendingN');
+  b.hidden = !n; b.textContent = n;
+}
+
+/** writes products (array) — to the draft, or to the Sheet (photos uploaded after the row exists) */
+async function commit(list, opts){
+  opts = opts || {};
+  if(!sheetMode()){
+    const byId = new Map(products.map(p => [p.id, p]));
+    list.forEach(p => byId.set(p.id, C.clean(p)));
+    (opts.remove || []).forEach(id => byId.delete(id));
+    products = [...byId.values()].sort((a, b) => a.id - b.id);
+    await saveDraft();
+    return;
+  }
+  if(opts.remove && opts.remove.length){ const j = await api('delete', { ids: opts.remove }); products = j.products.map(C.clean); }
+  if(list.length){
+    const photos = list.filter(p => /^data:/.test(p.img));
+    const rows = list.map(p => Object.assign({}, C.clean(p), /^data:/.test(p.img) ? { img: (products.find(x => x.id === p.id) || {}).img || '' } : {}));
+    const j = await api(opts.replace ? 'replaceAll' : 'save', { products: rows });
+    products = j.products.map(C.clean);
+    for(let i = 0; i < photos.length; i++){
+      if(photos.length > 1) busy(t('uploading', { i: i + 1, n: photos.length }));
+      const r = await api('photo', { id: photos[i].id, dataUrl: photos[i].img });
+      const k = products.findIndex(x => x.id === photos[i].id); if(k >= 0) products[k] = C.clean(r.product);
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GATE
+   ═══════════════════════════════════════════════════════════ */
+function lockWait(){ const g = ls.get('gate', { fails: 0, until: 0 }); return Math.max(0, Math.ceil((g.until - Date.now()) / 1000)); }
+$('#gateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('#gateErr'), input = $('#code'), w = lockWait();
+  if(w){ err.textContent = t('wait', { s: w }); return; }
+  const code = input.value.trim();
+  if(await sha256(code) !== ADMIN.codeHash){
+    const g = ls.get('gate', { fails: 0, until: 0 }); g.fails++;
+    // five free tries, then 30s, 60s, 120s… between attempts
+    if(g.fails >= 5) g.until = Date.now() + 30000 * Math.pow(2, g.fails - 5);
+    ls.set('gate', g); err.textContent = g.until > Date.now() ? t('wait', { s: lockWait() }) : t('wrong');
+    input.value = ''; input.focus(); return;
+  }
+  ls.set('gate', { fails: 0, until: 0 });
+  session = { code, at: Date.now() };
+  if(sheetMode()){
+    try{ busy(t('working')); await api('login'); }
+    catch(x){
+      busy();
+      // the Sheet refused the code: stay locked. The Sheet is unreachable: open on the local draft instead
+      if(!x.network){ session = null; err.textContent = t('sheetWrong', { e: x.message }); return; }
+      backend = ''; toast(x.message, true);
+    }
+  }
+  ss.set('session', session);
+  input.value = ''; err.textContent = '';
+  await openApp();
+});
+
+async function openApp(){
+  busy(t('working'));
+  try{ await loadProducts(); }
+  catch(e){ busy(); toast(t('fail', { e: e.message }), true); backend = ''; await loadProducts(); }
+  busy();
+  $('#gate').hidden = true; $('#app').hidden = false;
+  paintChrome(); paintPending();
+  if(!location.hash || location.hash === '#') location.replace('#/products');
+  render();
+}
+function lock(){
+  session = null; ss.del('session'); products = []; closeEditor();
+  $('#app').hidden = true; $('#gate').hidden = false; $('#code').focus();
+}
+$('#lockBtn').onclick = () => { lock(); toast(t('locked')); };
+// lock after a while without use
+let lastUse = Date.now();
+['click', 'keydown', 'input'].forEach(ev => document.addEventListener(ev, () => { lastUse = Date.now(); if(session){ session.at = lastUse; ss.set('session', session); } }, true));
+setInterval(() => { if(session && Date.now() - lastUse > ADMIN.idleMinutes * 60000) lock(); }, 30000);
+
+/* ═══════════════════════════════════════════════════════════
+   CHROME + ROUTER
+   ═══════════════════════════════════════════════════════════ */
+function paintChrome(){
+  document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.title = t('_title');
+  $$('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  $$('[data-lang]').forEach(el => el.textContent = t('lang'));
+  const m = $('#mode'); m.className = 'mode ' + (sheetMode() ? 'sheet' : 'local'); m.querySelector('span').textContent = t(sheetMode() ? 'modeSheet' : 'modeLocal');
+  $('#toShop').href = ADMIN.shopUrl;
+}
+document.addEventListener('click', e => {
+  if(e.target.closest('[data-lang]')){ lang = lang === 'ar' ? 'en' : 'ar'; ls.set('lang', lang); paintChrome(); if(session) render(); if(!$('#drawer').hidden && editing) openEditor(editing.id, true); }
+});
+window.addEventListener('hashchange', () => { if(session) render(); });
+
+function render(){
+  const r = (location.hash.match(/^#\/(\w+)/) || [])[1] || 'products';
+  $$('.tab').forEach(a => a.dataset.tab === r ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  const v = { products: viewProducts, bulk: viewBulk, photos: viewPhotos, publish: viewPublish }[r] || viewProducts;
+  $('#view').innerHTML = v();
+  if(r === 'products') paintList();
+  if(r === 'photos') paintPhotoGrid();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRODUCTS
+   ═══════════════════════════════════════════════════════════ */
+function viewProducts(){
+  const opt = (v, l, cur) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`;
+  return `<div class="head"><div><h1>${t('prodT')}</h1><p>${t('prodP')}</p></div><button class="btn or" type="button" data-new>${icon('i-plus')}${t('add')}</button></div>
+    <div class="tools">
+      <input type="search" id="fq" placeholder="${esc(t('search'))}" value="${esc(filters.q)}" aria-label="${esc(t('search'))}">
+      <select id="fdept" aria-label="${esc(t('dept'))}">${opt('', t('allDepts'), filters.dept)}${DEPTS.map(d => opt(d.key, L(d), filters.dept)).join('')}</select>
+      <select id="fstatus" aria-label="${esc(t('status'))}">${opt('', t('allStatus'), filters.status)}${C.STATUSES.map(s => opt(s, t('st')[s], filters.status)).join('')}</select>
+      <select id="fphoto" aria-label="${esc(t('photo'))}">${opt('', t('allPhotos'), filters.photo)}${opt('own', t('withPhoto'), filters.photo)}${opt('web', t('placeholder'), filters.photo)}</select>
+      ${sheetMode() ? '' : `<label class="btn"><input type="checkbox" id="fchanged" ${filters.changed ? 'checked' : ''}> ${t('changedOnly')}</label>`}
+    </div>
+    <p class="count" id="count"></p><div class="list" id="list"></div>`;
+}
+function filtered(){
+  const q = LIB.norm(filters.q), pub = new Map(PUBLISHED.map(p => [p.id, p]));
+  return products.filter(p => (!q || String(p.id) === q || LIB.norm(p.en + ' ' + p.ar).includes(q))
+    && (!filters.dept || p.dept === filters.dept) && (!filters.status || p.status === filters.status)
+    && (!filters.photo || (filters.photo === 'own') === !!p.img)
+    && (!filters.changed || !pub.has(p.id) || !same(pub.get(p.id), p)));
+}
+function paintList(){
+  const list = filtered(), pub = new Map(PUBLISHED.map(p => [p.id, p]));
+  $('#count').textContent = t('shown', { n: list.length, t: products.length });
+  $('#list').innerHTML = `<div class="li hd"><span>${t('hPhoto')}</span><span>#</span><span>${t('hName')}</span><span>${t('hDept')}</span><span>${t('hPrice')}</span><span>${t('hOpts')}</span><span>${t('hStatus')}</span></div>` +
+    list.map(p => {
+      const changed = !sheetMode() && (!pub.has(p.id) || !same(pub.get(p.id), p)), s = subOf(p);
+      return `<div class="li" data-edit="${p.id}" tabindex="0" role="button">${changed ? '<i class="dot"></i>' : ''}${thumb(p, 160)}<span class="id">#${p.id}</span>
+        <span><b>${esc(pName(p))}</b><small>${esc(lang === 'ar' ? p.en : p.ar)}</small></span>
+        <span class="c-dept"><small>${esc(L(DEPT[p.dept]) || p.dept)} › ${esc(L(s) || p.sub)}</small></span>
+        <span class="c-price price">${p.price ? iqd(p.price) : p.rentPrice ? '' : `<span class="muted">${t('noPrice')}</span>`}${p.rentPrice ? `<small>${iqd(p.rentPrice)} ${t('perMonth')}</small>` : ''}</span>
+        <span class="c-opts chips">${p.rent ? `<span class="chip c-rent">${t('oRent')}</span>` : ''}${p.refill ? `<span class="chip c-refill">${t('oRefill')}</span>` : ''}${p.b2b ? `<span class="chip c-b2b">${t('oB2b')}</span>` : ''}</span>
+        <span class="c-status"><span class="st st-${p.status}">${t('st')[p.status]}</span></span></div>`;
+    }).join('');
+}
+document.addEventListener('input', e => {
+  if(e.target.id === 'fq'){ filters.q = e.target.value; paintList(); }
+});
+document.addEventListener('change', e => {
+  const id = e.target.id;
+  if(id === 'fdept') filters.dept = e.target.value;
+  else if(id === 'fstatus') filters.status = e.target.value;
+  else if(id === 'fphoto') filters.photo = e.target.value;
+  else if(id === 'fchanged') filters.changed = e.target.checked;
+  else return;
+  paintList();
+});
+
+/* ── editor ── */
+let editing = null;          // working copy
+function openEditor(id, keep){
+  const isNew = id == null;
+  if(!keep) editing = isNew ? C.clean({ id: Math.max(0, ...products.map(p => p.id), ...PUBLISHED.map(p => p.id)) + 1, dept: '', sub: '', status: 'available' })
+                            : Object.assign({}, products.find(p => p.id === id));
+  editing._new = isNew || editing._new;
+  const p = editing, d = DEPT[p.dept];
+  const opt = (v, l, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(l)}</option>`;
+  const ph = C.photo(p, 500), saved = (products.find(x => x.id === p.id) || {}).img || '', pending = !!p.img && p.img !== saved;
+  $('#drawer').innerHTML = `
+    <div class="dHead"><h2 id="dTitle">${p._new ? t('newT') : t('edT')} <span class="id mono">#${p.id}</span></h2><button class="x" type="button" data-close aria-label="${esc(t('cancel'))}">${icon('i-x')}</button></div>
+    <form class="dBody" id="edForm" novalidate>
+      <div class="photoBox">
+        <div class="bigThumb ${ph.src ? '' : 'noimg'}" id="bigThumb">${ph.src ? `<span class="tag ${ph.placeholder ? '' : 'own'}">${ph.placeholder ? t('bingTag') : pending ? t('pendingTag') : t('ownTag')}</span><img src="${esc(ph.src)}" alt="" referrerpolicy="no-referrer">` : ''}<span>${t('dropHere')}</span></div>
+        <div><b>${t('photo')}</b><p class="lead" style="margin:4px 0 8px;font-size:12.5px">${t('photoHelp')}</p>
+          <div class="row"><button class="btn sm navy" type="button" data-pick-one>${icon('i-up')}${t('upload')}</button><button class="btn sm" type="button" data-link>${t('link')}</button>${p.img ? `<button class="btn sm red" type="button" data-unphoto>${t('removePhoto')}</button>` : ''}</div></div>
+      </div>
+      <div class="grid2">
+        <label class="field" data-f="en"><span>${t('nameEn')}</span><input name="en" value="${esc(p.en)}" dir="ltr"><em class="err">${t('eName')}</em></label>
+        <label class="field" data-f="ar"><span>${t('nameAr')}</span><input name="ar" value="${esc(p.ar)}" dir="rtl"></label>
+        <label class="field" data-f="dept"><span>${t('dept')}</span><select name="dept">${opt('', '—', p.dept)}${DEPTS.map(x => opt(x.key, L(x), p.dept)).join('')}</select><em class="err">${t('eDept')}</em></label>
+        <label class="field" data-f="sub"><span>${t('sub')}</span><select name="sub">${opt('', '—', p.sub)}${(d ? d.subs : []).map(x => opt(x.key, L(x), p.sub)).join('')}</select><em class="err">${t('eSub')}</em></label>
+        <label class="field" data-f="price"><span>${t('price')} <i>${t('optional')}</i></span><input name="price" inputmode="numeric" value="${p.price ?? ''}" dir="ltr"><em class="err">${t('ePrice')}</em></label>
+        <label class="field" data-f="rentPrice"><span>${t('rentPrice')} <i>${t('optional')}</i></span><input name="rentPrice" inputmode="numeric" value="${p.rentPrice ?? ''}" dir="ltr" ${p.rent ? '' : 'disabled'}><em class="err">${t('ePrice')}</em></label>
+        <label class="field"><span>${t('status')}</span><select name="status">${C.STATUSES.map(s => opt(s, t('st')[s], p.status)).join('')}</select></label>
+        <label class="field"><span>${t('tier')}</span><select name="tier">${[1, 2, 3].map(n => opt(n, t('tiers')[n], p.tier)).join('')}</select></label>
+      </div>
+      <fieldset><legend>${t('sell')}</legend><div class="checks">
+        <label><input type="checkbox" name="rent" ${p.rent ? 'checked' : ''}>${t('rent')}</label>
+        <label><input type="checkbox" name="refill" ${p.refill ? 'checked' : ''}>${t('refill')}</label>
+        <label><input type="checkbox" name="b2b" ${p.b2b ? 'checked' : ''}>${t('b2b')}</label></div></fieldset>
+      <fieldset><legend>${t('services')}</legend><div class="checks">${C.SERVICES.map(s => `<label><input type="checkbox" name="svc" value="${s}" ${p.services.includes(s) ? 'checked' : ''}>${t('svc')[s]}</label>`).join('')}</div></fieldset>
+      <label class="field"><span>${t('whyEn')}</span><textarea name="whyEn" dir="ltr">${esc(p.whyEn)}</textarea></label>
+      <label class="field"><span>${t('whyAr')}</span><textarea name="whyAr" dir="rtl">${esc(p.whyAr)}</textarea></label>
+    </form>
+    <div class="dFoot"><button class="btn navy" type="submit" form="edForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${p._new ? '' : `<button class="btn red" type="button" data-del>${t('del')}</button>`}</div>`;
+  $('#drawer').hidden = false; $('#shade').hidden = false;
+  if(!keep) $('#drawer [name=en]').focus();
+}
+function closeEditor(){ $('#drawer').hidden = true; $('#shade').hidden = true; editing = null; }
+// read the form back into the working copy, without saving
+function readForm(){
+  const f = $('#edForm'); if(!f) return;
+  const g = n => f.elements[n];
+  Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value,
+    status: g('status').value, tier: +g('tier').value, rent: g('rent').checked, refill: g('refill').checked, b2b: g('b2b').checked,
+    services: [...f.querySelectorAll('[name=svc]:checked')].map(x => x.value), whyEn: g('whyEn').value, whyAr: g('whyAr').value,
+    _priceRaw: g('price').value, _rentRaw: g('rentPrice').value });
+}
+document.addEventListener('change', e => {
+  if(!e.target.closest('#edForm')) return;
+  if(['dept', 'rent'].includes(e.target.name)){ readForm(); if(e.target.name === 'dept') editing.sub = ''; keepPrices(); openEditor(editing.id, true); }
+});
+const parsePrice = v => { v = String(v || '').replace(/[,\s]/g, ''); if(!v) return null; const n = Number(v); return Number.isInteger(n) && n > 0 ? n : NaN; };
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'edForm') return;
+  e.preventDefault(); readForm();
+  const p = editing, bad = [];
+  if(!p.en && !p.ar) bad.push('en');
+  if(!p.dept) bad.push('dept');
+  if(!p.sub) bad.push('sub');
+  const price = parsePrice(p._priceRaw), rentPrice = p.rent ? parsePrice(p._rentRaw) : null;
+  if(Number.isNaN(price)) bad.push('price');
+  if(Number.isNaN(rentPrice)) bad.push('rentPrice');
+  $$('#edForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
+  if(bad.length) return;
+  const out = C.clean(Object.assign({}, p, { price, rentPrice }));
+  out.img = p.img;                         // keep a just-uploaded data: photo for commit()
+  try{ busy(t('working')); await commit([out]); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }
+  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+});
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-edit],[data-new],[data-close],[data-del],[data-pick-one],[data-link],[data-unphoto]');
+  if(!el) return;
+  if(el.matches('[data-edit]')) openEditor(+el.dataset.edit);
+  else if(el.matches('[data-new]')) openEditor(null);
+  else if(el.matches('[data-close]')) closeEditor();
+  else if(el.matches('[data-pick-one]')){ pickTarget = 'editor'; $('#pickOne').click(); }
+  else if(el.matches('[data-link]')){ readForm(); const u = prompt(t('linkAsk'), /^https:/.test(editing.img) ? editing.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editing.img = u.trim(); keepPrices(); openEditor(editing.id, true); } }
+  else if(el.matches('[data-unphoto]')){ readForm(); editing.img = ''; keepPrices(); openEditor(editing.id, true); }
+  else if(el.matches('[data-del]')){
+    if(!confirm(t('delAsk', { n: pName(editing) }))) return;
+    try{ busy(t('working')); await commit([], { remove: [editing.id] }); busy(); closeEditor(); render(); toast(t('deleted')); }
+    catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+  }
+});
+const keepPrices = () => { editing.price = parsePrice(editing._priceRaw); editing.rentPrice = parsePrice(editing._rentRaw); if(Number.isNaN(editing.price)) editing.price = null; if(Number.isNaN(editing.rentPrice)) editing.rentPrice = null; };
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && !$('#drawer').hidden) closeEditor();
+  if(e.key === 'Enter' && e.target.matches('.li[data-edit]')) openEditor(+e.target.dataset.edit);
+});
+$('#shade').onclick = closeEditor;
+
+/* photo into the editor: file picker or drag and drop */
+let pickTarget = null;      // 'editor' | product id (photos tab)
+async function photoFile(file, target){
+  if(!file || !/^image\//.test(file.type)) return;
+  const dataUrl = await LIB.resizeImage(file);
+  if(target === 'editor'){ readForm(); keepPrices(); editing.img = dataUrl; openEditor(editing.id, true); return; }
+  const p = products.find(x => x.id === target); if(!p) return;
+  try{ busy(t('working')); await commit([Object.assign({}, p, { img: dataUrl })]); busy(); paintPhotoGrid(); toast(t('photosSaved', { n: 1 })); }
+  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+}
+$('#pickOne').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; photoFile(f, pickTarget); });
+['dragover', 'dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => {
+  // a file dropped anywhere else would open in the tab and lose unsaved work
+  if(ev !== 'dragleave') e.preventDefault();
+  const zone = e.target.closest && e.target.closest('#bigThumb, .drop, .pt .thumb');
+  if(!zone) return;
+  zone.classList.toggle('drag', ev === 'dragover');
+  if(ev !== 'drop') return;
+  const files = [...(e.dataTransfer.files || [])];
+  if(zone.id === 'bigThumb') photoFile(files[0], 'editor');
+  else if(zone.matches('.pt .thumb')) photoFile(files[0], +zone.closest('.pt').dataset.id);
+  else if(zone.id === 'sheetDrop') readSheetFile(files[0]);
+  else if(zone.id === 'photoDrop') queuePhotos(files);
+}));
+
+/* ═══════════════════════════════════════════════════════════
+   BULK UPLOAD
+   ═══════════════════════════════════════════════════════════ */
+function viewBulk(){
+  return `<div class="head"><div><h1>${t('bulkT')}</h1><p>${t('bulkP')}</p></div></div>
+  <section class="panel"><h2><span class="step">1</span>${t('s1')}</h2><p>${t('s1p')}</p>
+    <div class="row"><button class="btn navy" type="button" data-export="xlsx">${icon('i-down')}${t('xlsx')}</button><button class="btn" type="button" data-export="csv">${icon('i-down')}${t('csv')}</button><button class="btn" type="button" data-export="blank">${t('blank')}</button></div>
+    <p class="note info">${icon('i-info')}<span>${t('rules')}</span></p>
+    <details><summary>${t('guide')}</summary><table class="guide"><tr><th>${t('colCol')}</th><th>${t('colMeans')}</th></tr>
+      ${LIB.COLUMNS.map(c => `<tr><td><code>${c.key}</code></td><td>${esc(c.help)}</td></tr>`).join('')}
+      <tr><td><code>department</code> · <code>section</code></td><td>${DEPTS.map(d => `<b>${d.key}</b> (${esc(L(d))}): ${d.subs.map(s => s.key).join(', ')}`).join('<br>')}</td></tr></table></details>
+  </section>
+  <section class="panel"><h2><span class="step">2</span>${t('s2')}</h2><p>${t('s2p')}</p>
+    <label class="drop" id="sheetDrop" data-pick-sheet>${icon('i-sheet')}<strong>${t('dropSheet')}</strong><span>.xlsx · .csv</span></label>
+    <details style="margin-top:10px"><summary>${t('pasteT')}</summary><textarea class="paste" id="paste" placeholder="id	name_en	buy_price_iqd&#10;21	Digital blood pressure monitor	45000"></textarea><div class="row" style="margin-top:8px"><button class="btn" type="button" data-check-paste>${t('check')}</button></div></details>
+  </section>
+  <div id="planBox">${plan ? planHtml() : ''}</div>`;
+}
+document.addEventListener('click', e => {
+  const x = e.target.closest('[data-export],[data-pick-sheet],[data-check-paste],[data-plan-show],[data-apply],[data-plan-reset]');
+  if(!x) return;
+  if(x.dataset.export) exportSheet(x.dataset.export);
+  else if(x.matches('[data-pick-sheet]')){ e.preventDefault(); $('#pickSheet').click(); }
+  else if(x.matches('[data-check-paste]')) makePlan(LIB.csvParse($('#paste').value));
+  else if(x.dataset.planShow){ planShow = x.dataset.planShow; $('#planBox').innerHTML = planHtml(); }
+  else if(x.matches('[data-apply]')) applyPlan();
+  else if(x.matches('[data-plan-reset]')){ plan = null; $('#planBox').innerHTML = ''; }
+});
+document.addEventListener('change', e => { if(e.target.name === 'missing'){ planMissing = e.target.value; $('#planBox').innerHTML = planHtml(); } });
+$('#pickSheet').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; readSheetFile(f); });
+
+function exportSheet(kind){
+  const rows = kind === 'blank' ? [LIB.COLUMNS.map(c => c.key), ['', 'Example product', 'منتج تجريبي', 'mobility', 'walking', 2, 25000, '', 'no', 'no', 'no', 'physio', 'available', 'Why a patient needs it', 'ليش يحتاجه المريض', '']]
+                                : LIB.toRows(products);
+  const name = 'saleem-products-' + (kind === 'blank' ? 'template' : stamp());
+  if(kind === 'csv'){ download(new Blob([LIB.csvWrite(rows)], { type: 'text/csv;charset=utf-8' }), name + '.csv'); return; }
+  const lists = [{ col: 3, list: DEPTS.map(d => d.key) }, { col: 5, list: ['1', '2', '3'] }, { col: 8, list: ['yes', 'no'] }, { col: 9, list: ['yes', 'no'] },
+                 { col: 10, list: ['yes', 'no'] }, { col: 12, list: ['available', 'out_of_stock', 'hidden'] }];
+  const deptRows = [['department', 'section', 'department (EN)', 'section (EN)', 'القسم', 'القسم الفرعي'],
+                    ...DEPTS.flatMap(d => d.subs.map(s => [d.key, s.key, d.en, s.en, d.ar, s.ar]))];
+  const help = [['column', 'what it means', 'بالعربي'], ...LIB.COLUMNS.map(c => [c.key, c.help, c.ar]),
+                ['', ''], ['Rules', 'Blank cell = leave as is. "-" = clear it. No id = new product. Delete columns you don’t need, but keep id.']];
+  download(LIB.xlsxWrite([
+    { name: 'Products', rows, widths: LIB.COLUMNS.map(c => c.width), validations: lists },
+    { name: 'Departments', rows: deptRows, widths: [14, 14, 26, 26, 26, 26] },
+    { name: 'Help', rows: help, widths: [22, 80, 26] },
+  ]), name + '.xlsx');
+}
+
+async function readSheetFile(file){
+  if(!file) return;
+  try{
+    busy(t('working'));
+    const isX = /\.xlsx$/i.test(file.name) || file.type.includes('spreadsheetml');
+    const rows = isX ? await LIB.xlsxRead(await file.arrayBuffer()) : LIB.csvParse(await file.text());
+    busy(); makePlan(rows, file.name);
+  }catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+}
+function makePlan(rows, name){
+  try{ plan = LIB.planImport(rows, products, DEPTS); plan.file = name || ''; planShow = 'changes'; planMissing = 'keep'; }
+  catch(x){ toast(x.message, true); return; }
+  $('#planBox').innerHTML = planHtml();
+  $('#planBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+const fieldLabel = { en:'name_en', ar:'name_ar', dept:'department', sub:'section', tier:'tier', price:'buy_price_iqd', rentPrice:'rent_price_iqd_month', rent:'rentable', refill:'monthly_refill', b2b:'clinic_only', services:'services', status:'status', whyEn:'why_en', whyAr:'why_ar', img:'photo_url' };
+const show = v => v == null || v === '' ? '∅' : Array.isArray(v) ? (v.join(', ') || '∅') : typeof v === 'boolean' ? (v ? 'yes' : 'no') : String(v).length > 60 ? String(v).slice(0, 57) + '…' : String(v);
+const showField = (f, v) => f === 'status' ? t('st')[v] || v : f === 'dept' ? L(DEPT[v]) || v : show(v);
+function planToApply(){
+  const list = plan.rows.filter(r => r.kind === 'new' || r.kind === 'update').map(r => r.product);
+  const hide = planMissing === 'hide' ? plan.missing.map(id => products.find(p => p.id === id)).filter(p => p && p.status !== 'hidden').map(p => Object.assign({}, p, { status: 'hidden' })) : [];
+  return list.concat(hide);
+}
+function planHtml(){
+  const k = { new: 0, update: 0, same: 0, error: 0 }; plan.rows.forEach(r => k[r.kind]++);
+  const rows = plan.rows.filter(r => planShow === 'all' || (planShow === 'changes' ? r.kind !== 'same' : r.kind === planShow));
+  const n = planToApply().length;
+  return `<section class="panel"><h2><span class="step">3</span>${t('s3')}${plan.file ? ` <small class="muted mono" style="font-size:12px">${esc(plan.file)}</small>` : ''}</h2>
+    <div class="sum">${['new', 'update', 'same', 'error'].map(x => `<button type="button" class="k-${x}" data-plan-show="${x}" aria-pressed="${planShow === x}"><b>${k[x]}</b><span>${t('kinds')[x]}</span></button>`).join('')}</div>
+    ${plan.ignored.length ? `<p class="note warn">${icon('i-info')}<span>${esc(t('ignoredCols', { c: plan.ignored.join(', ') }))}</span></p>` : ''}
+    ${k.error ? `<p class="note bad">${icon('i-info')}<span>${t('errSkip')}</span></p>` : ''}
+    ${plan.missing.length ? `<div class="note info" style="display:block"><b>${t('missingT', { n: plan.missing.length })}</b><div class="checks" style="margin:6px 0 0">
+        <label><input type="radio" name="missing" value="keep" ${planMissing === 'keep' ? 'checked' : ''}>${t('keepMissing')}</label>
+        <label><input type="radio" name="missing" value="hide" ${planMissing === 'hide' ? 'checked' : ''}>${t('hideMissing')}</label></div></div>` : ''}
+    <div class="plan"><div class="pr hd"><span>${t('hLine')}</span><span>${t('hKind')}</span><span>${t('hId')}</span><span>${t('hProduct')}</span><span>${t('hWhat')}</span></div>
+      ${rows.slice(0, 400).map(r => `<div class="pr"><span class="mono">${r.line}</span><span><span class="pill p-${r.kind}">${t('kinds')[r.kind]}</span></span><span class="mono">${r.id ?? '—'}</span><span>${esc(r.name || '')}</span>
+        <span>${r.errors.length ? `<span class="errs">${r.errors.map(esc).join('<br>')}</span>` : ''}
+          ${r.kind === 'update' ? r.changes.map(c => `<span class="chg">${fieldLabel[c]}: <em>${esc(showField(c, r.before[c]))}</em> → <strong>${esc(showField(c, r.product[c]))}</strong></span>`).join('') : ''}
+          ${r.kind === 'new' ? `<span class="chg">${esc(L(DEPT[r.product.dept]))} › ${esc(L(subOf(r.product)))}${r.product.price ? ' · ' + iqd(r.product.price) + ' IQD' : ''}</span>` : ''}
+          ${r.warnings.length && r.kind !== 'error' ? `<span class="warns">${r.warnings.map(esc).join('<br>')}</span>` : ''}</span></div>`).join('')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn or" type="button" data-apply ${n ? '' : 'disabled'}>${icon('i-check')}${n ? t('apply', { n }) : t('nothing')}</button><button class="btn" type="button" data-plan-reset>${t('reupload')}</button></div>
+  </section>`;
+}
+async function applyPlan(){
+  const list = planToApply(); if(!list.length) return;
+  try{ busy(t('working')); await commit(list); busy(); plan = null; render(); toast(t('applied', { n: list.length })); }
+  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PHOTOS
+   ═══════════════════════════════════════════════════════════ */
+function viewPhotos(){
+  const own = products.filter(p => p.img).length;
+  return `<div class="head"><div><h1>${t('phT')}</h1><p>${t('phP')}</p></div></div>
+  <section class="panel">
+    <label class="drop" id="photoDrop" data-pick-many>${icon('i-img')}<strong>${t('dropMany')}</strong><span>${t('dropManyP')}</span></label>
+    <div id="queue">${queueHtml()}</div>
+  </section>
+  <div class="tools"><div class="sum" style="margin:0">${[['all', products.length], ['own', own], ['web', products.length - own]].map(([k, n]) => `<button type="button" data-pf="${k}" aria-pressed="${photoFilter === k}"><b>${n}</b><span>${t({ all:'fAll', own:'fOwn', web:'fWeb' }[k])}</span></button>`).join('')}</div></div>
+  <div class="pgrid" id="pgrid"></div>
+  <datalist id="plist">${products.map(p => `<option value="#${p.id} ${esc(p.en || p.ar)}"></option>`).join('')}</datalist>`;
+}
+function paintPhotoGrid(){
+  const g = $('#pgrid'); if(!g) return;
+  const list = products.filter(p => photoFilter === 'all' || (photoFilter === 'own') === !!p.img);
+  g.innerHTML = list.map(p => `<div class="pt" data-id="${p.id}">${thumb(p, 300)}<div class="t"><small>#${p.id}</small><b>${esc(pName(p))}</b></div>
+    <div class="row"><button class="btn sm" type="button" data-photo-up="${p.id}">${icon('i-up')}${p.img ? t('replace') : t('upload')}</button>${p.img ? `<button class="btn sm red" type="button" data-photo-rm="${p.id}" aria-label="${esc(t('removePhoto'))}">${icon('i-x')}</button>` : ''}</div></div>`).join('');
+}
+function matchFile(name){
+  const base = name.replace(/\.[^.]+$/, ''), m = /^#?(\d+)/.exec(base);
+  if(m){ const p = products.find(x => x.id === +m[1]); if(p) return p.id; }
+  const n = LIB.norm(base.replace(/[-_]+/g, ' '));
+  const p = products.find(x => LIB.norm(x.en) === n || LIB.norm(x.ar) === n);
+  return p ? p.id : null;
+}
+async function queuePhotos(files){
+  files = files.filter(f => /^image\//.test(f.type)); if(!files.length) return;
+  busy(t('working'));
+  for(const f of files){ try{ pendingPhotos.push({ name: f.name, dataUrl: await LIB.resizeImage(f), id: matchFile(f.name) }); }catch(e){ toast(f.name + ': ' + e.message, true); } }
+  busy(); $('#queue').innerHTML = queueHtml();
+}
+function queueHtml(){
+  if(!pendingPhotos.length) return '';
+  const ok = pendingPhotos.filter(x => x.id), no = pendingPhotos.filter(x => !x.id), name = id => { const p = products.find(x => x.id === id); return p ? `#${p.id} ${p.en || p.ar}` : ''; };
+  const row = (x, i) => `<div class="match"><img src="${x.dataUrl}" alt=""><span><b class="mono" style="font-size:12px">${esc(x.name)}</b></span>
+    <input class="inp" list="plist" data-q="${i}" placeholder="${esc(t('pickProduct'))}" value="${esc(name(x.id))}"></div>`;
+  return `<div style="margin-top:14px">${ok.length ? `<p class="note ok">${icon('i-check')}<span>${t('matched', { n: ok.length })}</span></p>` : ''}${no.length ? `<p class="note warn">${icon('i-info')}<span>${t('unmatched', { n: no.length })}</span></p>` : ''}
+    ${pendingPhotos.map(row).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn or" type="button" data-save-photos ${ok.length ? '' : 'disabled'}>${icon('i-check')}${t('savePhotos', { n: ok.length })}</button><button class="btn" type="button" data-clear-photos>${t('clear')}</button></div></div>`;
+}
+document.addEventListener('change', e => {
+  if(e.target.dataset.q != null){
+    const m = /#(\d+)/.exec(e.target.value), x = pendingPhotos[+e.target.dataset.q]; if(!x) return;
+    x.id = m && products.some(p => p.id === +m[1]) ? +m[1] : null;
+    // redraw after this event finishes: replacing a focused input mid-event fires change again
+    setTimeout(() => { const q = $('#queue'); if(q) q.innerHTML = queueHtml(); });
+  }
+});
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-pick-many],[data-save-photos],[data-clear-photos],[data-pf],[data-photo-up],[data-photo-rm]');
+  if(!x) return;
+  if(x.matches('[data-pick-many]')){ e.preventDefault(); $('#pickMany').click(); }
+  else if(x.matches('[data-clear-photos]')){ pendingPhotos = []; $('#queue').innerHTML = ''; }
+  else if(x.dataset.pf){ photoFilter = x.dataset.pf; render(); }
+  else if(x.dataset.photoUp){ pickTarget = +x.dataset.photoUp; $('#pickOne').click(); }
+  else if(x.dataset.photoRm){
+    const p = products.find(y => y.id === +x.dataset.photoRm);
+    try{ busy(t('working')); await commit([Object.assign({}, p, { img: '' })]); busy(); render(); }catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+  }
+  else if(x.matches('[data-save-photos]')){
+    const ok = pendingPhotos.filter(y => y.id), latest = new Map();
+    ok.forEach(y => latest.set(y.id, y.dataUrl));               // two files for one product: the last wins
+    const list = [...latest].map(([id, img]) => Object.assign({}, products.find(p => p.id === id), { img }));
+    try{ busy(t('working')); await commit(list); busy(); pendingPhotos = pendingPhotos.filter(y => !y.id); render(); toast(t('photosSaved', { n: list.length })); }
+    catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+  }
+});
+$('#pickMany').addEventListener('change', e => { const f = [...e.target.files]; e.target.value = ''; queuePhotos(f); });
+
+/* ═══════════════════════════════════════════════════════════
+   PUBLISH + CONNECT
+   ═══════════════════════════════════════════════════════════ */
+function viewPublish(){
+  const pc = pendingChanges();
+  const local = `<section class="panel"><h2>${icon('i-send')}${t('pending')}</h2><p>${t('pubLocalP')}</p>
+      <div class="stat"><div><b>${pc.edited.length}</b><span>${t('edited')}</span></div><div><b>${pc.added.length}</b><span>${t('added')}</span></div><div><b>${pc.removed.length}</b><span>${t('removed')}</span></div><div><b>${pc.photos.length}</b><span>${t('photosN')}</span></div></div>
+      ${pc.total ? '' : `<p class="note ok">${icon('i-check')}<span>${t('noPending')}</span></p>`}
+      <div class="row"><a class="btn" href="${ADMIN.shopUrl}?preview=1" target="_blank" rel="noopener">${icon('i-eye')}${t('preview')}</a>
+        <button class="btn or" type="button" data-bundle ${pc.total ? '' : 'disabled'}>${icon('i-down')}${t('download')}</button>
+        <button class="btn red" type="button" data-discard ${pc.total ? '' : 'disabled'}>${t('discard')}</button></div>
+      <p class="lead" style="font-size:12.5px;margin-top:8px">${t('previewP')}</p>
+      <details><summary>${t('howPub')}</summary><ol class="steps">${t('howPubSteps').map(s => `<li>${esc(s)}</li>`).join('')}</ol></details></section>`;
+  const reads = t('shopReads', { s: C.config.catalogUrl ? t('srcSheet') : t('srcFile') });
+  const sheet = `<section class="panel"><h2>${icon('i-sheet')}${t('sheetT')}</h2><p>${t('sheetP')}</p>
+      ${sheetMode() ? `<p class="note ok">${icon('i-check')}<span>${t('connected', { n: products.length })}</span></p>` : ''}
+      <label class="field"><span>${t('urlLbl')}</span><input class="inp mono" id="beUrl" value="${esc(backend)}" placeholder="https://script.google.com/macros/s/…/exec" dir="ltr"></label>
+      <div class="row"><button class="btn" type="button" data-test>${t('test')}</button>
+        ${sheetMode() ? `<button class="btn red" type="button" data-disconnect>${t('disconnect')}</button>` : `<button class="btn navy" type="button" data-connect>${t('connect')}</button>`}</div>
+      <p class="note info">${icon('i-info')}<span>${esc(t('thisBrowser'))}<br><b>${esc(reads)}</b></span></p>
+      ${sheetMode() ? `<hr style="border:0;border-top:1px solid var(--line);margin:16px 0"><b>${t('seed')}</b><p class="lead">${t('seedP')}</p><button class="btn" type="button" data-seed>${icon('i-up')}${t('seed')}</button>` : ''}
+    </section>`;
+  return `<div class="head"><div><h1>${t('pubT')}</h1></div></div>${sheetMode() ? '' : local}${sheet}`;
+}
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-bundle],[data-discard],[data-test],[data-connect],[data-disconnect],[data-seed]');
+  if(!x) return;
+  if(x.matches('[data-bundle]')) bundle();
+  else if(x.matches('[data-discard]')){ if(confirm(t('discardAsk'))){ await C.kv.del('draft'); await loadProducts(); paintPending(); render(); } }
+  else if(x.matches('[data-test]')){
+    const url = $('#beUrl').value.trim();
+    try{ busy(t('working')); const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=catalog'); const j = await r.json(); busy(); if(!j.ok) throw new Error(j.error); toast(t('testOk', { n: j.products.length })); }
+    catch(err){ busy(); toast(t('testBad', { e: err.message }), true); }
+  }
+  else if(x.matches('[data-connect]')){
+    const url = $('#beUrl').value.trim(); if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){ toast(t('testBad', { e: 'https://script.google.com/…/exec' }), true); return; }
+    const prev = backend; backend = url;
+    try{ busy(t('working')); await api('login'); await loadProducts(); ls.set('backend', url); busy(); paintChrome(); paintPending(); render(); toast(t('connected', { n: products.length })); }
+    catch(err){ busy(); backend = prev; toast(t('fail', { e: err.message }), true); }
+  }
+  else if(x.matches('[data-disconnect]')){ backend = ''; ls.set('backend', ''); await loadProducts(); paintChrome(); paintPending(); render(); }
+  else if(x.matches('[data-seed]')){
+    // the local draft if there is one (it may carry uploaded photos), else the published file
+    const d = await C.kv.get('draft'), list = (d && d.products ? d.products : PUBLISHED).map(p => Object.assign(C.clean(p), { img: p.img || '' }));
+    if(!confirm(t('seedAsk', { n: list.length }))) return;
+    try{ busy(t('working')); await commit(list, { replace: true }); busy(); render(); toast(t('seeded', { n: products.length })); }
+    catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+  }
+});
+
+// data/products.js + the uploaded photos, laid out like the saleem-store folder
+function bundle(){
+  const files = [], out = products.map(p => {
+    if(!/^data:/.test(p.img)) return p;
+    const ext = p.img.startsWith('data:image/webp') ? 'webp' : p.img.startsWith('data:image/png') ? 'png' : 'jpg', path = `assets/products/${p.id}.${ext}`;
+    files.push({ name: path, data: LIB.dataUrlBytes(p.img) });
+    return Object.assign({}, p, { img: path });
+  });
+  files.unshift({ name: 'data/products.js', data: C.serialize(DEPTS, out) });
+  files.push({ name: 'UPDATE-README.txt', data: [
+    'Saleem Store catalog update — ' + new Date().toISOString(),
+    '', 'Unzip this inside the saleem-store folder, replacing files when asked:',
+    '  data/products.js       the full product list (' + out.length + ' products)',
+    '  assets/products/       ' + (files.length - 1) + ' uploaded photo(s)',
+    '', 'Then upload the folder to your host, or commit it to the repo.', '' ].join('\r\n') });
+  download(LIB.zip(files), 'saleem-store-update-' + stamp() + '.zip');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   START
+   ═══════════════════════════════════════════════════════════ */
+paintChrome();
+(async () => {
+  const s = ss.get('session');
+  if(s && s.code && Date.now() - s.at < ADMIN.idleMinutes * 60000 && await sha256(s.code) === ADMIN.codeHash){ session = s; lastUse = Date.now(); await openApp(); }
+  else $('#code').focus();
+})();
+</script>
+</body>
+</html>

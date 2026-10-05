@@ -65,6 +65,7 @@ html[lang=ar] .row.hd{font-family:Cairo,sans-serif;letter-spacing:0;font-size:12
 .g-lab{background:#F3EDF9;color:#5B3A85}.g-direct{background:#EEF2F6;color:#4A6478}
 .m-rent{background:#FEF2E8;color:#D9611A}.m-refill{background:#E7F5ED;color:#0F6B3D}.m-b2b{background:#F3EDF9;color:#5B3A85}
 .why{color:var(--mut);font-size:13px}
+.st-out{background:#FBEBE9;color:#C0392B}.tag.price{background:#EEF2F6;color:var(--navy);font-family:Montserrat,sans-serif}
 .lbl{display:none}
 .empty{background:#fff;border-radius:12px;padding:40px;text-align:center;color:var(--mut)}
 footer{text-align:center;font-size:12px;color:var(--mut);padding:24px 0 40px}
@@ -97,9 +98,12 @@ footer{text-align:center;font-size:12px;color:var(--mut);padding:24px 0 40px}
 </div>
 <footer><span id="foot"></span></footer>
 
+<script src="config.js"></script>
 <script src="data/products.js"></script>
+<script src="js/catalog.js"></script>
 <script>
-const { departments: DEPTS, products: P } = window.SALEEM_DATA;
+const DEPTS = SaleemCatalog.bundled.departments;
+let P = [];
 const DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
 const T = {
   en: { _title:'Saleem Supplies — buying list', bar:'Saleem Supplies · internal', lang:'العربية', print:'Print', kk:'Saleem Store · Procurement reference',
@@ -111,6 +115,7 @@ const T = {
     tiers:{1:['Mandatory — the care plan depends on it','Items a doctor or nurse needs the moment a visit generates the need','The test: if this runs out, does an existing patient’s care plan break?','▸ Needs 3–4 weeks of safety stock and at least two suppliers'],
            2:['Useful — worth stocking','Improves comfort, safety or independence, but recovery doesn’t fail without it','The test: does it improve the outcome or comfort, but has an alternative or isn’t critical?','▸ Light safety stock — one supplier is acceptable'],
            3:['Bonus — add later','Comfort, wellness and adjacent goods — real revenue, no role in the care plan','The test: if we never sold this, would any patient be affected?','▸ No pre-stock — order on demand or drop-ship from the supplier']},
+    out:'Out of stock', mo:'month',
     svc:{doctor:'Doctor visit',nursing:'Nursing visit',physio:'Physiotherapy',lab:'Lab visit',direct:'Direct order'}, m:{rent:'Rentable',refill:'Subscription',b2b:'B2B only'},
     foot:'Almostaqbal Alsaleem for Healthcare Services LLC — internal procurement reference. Generated from data/products.js.' },
   ar: { _title:'مستلزمات سليم — قائمة المشتريات', bar:'مستلزمات سليم · داخلي', lang:'English', print:'طباعة', kk:'متجر سليم · مرجع المشتريات',
@@ -122,6 +127,7 @@ const T = {
     tiers:{1:['إلزامي — خطة العلاج تعتمد عليه','الأصناف اللي الطبيب أو الممرض يحتاجها فوراً بعد الزيارة','سؤال الفرز: إذا خلص من المخزن، هل تتعطّل خطة علاج مريض موجود؟','▸ لازم مخزون أمان (3–4 أسابيع) ومورّدين اثنين على الأقل'],
            2:['مفيد — يضاف للقائمة','يحسّن الراحة أو السلامة أو الاستقلالية، لكن التعافي ما يفشل بلاه','سؤال الفرز: يحسّن النتيجة أو الراحة، لكن في بديل أو ما هو حرج؟','▸ مخزون خفيف — مورّد واحد يكفي'],
            3:['إضافي — نضيفه لاحقاً','راحة وعافية وسلع مجاورة — إيراد إضافي بلا دور بخطة الرعاية','سؤال الفرز: لو ما بعناه أبداً، هل يتأثر أي مريض؟','▸ بلا مخزون مسبق — يُطلب عند الحاجة أو بالتوصيل المباشر من المورّد']},
+    out:'غير متوفر', mo:'شهر',
     svc:{doctor:'زيارة طبيب',nursing:'تمريض',physio:'علاج طبيعي',lab:'مختبر',direct:'طلب مباشر'}, m:{rent:'إيجار',refill:'اشتراك',b2b:'جملة فقط'},
     foot:'شركة المستقبل السليم للخدمات الصحية المحدودة — مرجع داخلي للمشتريات. مولّد من data/products.js.' },
 };
@@ -137,9 +143,12 @@ document.addEventListener('error', e => { if(e.target.tagName === 'IMG'){ const 
 
 function row(p){
   const sub = DEPT[p.dept].subs.find(s => s.key === p.sub), qy = encodeURIComponent(p.en + ' medical supply product white background');
-  const models = ['rent', 'refill', 'b2b'].filter(k => p[k]).map(k => `<span class="tag m-${k}">${t('m')[k]}</span>`).join('') || '<span style="color:#c3cfda">—</span>';
+  const models = (['rent', 'refill', 'b2b'].filter(k => p[k]).map(k => `<span class="tag m-${k}">${t('m')[k]}</span>`).join('') || '<span style="color:#c3cfda">—</span>')
+    + (p.status === 'out' ? `<span class="tag st-out">${t('out')}</span>` : '')
+    + (p.price || p.rentPrice ? `<span class="tag price">${[p.price && p.price.toLocaleString('en-US'), p.rentPrice && p.rentPrice.toLocaleString('en-US') + ' / ' + t('mo')].filter(Boolean).join(' · ')} IQD</span>` : '');
+  const thumb = p.img || ('https://tse1.mm.bing.net/th?q=' + qy + '&w=240&h=170&c=7&rs=1&p=0&dpr=1.5&pid=1.7&mkt=en-US&adlt=strict');
   return `<div class="row">
-    <a class="ph" href="https://www.bing.com/images/search?q=${qy}" target="_blank" rel="noopener noreferrer" aria-label="${esc(p.en)}"><span>#${p.id}</span><img src="https://tse1.mm.bing.net/th?q=${qy}&w=240&h=170&c=7&rs=1&p=0&dpr=1.5&pid=1.7&mkt=en-US&adlt=strict" alt="" loading="lazy" referrerpolicy="no-referrer"></a>
+    <a class="ph" href="https://www.bing.com/images/search?q=${qy}" target="_blank" rel="noopener noreferrer" aria-label="${esc(p.en)}"><span>#${p.id}</span><img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer"></a>
     <div class="nm"><b>${esc(L(p))}</b><small>${esc(lang === 'ar' ? p.en : p.ar)}</small><em>${esc(L(sub))} · #${p.id}</em></div>
     <div class="tags"><span class="lbl">${t('hTrig')}:</span>${p.services.map(s => `<span class="tag g-${s}">${t('svc')[s]}</span>`).join('')}</div>
     <div class="tags"><span class="lbl">${t('hModel')}:</span>${models}</div>
@@ -175,7 +184,9 @@ document.addEventListener('click', e => {
 });
 $('#dept').addEventListener('change', e => { dept = e.target.value; list(); });
 $('#q').addEventListener('input', e => { q = e.target.value; list(); });
-render();
+// the same list the shop shows — the Google Sheet when one is connected. A row whose
+// department or section doesn't exist (a typo in the Sheet) is left out rather than breaking the page.
+SaleemCatalog.load().then(cat => { P = cat.products.filter(p => DEPT[p.dept] && DEPT[p.dept].subs.some(s => s.key === p.sub)); render(); });
 </script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 /* Saleem Store — the one product list.
  *
- * Both pages read this file: index.html (the public shop) and supplies.html
- * (the internal buying list). Edit products here and both update.
+ * Every page reads this file: index.html (the shop), supplies.html (the internal
+ * buying list) and admin.html (where it's edited). Edit products in admin.html —
+ * it writes this file for you — or by hand here.
  *
  * departments  how the shop is organised for customers: by what the patient
  *              needs, each with sub-tabs. Order here is the order on screen.
@@ -15,6 +16,11 @@
  *   b2b        clinics only — sold by quote, never from store stock
  *   services   which Saleem visits create the need:
  *              doctor · nursing · physio · lab · direct (customers order it themselves)
+ *   price      optional, IQD. Shown when set; otherwise "price on WhatsApp"
+ *   rentPrice  optional, IQD per month
+ *   status     optional: "out" (shown, can't be ordered) or "hidden" (not shown)
+ *   img        optional photo: a path like assets/products/23.webp, or a URL.
+ *              Empty = a Bing reference thumbnail as a placeholder.
  */
 window.SALEEM_DATA = {
 departments: [
@@ -46,7 +52,7 @@ departments: [
    subs:[{key:"hygiene",en:"Bed bathing & hygiene",ar:"النظافة والاستحمام بالسرير"},{key:"grooming",en:"Mouth, nail & hair care",ar:"العناية بالفم والأظافر والشعر"},{key:"comfort",en:"Comfort",ar:"الراحة"}]},
   {key:"baby",icon:"baby",en:"Mother & Baby",ar:"الأم والطفل",blurbEn:"Breast pumps, pregnancy aids and baby care",blurbAr:"مضخات حليب ومستلزمات حمل ورعاية الطفل",
    subs:[{key:"mother",en:"Pregnancy & breastfeeding",ar:"الحمل والرضاعة"},{key:"infant",en:"Baby care",ar:"رعاية الطفل"}]},
-  {key:"clinic",icon:"clinic",en:"For Clinics",ar:"للعيادات",blurbEn:"Professional equipment and consumables \u2014 quoted per order",blurbAr:"أجهزة ومستهلكات مهنية — بعرض سعر لكل طلب",
+  {key:"clinic",icon:"clinic",en:"For Clinics",ar:"للعيادات",blurbEn:"Professional equipment and consumables — quoted per order",blurbAr:"أجهزة ومستهلكات مهنية — بعرض سعر لكل طلب",
    subs:[{key:"diagnostic",en:"Diagnostic equipment",ar:"أجهزة التشخيص"},{key:"physio",en:"Physiotherapy equipment",ar:"أجهزة العلاج الطبيعي"},{key:"consumables",en:"Clinical consumables",ar:"مستهلكات سريرية"}]},
 ],
 products: [

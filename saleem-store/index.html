@@ -161,6 +161,23 @@ html[dir=rtl] .flip{transform:scaleX(-1)}
 .stepper.light{background:#fff;color:var(--navy);border-color:var(--line)}
 .stepper.light button:hover{background:var(--paper)}
 
+.price{margin:6px 0 0;color:var(--navy);font:800 14px Montserrat,sans-serif}
+html[lang=ar] .price{font-family:Cairo,sans-serif}
+.price small{display:block;color:var(--mut);font-size:12px;font-weight:700}
+.price.big{font-size:22px;margin-top:12px}
+.bdg.out{color:var(--red)}
+.add.ask{border-color:var(--line);color:var(--mut);font-size:13px}
+.add.ask:hover{background:var(--paper);color:var(--navy)}
+.optPrice{margin-inline-start:auto;text-align:end;color:var(--navy);font:800 14px Montserrat,sans-serif;white-space:nowrap}
+.optPrice small{display:block;color:var(--mut);font-size:11.5px;font-weight:700}
+.note.out{background:#FBEBE9;color:#8E2A20;margin-top:18px}
+.sum.est{border-top:1px dashed var(--line);margin-top:0;color:var(--navy)}
+.estNote{margin:0;color:var(--mut);font-size:12.5px}
+.previewBar{position:relative;z-index:45;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:var(--or);color:#fff;font-size:13.5px;font-weight:800;text-align:center}
+.previewBar[hidden]{display:none}
+.previewBar a{color:#fff;text-decoration:underline}
+.loading{height:60vh}
+
 /* ── list pages ─────────────────────────────────── */
 .pageHead{background:#fff;border-bottom:1px solid var(--line)}
 .pageHead .wrap{padding:24px 0 0}
@@ -381,7 +398,8 @@ footer a{color:#fff;font-weight:800}
   <a class="tab clinic" href="#/d/clinic" data-tab="clinic"><svg class="ic"><use href="#d-clinic"/></svg><span data-t="tClinic"></span></a>
 </div></nav>
 
-<main id="view" tabindex="-1"></main>
+<div class="previewBar" id="previewBar" hidden></div>
+<main id="view" tabindex="-1"><div class="loading" aria-hidden="true"></div></main>
 
 <footer><div class="wrap">
   <img src="assets/logo-saleem.png" alt="Saleem" width="91" height="36">
@@ -390,22 +408,15 @@ footer a{color:#fff;font-weight:800}
 </div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="config.js"></script>
 <script src="data/products.js"></script>
+<script src="js/catalog.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════
    ⚙️  CONFIG
    ═══════════════════════════════════════════════════════════ */
-const CONFIG = {
-  // Orders and questions go to this WhatsApp. Same number as the Ozempic
-  // funnel for now — swap in the store's own line when it has one.
-  whatsapp : "9647710335500",           // digits only, no +, for wa.me links
-  bizPhone : "+964 771 033 5500",       // shown in the footer
-  // Prototype photos: reference thumbnails from a Bing image search on the
-  // product name. Brands and models won't match stock. Set false to show the
-  // department icon instead, and replace with real photos before launch.
-  webPhotos: true,
-  pageSize : 24,
-};
+// WhatsApp number, where the catalog comes from, placeholder photos: config.js
+const CONFIG = Object.assign({ pageSize: 24 }, SaleemCatalog.config);
 
 /* ═══════════════════════════════════════════════════════════
    COPY — every string on the page, both languages
@@ -448,6 +459,11 @@ const T = {
     sentT:'تمام — كمّل على واتساب', sentP:'إذا انفتح واتساب ودزّيت الرسالة، فريقنا راح يرجعلك بالسعر وموعد التوصيل.', sentAgain:'افتح واتساب مرة ثانية', sentNew:'ابدأ طلب جديد', sentBack:'رجوع للطلب',
     msgHead:'طلب من متجر سليم', msgName:'الاسم', msgPhone:'الرقم', msgArea:'المنطقة', msgAddr:'العنوان', msgClinic:'العيادة', msgItems:'المستلزمات', msgNotes:'ملاحظات', msgFoot:'رجاءً أكدوا التوفّر والسعر والتوصيل.',
     askMsg:'مرحبا، عندي سؤال عن متجر سليم للمستلزمات الطبية.',
+    bOut:'غير متوفر', askAvail:'اسأل عن التوفّر', askOut:'مرحبا، أريد أسأل متى يتوفّر: {p}', outNote:'هذا المنتج غير متوفر حالياً. راسلنا ونخبرك أول ما يوصل.',
+    orRent:'أو إيجار {p} بالشهر', rentFrom:'إيجار من {p} بالشهر', perMonth:'بالشهر', perDelivery:'لكل توصيلة',
+    priceSet:'السعر المعروض تقريبي ويأكده فريقنا على واتساب قبل التوصيل — ما تدفع شي هسه.',
+    estimate:'المجموع التقريبي', estAll:'فريقنا يأكد السعر النهائي والتوصيل على واتساب.', estPartial:'بعض المنتجات بدون سعر — فريقنا يكمّل السعر على واتساب.',
+    previewing:'معاينة — هذي تعديلات لوحة الإدارة اللي ما انتشرت بعد. محد يشوفها غيرك.', previewExit:'عرض المتجر المنشور',
     foot:'متجر سليم للمستلزمات الطبية المنزلية — شركة المستقبل السليم للخدمات الصحية المحدودة. الصور مرجعية بهذي النسخة التجريبية.', footWa:'واتساب: ',
   },
   en: {
@@ -487,6 +503,11 @@ const T = {
     sentT:'Done — finish in WhatsApp', sentP:'Once WhatsApp opens and you send the message, our team will reply with the price and a delivery time.', sentAgain:'Open WhatsApp again', sentNew:'Start a new order', sentBack:'Back to my order',
     msgHead:'Saleem Store order', msgName:'Name', msgPhone:'Phone', msgArea:'Area', msgAddr:'Address', msgClinic:'Clinic', msgItems:'Items', msgNotes:'Notes', msgFoot:'Please confirm availability, price and delivery.',
     askMsg:'Hello, I have a question about Saleem’s medical supplies store.',
+    bOut:'Out of stock', askAvail:'Ask about availability', askOut:'Hello, when will this be back in stock: {p}', outNote:'This item is out of stock right now. Message us and we’ll tell you as soon as it’s back.',
+    orRent:'or rent for {p} / month', rentFrom:'Rent from {p} / month', perMonth:'/ month', perDelivery:'per delivery',
+    priceSet:'Prices shown are a guide; our team confirms on WhatsApp before delivery — you pay nothing now.',
+    estimate:'Estimated total', estAll:'Our team confirms the final price and delivery on WhatsApp.', estPartial:'Some items have no price yet — our team will complete it on WhatsApp.',
+    previewing:'Preview — unpublished changes from the admin portal. Only you can see this.', previewExit:'View the published shop',
     foot:'Saleem Store for home medical supplies — Almostaqbal Alsaleem for Healthcare Services LLC. Photos are references in this prototype.', footWa:'WhatsApp: ',
   }
 };
@@ -494,13 +515,21 @@ const T = {
 /* ═══════════════════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════════════════ */
-const DATA = window.SALEEM_DATA;
-const DEPTS = DATA.departments;
-const DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
-const PRODUCTS = DATA.products;
-const BYID = new Map(PRODUCTS.map(p => [String(p.id), p]));
 const SERVICES = ['doctor','nursing','physio','lab'];
-const RETAIL = PRODUCTS.filter(p => !p.b2b);
+let DEPTS, DEPT, PRODUCTS, BYID, RETAIL, HAY, SOURCE = 'file';
+function setCatalog(cat){
+  DEPTS = cat.departments;
+  DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
+  // a product pointing at a department or section that no longer exists can't be shown
+  PRODUCTS = cat.products.filter(p => DEPT[p.dept] && DEPT[p.dept].subs.some(s => s.key === p.sub));
+  BYID = new Map(PRODUCTS.map(p => [String(p.id), p]));
+  RETAIL = PRODUCTS.filter(p => !p.b2b);
+  HAY = new Map(PRODUCTS.map(p => {
+    const d = DEPT[p.dept], s = subOf(p);
+    return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr].join(' ')) }];
+  }));
+  SOURCE = cat.source;
+}
 
 // localStorage can be missing or throw (private mode, blocked storage): every
 // access goes through these, and the page works without it.
@@ -510,7 +539,7 @@ const store = {
 };
 
 let lang = store.get('lang', 'ar') === 'en' ? 'en' : 'ar';
-let cart = loadCart();
+let cart = [];
 let customer = Object.assign({name:'', phone:'', area:'', addr:'', notes:'', clinic:''}, store.get('customer', {}));
 let shown = CONFIG.pageSize;
 let lastSent = null;
@@ -518,7 +547,7 @@ let lastSent = null;
 function loadCart(){
   const raw = store.get('cart', []);
   if(!Array.isArray(raw)) return [];
-  return raw.filter(l => l && BYID.has(String(l.id)) && modesFor(BYID.get(String(l.id))).includes(l.mode) && l.qty > 0)
+  return raw.filter(l => l && BYID.has(String(l.id)) && !isOut(BYID.get(String(l.id))) && modesFor(BYID.get(String(l.id))).includes(l.mode) && l.qty > 0)
             .map(l => ({id:String(l.id), mode:l.mode, qty:Math.min(99, Math.floor(l.qty))}));
 }
 const saveCart = () => { store.set('cart', cart); paintCounts(); };
@@ -538,18 +567,20 @@ const pWhy  = p => lang === 'ar' ? p.whyAr : p.whyEn;
 const subOf = p => DEPT[p.dept].subs.find(s => s.key === p.sub);
 const modesFor = p => p.b2b ? ['quote'] : ['buy', ...(p.rent ? ['rent'] : []), ...(p.refill ? ['refill'] : [])];
 const modeLabel = m => t({buy:'mBuy', rent:'mRent', refill:'mRefill', quote:'mQuote'}[m])[0];
+const fmtIqd = n => n.toLocaleString('en-US') + (lang === 'ar' ? ' د.ع' : ' IQD');
+const unitPrice = (p, mode) => mode === 'rent' ? p.rentPrice : (mode === 'buy' || mode === 'refill') ? p.price : null;
+const isOut = p => p.status === 'out';
 const qtyOf = (id, mode) => (cart.find(l => l.id === String(id) && l.mode === mode) || {}).qty || 0;
 const pieces = () => cart.reduce((a, l) => a + l.qty, 0);
 const byNeed = (a, b) => a.tier - b.tier || PRODUCTS.indexOf(a) - PRODUCTS.indexOf(b);
 const byName = (a, b) => pName(a).localeCompare(pName(b), lang);
 const wa = text => 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text);
 
+// the uploaded photo if there is one, else the Bing placeholder, else the department icon
 function photo(p, w){
-  const fb = `<span class="fb">${icon('d-' + DEPT[p.dept].icon)}</span>`;
-  if(!CONFIG.webPhotos) return `<div class="ph noimg">${fb}</div>`;
-  const src = 'https://tse1.mm.bing.net/th?q=' + encodeURIComponent(p.en + ' medical supply product white background') +
-              `&w=${w}&h=${Math.round(w * .75)}&c=7&rs=1&p=0&dpr=1.5&pid=1.7&mkt=en-US&adlt=strict`;
-  return `<div class="ph">${fb}<img src="${src}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>`;
+  const fb = `<span class="fb">${icon('d-' + DEPT[p.dept].icon)}</span>`, ph = SaleemCatalog.photo(p, w);
+  if(!ph.src) return `<div class="ph noimg">${fb}</div>`;
+  return `<div class="ph ${ph.placeholder ? 'web' : 'own'}">${fb}<img src="${esc(ph.src)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>`;
 }
 // a thumbnail that fails to load falls back to the department icon behind it
 document.addEventListener('error', e => {
@@ -558,6 +589,7 @@ document.addEventListener('error', e => {
 
 function badges(p){
   let b = '';
+  if(isOut(p)) b += `<span class="bdg out">${t('bOut')}</span>`;
   if(p.b2b)    b += `<span class="bdg quote" title="${esc(t('mQuote')[0])}">${icon('i-quote')}<span>${t('bQuote')}</span></span>`;
   if(p.rent && !p.b2b)   b += `<span class="bdg rent" title="${esc(t('rentT'))}">${icon('i-rent')}<span>${t('bRent')}</span></span>`;
   if(p.refill && !p.b2b) b += `<span class="bdg refill" title="${esc(t('refillT'))}">${icon('i-refill')}<span>${t('bRefill')}</span></span>`;
@@ -565,15 +597,24 @@ function badges(p){
 }
 
 function addControl(p){
+  if(isOut(p)) return `<a class="add ask" href="${wa(t('askOut', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('askAvail')}</a>`;
   const mode = modesFor(p)[0], q = qtyOf(p.id, mode);
   if(q) return `<div class="stepper" data-line="${p.id}|${mode}"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(q)}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div>`;
   return `<button type="button" class="add" data-add="${p.id}|${mode}">${icon('i-plus')}${p.b2b ? t('addQuote') : t('add')}</button>`;
 }
 
+// "25,000 IQD", or "Rent from 40,000 IQD / month" when only the rental is priced
+function priceLine(p){
+  if(p.b2b) return '';
+  if(p.price) return `<p class="price">${fmtIqd(p.price)}${p.rent && p.rentPrice ? `<small>${t('orRent', {p: fmtIqd(p.rentPrice)})}</small>` : ''}</p>`;
+  if(p.rent && p.rentPrice) return `<p class="price">${t('rentFrom', {p: fmtIqd(p.rentPrice)})}</p>`;
+  return '';
+}
+
 function card(p){
   return `<article class="card" data-card="${p.id}">
     <a href="#/p/${p.id}">${badges(p)}${photo(p, 400)}
-      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3></div></a>
+      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${priceLine(p)}</div></a>
     <div class="cFoot">${addControl(p)}</div></article>`;
 }
 
@@ -581,10 +622,6 @@ function card(p){
 const norm = s => String(s).toLowerCase()
   .replace(/[ً-ْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
   .replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
-const HAY = new Map(PRODUCTS.map(p => {
-  const d = DEPT[p.dept], s = subOf(p);
-  return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr].join(' ')) }];
-}));
 function search(q){
   const words = norm(q).split(' ').filter(Boolean);
   if(!words.length) return [];
@@ -796,16 +833,17 @@ function viewProduct(p){
   return `<div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb" style="margin-top:18px"><a href="#/departments">${t('tDepts')}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}">${esc(L(d))}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}/${s.key}">${esc(L(s))}</a></nav>
     <div class="pd">
-      <div>${photo(p, 700)}${CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
+      <div>${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
       <div class="pInfo" data-product="${p.id}">
         <h1>${esc(pName(p))}</h1><p class="alt" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(lang === 'ar' ? p.en : p.ar)}</p>
-        ${badges(p)}
+        ${badges(p)}${modes.length === 1 && unitPrice(p, modes[0]) ? `<p class="price big">${fmtIqd(unitPrice(p, modes[0]))}</p>` : ''}
         <p class="why"><b>${t('why')}</b>${esc(pWhy(p))}</p>
         ${p.services.some(x => SERVICES.includes(x)) ? `<span class="lbl">${t('usedWith')}</span><div class="svcList">${p.services.filter(x => SERVICES.includes(x)).map(x => `<a class="chip" href="#/s/${x}">${icon('s-' + x)}${t('svc')[x][0]}</a>`).join('')}</div>` : ''}
-        ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(m => `<label class="opt"><input type="radio" name="mode" value="${m}" ${m === sel ? 'checked' : ''}><span><strong>${t(optDesc[m])[0]}</strong><small>${t(optDesc[m])[1]}</small></span></label>`).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
+        ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(m => `<label class="opt"><input type="radio" name="mode" value="${m}" ${m === sel ? 'checked' : ''}><span><strong>${t(optDesc[m])[0]}</strong><small>${t(optDesc[m])[1]}</small></span>${unitPrice(p, m) ? `<b class="optPrice">${fmtIqd(unitPrice(p, m))}${m === 'rent' ? `<small>${t('perMonth')}</small>` : m === 'refill' ? `<small>${t('perDelivery')}</small>` : ''}</b>` : ''}</label>`).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
+        ${isOut(p) ? `<div class="note out">${icon('i-x')}<span>${t('outNote')}</span></div><a class="btn wa block" href="${wa(t('askOut', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('askAvail')}</a>` : `
         <div class="buy"><div class="stepper light" aria-label="${esc(t('qty'))}"><button type="button" data-pdec aria-label="−">${icon('i-minus')}</button><span data-pqty>1</span><button type="button" data-pinc aria-label="+">${icon('i-plus')}</button></div>
           <button type="button" class="btn or" data-padd>${icon('i-bag')}${p.b2b ? t('addQuote') : t('add')}</button></div>
-        <p class="priceNote">${icon('i-shieldok')}<span>${t('price')}</span></p>
+        <p class="priceNote">${icon('i-shieldok')}<span>${t(modes.some(m => unitPrice(p, m)) ? 'priceSet' : 'price')}</span></p>`}
       </div>
     </div>
     ${related.length ? `<section class="sec"><div class="secHead"><h2>${t('moreIn')}</h2><a class="more" href="#/d/${d.key}/${s.key}">${esc(L(s))}${icon('i-chev', 'ic flip')}</a></div><div class="rail">${related.map(card).join('')}</div></section>` : ''}
@@ -825,9 +863,11 @@ function viewOrder(){
         <a href="#/p/${p.id}">${photo(p, 160)}</a>
         <div><h3><a href="#/p/${p.id}">${esc(pName(p))}</a></h3><div class="meta">
           ${modes.length > 1 ? `<label><span class="sr">${t('how2')}</span><select class="sel" data-mode>${modes.map(m => `<option value="${m}" ${m === l.mode ? 'selected' : ''}>${modeLabel(m)}</option>`).join('')}</select></label>` : `<span class="found">${modeLabel(l.mode)}</span>`}
-          <div class="stepper light"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(l.qty)}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div></div></div>
+          <div class="stepper light"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(l.qty)}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div>
+          ${unitPrice(p, l.mode) ? `<span class="found">${fmtIqd(unitPrice(p, l.mode) * l.qty)}${l.mode === 'rent' ? ' ' + t('perMonth') : ''}</span>` : ''}</div></div>
         <button type="button" class="rm" data-rm aria-label="${esc(t('remove'))}">${icon('i-trash')}</button></div>`; }).join('')}
       <div class="sum"><span>${t('total')}</span><span>${num(pieces())}</span></div>
+      ${estimate()}
     </section>
     <form class="panel" id="orderForm" novalidate><h2>${t('details')}</h2><p>${t('detailsP')}</p>
       ${f('name', t('fName'), 'text', 'autocomplete="name" required')}
@@ -840,6 +880,15 @@ function viewOrder(){
       <button class="btn wa block" type="submit">${icon('i-chat')}${t('send')}</button>
     </form>
   </div></div>`;
+}
+
+// what the priced lines add up to; anything unpriced is left to the team
+function estimate(){
+  const priced = cart.filter(l => unitPrice(BYID.get(l.id), l.mode));
+  if(!priced.length) return '';
+  const sum = priced.reduce((a, l) => a + unitPrice(BYID.get(l.id), l.mode) * l.qty, 0);
+  return `<div class="sum est"><span>${t('estimate')}</span><span>${fmtIqd(sum)}</span></div>
+    <p class="estNote">${t(priced.length < cart.length ? 'estPartial' : 'estAll')}</p>`;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -879,7 +928,8 @@ function buildMessage(){
   if(c.addr.trim()) lines.push(t('msgAddr') + ': ' + c.addr.trim());
   if(c.clinic.trim() && cart.some(l => l.mode === 'quote')) lines.push(t('msgClinic') + ': ' + c.clinic.trim());
   lines.push('', '*' + t('msgItems') + ' (' + pieces() + ')*');
-  cart.forEach(l => { const p = BYID.get(l.id); lines.push(`• ${l.qty} × ${pName(p)} — ${modeLabel(l.mode)} [#${p.id}]`); });
+  cart.forEach(l => { const p = BYID.get(l.id), u = unitPrice(p, l.mode);
+    lines.push(`• ${l.qty} × ${pName(p)} — ${modeLabel(l.mode)}${u ? ' — ' + fmtIqd(u * l.qty) : ''} [#${p.id}]`); });
   if(c.notes.trim()) lines.push('', t('msgNotes') + ': ' + c.notes.trim());
   lines.push('', t('msgFoot'));
   return lines.join('\n');
@@ -1002,12 +1052,30 @@ function applyLang(){
   $('#lang').textContent = t('lang');
   $('#orderPill').textContent = t('orderPill');
   $('#footText').textContent = t('foot');
+  if(PRODUCTS) previewBar();
   const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(CONFIG.bizPhone) + '</bdi>'; fw.href = wa(t('askMsg'));
 }
 
+function previewBar(){
+  const bar = $('#previewBar');
+  bar.hidden = SOURCE !== 'draft';
+  bar.innerHTML = `${icon('i-quote')}<span>${t('previewing')}</span><a href="${location.pathname}${location.hash}">${t('previewExit')}</a>`;
+}
+
+const previewing = new URLSearchParams(location.search).has('preview');
 applyLang();
-paintCounts();
-freshNav = true; onRoute();
+SaleemCatalog.load({
+  preview: previewing,
+  // the Sheet answered after we'd drawn the remembered copy: redraw in place
+  onUpdate(cat){ setCatalog(cat); cart = loadCart(); paintCounts(); const y = window.scrollY; render(); window.scrollTo(0, y); },
+}).then(cat => {
+  setCatalog(cat);
+  cart = loadCart();
+  // a preview never touches the real basket
+  if(previewing) store.set = () => {};
+  paintCounts(); previewBar();
+  freshNav = true; onRoute();
+});
 </script>
 </body>
 </html>
