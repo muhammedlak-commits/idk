@@ -10,11 +10,13 @@ home-care supplies, plus the admin portal to run it.
 - **No framework, no build step.** Every page opens straight off disk.
 
 ```
-index.html            the shop: home, departments, search, product pages, order → WhatsApp
-admin.html            the admin portal (code 335500): edit, bulk upload, photos, publish
+index.html            the shop: home, departments, kits, finder, search, product pages, order → WhatsApp
+admin.html            the admin portal (code 335500): products, stores, orders, kits, banners, settings…
 supplies.html         INTERNAL buying list by clinical tier
 config.js             WhatsApp number, where the catalog comes from, placeholder photos
 data/products.js      the product list (or the fallback, once a Google Sheet is connected)
+data/site.js          settings, partner stores (public part), kits, banners
+private/commercial.js PRIVATE: commission %, store contacts. Never deployed
 js/catalog.js         loads the catalog for all three pages
 js/admin-lib.js       Excel / CSV / zip reading and writing, bulk-upload rules (admin only)
 apps-script/          optional Google Sheet backend + SETUP.md
@@ -46,9 +48,46 @@ When a product has a price, it shows on the card and the product page, and the o
 up an estimated total. Without one, it says "price on WhatsApp". An **out-of-stock**
 product stays visible with an "ask about availability" button. A **hidden** one isn't shown.
 
+### What the admin switches on and off
+
+Everything below is set in **admin → Settings / Kits / Banners**:
+
+- **Banners**: the home page carousel. Each banner has an image (or a colour), a title, text and a button in both languages. The whole banner is one link (a department, a kit, a product, rentals, the finder, WhatsApp, or any web address). Optional start and end dates let you schedule offers.
+- **Delivery promise**: "Delivered in 1–2 days", shown on the home page, every product and the order page. An optional delivery fee is added to the estimated total.
+- **Payment methods**: cash on delivery, ZainCash, Qi Card, FastPay, card on delivery. Each is switched on or off; the customer picks one, and it goes into the order message.
+- **Rentals**: one switch for the whole shop. When off, no rent option, badge, filter or rentals page appears anywhere. Rental terms (minimum period, deposit, what's included) and a per-product deposit are shown on rentable items.
+- **Ask our nurse**: a WhatsApp button on its own number, plus the **Help me choose** finder: one question that suggests kits and departments.
+- **Care kits**: ready-made bundles ("Bedridden care", "After hip or knee surgery", …). Each kit has its own page and an **Add the whole kit** button. Six come pre-made.
+- **Clinics and bulk pricing**: the "For clinics" section, plus automatic quantity discounts (for example 10+ pieces 5% off, 25+ 10% off) shown on product pages and applied in the order.
+- **Refill reminders**: customers who order monthly refills can ask to be reminded (needs the Google Sheet; see below).
+- **Partner stores**: optionally show "Supplied by …" on product pages.
+
+The shop also has:
+- **Order again** for returning customers
+- **Recently viewed** products
+- a **Share** button on each product
+- an **add-to-order bar** that stays on screen on phones
+- an order number on every WhatsApp message
+
+## Partner stores and commission
+
+Delivery is done by the delivery company. Saleem earns a percentage on each partner store's sales:
+
+- **Stores tab**: each partner store has a commission %, plus private contact details and notes.
+- **On a product**: choose its store and, if needed, a different % for that one item. Bulk upload has `store` and `commission_pct` columns for doing this in one go.
+- **Kept private**: commission and store contacts never reach the shop.
+  - Locally they live in `private/commercial.js`, which `build-dist.sh` refuses to publish.
+  - In the Google Sheet, the public read leaves them out.
+- **Orders tab** (with the Sheet connected): every order from the shop is logged, and commission is worked out per line at the time of the order. Staff can:
+  - set a final price on unpriced lines
+  - mark orders confirmed, delivered or cancelled
+  - see commission per store for any month (delivered orders only)
+  - download the statement as CSV
+- **Refill reminders**: these show up in the Orders tab on the day they're due. **Send reminder** opens WhatsApp to the customer with a link that refills their basket in one tap (`#/reorder/…`).
+
 ## The admin portal (`admin.html`)
 
-Behind a 6-digit code (**335500**). Four tabs:
+Behind a 6-digit code (**335500**). Besides Stores, Orders, Kits, Banners and Settings (above), these tabs:
 
 - **Products:** search and filter all products; click one to edit names, department,
   prices, rent/refill/clinic, services, status, descriptions and photo. You can add new
@@ -102,7 +141,8 @@ Other notes:
 - **Photos:** Bing placeholders are fine for a prototype. Brands won't match stock, and
   they aren't licensed. Replace them through the Photos tab. To show department icons
   instead of Bing images, set `webPhotos: false`.
-- **Orders aren't stored.** They exist only as the WhatsApp message.
+- **Orders are logged only with the Google Sheet connected.** Without it, they exist only as the WhatsApp message (each with an order number).
+- **`private/` is committed to this repo** so the admin works off disk. If the repo is ever made public, move that file out of it first.
 
 ## Deploying
 
@@ -138,10 +178,11 @@ store files in the same folder, so that preview works. Don't deploy these files.
  "whyEn":"…","whyAr":"…","price":95000,"rentPrice":40000,"img":"assets/products/2.webp"}
 ```
 
-- `id` is stable. Saved baskets and order messages (`[#2]`) refer to it, so never reuse one.
+- `id` is stable. Saved baskets, reorder links and order messages (`[#2]`) refer to it, so never reuse one.
+- `store` is a partner store id from `data/site.js`. Commission is never in this file.
 - `tier` is buying priority (1 means the care plan breaks without it). The shop sorts by it
   but never shows it to customers.
-- `price`, `rentPrice`, `status` (`"out"` / `"hidden"`) and `img` are optional.
+- `price`, `rentPrice`, `deposit`, `status` (`"out"` / `"hidden"`), `img` and `store` are optional.
 - Departments and their sections are defined at the top of the file. The admin and bulk
   upload don't create new ones; add them there by hand.
 

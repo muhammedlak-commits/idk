@@ -208,9 +208,14 @@
     { key: 'why_en',        field: 'whyEn',     width: 50, help: 'Why a patient needs it, English', ar: 'السبب بالإنكليزي' },
     { key: 'why_ar',        field: 'whyAr',     width: 50, help: 'Why a patient needs it, Arabic', ar: 'السبب بالعربي' },
     { key: 'photo_url',     field: 'img',       width: 30, help: 'Optional https:// link to a photo. Blank keeps the current photo; "-" removes it', ar: 'رابط الصورة' },
+    { key: 'store',         field: 'store',     width: 16, help: 'Partner store id or name (see the Stores sheet). "-" unassigns it', ar: 'المتجر الشريك' },
+    { key: 'commission_pct', field: 'commission', width: 14, help: 'PRIVATE. Optional % that overrides the store’s commission for this item. "-" goes back to the store’s', ar: 'نسبة العمولة' },
+    { key: 'deposit_iqd',   field: 'deposit',   width: 12, help: 'Optional refundable deposit on a rental, IQD', ar: 'التأمين' },
   ];
   const ALIASES = {};
   COLUMNS.forEach(c => [c.key, c.field, c.ar].forEach(a => { ALIASES[norm(a)] = c; }));
+  const byKey = k => COLUMNS.find(c => c.key === k);
+  Object.assign(ALIASES, { [norm('commission')]: byKey('commission_pct'), [norm('deposit')]: byKey('deposit_iqd'), [norm('supplier')]: byKey('store') });
   Object.assign(ALIASES, { [norm('name')]: COLUMNS[1], [norm('english name')]: COLUMNS[1], [norm('arabic name')]: COLUMNS[2], [norm('price')]: COLUMNS[6],
     [norm('rent price')]: COLUMNS[7], [norm('photo')]: COLUMNS[15], [norm('image')]: COLUMNS[15], [norm('dept')]: COLUMNS[3], [norm('sub')]: COLUMNS[4] });
 
@@ -221,7 +226,8 @@
         case 'rent': case 'refill': case 'b2b': return v ? 'yes' : 'no';
         case 'services': return (v || []).join(', ');
         case 'status': return STATUS_OUT[v] || 'available';
-        case 'price': case 'rentPrice': return v == null ? '' : v;
+        case 'price': case 'rentPrice': case 'deposit': case 'commission': return v == null ? '' : v;
+        case 'store': return v || '';
         // a photo uploaded in this browser can't ride in a cell; blank keeps it on re-upload
         case 'img': return /^data:/.test(v || '') ? '' : (v || '');
         default: return v == null ? '' : v;
@@ -235,7 +241,8 @@
    * departments for checking department / section
    * → { columns, ignored, rows: [{ line, kind: new|update|same|error, id, name, changes, errors, warnings, product }], missing }
    */
-  function planImport(rows, products, departments) {
+  function planImport(rows, products, departments, stores) {
+    stores = stores || [];
     rows = rows.filter(r => r && r.some(c => String(c == null ? '' : c).trim() !== ''));
     if (!rows.length) throw new Error('The file is empty.');
     const header = rows[0].map(h => ALIASES[norm(h)] || null);
@@ -247,6 +254,7 @@
     const byName = new Map(products.map(p => [norm(p.en), p]));
     const D = new Map(departments.map(d => [d.key, d]));
     const findDept = v => { const n = norm(v); return departments.find(d => [d.key, d.en, d.ar].some(x => norm(x) === n)); };
+    const findStore = v => { const n = norm(v); return stores.find(s => [s.id, s.en, s.ar].some(x => norm(x) === n)); };
     const findSub = (d, v) => { const n = norm(v); return d && d.subs.find(s => [s.key, s.en, s.ar].some(x => norm(x) === n)); };
     const seen = new Set(), out = [];
     let nextId = Math.max(0, ...products.map(p => p.id)) + 1;
@@ -279,7 +287,15 @@
           }
           case 'sub': patch._subRaw = v; break;                    // checked once the department is known
           case 'tier': { const n = Number(v); if ([1, 2, 3].includes(n)) set('tier', n); else errors.push(`tier must be 1, 2 or 3 (got "${v}")`); break; }
-          case 'price': case 'rentPrice': {
+          case 'store': {
+            if (clear) { set('store', ''); break; }
+            const s = findStore(v); if (s) set('store', s.id); else errors.push(`no partner store "${v}"${stores.length ? ' — use one of: ' + stores.map(s => s.id).join(', ') : ' — add stores in the admin first'}`); break;
+          }
+          case 'commission': {
+            if (clear) { set('commission', null); break; }
+            const n = Number(v.replace(/[%\s]/g, '')); if (isFinite(n) && n >= 0 && n <= 100) set('commission', Math.round(n * 100) / 100); else errors.push(`commission_pct must be 0–100 (got "${v}")`); break;
+          }
+          case 'price': case 'rentPrice': case 'deposit': {
             if (clear) { set(c.field, null); break; }
             const n = Number(v.replace(/[,\s]|iqd|د\.?ع/gi, ''));
             if (isFinite(n) && n > 0) set(c.field, Math.round(n)); else errors.push(`${c.key} "${v}" isn’t a price in IQD`); break;
@@ -313,7 +329,7 @@
         if (!patch.dept) errors.push('a new product needs a department');
         if (!patch.sub && patch.dept) errors.push('a new product needs a section');
       }
-      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, status: 'available', img: '' },
+      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, deposit: null, status: 'available', img: '', store: '', commission: null },
                                    base || {}, patch);
       if (merged.b2b && merged.dept !== 'clinic') warnings.push('clinic-only items normally sit in the clinic department');
       if (!merged.b2b && merged.dept === 'clinic') warnings.push('items in the clinic department are normally clinic-only');

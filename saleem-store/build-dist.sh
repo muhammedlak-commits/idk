@@ -2,14 +2,16 @@
 # Assemble the publishable shop into dist/.
 #
 # Public by default: index.html, config.js, js/catalog.js, data/, assets/.
-# Left out: supplies.html (internal buying list), admin.html, apps-script/
-# (it holds the admin code), the docs and these scripts.
+# Left out: private/ (commission and partner-store contacts — never public),
+# supplies.html (internal buying list), admin.html, apps-script/ (it holds the
+# admin code), the docs and these scripts.
 #
 #   ./build-dist.sh               production headers
 #   ./build-dist.sh --staging     adds X-Robots-Tag: noindex, so a test URL can't get indexed
 #   ./build-dist.sh --with-admin  also publishes admin.html. Only worth it once the Google
 #                                 Sheet is connected — then every save is checked against the
-#                                 code by Google, and the page itself holds nothing secret.
+#                                 code by Google, commission comes from the Sheet, and the page
+#                                 itself holds nothing secret (private/ still stays out).
 #                                 Without the Sheet, admin edits only ever reach the browser
 #                                 they're made in, so hosting it gains you nothing.
 set -euo pipefail
@@ -41,5 +43,9 @@ if [ "$staging" = 1 ]; then
   rm -f dist/_headers.bak
   echo "staging: noindex enabled"
 fi
+
+# belt and braces: nothing private may ride along
+if grep -rqs '"commission"' dist/data dist/index.html; then echo "refusing: commission found in dist/" >&2; exit 1; fi
+[ -e dist/private ] && { echo "refusing: dist/private exists" >&2; exit 1; }
 
 echo "dist/ ready — $(find dist -type f | wc -l | tr -d ' ') files, $(du -sh dist | cut -f1)"

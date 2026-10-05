@@ -1,9 +1,13 @@
 # Connecting the store to a Google Sheet
 
 Optional. Without it, the admin portal keeps changes in your browser and you publish
-by downloading an update file. With it, the Sheet *is* the product list: the admin
-saves to it, photos go to your Google Drive, and the shop reads it live, with no files
-to re-upload. It takes about 10 minutes, all in the browser.
+by downloading an update file. With it:
+- the Sheet *is* the store: products, partner stores, settings, kits and banners
+- photos go to your Google Drive
+- the shop reads it all live, with no files to re-upload
+- every order is logged, so you get commission statements and refill reminders
+
+It takes about 10 minutes, all in the browser.
 
 ```
   admin.html  ──save──▶  Google Sheet + Drive  ◀──read──  index.html (the shop)
@@ -58,10 +62,17 @@ code, which the script checks on every save.
 Open `admin.html`, enter the code, then **Publish & connect**:
 
 1. Paste the `/exec` URL → **Connect**.
-2. **Copy the catalog into the Sheet**. This fills it with all products, plus any photos
+2. **Copy everything into the Sheet**. This fills it with all products, stores, settings, kits and banners, plus any photos
    you'd uploaded in your browser draft.
 
-The Sheet now has a **Products** tab, with the same columns as the bulk-upload spreadsheet.
+The Sheet now has four tabs:
+
+| Tab | What's in it |
+|---|---|
+| **Products** | the same columns as the bulk-upload spreadsheet, including the private `commission_pct` |
+| **Stores** | partner stores, their commission % and contacts (private) |
+| **Site** | settings, kits and banners, written by the admin. Don't edit this one by hand |
+| **Orders** | one row per order from the shop: customer, items, total, commission, reminder date, status |
 
 ## 6 — Point the shop at it
 
@@ -80,6 +91,17 @@ visitor sees the last copy their browser saw, and a first-time visitor sees the 
 ---
 
 ## Good to know
+
+- **The public read never includes commission or store contacts.** Anyone with the
+  `/exec` URL can see what the shop shows, and nothing more. Orders can only be read with
+  the code.
+- **Orders are logged as the customer taps Send.** The shop posts the order to the Sheet
+  while it opens WhatsApp. Prices and commission are worked out on Google's side from the
+  Sheet, not taken from the browser. Commission is fixed at that moment, so later changes
+  to a store's % don't rewrite past orders. A cap of 60 orders per 10 minutes stops anyone
+  flooding the tab.
+- **Reminder links** point at the address in admin → Settings → *Published shop address*.
+  Fill it in once the shop has a public URL.
 
 - **Editing the Sheet by hand works.** The shop reads it on the next load. In the Sheet,
   a cell is exactly what's shown: blank means empty. (The bulk upload's

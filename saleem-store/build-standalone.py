@@ -12,6 +12,10 @@ writes Saleem_Store_standalone.html (the shop), Saleem_Supplies_standalone.html
 Keep the admin and store files in the same folder: the admin's "Preview in the
 shop" opens the store file next to it.
 
+Saleem_Admin_standalone.html carries private/commercial.js inside it — commission
+and partner-store contacts. Share it with staff only, never with a store or customer.
+The store file never includes it.
+
 Deploy index.html, not these. The inlined images are base64, so they cost about
 a third more bytes and can't be cached separately by the browser.
 """

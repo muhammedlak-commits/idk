@@ -211,6 +211,81 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
   .match{grid-template-columns:56px 1fr}
   .match .inp{grid-column:1/-1}
 }
+
+/* ── v3: stores, orders, kits, banners, settings ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:6px;position:relative}
+.sc:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.sc h3{font-size:16px}
+.sc .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--mut);font-size:12.5px}
+.sc .big{font:800 26px Montserrat,sans-serif;color:var(--navy)}
+.sc .big small{font-size:13px;color:var(--mut);font-weight:700}
+.sc.off{opacity:.6}
+.sc .ord{position:absolute;inset-inline-end:10px;top:10px;display:flex;gap:4px}
+.sc .ord button{width:28px;height:28px;border:1px solid var(--line);border-radius:7px;background:#fff;display:grid;place-items:center;color:var(--mut)}
+.sc .ord button:hover{border-color:var(--blue);color:var(--navy)}
+.pctIn{position:relative}
+.pctIn input{padding-inline-end:28px}
+.pctIn:after{content:"%";position:absolute;inset-inline-end:11px;bottom:10px;color:var(--mut);font-weight:800}
+.set{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.set h2{font-size:16px;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.set>p{color:var(--mut);margin:0 0 12px;font-size:13px}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:800;color:var(--navy2)}
+.switch input{appearance:none;width:42px;height:24px;border-radius:12px;background:#C9D7E3;position:relative;transition:.15s;cursor:pointer;flex:none;margin:0}
+.switch input:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked{background:var(--green)}
+.switch input:checked:after{inset-inline-start:21px}
+.set .head2{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.set .body{margin-top:12px}
+.set.dim .body{opacity:.5}
+.tierRow{display:grid;grid-template-columns:1fr 1fr 36px;gap:8px;margin-bottom:8px;align-items:end}
+.saveBar{position:sticky;bottom:0;z-index:20;display:flex;gap:10px;align-items:center;padding:12px 0;background:linear-gradient(0deg,var(--paper) 70%,rgba(244,248,251,0))}
+.kitRow{display:grid;grid-template-columns:1fr 70px 130px 36px;gap:8px;align-items:center;margin-bottom:8px}
+.kitRow .inp{width:100%}
+.icons{display:flex;flex-wrap:wrap;gap:6px}
+.icons label{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--blue)}
+.icons input{display:none}
+.icons label:has(input:checked){border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--blue50)}
+.bPrev{position:relative;aspect-ratio:1240/440;border-radius:14px;overflow:hidden;color:#fff;margin-bottom:14px;isolation:isolate}
+.bPrev.navy{background:linear-gradient(120deg,#002444,#003260 55%,#0A5A96)}
+.bPrev.orange{background:linear-gradient(120deg,#B4490C,#F47B20 60%,#FF9A52)}
+.bPrev.green{background:linear-gradient(120deg,#0B5247,#12806F 60%,#2BA392)}
+.bPrev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.bPrev.hasImg:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(0,24,45,.82),rgba(0,24,45,.5) 45%,rgba(0,24,45,0) 75%)}
+html[dir=rtl] .bPrev.hasImg:after{background:linear-gradient(270deg,rgba(0,24,45,.82),rgba(0,24,45,.5) 45%,rgba(0,24,45,0) 75%)}
+.bPrev .bt{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 6%;max-width:72%}
+.bPrev h3{color:#fff;font-size:clamp(15px,2.2vw,24px);line-height:1.2}
+.bPrev p{margin:0;font-size:12.5px;opacity:.9}
+.bPrev span.cta{align-self:flex-start;margin-top:4px;padding:6px 12px;border-radius:9px;background:#fff;color:var(--navy2);font-weight:800;font-size:12px}
+.sc .bPrev{margin:0 0 6px}
+.olist .li{grid-template-columns:110px 96px minmax(160px,1.3fr) minmax(110px,1fr) 70px 110px 110px 100px}
+.olist .li.hd{grid-template-columns:110px 96px minmax(160px,1.3fr) minmax(110px,1fr) 70px 110px 110px 100px}
+.st-new{background:var(--blue50);color:var(--blue)}.st-confirmed{background:var(--amber50);color:var(--amber)}.st-delivered{background:var(--green50);color:var(--green)}.st-cancelled{background:#EEF2F6;color:#4A6478}
+table.lines{width:100%;border-collapse:collapse;font-size:13px}
+table.lines th,table.lines td{padding:7px 6px;border-top:1px solid var(--line);text-align:start;vertical-align:middle}
+table.lines th{font-size:11.5px;color:var(--mut);font-weight:800}
+table.lines .inp{height:34px;width:100%;min-width:70px;padding:0 8px}
+table.stmt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.stmt th,table.stmt td{padding:8px;border-top:1px solid var(--line);text-align:start}
+table.stmt th{color:var(--mut);font-size:12px}
+table.stmt td.n{font-family:Montserrat,sans-serif;font-weight:700}
+table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(--line)}
+.due{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.due:first-of-type{border-top:0}
+.due small{display:block;color:var(--mut)}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:4px 12px;font-size:13.5px;margin-bottom:12px}
+.kv dt{color:var(--mut);font-weight:800}
+.kv dd{margin:0}
+.monthSel{display:flex;gap:8px;align-items:center}
+@media(max-width:860px){
+  .olist .li,.olist .li.hd{grid-template-columns:1fr auto}
+  .olist .li>*:nth-child(n+3){grid-column:1}
+  .olist .li>.c-status{grid-column:2;grid-row:1}
+  .kitRow{grid-template-columns:1fr 60px;}
+  .kitRow select{grid-column:1}
+  .tierRow{grid-template-columns:1fr 1fr 36px}
+  .kv{grid-template-columns:100px 1fr}
+}
 </style>
 </head>
 <body>
@@ -227,6 +302,30 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
   <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M4 9h16M4 14.5h16M10 9v11.5"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9.5L5.5 4h13L20 9.5M4 9.5h16M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0M5 11.5V20h14v-8.5M10 20v-5h4v5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12H6.2zM9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.2-4.2A8.5 8.5 0 1 1 20.5 12z"/></symbol>
+  <symbol id="i-arrowup" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-arrowdown" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <!-- department icons, for kits -->
+  <symbol id="d-walk" viewBox="0 0 24 24"><path d="M7 21V9a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12M7 13h10M5.5 21h3M15.5 21h3M10 7V4.5h4V7"/></symbol>
+  <symbol id="d-brace" viewBox="0 0 24 24"><path d="M9 2.5v6c0 2.5-1 4-1 6.5v6.5M15 2.5v6c0 2.5 1 4 1 6.5v6.5M8.5 8.5h7M8 15h8"/><circle cx="12" cy="11.8" r="1.4"/></symbol>
+  <symbol id="d-pulse" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M6 12.5h3l1.5-3.5 3 7 1.5-3.5h3"/></symbol>
+  <symbol id="d-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/></symbol>
+  <symbol id="d-bandage" viewBox="0 0 24 24"><path d="M4.6 14.4L14.4 4.6a3.5 3.5 0 0 1 5 5L9.6 19.4a3.5 3.5 0 0 1-5-5z"/><path d="M9.5 9.5l5 5"/></symbol>
+  <symbol id="d-syringe" viewBox="0 0 24 24"><path d="M17 3l4 4M19 5l-3 3M15.5 5.5l3 3L9 18l-4 1 1-4zM3 21l3-3"/></symbol>
+  <symbol id="d-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+  <symbol id="d-bed" viewBox="0 0 24 24"><path d="M3 18.5V6M3 14.5h18v4M21 14.5V12a3 3 0 0 0-3-3h-7.5v5.5"/><circle cx="7" cy="11.5" r="1.8"/></symbol>
+  <symbol id="d-lungs" viewBox="0 0 24 24"><path d="M12 3.5v8.5M8.5 6.5C5.5 7.5 3.5 12 3.5 16c0 2 1 3.5 3 3.5S9 18 9 16V9.5M15.5 6.5c3 1 5 5.5 5 9.5 0 2-1 3.5-3 3.5S15 18 15 16V9.5"/></symbol>
+  <symbol id="d-dumbbell" viewBox="0 0 24 24"><path d="M6.5 7v10M3.5 9.5v5M17.5 7v10M20.5 9.5v5M6.5 12h11"/></symbol>
+  <symbol id="d-bath" viewBox="0 0 24 24"><path d="M3.5 12h17v3a4.5 4.5 0 0 1-4.5 4.5H8A4.5 4.5 0 0 1 3.5 15zM6 12V6a2 2 0 0 1 4 0"/></symbol>
+  <symbol id="d-hand" viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4a1.5 1.5 0 0 1 3 0v6M14 10V5.5a1.5 1.5 0 0 1 3 0V13M8 13v-2.5a1.5 1.5 0 0 0-3 0V14c0 4 3 7 7 7s5-3 5-7v-1"/></symbol>
+  <symbol id="d-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="d-baby" viewBox="0 0 24 24"><path d="M10 3h4M9.5 6h5l-.5-3h-4zM8 9.5A2.5 2.5 0 0 1 10.5 7h3A2.5 2.5 0 0 1 16 9.5V19a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2zM8 13h8"/></symbol>
+  <symbol id="d-clinic" viewBox="0 0 24 24"><path d="M4 21V8l8-4.5L20 8v13M2.5 21h19M12 9.5v6M9 12.5h6"/></symbol>
 </svg>
 
 <!-- ─── the code screen ─── -->
@@ -255,6 +354,11 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
   </div></header>
   <nav class="tabs"><div class="wrap">
     <a class="tab" href="#/products" data-tab="products"><svg class="ic"><use href="#i-list"/></svg><span data-t="tProducts"></span></a>
+    <a class="tab" href="#/stores" data-tab="stores"><svg class="ic"><use href="#i-store"/></svg><span data-t="tStores"></span></a>
+    <a class="tab" href="#/orders" data-tab="orders"><svg class="ic"><use href="#i-bag"/></svg><span data-t="tOrders"></span><b class="n" id="dueN" hidden></b></a>
+    <a class="tab" href="#/kits" data-tab="kits"><svg class="ic"><use href="#i-box"/></svg><span data-t="tKits"></span></a>
+    <a class="tab" href="#/banners" data-tab="banners"><svg class="ic"><use href="#i-flag"/></svg><span data-t="tBanners"></span></a>
+    <a class="tab" href="#/settings" data-tab="settings"><svg class="ic"><use href="#i-gear"/></svg><span data-t="tSettings"></span></a>
     <a class="tab" href="#/bulk" data-tab="bulk"><svg class="ic"><use href="#i-up"/></svg><span data-t="tBulk"></span></a>
     <a class="tab" href="#/photos" data-tab="photos"><svg class="ic"><use href="#i-img"/></svg><span data-t="tPhotos"></span></a>
     <a class="tab" href="#/publish" data-tab="publish"><svg class="ic"><use href="#i-send"/></svg><span data-t="tPublish"></span><b class="n" id="pendingN" hidden></b></a>
@@ -272,6 +376,8 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
 
 <script src="config.js"></script>
 <script src="data/products.js"></script>
+<script src="data/site.js"></script>
+<script src="private/commercial.js"></script>
 <script src="js/catalog.js"></script>
 <script src="js/admin-lib.js"></script>
 <script>
@@ -297,26 +403,59 @@ const T = {
   ar: {
     _title:'لوحة متجر سليم', title:'لوحة إدارة المتجر', gateT:'لوحة إدارة متجر سليم', gateP:'اكتب رمز الدخول.', gateLbl:'رمز الدخول', unlock:'دخول',
     wrong:'الرمز غلط.', wait:'محاولات كثيرة. انتظر {s} ثانية.', sheetWrong:'الرمز صحيح هنا، بس الشيت رفضه: {e}', lang:'English',
-    openShop:'فتح المتجر', lock:'قفل', tProducts:'المنتجات', tBulk:'رفع جماعي', tPhotos:'الصور', tPublish:'النشر والربط',
+    openShop:'فتح المتجر', lock:'قفل', tProducts:'المنتجات', tStores:'المتاجر', tOrders:'الطلبات', tKits:'الأطقم', tBanners:'البانرات', tSettings:'الإعدادات', tBulk:'رفع جماعي', tPhotos:'الصور', tPublish:'النشر والربط',
     modeLocal:'مسودة محلية', modeSheet:'مربوط بالشيت',
-    // products
     prodT:'المنتجات', prodP:'اضغط على أي منتج حتى تعدّله.', add:'منتج جديد', search:'ابحث بالاسم أو الرقم…',
-    allDepts:'كل الأقسام', allStatus:'كل الحالات', allPhotos:'كل الصور', withPhoto:'صورة مرفوعة', placeholder:'صورة Bing مؤقتة', changedOnly:'المعدّلة فقط',
-    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة',
+    allDepts:'كل الأقسام', allStatus:'كل الحالات', allPhotos:'كل الصور', allStores:'كل المتاجر', noStore:'بدون متجر', withPhoto:'صورة مرفوعة', placeholder:'صورة Bing مؤقتة', changedOnly:'المعدّلة فقط',
+    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة', hStore:'المتجر · العمولة',
     st:{available:'متوفر', out:'غير متوفر', hidden:'مخفي'}, oRent:'إيجار', oRefill:'شهري', oB2b:'عيادات', perMonth:'/شهر', noPrice:'—',
-    // editor
     edT:'تعديل منتج', newT:'منتج جديد', photo:'الصورة', upload:'رفع صورة', link:'رابط صورة', removePhoto:'حذف الصورة', linkAsk:'الصق رابط الصورة (يبدأ بـ https://)',
     dropHere:'اسحب صورة هنا', bingTag:'Bing — مؤقتة', ownTag:'مرفوعة', pendingTag:'جديدة — تنحفظ مع المنتج',
     photoHelp:'بدون صورة مرفوعة، المتجر يعرض صورة من بحث Bing على الاسم الإنكليزي كصورة مؤقتة.',
     nameEn:'الاسم بالإنكليزي', nameAr:'الاسم بالعربي', dept:'القسم', sub:'القسم الفرعي', tier:'الأهمية (داخلي)', tiers:{1:'1 — إلزامي',2:'2 — مفيد',3:'3 — إضافي'},
-    price:'سعر الشراء (د.ع)', rentPrice:'الإيجار الشهري (د.ع)', optional:'(اختياري)', sell:'طرق البيع', rent:'إيجار', refill:'توصيل شهري', b2b:'للعيادات فقط (عرض سعر)',
+    price:'سعر الشراء (د.ع)', rentPrice:'الإيجار الشهري (د.ع)', deposit:'تأمين الإيجار (د.ع)', optional:'(اختياري)', sell:'طرق البيع', rent:'إيجار', refill:'توصيل شهري', b2b:'للعيادات فقط (عرض سعر)',
     services:'يطلبه عادةً', svc:{doctor:'زيارة طبيب', nursing:'تمريض', physio:'علاج طبيعي', lab:'مختبر', direct:'طلب مباشر'},
     status:'الحالة', whyEn:'ليش يحتاجه المريض (إنكليزي)', whyAr:'ليش يحتاجه المريض (عربي)',
+    store:'المتجر الشريك', commission:'العمولة على هذا المنتج', commissionP:'فارغ = عمولة المتجر ({p}٪). خاص — ما يظهر بالمتجر.', commissionNone:'اختار متجر أولاً',
     save:'حفظ', cancel:'إلغاء', del:'حذف', delAsk:'تحذف «{n}» نهائياً؟\nإذا تريد تشيله من المتجر بس، خلّي الحالة «مخفي».',
-    eName:'اكتب اسم واحد على الأقل', eDept:'اختار القسم', eSub:'اختار القسم الفرعي', ePrice:'رقم صحيح بالدينار',
+    eName:'اكتب اسم واحد على الأقل', eDept:'اختار القسم', eSub:'اختار القسم الفرعي', ePrice:'رقم صحيح بالدينار', ePct:'رقم بين 0 و 100',
     savedLocal:'انحفظ بالمسودة', savedSheet:'انحفظ بالشيت', deleted:'انحذف',
+    // stores
+    storesT:'المتاجر الشريكة', storesP:'المتاجر اللي تجهّز المنتجات. لكل متجر نسبة عمولة، وتكدر تبدّلها لأي منتج من صفحة المنتج.',
+    addStore:'متجر جديد', storeT:'متجر شريك', sId:'المعرّف (بالإنكليزي، بدون مسافات)', sEn:'الاسم بالإنكليزي', sAr:'الاسم بالعربي', sArea:'المنطقة', sPhone:'الهاتف / واتساب', sContact:'الشخص المسؤول', sNotes:'ملاحظات', sComm:'نسبة العمولة', sOn:'فعّال',
+    sProducts:'{n} منتج', sOverrides:'{n} بعمولة خاصة', sShow:'شوف منتجاته', sPrivate:'العمولة والهاتف والملاحظات خاصة — ما تنشر ويا المتجر.',
+    sDelAsk:'تحذف «{n}»؟ منتجاته ({c}) راح تصير بدون متجر.', eId:'معرّف بالإنكليزي بدون مسافات، وما مكرر', noStores:'ماكو متاجر بعد. أضف أول متجر شريك.',
+    // orders
+    ordersT:'الطلبات والعمولة', ordersP:'كل طلب ينرسل من المتجر ينحفظ هنا، ويا العمولة لكل متجر.', ordersLocal:'تسجيل الطلبات يحتاج ربط Google Sheet (تبويب النشر والربط). بدونه، الطلبات توصل على واتساب بس — كل رسالة بيها رقم طلب.',
+    month:'الشهر', oCount:'طلبات', oDelivered:'انوصلت', oSales:'مبيعات منوصلة', oComm:'العمولة المستحقة',
+    dueT:'تذكيرات التجديد المستحقة', dueNone:'ماكو تذكيرات مستحقة اليوم.', dueSend:'أرسل التذكير', dueOn:'مستحق {d}', dueSent:'انرسل التذكير',
+    remindMsgAr:'مرحبا {n}، صار وقت تجديد طلبك من متجر سليم ({i}). اضغط الرابط وطلبك يتجهّز: {u}', remindMsgEn:'Hi {n}, it’s time to refill your Saleem Store order ({i}). Tap to reorder: {u}',
+    stmtT:'العمولة حسب المتجر', stmtP:'من الطلبات المنوصلة بهذا الشهر.', stmtStore:'المتجر', stmtOrders:'طلبات', stmtSales:'المبيعات', stmtComm:'العمولة', stmtCsv:'نزّل الكشف (CSV)', unassigned:'بدون متجر', stmtNone:'ماكو طلبات منوصلة بهذا الشهر.',
+    allSt:'الكل', ost:{new:'جديد', confirmed:'مؤكد', delivered:'انوصل', cancelled:'ملغي'}, hNo:'الرقم', hDate:'التاريخ', hCustomer:'الزبون', hArea:'المنطقة', hItems:'قطع', hTotal:'المجموع', hComm:'العمولة',
+    orderT:'طلب {n}', oCustomer:'الزبون', oPhone:'الهاتف', oAddr:'العنوان', oClinic:'العيادة', oPay:'الدفع', oNotes:'ملاحظاته', oLines:'المستلزمات', lProd:'المنتج', lStore:'المتجر', lQty:'الكمية', lUnit:'سعر القطعة', lOff:'خصم', lTotal:'المجموع', lPct:'العمولة ٪', lComm:'العمولة',
+    staffNote:'ملاحظة داخلية', oSaved:'انحفظ الطلب', refresh:'تحديث', noOrders:'ماكو طلبات بعد.',
+    // kits
+    kitsT:'أطقم الرعاية', kitsP:'مجموعات منتجات لحالة وحدة تظهر بالمتجر. الزبون يضيف الطقم كامل بضغطة.', addKit:'طقم جديد', kitT:'طقم', kEn:'الاسم بالإنكليزي', kAr:'الاسم بالعربي', kBEn:'الوصف بالإنكليزي', kBAr:'الوصف بالعربي',
+    kIcon:'الأيقونة', kSit:'يظهر بأداة «ساعدني أختار» لـ', kItems:'المنتجات', kAddItem:'أضف منتج', kOn:'ظاهر بالمتجر', kN:'{n} منتج', kDelAsk:'تحذف الطقم «{n}»؟', eKit:'الطقم يحتاج اسم ومنتج واحد على الأقل', kPick:'اكتب رقم أو اسم المنتج…', modes:{buy:'شراء', rent:'إيجار', refill:'شهري', quote:'عرض سعر'},
+    // banners
+    bannersT:'البانرات', bannersP:'تظهر أعلى الصفحة الرئيسية وتتبدّل كل ٦ ثواني. كل بانر رابط — للإعلانات والعروض.', addBanner:'بانر جديد', bannerT:'بانر',
+    bImg:'الصورة', bImgP:'1600×570 تقريباً. بدون صورة، البانر يكون بلون.', bTheme:'اللون', themes:{navy:'كحلي', orange:'برتقالي', green:'أخضر'},
+    bEn:'العنوان بالإنكليزي', bAr:'العنوان بالعربي', bTEn:'النص بالإنكليزي', bTAr:'النص بالعربي', bCEn:'زر بالإنكليزي', bCAr:'زر بالعربي', bLink:'لوين يودّي', bCustom:'رابط ثاني', bCustomP:'#/p/21 لمنتج، أو https://… لموقع',
+    bStart:'يبدأ', bEnd:'ينتهي', bOn:'ظاهر', bLive:'ظاهر هسه', bSched:'مجدول', bOff:'مخفي', bDelAsk:'تحذف هذا البانر؟', noBanners:'ماكو بانرات — المتجر يعرض الواجهة الافتراضية.',
+    links:{'#/departments':'الأقسام','#/kits':'الأطقم','#/rent':'الإيجار','#/refill':'التوصيل الشهري','#/finder':'ساعدني أختار','whatsapp':'واتساب المتجر','nurse':'اسأل الممرضة','custom':'رابط ثاني…'},
+    // settings
+    setT:'إعدادات المتجر', setP:'شنو يظهر بالمتجر وشلون يشتغل.', saveSet:'احفظ الإعدادات', setSaved:'انحفظت الإعدادات',
+    setDel:'التوصيل', setDelP:'شركة التوصيل توصّل الطلبات. هذا الوعد يظهر بالرئيسية وبصفحة كل منتج.', dTEn:'الوعد بالإنكليزي', dTAr:'الوعد بالعربي', dNEn:'ملاحظة بالإنكليزي', dNAr:'ملاحظة بالعربي', dFee:'رسوم التوصيل (د.ع)', dFeeP:'فارغ = ما تنضاف للمجموع',
+    setPay:'طرق الدفع', setPayP:'اللي تختاره يظهر للزبون ويختار منه بالطلب.',
+    setRent:'الإيجار', setRentP:'تشغيل وإطفاء الإيجار للمتجر كله. لما يطفى، المنتجات تنباع شراء بس.', rMin:'أقل مدة (شهر)', rDEn:'التأمين بالإنكليزي', rDAr:'التأمين بالعربي', rIEn:'يشمل بالإنكليزي', rIAr:'يشمل بالعربي',
+    setNurse:'اسأل الممرضة', setNurseP:'زر يفتح واتساب على رقم الاستشارات.', nNum:'رقم واتساب (مثلاً 9647701234567)', eNum:'رقم بصيغة دولية، بدون + ', setFinder:'أداة «ساعدني أختار»', setFinderP:'سؤال واحد يقترح أطقم وأقسام.',
+    setKits:'أطقم الرعاية', setKitsP:'إظهار الأطقم بالمتجر (تتعدّل من تبويب الأطقم).',
+    setClinic:'العيادات وخصم الكميات', setClinicP:'قسم «للعيادات» بالمتجر، وخصم تلقائي على الكميات الكبيرة.', cBulk:'خصم الكميات', cMin:'من كمية', cPct:'خصم ٪', cAdd:'أضف شريحة',
+    setRem:'تذكير التجديد', setRemP:'الزبون يختار يتذكّر، وتبويب الطلبات يجمع التذكيرات المستحقة (يحتاج ربط الشيت).', remDays:'بعد كم يوم',
+    setStore:'المتاجر الشريكة', setStoreP:'إظهار «يجهّزه: …» بصفحة المنتج.', setUrl:'رابط المتجر المنشور', setUrlP:'يُستخدم بروابط التذكير. مثلاً https://store.saleem.iq/',
+    on:'شغّال', off:'طافي',
     // bulk
-    bulkT:'رفع جماعي', bulkP:'عدّل المنتجات بملف Excel أو CSV — أسعار، أقسام، حالات، منتجات جديدة — وارفعه مرة وحدة.',
+    bulkT:'رفع جماعي', bulkP:'عدّل المنتجات بملف Excel أو CSV — أسعار، أقسام، متاجر، عمولات، حالات، منتجات جديدة — وارفعه مرة وحدة.',
     s1:'نزّل الملف', s1p:'فيه كل المنتجات الحالية. عدّله بـ Excel أو Google Sheets وخلّي صف العناوين مثل ما هو.',
     xlsx:'Excel ‏(.xlsx)', csv:'CSV', blank:'قالب فارغ',
     rules:'القواعد: خانة فارغة = يبقى مثل ما هو · <code>-</code> = يمسح القيمة · بدون رقم <code>id</code> = منتج جديد · تكدر تحذف أعمدة ما تحتاجها (لازم يبقى id).',
@@ -327,44 +466,72 @@ const T = {
     missingT:'{n} منتج موجود بالكتالوج بس مو بالملف:', keepMissing:'خلّيهم مثل ما هم', hideMissing:'أخفيهم من المتجر',
     ignoredCols:'أعمدة تم تجاهلها: {c}', errSkip:'الصفوف اللي بيها أخطاء ما راح تنطبق. صلّحها بالملف وارفعه مرة ثانية.',
     apply:'طبّق {n} تغيير', nothing:'ماكو تغييرات تنطبق.', applied:'انطبق: {n} تغيير', reupload:'ملف ثاني',
-    // photos
     phT:'الصور', phP:'ارفع صور المنتجات. أي منتج بدون صورة يعرض صورة Bing مؤقتة.',
     dropMany:'اسحب صور كثيرة مرة وحدة', dropManyP:'سمّي كل ملف برقم المنتج — مثلاً 23.jpg أو 23-front.png — أو باسمه الإنكليزي، وتنربط تلقائياً.',
     matched:'{n} صورة انربطت', unmatched:'{n} صورة ما انربطت — اختار المنتج', pickProduct:'اكتب رقم أو اسم المنتج…', savePhotos:'احفظ {n} صورة', clear:'إلغاء',
     fAll:'الكل', fOwn:'مرفوعة', fWeb:'مؤقتة (Bing)', replace:'تغيير', photosSaved:'انحفظت {n} صورة',
-    // publish
     pubT:'النشر والربط', pubLocalP:'التعديلات محفوظة بهذا المتصفح بس، لحد ما تنشرها.',
-    pending:'تعديلات غير منشورة', edited:'معدّل', added:'جديد', removed:'محذوف', photosN:'صور جديدة',
-    preview:'معاينة بالمتجر', previewP:'يفتح المتجر بتعديلاتك — محد يشوفها غيرك.', download:'نزّل التحديث (.zip)', discard:'تجاهل كل التعديلات', discardAsk:'تمسح كل التعديلات غير المنشورة وترجع للكتالوج المنشور؟',
-    howPub:'شلون أنشر؟', howPubSteps:['نزّل ملف التحديث.','فكّه داخل مجلد saleem-store — يبدّل data/products.js ويضيف الصور بـ assets/products/.','ارفع المجلد للاستضافة (أو سوّي commit)، والمتجر يتحدّث.'],
+    pending:'تعديلات غير منشورة', edited:'معدّل', added:'جديد', removed:'محذوف', photosN:'صور جديدة', other:'إعدادات / متاجر / أطقم / بانرات',
+    preview:'معاينة بالمتجر', previewP:'يفتح المتجر بتعديلاتك — محد يشوفها غيرك.', download:'نزّل التحديث (.zip)', discard:'تجاهل كل التعديلات', discardAsk:'تمسح كل التعديلات غير المنشورة وترجع للنسخة المنشورة؟',
+    howPub:'شلون أنشر؟', howPubSteps:['نزّل ملف التحديث.','فكّه داخل مجلد saleem-store — يبدّل data/products.js و data/site.js و private/commercial.js ويضيف الصور.','ارفع المجلد للاستضافة (أو سوّي commit) — بس بدون مجلد private، هذا خاص.'],
     noPending:'ماكو تعديلات غير منشورة.',
-    sheetT:'ربط Google Sheet', sheetP:'بدل تنزيل الملفات، المنتجات والصور تنحفظ بالشيت والمتجر يقرأها مباشرة — بدون إعادة نشر. الخطوات بـ apps-script/SETUP.md.',
+    sheetT:'ربط Google Sheet', sheetP:'بدل تنزيل الملفات، كل شي ينحفظ بالشيت والمتجر يقرأ منه مباشرة — وتنسجّل الطلبات والعمولات. الخطوات بـ apps-script/SETUP.md.',
     urlLbl:'رابط Apps Script ‏(/exec)', test:'فحص', connect:'ربط', disconnect:'فك الربط', connected:'مربوط — {n} منتج بالشيت.',
     testOk:'الرابط شغّال — {n} منتج ظاهر بالمتجر.', testBad:'ما اشتغل: {e}', thisBrowser:'الربط هنا يخص هذا المتصفح. حتى المتجر يقرأ من الشيت، حط نفس الرابط بـ config.js ← catalogUrl.',
-    seed:'انسخ الكتالوج للشيت', seedP:'يبدّل محتوى الشيت بكل المنتجات الحالية (مع صورك المرفوعة). يُستخدم أول مرة.', seedAsk:'هذا يبدّل كل محتوى الشيت بـ {n} منتج. نكمل؟', seeded:'الشيت صار بيه {n} منتج',
-    shopReads:'المتجر حالياً يقرأ من: {s}', srcFile:'الملف data/products.js', srcSheet:'Google Sheet',
-    working:'جاري العمل…', uploading:'رفع الصور {i} من {n}…', fail:'فشل: {e}', locked:'انقفلت اللوحة.',
+    seed:'انسخ كل شي للشيت', seedP:'يبدّل محتوى الشيت بكل المنتجات والمتاجر والإعدادات والأطقم والبانرات الحالية. يُستخدم أول مرة.', seedAsk:'هذا يبدّل كل محتوى الشيت. نكمل؟', seeded:'الشيت صار بيه {n} منتج',
+    shopReads:'المتجر حالياً يقرأ من: {s}', srcFile:'الملفات بمجلد المتجر', srcSheet:'Google Sheet',
+    working:'جاري العمل…', uploading:'رفع الصور {i} من {n}…', fail:'فشل: {e}', locked:'انقفلت اللوحة.', up:'لفوك', down:'لجوه',
   },
   en: {
     _title:'Saleem Store admin', title:'Store admin', gateT:'Saleem Store admin', gateP:'Enter the access code.', gateLbl:'Access code', unlock:'Unlock',
     wrong:'Wrong code.', wait:'Too many attempts. Wait {s} seconds.', sheetWrong:'Code accepted here, but the Sheet refused it: {e}', lang:'العربية',
-    openShop:'Open shop', lock:'Lock', tProducts:'Products', tBulk:'Bulk upload', tPhotos:'Photos', tPublish:'Publish & connect',
+    openShop:'Open shop', lock:'Lock', tProducts:'Products', tStores:'Stores', tOrders:'Orders', tKits:'Kits', tBanners:'Banners', tSettings:'Settings', tBulk:'Bulk upload', tPhotos:'Photos', tPublish:'Publish & connect',
     modeLocal:'Local draft', modeSheet:'Connected to Sheet',
     prodT:'Products', prodP:'Click any product to edit it.', add:'New product', search:'Search by name or number…',
-    allDepts:'All departments', allStatus:'Any status', allPhotos:'Any photo', withPhoto:'Photo uploaded', placeholder:'Bing placeholder', changedOnly:'Changed only',
-    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status',
+    allDepts:'All departments', allStatus:'Any status', allPhotos:'Any photo', allStores:'All stores', noStore:'No store', withPhoto:'Photo uploaded', placeholder:'Bing placeholder', changedOnly:'Changed only',
+    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status', hStore:'Store · commission',
     st:{available:'Available', out:'Out of stock', hidden:'Hidden'}, oRent:'Rent', oRefill:'Monthly', oB2b:'Clinic', perMonth:'/mo', noPrice:'—',
     edT:'Edit product', newT:'New product', photo:'Photo', upload:'Upload photo', link:'Photo link', removePhoto:'Remove photo', linkAsk:'Paste the photo link (starts with https://)',
     dropHere:'Drop a photo here', bingTag:'Bing — placeholder', ownTag:'Uploaded', pendingTag:'New — saved with the product',
     photoHelp:'With no uploaded photo, the shop shows a Bing image search on the English name as a placeholder.',
     nameEn:'Name in English', nameAr:'Name in Arabic', dept:'Department', sub:'Section', tier:'Priority (internal)', tiers:{1:'1 — Mandatory',2:'2 — Useful',3:'3 — Bonus'},
-    price:'Buy price (IQD)', rentPrice:'Monthly rent (IQD)', optional:'(optional)', sell:'Sold as', rent:'Rentable', refill:'Monthly refill', b2b:'Clinics only (quote)',
+    price:'Buy price (IQD)', rentPrice:'Monthly rent (IQD)', deposit:'Rental deposit (IQD)', optional:'(optional)', sell:'Sold as', rent:'Rentable', refill:'Monthly refill', b2b:'Clinics only (quote)',
     services:'Usually requested with', svc:{doctor:'Doctor visit', nursing:'Nursing', physio:'Physiotherapy', lab:'Lab', direct:'Direct order'},
     status:'Status', whyEn:'Why a patient needs it (English)', whyAr:'Why a patient needs it (Arabic)',
+    store:'Partner store', commission:'Commission on this item', commissionP:'Empty = the store’s ({p}%). Private — never shown in the shop.', commissionNone:'Choose a store first',
     save:'Save', cancel:'Cancel', del:'Delete', delAsk:'Delete “{n}” for good?\nTo just take it off the shop, set its status to Hidden.',
-    eName:'Enter at least one name', eDept:'Choose a department', eSub:'Choose a section', ePrice:'A whole number in IQD',
+    eName:'Enter at least one name', eDept:'Choose a department', eSub:'Choose a section', ePrice:'A whole number in IQD', ePct:'A number from 0 to 100',
     savedLocal:'Saved to the draft', savedSheet:'Saved to the Sheet', deleted:'Deleted',
-    bulkT:'Bulk upload', bulkP:'Change many products at once with an Excel or CSV file — prices, departments, status, new products.',
+    storesT:'Partner stores', storesP:'The stores that supply the products. Each has a commission %, and any product can override it on its own page.',
+    addStore:'New store', storeT:'Partner store', sId:'ID (English, no spaces)', sEn:'Name in English', sAr:'Name in Arabic', sArea:'Area', sPhone:'Phone / WhatsApp', sContact:'Contact person', sNotes:'Notes', sComm:'Commission', sOn:'Active',
+    sProducts:'{n} products', sOverrides:'{n} with their own %', sShow:'See its products', sPrivate:'Commission, phone and notes are private — never published with the shop.',
+    sDelAsk:'Delete “{n}”? Its {c} products will have no store.', eId:'An English id with no spaces, not already used', noStores:'No stores yet. Add the first partner store.',
+    ordersT:'Orders & commission', ordersP:'Every order sent from the shop lands here, with commission per store.', ordersLocal:'Logging orders needs the Google Sheet connected (Publish & connect tab). Without it, orders arrive on WhatsApp only — each message carries an order number.',
+    month:'Month', oCount:'Orders', oDelivered:'Delivered', oSales:'Delivered sales', oComm:'Commission due',
+    dueT:'Refill reminders due', dueNone:'No reminders due today.', dueSend:'Send reminder', dueOn:'due {d}', dueSent:'Reminder sent',
+    remindMsgAr:'مرحبا {n}، صار وقت تجديد طلبك من متجر سليم ({i}). اضغط الرابط وطلبك يتجهّز: {u}', remindMsgEn:'Hi {n}, it’s time to refill your Saleem Store order ({i}). Tap to reorder: {u}',
+    stmtT:'Commission by store', stmtP:'From orders delivered this month.', stmtStore:'Store', stmtOrders:'Orders', stmtSales:'Sales', stmtComm:'Commission', stmtCsv:'Download statement (CSV)', unassigned:'No store', stmtNone:'No delivered orders this month.',
+    allSt:'All', ost:{new:'New', confirmed:'Confirmed', delivered:'Delivered', cancelled:'Cancelled'}, hNo:'No.', hDate:'Date', hCustomer:'Customer', hArea:'Area', hItems:'Pcs', hTotal:'Total', hComm:'Commission',
+    orderT:'Order {n}', oCustomer:'Customer', oPhone:'Phone', oAddr:'Address', oClinic:'Clinic', oPay:'Payment', oNotes:'Their notes', oLines:'Items', lProd:'Product', lStore:'Store', lQty:'Qty', lUnit:'Unit price', lOff:'Off', lTotal:'Total', lPct:'Comm. %', lComm:'Commission',
+    staffNote:'Internal note', oSaved:'Order saved', refresh:'Refresh', noOrders:'No orders yet.',
+    kitsT:'Care kits', kitsP:'Sets of products for one situation, shown in the shop. Customers add the whole kit in one tap.', addKit:'New kit', kitT:'Kit', kEn:'Name in English', kAr:'Name in Arabic', kBEn:'Description in English', kBAr:'Description in Arabic',
+    kIcon:'Icon', kSit:'Suggested by “Help me choose” for', kItems:'Products', kAddItem:'Add a product', kOn:'Shown in the shop', kN:'{n} products', kDelAsk:'Delete the kit “{n}”?', eKit:'A kit needs a name and at least one product', kPick:'Type a number or name…', modes:{buy:'Buy', rent:'Rent', refill:'Monthly', quote:'Quote'},
+    bannersT:'Banners', bannersP:'Shown at the top of the home page, rotating every 6 seconds. Each banner is one link — for ads and offers.', addBanner:'New banner', bannerT:'Banner',
+    bImg:'Image', bImgP:'About 1600×570. Without an image, the banner is a colour.', bTheme:'Colour', themes:{navy:'Navy', orange:'Orange', green:'Green'},
+    bEn:'Title in English', bAr:'Title in Arabic', bTEn:'Text in English', bTAr:'Text in Arabic', bCEn:'Button in English', bCAr:'Button in Arabic', bLink:'Where it goes', bCustom:'Other link', bCustomP:'#/p/21 for a product, or https://… for a website',
+    bStart:'Starts', bEnd:'Ends', bOn:'Shown', bLive:'Live now', bSched:'Scheduled', bOff:'Hidden', bDelAsk:'Delete this banner?', noBanners:'No banners — the shop shows its default header.',
+    links:{'#/departments':'Departments','#/kits':'Kits','#/rent':'Rentals','#/refill':'Monthly refills','#/finder':'Help me choose','whatsapp':'The store’s WhatsApp','nurse':'Ask our nurse','custom':'Other link…'},
+    setT:'Store settings', setP:'What the shop shows and how it works.', saveSet:'Save settings', setSaved:'Settings saved',
+    setDel:'Delivery', setDelP:'Orders are delivered by the delivery company. This promise shows on the home page and every product.', dTEn:'Promise in English', dTAr:'Promise in Arabic', dNEn:'Note in English', dNAr:'Note in Arabic', dFee:'Delivery fee (IQD)', dFeeP:'Empty = not added to the total',
+    setPay:'Payment methods', setPayP:'The ones you switch on are shown, and the customer picks one in the order.',
+    setRent:'Rentals', setRentP:'Switches renting on or off for the whole shop. Off, products are sold to buy only.', rMin:'Minimum period (months)', rDEn:'Deposit in English', rDAr:'Deposit in Arabic', rIEn:'Includes, English', rIAr:'Includes, Arabic',
+    setNurse:'Ask our nurse', setNurseP:'A button that opens WhatsApp on the advice line.', nNum:'WhatsApp number (e.g. 9647701234567)', eNum:'International format, no +', setFinder:'“Help me choose” finder', setFinderP:'One question that suggests kits and departments.',
+    setKits:'Care kits', setKitsP:'Show kits in the shop (edit them in the Kits tab).',
+    setClinic:'Clinics & bulk pricing', setClinicP:'The “For clinics” section, and an automatic discount on large quantities.', cBulk:'Bulk discount', cMin:'From qty', cPct:'% off', cAdd:'Add a tier',
+    setRem:'Refill reminders', setRemP:'Customers can ask to be reminded; the Orders tab collects the ones that are due (needs the Sheet).', remDays:'After how many days',
+    setStore:'Partner stores', setStoreP:'Show “Supplied by: …” on product pages.', setUrl:'Published shop address', setUrlP:'Used in reminder links. e.g. https://store.saleem.iq/',
+    on:'On', off:'Off',
+    bulkT:'Bulk upload', bulkP:'Change many products at once with an Excel or CSV file — prices, departments, stores, commission, status, new products.',
     s1:'Download the spreadsheet', s1p:'It holds every current product. Edit it in Excel or Google Sheets and keep the heading row as it is.',
     xlsx:'Excel (.xlsx)', csv:'CSV', blank:'Blank template',
     rules:'Rules: blank cell = leave as is · <code>-</code> = clear it · no <code>id</code> = new product · you can delete columns you don’t need (keep id).',
@@ -380,16 +547,16 @@ const T = {
     matched:'{n} photos matched', unmatched:'{n} photos not matched — choose the product', pickProduct:'Type a number or name…', savePhotos:'Save {n} photos', clear:'Cancel',
     fAll:'All', fOwn:'Uploaded', fWeb:'Placeholder (Bing)', replace:'Replace', photosSaved:'Saved {n} photos',
     pubT:'Publish & connect', pubLocalP:'Your changes are saved in this browser only, until you publish them.',
-    pending:'Unpublished changes', edited:'Edited', added:'New', removed:'Deleted', photosN:'New photos',
-    preview:'Preview in the shop', previewP:'Opens the shop with your changes — nobody else sees them.', download:'Download the update (.zip)', discard:'Discard all changes', discardAsk:'Throw away every unpublished change and go back to the published catalog?',
-    howPub:'How do I publish?', howPubSteps:['Download the update.','Unzip it inside the saleem-store folder — it replaces data/products.js and adds photos under assets/products/.','Upload the folder to your host (or commit it), and the shop updates.'],
+    pending:'Unpublished changes', edited:'Edited', added:'New', removed:'Deleted', photosN:'New photos', other:'Settings / stores / kits / banners',
+    preview:'Preview in the shop', previewP:'Opens the shop with your changes — nobody else sees them.', download:'Download the update (.zip)', discard:'Discard all changes', discardAsk:'Throw away every unpublished change and go back to the published version?',
+    howPub:'How do I publish?', howPubSteps:['Download the update.','Unzip it inside the saleem-store folder — it replaces data/products.js, data/site.js and private/commercial.js and adds the images.','Upload the folder to your host (or commit it) — but never the private folder; that one is internal.'],
     noPending:'No unpublished changes.',
-    sheetT:'Connect a Google Sheet', sheetP:'Instead of downloading files, products and photos save to a Sheet and the shop reads it directly — no re-publishing. Steps in apps-script/SETUP.md.',
+    sheetT:'Connect a Google Sheet', sheetP:'Instead of downloading files, everything saves to a Sheet and the shop reads it directly — and orders and commission get logged. Steps in apps-script/SETUP.md.',
     urlLbl:'Apps Script URL (/exec)', test:'Test', connect:'Connect', disconnect:'Disconnect', connected:'Connected — {n} products in the Sheet.',
     testOk:'The link works — {n} products visible in the shop.', testBad:'Didn’t work: {e}', thisBrowser:'Connecting here applies to this browser. For the shop to read the Sheet, put the same URL in config.js → catalogUrl.',
-    seed:'Copy the catalog into the Sheet', seedP:'Replaces the Sheet’s contents with every current product (and your uploaded photos). For the first time.', seedAsk:'This replaces everything in the Sheet with {n} products. Continue?', seeded:'The Sheet now has {n} products',
-    shopReads:'The shop currently reads from: {s}', srcFile:'data/products.js', srcSheet:'the Google Sheet',
-    working:'Working…', uploading:'Uploading photo {i} of {n}…', fail:'Failed: {e}', locked:'Locked.',
+    seed:'Copy everything into the Sheet', seedP:'Replaces the Sheet’s contents with every current product, store, setting, kit and banner. For the first time.', seedAsk:'This replaces everything in the Sheet. Continue?', seeded:'The Sheet now has {n} products',
+    shopReads:'The shop currently reads from: {s}', srcFile:'the files in the shop folder', srcSheet:'the Google Sheet',
+    working:'Working…', uploading:'Uploading image {i} of {n}…', fail:'Failed: {e}', locked:'Locked.', up:'Up', down:'Down',
   }
 };
 
@@ -398,7 +565,16 @@ const T = {
    ═══════════════════════════════════════════════════════════ */
 const C = SaleemCatalog, LIB = SaleemAdminLib;
 const DEPTS = C.bundled.departments, DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
-const PUBLISHED = C.bundled.products.map(C.clean);
+const PRIV = window.SALEEM_PRIVATE || { stores: {}, commission: {} };
+// the published version: public files + the private file, merged
+const PUB = (() => {
+  const site = C.cleanSite(C.bundledSite);
+  return {
+    products: C.bundled.products.map(p => C.clean(Object.assign({}, p, { commission: (PRIV.commission || {})[p.id] }))),
+    stores: site.stores.map(s => Object.assign({ commission: 0, phone: '', contact: '', notes: '' }, s, (PRIV.stores || {})[s.id] || {})),
+    settings: site.settings, kits: site.kits, banners: site.banners,
+  };
+})();
 const ls = {
   get(k, fb){ try{ const v = localStorage.getItem('saleem-admin:' + k); return v == null ? fb : JSON.parse(v); }catch(e){ return fb; } },
   set(k, v){ try{ localStorage.setItem('saleem-admin:' + k, JSON.stringify(v)); }catch(e){} },
@@ -411,10 +587,11 @@ const ss = {
 let lang = ls.get('lang', 'ar') === 'en' ? 'en' : 'ar';
 let backend = ls.get('backend', '') || C.config.catalogUrl || '';
 let session = null;          // { code, at }
-let products = [];           // what this portal is editing
-let filters = { q:'', dept:'', status:'', photo:'', changed:false };
+let products = [], stores = [], settings = PUB.settings, kits = [], banners = [];
+let orders = null, ordersMonth = new Date().toISOString().slice(0, 7), ordersFilter = '';
+let filters = { q:'', dept:'', status:'', photo:'', store:'', changed:false };
 let plan = null, planShow = 'changes', planMissing = 'keep';
-let pendingPhotos = [];      // [{ file, dataUrl, id }]
+let pendingPhotos = [];
 let photoFilter = 'all';
 
 /* ═══════════════════════════════════════════════════════════
@@ -423,19 +600,26 @@ let photoFilter = 'all';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const t = (k, v) => { let s = T[lang][k] ?? T.en[k] ?? k; if(v && typeof s === 'string') for(const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const L = o => o ? (lang === 'ar' ? o.ar : o.en) : '';
+const L = o => o ? (lang === 'ar' ? o.ar || o.en : o.en || o.ar) : '';
 const icon = id => `<svg class="ic"><use href="#${id}"/></svg>`;
 const pName = p => (lang === 'ar' ? p.ar || p.en : p.en || p.ar) || '#' + p.id;
 const subOf = p => DEPT[p.dept] && DEPT[p.dept].subs.find(s => s.key === p.sub);
-const iqd = n => n == null ? '' : n.toLocaleString('en-US');
+const iqd = n => n == null || n === '' ? '' : Number(n).toLocaleString('en-US');
 const sheetMode = () => !!backend;
 const same = (a, b) => JSON.stringify(C.clean(a)) === JSON.stringify(C.clean(b));
+const storeById = id => stores.find(s => s.id === id);
+const effPct = p => p.commission != null ? p.commission : (storeById(p.store) || {}).commission ?? null;
+const slug = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/[\s_]+/g, '-').slice(0, 30);
+const uniq = (base, taken) => { base = base || 'item'; let id = base, i = 2; while(taken.includes(id)) id = base + '-' + i++; return id; };
+const opt = (v, l, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(l)}</option>`;
+const sw = (name, on, label) => `<label class="switch"><input type="checkbox" name="${name}" ${on ? 'checked' : ''}>${esc(label)}</label>`;
 
 let toastT;
 function toast(msg, bad){ const el = $('#toast'); el.textContent = msg; el.classList.toggle('bad', !!bad); el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), bad ? 5000 : 2400); }
 function busy(msg){ $('#busy').hidden = !msg; $('#busyText').textContent = msg || ''; }
 function download(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
 const stamp = () => new Date().toISOString().slice(0, 10);
+const fail = x => { busy(); toast(t('fail', { e: x.message }), true); };
 
 function thumb(p, w, cls = 'thumb'){
   const ph = C.photo(p, w);
@@ -475,24 +659,42 @@ async function api(action, body){
   return j;
 }
 
-async function loadProducts(){
+const fullStore = s => Object.assign({ id: '', en: '', ar: '', area: '', on: true, commission: 0, phone: '', contact: '', notes: '' }, s, { commission: C.pct(s.commission) ?? 0 });
+function useSite(site){ const s = C.cleanSite(site); settings = s.settings; kits = s.kits; banners = s.banners; }
+async function loadAll(){
+  orders = null;
   if(sheetMode()){
     const j = await api('list');
     products = j.products.map(C.clean);
+    stores = (j.stores || []).map(fullStore);
+    useSite(j.site || {});
   } else {
     const d = await C.kv.get('draft');
-    products = d && Array.isArray(d.products) ? d.products.map(C.clean) : PUBLISHED.map(p => Object.assign({}, p));
+    if(d && Array.isArray(d.products)){
+      products = d.products.map(C.clean);
+      const s = d.site || {};
+      stores = (s.stores || PUB.stores).map(fullStore);
+      useSite({ settings: s.settings || PUB.settings, kits: s.kits || PUB.kits, banners: s.banners || PUB.banners });
+    } else {
+      products = PUB.products.map(p => Object.assign({}, p));
+      stores = PUB.stores.map(fullStore);
+      useSite(PUB);
+    }
   }
 }
-async function saveDraft(){ await C.kv.set('draft', { products, updatedAt: new Date().toISOString() }); paintPending(); }
+// the draft carries full store records; the shop's preview strips the private parts
+const draftSite = () => ({ settings, kits, banners, stores });
+async function saveDraft(){ await C.kv.set('draft', { products, site: draftSite(), updatedAt: new Date().toISOString() }); paintPending(); }
 
-// what differs from the published file (local mode only)
+// what differs from the published files (local mode only)
 function pendingChanges(){
-  const pub = new Map(PUBLISHED.map(p => [p.id, p])), now = new Map(products.map(p => [p.id, p]));
+  const pub = new Map(PUB.products.map(p => [p.id, p])), now = new Map(products.map(p => [p.id, p]));
   const out = { edited: [], added: [], removed: [], photos: [] };
   products.forEach(p => { const o = pub.get(p.id); if(!o) out.added.push(p); else if(!same(o, p)) out.edited.push(p); if(/^data:/.test(p.img)) out.photos.push(p); });
-  PUBLISHED.forEach(p => { if(!now.has(p.id)) out.removed.push(p); });
-  out.total = out.edited.length + out.added.length + out.removed.length;
+  PUB.products.forEach(p => { if(!now.has(p.id)) out.removed.push(p); });
+  const j = JSON.stringify;
+  out.other = [j(settings) !== j(PUB.settings), j(kits) !== j(PUB.kits), j(banners) !== j(PUB.banners), j(stores.map(fullStore)) !== j(PUB.stores.map(fullStore))].filter(Boolean).length;
+  out.total = out.edited.length + out.added.length + out.removed.length + out.other;
   return out;
 }
 function paintPending(){
@@ -500,7 +702,13 @@ function paintPending(){
   b.hidden = !n; b.textContent = n;
 }
 
-/** writes products (array) — to the draft, or to the Sheet (photos uploaded after the row exists) */
+// images still held as data: URLs go to Drive first when the Sheet is connected
+async function uploadInline(url, name){
+  if(!sheetMode() || !/^data:/.test(url || '')) return url;
+  return (await api('upload', { dataUrl: url, name })).url;
+}
+
+/** writes products — to the draft, or to the Sheet (photos uploaded after the row exists) */
 async function commit(list, opts){
   opts = opts || {};
   if(!sheetMode()){
@@ -515,14 +723,30 @@ async function commit(list, opts){
   if(list.length){
     const photos = list.filter(p => /^data:/.test(p.img));
     const rows = list.map(p => Object.assign({}, C.clean(p), /^data:/.test(p.img) ? { img: (products.find(x => x.id === p.id) || {}).img || '' } : {}));
-    const j = await api(opts.replace ? 'replaceAll' : 'save', { products: rows });
+    const extra = opts.replace ? { stores, site: { settings, kits, banners: await Promise.all(banners.map(async b => Object.assign({}, b, { img: await uploadInline(b.img, 'banner-' + b.id) }))) } } : {};
+    const j = await api(opts.replace ? 'replaceAll' : 'save', Object.assign({ products: rows }, extra));
     products = j.products.map(C.clean);
+    if(j.stores) stores = j.stores.map(fullStore);
+    if(j.site) useSite(j.site);
     for(let i = 0; i < photos.length; i++){
       if(photos.length > 1) busy(t('uploading', { i: i + 1, n: photos.length }));
       const r = await api('photo', { id: photos[i].id, dataUrl: photos[i].img });
       const k = products.findIndex(x => x.id === photos[i].id); if(k >= 0) products[k] = C.clean(r.product);
     }
   }
+}
+async function commitSite(patch){
+  if('banners' in patch && sheetMode()) patch.banners = await Promise.all(patch.banners.map(async b => Object.assign({}, b, { img: await uploadInline(b.img, 'banner-' + b.id) })));
+  if('settings' in patch) settings = patch.settings;
+  if('kits' in patch) kits = patch.kits;
+  if('banners' in patch) banners = patch.banners;
+  if(sheetMode()){ const j = await api('saveSite', { site: patch }); useSite(j.site); }
+  else await saveDraft();
+}
+async function commitStores(list){
+  stores = list.map(fullStore);
+  if(sheetMode()){ const j = await api('saveStores', { stores }); stores = j.stores.map(fullStore); }
+  else await saveDraft();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -559,20 +783,20 @@ $('#gateForm').addEventListener('submit', async e => {
 
 async function openApp(){
   busy(t('working'));
-  try{ await loadProducts(); }
-  catch(e){ busy(); toast(t('fail', { e: e.message }), true); backend = ''; await loadProducts(); }
+  try{ await loadAll(); }
+  catch(e){ busy(); toast(t('fail', { e: e.message }), true); backend = ''; await loadAll(); }
   busy();
   $('#gate').hidden = true; $('#app').hidden = false;
   paintChrome(); paintPending();
   if(!location.hash || location.hash === '#') location.replace('#/products');
   render();
+  if(sheetMode()) loadOrders(true);
 }
 function lock(){
-  session = null; ss.del('session'); products = []; closeEditor();
+  session = null; ss.del('session'); products = []; orders = null; closeEditor();
   $('#app').hidden = true; $('#gate').hidden = false; $('#code').focus();
 }
 $('#lockBtn').onclick = () => { lock(); toast(t('locked')); };
-// lock after a while without use
 let lastUse = Date.now();
 ['click', 'keydown', 'input'].forEach(ev => document.addEventListener(ev, () => { lastUse = Date.now(); if(session){ session.at = lastUse; ss.set('session', session); } }, true));
 setInterval(() => { if(session && Date.now() - lastUse > ADMIN.idleMinutes * 60000) lock(); }, 30000);
@@ -588,28 +812,39 @@ function paintChrome(){
   $('#toShop').href = ADMIN.shopUrl;
 }
 document.addEventListener('click', e => {
-  if(e.target.closest('[data-lang]')){ lang = lang === 'ar' ? 'en' : 'ar'; ls.set('lang', lang); paintChrome(); if(session) render(); if(!$('#drawer').hidden && editing) openEditor(editing.id, true); }
+  if(e.target.closest('[data-lang]')){ lang = lang === 'ar' ? 'en' : 'ar'; ls.set('lang', lang); paintChrome(); if(session) render(); closeEditor(); }
 });
-window.addEventListener('hashchange', () => { if(session) render(); });
+window.addEventListener('hashchange', () => { if(session){ closeEditor(); render(); } });
 
+const VIEWS = { products: viewProducts, stores: viewStores, orders: viewOrders, kits: viewKits, banners: viewBanners, settings: viewSettings, bulk: viewBulk, photos: viewPhotos, publish: viewPublish };
 function render(){
   const r = (location.hash.match(/^#\/(\w+)/) || [])[1] || 'products';
   $$('.tab').forEach(a => a.dataset.tab === r ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
-  const v = { products: viewProducts, bulk: viewBulk, photos: viewPhotos, publish: viewPublish }[r] || viewProducts;
-  $('#view').innerHTML = v();
-  if(r === 'products') paintList();
+  $('#view').innerHTML = (VIEWS[r] || viewProducts)();
+  if(r === 'products' || !VIEWS[r]) paintList();
   if(r === 'photos') paintPhotoGrid();
 }
+
+// one drawer for every editor
+function openDrawer(title, body, foot){
+  $('#drawer').innerHTML = `<div class="dHead"><h2 id="dTitle">${title}</h2><button class="x" type="button" data-close aria-label="${esc(t('cancel'))}">${icon('i-x')}</button></div>
+    <div class="dBody">${body}</div><div class="dFoot">${foot}</div>`;
+  $('#drawer').hidden = false; $('#shade').hidden = false;
+}
+function closeEditor(){ $('#drawer').hidden = true; $('#shade').hidden = true; editing = null; editStore = null; editKit = null; editBanner = null; editOrder = null; }
+$('#shade').onclick = closeEditor;
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#drawer').hidden) closeEditor(); });
+document.addEventListener('click', e => { if(e.target.closest('[data-close]')) closeEditor(); });
 
 /* ═══════════════════════════════════════════════════════════
    PRODUCTS
    ═══════════════════════════════════════════════════════════ */
 function viewProducts(){
-  const opt = (v, l, cur) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`;
   return `<div class="head"><div><h1>${t('prodT')}</h1><p>${t('prodP')}</p></div><button class="btn or" type="button" data-new>${icon('i-plus')}${t('add')}</button></div>
     <div class="tools">
       <input type="search" id="fq" placeholder="${esc(t('search'))}" value="${esc(filters.q)}" aria-label="${esc(t('search'))}">
       <select id="fdept" aria-label="${esc(t('dept'))}">${opt('', t('allDepts'), filters.dept)}${DEPTS.map(d => opt(d.key, L(d), filters.dept)).join('')}</select>
+      <select id="fstore" aria-label="${esc(t('store'))}">${opt('', t('allStores'), filters.store)}${opt('-', t('noStore'), filters.store)}${stores.map(s => opt(s.id, L(s), filters.store)).join('')}</select>
       <select id="fstatus" aria-label="${esc(t('status'))}">${opt('', t('allStatus'), filters.status)}${C.STATUSES.map(s => opt(s, t('st')[s], filters.status)).join('')}</select>
       <select id="fphoto" aria-label="${esc(t('photo'))}">${opt('', t('allPhotos'), filters.photo)}${opt('own', t('withPhoto'), filters.photo)}${opt('web', t('placeholder'), filters.photo)}</select>
       ${sheetMode() ? '' : `<label class="btn"><input type="checkbox" id="fchanged" ${filters.changed ? 'checked' : ''}> ${t('changedOnly')}</label>`}
@@ -617,52 +852,45 @@ function viewProducts(){
     <p class="count" id="count"></p><div class="list" id="list"></div>`;
 }
 function filtered(){
-  const q = LIB.norm(filters.q), pub = new Map(PUBLISHED.map(p => [p.id, p]));
+  const q = LIB.norm(filters.q), pub = new Map(PUB.products.map(p => [p.id, p]));
   return products.filter(p => (!q || String(p.id) === q || LIB.norm(p.en + ' ' + p.ar).includes(q))
     && (!filters.dept || p.dept === filters.dept) && (!filters.status || p.status === filters.status)
     && (!filters.photo || (filters.photo === 'own') === !!p.img)
+    && (!filters.store || (filters.store === '-' ? !p.store : p.store === filters.store))
     && (!filters.changed || !pub.has(p.id) || !same(pub.get(p.id), p)));
 }
 function paintList(){
-  const list = filtered(), pub = new Map(PUBLISHED.map(p => [p.id, p]));
+  const list = filtered(), pub = new Map(PUB.products.map(p => [p.id, p]));
   $('#count').textContent = t('shown', { n: list.length, t: products.length });
-  $('#list').innerHTML = `<div class="li hd"><span>${t('hPhoto')}</span><span>#</span><span>${t('hName')}</span><span>${t('hDept')}</span><span>${t('hPrice')}</span><span>${t('hOpts')}</span><span>${t('hStatus')}</span></div>` +
-    list.map(p => {
-      const changed = !sheetMode() && (!pub.has(p.id) || !same(pub.get(p.id), p)), s = subOf(p);
+  $('#list').innerHTML = `<div class="li hd"><span>${t('hPhoto')}</span><span>#</span><span>${t('hName')}</span><span>${t('hDept')}</span><span>${t('hPrice')}</span><span>${t('hStore')}</span><span>${t('hStatus')}</span></div>` +
+    list.slice(0, 400).map(p => {
+      const changed = !sheetMode() && (!pub.has(p.id) || !same(pub.get(p.id), p)), s = subOf(p), st = storeById(p.store), pc = effPct(p);
       return `<div class="li" data-edit="${p.id}" tabindex="0" role="button">${changed ? '<i class="dot"></i>' : ''}${thumb(p, 160)}<span class="id">#${p.id}</span>
         <span><b>${esc(pName(p))}</b><small>${esc(lang === 'ar' ? p.en : p.ar)}</small></span>
-        <span class="c-dept"><small>${esc(L(DEPT[p.dept]) || p.dept)} › ${esc(L(s) || p.sub)}</small></span>
+        <span class="c-dept"><small>${esc(L(DEPT[p.dept]) || p.dept)} › ${esc(L(s) || p.sub)}</small><span class="chips">${p.rent ? `<span class="chip c-rent">${t('oRent')}</span>` : ''}${p.refill ? `<span class="chip c-refill">${t('oRefill')}</span>` : ''}${p.b2b ? `<span class="chip c-b2b">${t('oB2b')}</span>` : ''}</span></span>
         <span class="c-price price">${p.price ? iqd(p.price) : p.rentPrice ? '' : `<span class="muted">${t('noPrice')}</span>`}${p.rentPrice ? `<small>${iqd(p.rentPrice)} ${t('perMonth')}</small>` : ''}</span>
-        <span class="c-opts chips">${p.rent ? `<span class="chip c-rent">${t('oRent')}</span>` : ''}${p.refill ? `<span class="chip c-refill">${t('oRefill')}</span>` : ''}${p.b2b ? `<span class="chip c-b2b">${t('oB2b')}</span>` : ''}</span>
+        <span class="c-opts"><small>${st ? esc(L(st)) : `<span class="muted">${t('noStore')}</span>`}${pc != null && st ? ` · <b class="mono">${pc}%</b>${p.commission != null ? ' ✎' : ''}` : ''}</small></span>
         <span class="c-status"><span class="st st-${p.status}">${t('st')[p.status]}</span></span></div>`;
     }).join('');
 }
-document.addEventListener('input', e => {
-  if(e.target.id === 'fq'){ filters.q = e.target.value; paintList(); }
-});
+document.addEventListener('input', e => { if(e.target.id === 'fq'){ filters.q = e.target.value; paintList(); } });
 document.addEventListener('change', e => {
-  const id = e.target.id;
-  if(id === 'fdept') filters.dept = e.target.value;
-  else if(id === 'fstatus') filters.status = e.target.value;
-  else if(id === 'fphoto') filters.photo = e.target.value;
+  const id = e.target.id, map = { fdept: 'dept', fstatus: 'status', fphoto: 'photo', fstore: 'store' };
+  if(map[id]) filters[map[id]] = e.target.value;
   else if(id === 'fchanged') filters.changed = e.target.checked;
   else return;
   paintList();
 });
 
-/* ── editor ── */
-let editing = null;          // working copy
+let editing = null;
 function openEditor(id, keep){
   const isNew = id == null;
-  if(!keep) editing = isNew ? C.clean({ id: Math.max(0, ...products.map(p => p.id), ...PUBLISHED.map(p => p.id)) + 1, dept: '', sub: '', status: 'available' })
+  if(!keep) editing = isNew ? C.clean({ id: Math.max(0, ...products.map(p => p.id), ...PUB.products.map(p => p.id)) + 1, dept: '', sub: '', status: 'available' })
                             : Object.assign({}, products.find(p => p.id === id));
   editing._new = isNew || editing._new;
-  const p = editing, d = DEPT[p.dept];
-  const opt = (v, l, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(l)}</option>`;
+  const p = editing, d = DEPT[p.dept], st = storeById(p.store);
   const ph = C.photo(p, 500), saved = (products.find(x => x.id === p.id) || {}).img || '', pending = !!p.img && p.img !== saved;
-  $('#drawer').innerHTML = `
-    <div class="dHead"><h2 id="dTitle">${p._new ? t('newT') : t('edT')} <span class="id mono">#${p.id}</span></h2><button class="x" type="button" data-close aria-label="${esc(t('cancel'))}">${icon('i-x')}</button></div>
-    <form class="dBody" id="edForm" novalidate>
+  openDrawer(`${p._new ? t('newT') : t('edT')} <span class="id mono">#${p.id}</span>`, `<form id="edForm" novalidate>
       <div class="photoBox">
         <div class="bigThumb ${ph.src ? '' : 'noimg'}" id="bigThumb">${ph.src ? `<span class="tag ${ph.placeholder ? '' : 'own'}">${ph.placeholder ? t('bingTag') : pending ? t('pendingTag') : t('ownTag')}</span><img src="${esc(ph.src)}" alt="" referrerpolicy="no-referrer">` : ''}<span>${t('dropHere')}</span></div>
         <div><b>${t('photo')}</b><p class="lead" style="margin:4px 0 8px;font-size:12.5px">${t('photoHelp')}</p>
@@ -673,8 +901,14 @@ function openEditor(id, keep){
         <label class="field" data-f="ar"><span>${t('nameAr')}</span><input name="ar" value="${esc(p.ar)}" dir="rtl"></label>
         <label class="field" data-f="dept"><span>${t('dept')}</span><select name="dept">${opt('', '—', p.dept)}${DEPTS.map(x => opt(x.key, L(x), p.dept)).join('')}</select><em class="err">${t('eDept')}</em></label>
         <label class="field" data-f="sub"><span>${t('sub')}</span><select name="sub">${opt('', '—', p.sub)}${(d ? d.subs : []).map(x => opt(x.key, L(x), p.sub)).join('')}</select><em class="err">${t('eSub')}</em></label>
+        <label class="field"><span>${t('store')}</span><select name="store">${opt('', '— ' + t('noStore'), p.store)}${stores.map(s => opt(s.id, L(s) + ' (' + s.commission + '%)', p.store)).join('')}</select></label>
+        <label class="field pctIn" data-f="commission"><span>${t('commission')} <i>${t('optional')}</i></span><input name="commission" inputmode="decimal" dir="ltr" value="${p.commission ?? ''}" placeholder="${st ? st.commission : ''}" ${st ? '' : 'disabled'}><em class="err">${t('ePct')}</em></label>
+      </div>
+      <p class="lead" style="margin:-6px 0 12px;font-size:12px">${st ? t('commissionP', { p: st.commission }) : t('commissionNone')}</p>
+      <div class="grid2">
         <label class="field" data-f="price"><span>${t('price')} <i>${t('optional')}</i></span><input name="price" inputmode="numeric" value="${p.price ?? ''}" dir="ltr"><em class="err">${t('ePrice')}</em></label>
         <label class="field" data-f="rentPrice"><span>${t('rentPrice')} <i>${t('optional')}</i></span><input name="rentPrice" inputmode="numeric" value="${p.rentPrice ?? ''}" dir="ltr" ${p.rent ? '' : 'disabled'}><em class="err">${t('ePrice')}</em></label>
+        <label class="field" data-f="deposit"><span>${t('deposit')} <i>${t('optional')}</i></span><input name="deposit" inputmode="numeric" value="${p.deposit ?? ''}" dir="ltr" ${p.rent ? '' : 'disabled'}><em class="err">${t('ePrice')}</em></label>
         <label class="field"><span>${t('status')}</span><select name="status">${C.STATUSES.map(s => opt(s, t('st')[s], p.status)).join('')}</select></label>
         <label class="field"><span>${t('tier')}</span><select name="tier">${[1, 2, 3].map(n => opt(n, t('tiers')[n], p.tier)).join('')}</select></label>
       </div>
@@ -685,89 +919,475 @@ function openEditor(id, keep){
       <fieldset><legend>${t('services')}</legend><div class="checks">${C.SERVICES.map(s => `<label><input type="checkbox" name="svc" value="${s}" ${p.services.includes(s) ? 'checked' : ''}>${t('svc')[s]}</label>`).join('')}</div></fieldset>
       <label class="field"><span>${t('whyEn')}</span><textarea name="whyEn" dir="ltr">${esc(p.whyEn)}</textarea></label>
       <label class="field"><span>${t('whyAr')}</span><textarea name="whyAr" dir="rtl">${esc(p.whyAr)}</textarea></label>
-    </form>
-    <div class="dFoot"><button class="btn navy" type="submit" form="edForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${p._new ? '' : `<button class="btn red" type="button" data-del>${t('del')}</button>`}</div>`;
-  $('#drawer').hidden = false; $('#shade').hidden = false;
+    </form>`,
+    `<button class="btn navy" type="submit" form="edForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${p._new ? '' : `<button class="btn red" type="button" data-del>${t('del')}</button>`}`);
   if(!keep) $('#drawer [name=en]').focus();
 }
-function closeEditor(){ $('#drawer').hidden = true; $('#shade').hidden = true; editing = null; }
-// read the form back into the working copy, without saving
+const parsePrice = v => { v = String(v || '').replace(/[,\s]/g, ''); if(!v) return null; const n = Number(v); return Number.isInteger(n) && n > 0 ? n : NaN; };
+const parsePct = v => { v = String(v || '').replace(/[%\s]/g, ''); if(!v) return null; const n = Number(v); return isFinite(n) && n >= 0 && n <= 100 ? Math.round(n * 100) / 100 : NaN; };
 function readForm(){
   const f = $('#edForm'); if(!f) return;
   const g = n => f.elements[n];
-  Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value,
+  Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value, store: g('store').value,
     status: g('status').value, tier: +g('tier').value, rent: g('rent').checked, refill: g('refill').checked, b2b: g('b2b').checked,
     services: [...f.querySelectorAll('[name=svc]:checked')].map(x => x.value), whyEn: g('whyEn').value, whyAr: g('whyAr').value,
-    _priceRaw: g('price').value, _rentRaw: g('rentPrice').value });
+    _raw: { price: g('price').value, rentPrice: g('rentPrice').value, deposit: g('deposit').value, commission: g('commission').value } });
 }
+const keepNums = () => { const r = editing._raw || {}; ['price', 'rentPrice', 'deposit'].forEach(k => { const v = parsePrice(r[k]); editing[k] = Number.isNaN(v) ? null : v; }); const c = parsePct(r.commission); editing.commission = Number.isNaN(c) ? null : c; };
 document.addEventListener('change', e => {
   if(!e.target.closest('#edForm')) return;
-  if(['dept', 'rent'].includes(e.target.name)){ readForm(); if(e.target.name === 'dept') editing.sub = ''; keepPrices(); openEditor(editing.id, true); }
+  if(['dept', 'rent', 'store'].includes(e.target.name)){ readForm(); if(e.target.name === 'dept') editing.sub = ''; keepNums(); openEditor(editing.id, true); }
 });
-const parsePrice = v => { v = String(v || '').replace(/[,\s]/g, ''); if(!v) return null; const n = Number(v); return Number.isInteger(n) && n > 0 ? n : NaN; };
 document.addEventListener('submit', async e => {
   if(e.target.id !== 'edForm') return;
   e.preventDefault(); readForm();
-  const p = editing, bad = [];
+  const p = editing, r = p._raw, bad = [];
   if(!p.en && !p.ar) bad.push('en');
   if(!p.dept) bad.push('dept');
   if(!p.sub) bad.push('sub');
-  const price = parsePrice(p._priceRaw), rentPrice = p.rent ? parsePrice(p._rentRaw) : null;
-  if(Number.isNaN(price)) bad.push('price');
-  if(Number.isNaN(rentPrice)) bad.push('rentPrice');
+  const price = parsePrice(r.price), rentPrice = p.rent ? parsePrice(r.rentPrice) : null, deposit = p.rent ? parsePrice(r.deposit) : null, commission = p.store ? parsePct(r.commission) : null;
+  [['price', price], ['rentPrice', rentPrice], ['deposit', deposit], ['commission', commission]].forEach(([k, v]) => { if(Number.isNaN(v)) bad.push(k); });
   $$('#edForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
   if(bad.length) return;
-  const out = C.clean(Object.assign({}, p, { price, rentPrice }));
-  out.img = p.img;                         // keep a just-uploaded data: photo for commit()
+  const out = C.clean(Object.assign({}, p, { price, rentPrice, deposit, commission }));
   try{ busy(t('working')); await commit([out]); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }
-  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+  catch(x){ fail(x); }
 });
 document.addEventListener('click', async e => {
-  const el = e.target.closest('[data-edit],[data-new],[data-close],[data-del],[data-pick-one],[data-link],[data-unphoto]');
+  const el = e.target.closest('[data-edit],[data-new],[data-del],[data-pick-one],[data-link],[data-unphoto]');
   if(!el) return;
   if(el.matches('[data-edit]')) openEditor(+el.dataset.edit);
   else if(el.matches('[data-new]')) openEditor(null);
-  else if(el.matches('[data-close]')) closeEditor();
-  else if(el.matches('[data-pick-one]')){ pickTarget = 'editor'; $('#pickOne').click(); }
-  else if(el.matches('[data-link]')){ readForm(); const u = prompt(t('linkAsk'), /^https:/.test(editing.img) ? editing.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editing.img = u.trim(); keepPrices(); openEditor(editing.id, true); } }
-  else if(el.matches('[data-unphoto]')){ readForm(); editing.img = ''; keepPrices(); openEditor(editing.id, true); }
+  else if(el.matches('[data-pick-one]')){ pickTarget = el.dataset.pickOne || 'editor'; $('#pickOne').click(); }
+  else if(el.matches('[data-link]')){
+    const target = el.dataset.link || 'editor';
+    if(target === 'banner'){ readBanner(); const u = prompt(t('linkAsk'), /^https:/.test(editBanner.img) ? editBanner.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editBanner.img = u.trim(); bannerEditor(true); } return; }
+    readForm(); const u = prompt(t('linkAsk'), /^https:/.test(editing.img) ? editing.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editing.img = u.trim(); keepNums(); openEditor(editing.id, true); }
+  }
+  else if(el.matches('[data-unphoto]')){
+    if(el.dataset.unphoto === 'banner'){ readBanner(); editBanner.img = ''; bannerEditor(true); return; }
+    readForm(); editing.img = ''; keepNums(); openEditor(editing.id, true);
+  }
   else if(el.matches('[data-del]')){
     if(!confirm(t('delAsk', { n: pName(editing) }))) return;
     try{ busy(t('working')); await commit([], { remove: [editing.id] }); busy(); closeEditor(); render(); toast(t('deleted')); }
-    catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+    catch(x){ fail(x); }
   }
 });
-const keepPrices = () => { editing.price = parsePrice(editing._priceRaw); editing.rentPrice = parsePrice(editing._rentRaw); if(Number.isNaN(editing.price)) editing.price = null; if(Number.isNaN(editing.rentPrice)) editing.rentPrice = null; };
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape' && !$('#drawer').hidden) closeEditor();
-  if(e.key === 'Enter' && e.target.matches('.li[data-edit]')) openEditor(+e.target.dataset.edit);
-});
-$('#shade').onclick = closeEditor;
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.matches('.li[data-edit]')) openEditor(+e.target.dataset.edit); });
 
-/* photo into the editor: file picker or drag and drop */
-let pickTarget = null;      // 'editor' | product id (photos tab)
+/* photo in: file picker or drag and drop */
+let pickTarget = null;      // 'editor' | 'banner' | product id (photos tab)
 async function photoFile(file, target){
   if(!file || !/^image\//.test(file.type)) return;
+  if(target === 'banner'){ const dataUrl = await LIB.resizeImage(file, 1600); readBanner(); editBanner.img = dataUrl; bannerEditor(true); return; }
   const dataUrl = await LIB.resizeImage(file);
-  if(target === 'editor'){ readForm(); keepPrices(); editing.img = dataUrl; openEditor(editing.id, true); return; }
+  if(target === 'editor'){ readForm(); keepNums(); editing.img = dataUrl; openEditor(editing.id, true); return; }
   const p = products.find(x => x.id === target); if(!p) return;
   try{ busy(t('working')); await commit([Object.assign({}, p, { img: dataUrl })]); busy(); paintPhotoGrid(); toast(t('photosSaved', { n: 1 })); }
-  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+  catch(x){ fail(x); }
 }
-$('#pickOne').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; photoFile(f, pickTarget); });
+$('#pickOne').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; photoFile(f, pickTarget === 'editor' || pickTarget === 'banner' ? pickTarget : +pickTarget); });
 ['dragover', 'dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => {
   // a file dropped anywhere else would open in the tab and lose unsaved work
   if(ev !== 'dragleave') e.preventDefault();
-  const zone = e.target.closest && e.target.closest('#bigThumb, .drop, .pt .thumb');
+  const zone = e.target.closest && e.target.closest('#bigThumb, #bannerDrop, .drop, .pt .thumb');
   if(!zone) return;
   zone.classList.toggle('drag', ev === 'dragover');
   if(ev !== 'drop') return;
   const files = [...(e.dataTransfer.files || [])];
   if(zone.id === 'bigThumb') photoFile(files[0], 'editor');
+  else if(zone.id === 'bannerDrop') photoFile(files[0], 'banner');
   else if(zone.matches('.pt .thumb')) photoFile(files[0], +zone.closest('.pt').dataset.id);
   else if(zone.id === 'sheetDrop') readSheetFile(files[0]);
   else if(zone.id === 'photoDrop') queuePhotos(files);
 }));
+
+/* ═══════════════════════════════════════════════════════════
+   STORES
+   ═══════════════════════════════════════════════════════════ */
+let editStore = null;
+function viewStores(){
+  return `<div class="head"><div><h1>${t('storesT')}</h1><p>${t('storesP')}</p></div><button class="btn or" type="button" data-store-new>${icon('i-plus')}${t('addStore')}</button></div>
+    <p class="note info">${icon('i-lock')}<span>${t('sPrivate')}</span></p>
+    ${stores.length ? `<div class="cards">${stores.map(s => { const n = products.filter(p => p.store === s.id).length, o = products.filter(p => p.store === s.id && p.commission != null).length;
+      return `<div class="sc ${s.on ? '' : 'off'}" data-store="${esc(s.id)}" tabindex="0" role="button"><h3>${esc(L(s))}</h3>
+        <div class="meta">${s.area ? esc(s.area) + ' · ' : ''}<span class="mono">${esc(s.id)}</span>${s.on ? '' : ` · <span class="st st-hidden">${t('off')}</span>`}</div>
+        <div class="big">${s.commission}%<small> ${t('sComm')}</small></div>
+        <div class="meta">${t('sProducts', { n })}${o ? ' · ' + t('sOverrides', { n: o }) : ''}</div></div>`; }).join('')}</div>`
+      : `<div class="panel"><p class="lead" style="margin:0">${t('noStores')}</p></div>`}`;
+}
+function storeEditor(s){
+  editStore = s ? Object.assign({}, s) : fullStore({ _new: true });
+  const x = editStore, n = products.filter(p => p.store === x.id).length;
+  openDrawer(x._new ? t('addStore') : esc(L(x)), `<form id="storeForm" novalidate>
+    <div class="grid2">
+      <label class="field"><span>${t('sEn')}</span><input name="en" value="${esc(x.en)}" dir="ltr"></label>
+      <label class="field"><span>${t('sAr')}</span><input name="ar" value="${esc(x.ar)}" dir="rtl"></label>
+      <label class="field" data-f="id"><span>${t('sId')}</span><input name="sid" value="${esc(x.id)}" dir="ltr" class="mono" ${x._new ? '' : 'readonly'} placeholder="al-nahrain"><em class="err">${t('eId')}</em></label>
+      <label class="field"><span>${t('sArea')}</span><input name="area" value="${esc(x.area)}"></label>
+      <label class="field pctIn" data-f="commission"><span>${t('sComm')}</span><input name="commission" inputmode="decimal" dir="ltr" value="${x.commission}"><em class="err">${t('ePct')}</em></label>
+      <label class="field"><span>${t('sPhone')}</span><input name="phone" value="${esc(x.phone)}" dir="ltr" inputmode="tel"></label>
+      <label class="field"><span>${t('sContact')}</span><input name="contact" value="${esc(x.contact)}"></label>
+      <label class="field" style="align-self:end">${sw('on', x.on, t('sOn'))}</label>
+    </div>
+    <label class="field"><span>${t('sNotes')}</span><textarea name="notes">${esc(x.notes)}</textarea></label>
+    <p class="note info">${icon('i-lock')}<span>${t('sPrivate')}</span></p>
+    ${x._new ? '' : `<button class="btn sm" type="button" data-store-products="${esc(x.id)}">${t('sShow')} (${n})</button>`}
+  </form>`, `<button class="btn navy" type="submit" form="storeForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${x._new ? '' : `<button class="btn red" type="button" data-store-del>${t('del')}</button>`}`);
+}
+document.addEventListener('input', e => {
+  // a new store's id follows its English name until someone types an id
+  if(e.target.closest('#storeForm') && e.target.name === 'en' && editStore && editStore._new && !editStore._idTyped){ const f = $('#storeForm'); f.elements.sid.value = slug(e.target.value); }
+  if(e.target.closest('#storeForm') && e.target.name === 'sid' && editStore) editStore._idTyped = true;
+});
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-store-new],[data-store],[data-store-del],[data-store-products]');
+  if(!x) return;
+  if(x.matches('[data-store-new]')) storeEditor(null);
+  else if(x.matches('[data-store-products]')){ filters = Object.assign(filters, { store: x.dataset.storeProducts, q: '', dept: '' }); closeEditor(); location.hash = '#/products'; }
+  else if(x.matches('[data-store]')) storeEditor(storeById(x.dataset.store));
+  else if(x.matches('[data-store-del]')){
+    const s = editStore, own = products.filter(p => p.store === s.id);
+    if(!confirm(t('sDelAsk', { n: L(s), c: own.length }))) return;
+    try{ busy(t('working')); await commitStores(stores.filter(y => y.id !== s.id)); if(own.length) await commit(own.map(p => Object.assign({}, p, { store: '', commission: null }))); busy(); closeEditor(); render(); toast(t('deleted')); }
+    catch(err){ fail(err); }
+  }
+});
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.matches('.sc[data-store]')) storeEditor(storeById(e.target.dataset.store)); });
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'storeForm') return;
+  e.preventDefault();
+  const f = e.target.elements, x = editStore, bad = [];
+  const id = (x._new ? slug(f.sid.value) : x.id), pc = parsePct(f.commission.value);
+  if(!id || (x._new && stores.some(s => s.id === id))) bad.push('id');
+  if(pc == null || Number.isNaN(pc)) bad.push('commission');
+  $$('#storeForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
+  if(bad.length) return;
+  const rec = fullStore({ id, en: f.en.value.trim(), ar: f.ar.value.trim(), area: f.area.value.trim(), commission: pc, phone: f.phone.value.trim(), contact: f.contact.value.trim(), notes: f.notes.value, on: f.on.checked });
+  if(!rec.en && !rec.ar) rec.en = id;
+  const list = x._new ? stores.concat(rec) : stores.map(s => s.id === id ? rec : s);
+  try{ busy(t('working')); await commitStores(list); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }
+  catch(err){ fail(err); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ORDERS — logged by the shop when the Sheet is connected
+   ═══════════════════════════════════════════════════════════ */
+let editOrder = null;
+async function loadOrders(quiet){
+  if(!sheetMode()) return;
+  try{ if(!quiet) busy(t('working')); orders = (await api('orders')).orders; busy(); paintDue(); if(/#\/orders/.test(location.hash)) render(); }
+  catch(x){ if(quiet) console.warn(x); else fail(x); }
+}
+const today = () => new Date().toISOString().slice(0, 10);
+const dueList = () => (orders || []).filter(o => o.remind && !o.reminded_at && o.status !== 'cancelled' && o.remind_on && o.remind_on <= today()).sort((a, b) => a.remind_on < b.remind_on ? -1 : 1);
+function paintDue(){ const n = dueList().length, b = $('#dueN'); b.hidden = !n; b.textContent = n; }
+const pieceCount = o => (o.lines || []).reduce((a, l) => a + (l.qty || 0), 0);
+function statement(month){
+  const by = new Map();
+  (orders || []).filter(o => o.status === 'delivered' && String(o.created_at).slice(0, 7) === month).forEach(o => {
+    const seen = new Set();
+    (o.lines || []).forEach(l => {
+      const k = l.store || '', row = by.get(k) || { store: k, name: l.storeName || (storeById(k) ? L(storeById(k)) : ''), orders: 0, sales: 0, commission: 0, lines: [] };
+      if(!seen.has(k)){ row.orders++; seen.add(k); }
+      row.sales += l.total || 0; row.commission += l.commission || 0; row.lines.push(Object.assign({ order: o.id, date: String(o.created_at).slice(0, 10) }, l));
+      by.set(k, row);
+    });
+  });
+  return [...by.values()].sort((a, b) => b.commission - a.commission);
+}
+function viewOrders(){
+  const head = `<div class="head"><div><h1>${t('ordersT')}</h1><p>${t('ordersP')}</p></div>${sheetMode() ? `<button class="btn" type="button" data-orders-refresh>${t('refresh')}</button>` : ''}</div>`;
+  if(!sheetMode()) return head + `<p class="note info">${icon('i-info')}<span>${t('ordersLocal')}</span></p>`;
+  if(!orders) return head + `<div class="panel"><p class="lead" style="margin:0">${t('working')}</p></div>`;
+  const months = [...new Set([today().slice(0, 7), ...orders.map(o => String(o.created_at).slice(0, 7))])].sort().reverse();
+  const inMonth = orders.filter(o => String(o.created_at).slice(0, 7) === ordersMonth), del = inMonth.filter(o => o.status === 'delivered');
+  const stmt = statement(ordersMonth), due = dueList();
+  const list = inMonth.filter(o => !ordersFilter || o.status === ordersFilter);
+  return head + `
+    <div class="tools"><label class="monthSel"><b>${t('month')}</b><select id="omonth" class="inp">${months.map(m => opt(m, m, ordersMonth)).join('')}</select></label></div>
+    <div class="stat"><div><b>${inMonth.length}</b><span>${t('oCount')}</span></div><div><b>${del.length}</b><span>${t('oDelivered')}</span></div>
+      <div><b>${iqd(del.reduce((a, o) => a + (Number(o.est_total_iqd) || 0), 0))}</b><span>${t('oSales')} (IQD)</span></div><div><b>${iqd(del.reduce((a, o) => a + (Number(o.commission_iqd) || 0), 0))}</b><span>${t('oComm')} (IQD)</span></div></div>
+    ${settings.reminders.on ? `<section class="panel"><h2>${icon('i-chat')}${t('dueT')}</h2>${due.length ? due.map(o => `<div class="due"><span><b>${esc(o.name)}</b> · <span class="mono">${esc(o.phone)}</span><small>${esc((o.lines || []).filter(l => l.mode === 'refill').map(l => l.qty + '× ' + l.name).join(', '))} · ${t('dueOn', { d: o.remind_on })}</small></span>
+      <button class="btn sm or" type="button" data-remind="${esc(o.id)}">${icon('i-chat')}${t('dueSend')}</button></div>`).join('') : `<p class="lead" style="margin:0">${t('dueNone')}</p>`}</section>` : ''}
+    <section class="panel"><h2>${icon('i-store')}${t('stmtT')}</h2><p>${t('stmtP')}</p>
+      ${stmt.length ? `<table class="stmt"><thead><tr><th>${t('stmtStore')}</th><th>${t('stmtOrders')}</th><th>${t('stmtSales')}</th><th>${t('stmtComm')}</th></tr></thead><tbody>
+        ${stmt.map(r => `<tr><td>${esc(r.name || t('unassigned'))}</td><td class="n">${r.orders}</td><td class="n">${iqd(r.sales)}</td><td class="n">${iqd(r.commission)}</td></tr>`).join('')}</tbody>
+        <tfoot><tr><td></td><td class="n">${del.length}</td><td class="n">${iqd(stmt.reduce((a, r) => a + r.sales, 0))}</td><td class="n">${iqd(stmt.reduce((a, r) => a + r.commission, 0))}</td></tr></tfoot></table>
+        <div class="row" style="margin-top:12px"><button class="btn" type="button" data-stmt-csv>${icon('i-down')}${t('stmtCsv')}</button></div>` : `<p class="lead" style="margin:0">${t('stmtNone')}</p>`}</section>
+    <div class="sum" style="margin:6px 0 10px">${['', ...['new', 'confirmed', 'delivered', 'cancelled']].map(s => `<button type="button" data-ofilter="${s}" aria-pressed="${ordersFilter === s}"><b>${(s ? inMonth.filter(o => o.status === s) : inMonth).length}</b><span>${s ? t('ost')[s] : t('allSt')}</span></button>`).join('')}</div>
+    ${list.length ? `<div class="list olist"><div class="li hd"><span>${t('hNo')}</span><span>${t('hDate')}</span><span>${t('hCustomer')}</span><span>${t('hArea')}</span><span>${t('hItems')}</span><span>${t('hTotal')}</span><span>${t('hComm')}</span><span>${t('hStatus')}</span></div>
+      ${list.map(o => `<div class="li" data-order="${esc(o.id)}" tabindex="0" role="button"><span class="mono"><b>${esc(o.id)}</b></span><span class="mono">${esc(String(o.created_at).slice(0, 10))}</span>
+        <span><b>${esc(o.name)}</b><small class="mono">${esc(o.phone)}</small></span><span><small>${esc(o.area)}</small></span><span class="mono">${pieceCount(o)}</span>
+        <span class="price">${iqd(o.est_total_iqd) || '—'}</span><span class="price">${iqd(o.commission_iqd) || '—'}</span><span class="c-status"><span class="st st-${esc(o.status)}">${t('ost')[o.status] || esc(o.status)}</span></span></div>`).join('')}</div>`
+      : `<div class="panel"><p class="lead" style="margin:0">${t('noOrders')}</p></div>`}`;
+}
+function orderEditor(o){
+  editOrder = JSON.parse(JSON.stringify(o));
+  const x = editOrder, pay = C.PAYMENTS.find(m => m.key === x.payment);
+  openDrawer(t('orderT', { n: esc(x.id) }), `<form id="orderForm" novalidate>
+    <dl class="kv"><dt>${t('oCustomer')}</dt><dd><b>${esc(x.name)}</b></dd>
+      <dt>${t('oPhone')}</dt><dd><a class="mono" href="https://wa.me/${intl(x.phone)}" target="_blank" rel="noopener">${esc(x.phone)}</a></dd>
+      <dt>${t('hArea')}</dt><dd>${esc(x.area)}</dd>${x.address ? `<dt>${t('oAddr')}</dt><dd>${esc(x.address)}</dd>` : ''}${x.clinic ? `<dt>${t('oClinic')}</dt><dd>${esc(x.clinic)}</dd>` : ''}
+      ${pay ? `<dt>${t('oPay')}</dt><dd>${esc(L(pay))}</dd>` : ''}${x.notes ? `<dt>${t('oNotes')}</dt><dd>${esc(x.notes)}</dd>` : ''}
+      <dt>${t('hDate')}</dt><dd class="mono">${esc(String(x.created_at).replace('T', ' ').slice(0, 16))}</dd></dl>
+    <label class="field"><span>${t('status')}</span><select name="status">${['new', 'confirmed', 'delivered', 'cancelled'].map(s => opt(s, t('ost')[s], x.status)).join('')}</select></label>
+    <b>${t('oLines')}</b>
+    <div style="overflow-x:auto"><table class="lines"><thead><tr><th>${t('lProd')}</th><th>${t('lStore')}</th><th>${t('lQty')}</th><th>${t('lUnit')}</th><th>${t('lOff')}</th><th>${t('lTotal')}</th><th>${t('lPct')}</th><th>${t('lComm')}</th></tr></thead><tbody>
+      ${x.lines.map((l, i) => `<tr data-ol="${i}"><td>${esc(l.name)} <small class="muted mono">#${l.id}</small></td><td><small>${esc(l.storeName || '—')}</small></td><td class="mono">${l.qty}× <small>${t('modes')[l.mode] || l.mode}</small></td>
+        <td><input class="inp mono" name="unit${i}" inputmode="numeric" value="${l.unit ?? ''}" dir="ltr"></td><td class="mono">${l.off ? l.off + '%' : ''}</td><td class="mono" data-tot>${iqd(l.total) || '—'}</td>
+        <td><input class="inp mono" name="pct${i}" inputmode="decimal" value="${l.pct ?? 0}" dir="ltr"></td><td class="mono" data-com>${iqd(l.commission) || '0'}</td></tr>`).join('')}</tbody></table></div>
+    <label class="field" style="margin-top:12px"><span>${t('staffNote')}</span><textarea name="staff_note">${esc(x.staff_note || '')}</textarea></label>
+  </form>`, `<button class="btn navy" type="submit" form="orderForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button>`);
+}
+// live totals while staff type a price or a %
+document.addEventListener('input', e => {
+  const tr = e.target.closest('#orderForm tr[data-ol]'); if(!tr) return;
+  const i = +tr.dataset.ol, l = editOrder.lines[i], f = $('#orderForm').elements;
+  const unit = parsePrice(f['unit' + i].value), pc = parsePct(f['pct' + i].value);
+  const total = unit && !Number.isNaN(unit) ? Math.round(unit * l.qty * (1 - (l.off || 0) / 100)) : null;
+  tr.querySelector('[data-tot]').textContent = iqd(total) || '—';
+  tr.querySelector('[data-com]').textContent = iqd(total && !Number.isNaN(pc) ? Math.round(total * (pc || 0) / 100) : 0) || '0';
+});
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'orderForm') return;
+  e.preventDefault();
+  const f = e.target.elements, x = editOrder;
+  const lines = x.lines.map((l, i) => { const u = parsePrice(f['unit' + i].value), pc = parsePct(f['pct' + i].value); return { unit: Number.isNaN(u) ? l.unit : u, pct: Number.isNaN(pc) || pc == null ? l.pct : pc }; });
+  try{
+    busy(t('working'));
+    const r = await api('updateOrder', { id: x.id, patch: { status: f.status.value, staff_note: f.staff_note.value, lines } });
+    orders = orders.map(o => o.id === x.id ? r.order : o); busy(); closeEditor(); paintDue(); render(); toast(t('oSaved'));
+  }catch(err){ fail(err); }
+});
+const intl = ph => { let d = String(ph || '').replace(/\D/g, ''); if(d.startsWith('0')) d = '964' + d.slice(1); return d; };
+function shopBase(){
+  const u = settings.publicUrl || new URL(ADMIN.shopUrl, location.href).href;
+  return u.split('#')[0];
+}
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-order],[data-remind],[data-ofilter],[data-orders-refresh],[data-stmt-csv]');
+  if(!x) return;
+  if(x.matches('[data-orders-refresh]')) loadOrders();
+  else if(x.dataset.ofilter !== undefined){ ordersFilter = x.dataset.ofilter; render(); }
+  else if(x.matches('[data-order]')) orderEditor(orders.find(o => o.id === x.dataset.order));
+  else if(x.matches('[data-stmt-csv]')){
+    const rows = [['order', 'date', 'store', 'product_id', 'product', 'mode', 'qty', 'unit_iqd', 'discount_pct', 'total_iqd', 'commission_pct', 'commission_iqd']];
+    statement(ordersMonth).forEach(s => s.lines.forEach(l => rows.push([l.order, l.date, s.name || t('unassigned'), l.id, l.name, l.mode, l.qty, l.unit ?? '', l.off || 0, l.total ?? '', l.pct ?? 0, l.commission || 0])));
+    download(new Blob([LIB.csvWrite(rows)], { type: 'text/csv;charset=utf-8' }), 'saleem-commission-' + ordersMonth + '.csv');
+  }
+  else if(x.matches('[data-remind]')){
+    // the reminder opens in WhatsApp for staff to send; it carries a link that refills the basket
+    const o = orders.find(y => y.id === x.dataset.remind), refills = (o.lines || []).filter(l => l.mode === 'refill');
+    const url = shopBase() + '#/reorder/' + C.encodeLines(refills.length ? refills : o.lines);
+    const items = (refills.length ? refills : o.lines).map(l => l.name).join('، ');
+    const msg = t(o.lang === 'en' ? 'remindMsgEn' : 'remindMsgAr', { n: o.name.split(' ')[0], i: items, u: url });
+    window.open('https://wa.me/' + intl(o.phone) + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    try{ const r = await api('updateOrder', { id: o.id, patch: { reminded: true } }); orders = orders.map(y => y.id === o.id ? r.order : y); paintDue(); render(); toast(t('dueSent')); }
+    catch(err){ fail(err); }
+  }
+});
+document.addEventListener('change', e => { if(e.target.id === 'omonth'){ ordersMonth = e.target.value; render(); } });
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.matches('.li[data-order]')) orderEditor(orders.find(o => o.id === e.target.dataset.order)); });
+
+/* ═══════════════════════════════════════════════════════════
+   KITS
+   ═══════════════════════════════════════════════════════════ */
+let editKit = null;
+const KIT_ICONS = ['bed', 'brace', 'walk', 'drop', 'lungs', 'baby', 'heart', 'hand', 'bath', 'bandage', 'pulse', 'syringe', 'shield', 'dumbbell', 'clinic'];
+const modesOf = p => p ? (p.b2b ? ['quote'] : ['buy', ...(p.rent ? ['rent'] : []), ...(p.refill ? ['refill'] : [])]) : ['buy'];
+const pLabel = p => p ? `#${p.id} ${p.en || p.ar}` : '';
+function viewKits(){
+  return `<div class="head"><div><h1>${t('kitsT')}</h1><p>${t('kitsP')}</p></div><button class="btn or" type="button" data-kit-new>${icon('i-plus')}${t('addKit')}</button></div>
+    ${settings.kits.on ? '' : `<p class="note warn">${icon('i-info')}<span>${t('setKits')}: ${t('off')} — ${t('tSettings')}</span></p>`}
+    <div class="cards">${kits.map((k, i) => `<div class="sc ${k.on ? '' : 'off'}" data-kit="${i}" tabindex="0" role="button">
+      <span class="ord"><button type="button" data-kit-move="${i}|-1" aria-label="${t('up')}">${icon('i-arrowup')}</button><button type="button" data-kit-move="${i}|1" aria-label="${t('down')}">${icon('i-arrowdown')}</button></span>
+      <span class="dIcon" style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--or50);color:var(--or2)">${icon('d-' + k.icon)}</span>
+      <h3>${esc(L(k))}</h3><div class="meta">${t('kN', { n: k.items.length })}${k.on ? '' : ` · <span class="st st-hidden">${t('off')}</span>`}</div>
+      <p class="lead" style="margin:0;font-size:12.5px">${esc(lang === 'ar' ? k.blurbAr : k.blurbEn)}</p></div>`).join('')}</div>
+    <datalist id="plist">${products.map(p => `<option value="${esc(pLabel(p))}"></option>`).join('')}</datalist>`;
+}
+function readKit(){
+  const f = $('#kitForm'); if(!f) return;
+  const g = n => f.elements[n];
+  Object.assign(editKit, { en: g('en').value.trim(), ar: g('ar').value.trim(), blurbEn: g('blurbEn').value, blurbAr: g('blurbAr').value, on: g('on').checked,
+    icon: (f.querySelector('[name=icon]:checked') || {}).value || editKit.icon, situations: [...f.querySelectorAll('[name=sit]:checked')].map(x => x.value),
+    items: [...f.querySelectorAll('.kitRow')].map(r => { const m = /#(\d+)/.exec(r.querySelector('[data-kp]').value), p = m && products.find(x => x.id === +m[1]);
+      return { id: p ? p.id : 0, qty: Math.max(1, Math.min(99, +r.querySelector('[data-kq]').value || 1)), mode: r.querySelector('[data-km]').value, _raw: r.querySelector('[data-kp]').value }; }) });
+}
+function kitEditor(keep){
+  const k = editKit;
+  openDrawer(k._new ? t('addKit') : esc(L(k)), `<form id="kitForm" novalidate>
+    <div class="grid2"><label class="field"><span>${t('kEn')}</span><input name="en" value="${esc(k.en)}" dir="ltr"></label><label class="field"><span>${t('kAr')}</span><input name="ar" value="${esc(k.ar)}" dir="rtl"></label></div>
+    <label class="field"><span>${t('kBEn')}</span><textarea name="blurbEn" dir="ltr">${esc(k.blurbEn)}</textarea></label>
+    <label class="field"><span>${t('kBAr')}</span><textarea name="blurbAr" dir="rtl">${esc(k.blurbAr)}</textarea></label>
+    <fieldset><legend>${t('kIcon')}</legend><div class="icons">${KIT_ICONS.map(i => `<label><input type="radio" name="icon" value="${i}" ${k.icon === i ? 'checked' : ''}>${icon('d-' + i)}</label>`).join('')}</div></fieldset>
+    <fieldset style="margin-top:12px"><legend>${t('kSit')}</legend><div class="checks">${C.SITUATIONS.map(s => `<label><input type="checkbox" name="sit" value="${s.key}" ${k.situations.includes(s.key) ? 'checked' : ''}>${esc(L(s))}</label>`).join('')}</div></fieldset>
+    <b>${t('kItems')}</b><div style="margin-top:8px" id="kitRows">
+      ${k.items.map((it, i) => { const p = products.find(x => x.id === it.id); return `<div class="kitRow"><input class="inp" list="plist" data-kp value="${esc(p ? pLabel(p) : it._raw || '')}" placeholder="${esc(t('kPick'))}">
+        <input class="inp mono" type="number" min="1" max="99" data-kq value="${it.qty}"><select class="inp" data-km>${modesOf(p).map(m => opt(m, t('modes')[m], it.mode)).join('')}</select>
+        <button class="btn sm red" type="button" data-kit-rm="${i}" aria-label="${esc(t('del'))}">${icon('i-x')}</button></div>`; }).join('')}</div>
+    <button class="btn sm" type="button" data-kit-add>${icon('i-plus')}${t('kAddItem')}</button>
+    <div style="margin-top:14px">${sw('on', k.on, t('kOn'))}</div>
+    <datalist id="plist">${products.map(p => `<option value="${esc(pLabel(p))}"></option>`).join('')}</datalist>
+  </form>`, `<button class="btn navy" type="submit" form="kitForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${k._new ? '' : `<button class="btn red" type="button" data-kit-del>${t('del')}</button>`}`);
+}
+document.addEventListener('change', e => { if(e.target.matches('#kitForm [data-kp]')){ readKit(); kitEditor(true); } });
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-kit-new],[data-kit],[data-kit-add],[data-kit-rm],[data-kit-del],[data-kit-move]');
+  if(!x) return;
+  if(x.matches('[data-kit-move]')){
+    e.stopPropagation();
+    const [i, d] = x.dataset.kitMove.split('|').map(Number), j = i + d; if(j < 0 || j >= kits.length) return;
+    const list = kits.slice(); [list[i], list[j]] = [list[j], list[i]];
+    try{ await commitSite({ kits: list }); render(); }catch(err){ fail(err); }
+    return;
+  }
+  if(x.matches('[data-kit-new]')){ editKit = { _new: true, id: '', on: true, icon: 'heart', en: '', ar: '', blurbEn: '', blurbAr: '', situations: [], items: [{ id: 0, qty: 1, mode: 'buy' }] }; kitEditor(); }
+  else if(x.matches('[data-kit]')){ editKit = JSON.parse(JSON.stringify(kits[+x.dataset.kit])); editKit._i = +x.dataset.kit; kitEditor(); }
+  else if(x.matches('[data-kit-add]')){ readKit(); editKit.items.push({ id: 0, qty: 1, mode: 'buy' }); kitEditor(true); const rows = $$('#kitRows [data-kp]'); rows[rows.length - 1].focus(); }
+  else if(x.matches('[data-kit-rm]')){ readKit(); editKit.items.splice(+x.dataset.kitRm, 1); kitEditor(true); }
+  else if(x.matches('[data-kit-del]')){
+    if(!confirm(t('kDelAsk', { n: L(editKit) }))) return;
+    try{ busy(t('working')); await commitSite({ kits: kits.filter((k, i) => i !== editKit._i) }); busy(); closeEditor(); render(); toast(t('deleted')); }catch(err){ fail(err); }
+  }
+});
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'kitForm') return;
+  e.preventDefault(); readKit();
+  const k = editKit, items = k.items.filter(i => i.id > 0).map(i => { const p = products.find(x => x.id === i.id); return { id: i.id, qty: i.qty, mode: modesOf(p).includes(i.mode) ? i.mode : modesOf(p)[0] }; });
+  if((!k.en && !k.ar) || !items.length){ toast(t('eKit'), true); return; }
+  const rec = { id: k._new ? uniq(slug(k.en) || 'kit', kits.map(x => x.id)) : k.id, on: k.on, icon: k.icon, en: k.en, ar: k.ar, blurbEn: k.blurbEn, blurbAr: k.blurbAr, situations: k.situations, items };
+  const list = k._new ? kits.concat(rec) : kits.map((x, i) => i === k._i ? rec : x);
+  try{ busy(t('working')); await commitSite({ kits: list }); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }catch(err){ fail(err); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   BANNERS
+   ═══════════════════════════════════════════════════════════ */
+let editBanner = null;
+const LINKS = () => [...Object.keys(t('links')).filter(k => k !== 'custom').map(k => [k, t('links')[k]]),
+  ...DEPTS.map(d => ['#/d/' + d.key, L(d)]), ...kits.map(k => ['#/k/' + k.id, '▸ ' + L(k)]), ['custom', t('links').custom]];
+function bannerPreview(b){
+  const title = L(b), text = lang === 'ar' ? b.textAr || b.textEn : b.textEn || b.textAr, cta = lang === 'ar' ? b.ctaAr || b.ctaEn : b.ctaEn || b.ctaAr;
+  return `<div class="bPrev ${b.theme} ${b.img ? 'hasImg' : ''}">${b.img ? `<img src="${esc(b.img)}" alt="">` : ''}<div class="bt">${title ? `<h3>${esc(title)}</h3>` : ''}${text ? `<p>${esc(text)}</p>` : ''}${cta ? `<span class="cta">${esc(cta)}</span>` : ''}</div></div>`;
+}
+const bannerState = b => !b.on ? 'off' : (b.start && b.start > today()) || (b.end && b.end < today()) ? 'sched' : 'live';
+function viewBanners(){
+  return `<div class="head"><div><h1>${t('bannersT')}</h1><p>${t('bannersP')}</p></div><button class="btn or" type="button" data-banner-new>${icon('i-plus')}${t('addBanner')}</button></div>
+    ${banners.length ? `<div class="cards">${banners.map((b, i) => { const s = bannerState(b); return `<div class="sc ${s === 'live' ? '' : 'off'}" data-banner="${i}" tabindex="0" role="button">
+      <span class="ord" style="z-index:2"><button type="button" data-banner-move="${i}|-1" aria-label="${t('up')}">${icon('i-arrowup')}</button><button type="button" data-banner-move="${i}|1" aria-label="${t('down')}">${icon('i-arrowdown')}</button></span>
+      ${bannerPreview(b)}<div class="meta"><span class="st st-${s === 'live' ? 'available' : s === 'sched' ? 'out' : 'hidden'}">${t({ live: 'bLive', sched: 'bSched', off: 'bOff' }[s])}</span>
+      ${b.start || b.end ? `<span class="mono">${esc(b.start || '…')} → ${esc(b.end || '…')}</span>` : ''}<span class="mono">${esc(b.link)}</span></div></div>`; }).join('')}</div>`
+      : `<div class="panel"><p class="lead" style="margin:0">${t('noBanners')}</p></div>`}`;
+}
+function readBanner(){
+  const f = $('#bannerForm'); if(!f) return;
+  const g = n => f.elements[n], link = g('link').value;
+  Object.assign(editBanner, { en: g('en').value, ar: g('ar').value, textEn: g('textEn').value, textAr: g('textAr').value, ctaEn: g('ctaEn').value, ctaAr: g('ctaAr').value,
+    theme: g('theme').value, start: g('start').value, end: g('end').value, on: g('on').checked,
+    link: link === 'custom' ? g('custom').value.trim() : link, _custom: link === 'custom' });
+}
+function bannerEditor(keep){
+  const b = editBanner, known = LINKS().some(([k]) => k === b.link && k !== 'custom'), sel = b._custom || (!known && b.link) ? 'custom' : b.link;
+  openDrawer(b._new ? t('addBanner') : t('bannerT'), `<form id="bannerForm" novalidate>
+    <div id="bannerDrop">${bannerPreview(b)}</div>
+    <div class="row" style="margin-bottom:6px"><button class="btn sm navy" type="button" data-pick-one="banner">${icon('i-up')}${t('upload')}</button><button class="btn sm" type="button" data-link="banner">${t('link')}</button>${b.img ? `<button class="btn sm red" type="button" data-unphoto="banner">${t('removePhoto')}</button>` : ''}</div>
+    <p class="lead" style="font-size:12px;margin:0 0 12px">${t('bImgP')}</p>
+    <div class="grid2">
+      <label class="field"><span>${t('bEn')}</span><input name="en" value="${esc(b.en)}" dir="ltr"></label><label class="field"><span>${t('bAr')}</span><input name="ar" value="${esc(b.ar)}" dir="rtl"></label>
+      <label class="field"><span>${t('bTEn')}</span><input name="textEn" value="${esc(b.textEn)}" dir="ltr"></label><label class="field"><span>${t('bTAr')}</span><input name="textAr" value="${esc(b.textAr)}" dir="rtl"></label>
+      <label class="field"><span>${t('bCEn')}</span><input name="ctaEn" value="${esc(b.ctaEn)}" dir="ltr"></label><label class="field"><span>${t('bCAr')}</span><input name="ctaAr" value="${esc(b.ctaAr)}" dir="rtl"></label>
+      <label class="field"><span>${t('bLink')}</span><select name="link">${LINKS().map(([k, l]) => opt(k, l, sel)).join('')}</select></label>
+      <label class="field" ${sel === 'custom' ? '' : 'hidden'}><span>${t('bCustom')}</span><input name="custom" value="${esc(sel === 'custom' ? b.link : '')}" dir="ltr" placeholder="${esc(t('bCustomP'))}"></label>
+      <label class="field"><span>${t('bTheme')}</span><select name="theme">${['navy', 'orange', 'green'].map(k => opt(k, t('themes')[k], b.theme)).join('')}</select></label>
+      <label class="field"><span>${t('bStart')} <i>${t('optional')}</i></span><input type="date" name="start" value="${esc(b.start)}"></label>
+      <label class="field"><span>${t('bEnd')} <i>${t('optional')}</i></span><input type="date" name="end" value="${esc(b.end)}"></label>
+    </div>
+    ${sw('on', b.on, t('bOn'))}
+  </form>`, `<button class="btn navy" type="submit" form="bannerForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${b._new ? '' : `<button class="btn red" type="button" data-banner-del>${t('del')}</button>`}`);
+}
+// the preview follows what's typed
+document.addEventListener('input', e => { if(e.target.closest('#bannerForm')){ readBanner(); $('#bannerDrop').innerHTML = bannerPreview(editBanner); } });
+document.addEventListener('change', e => { if(e.target.closest('#bannerForm') && ['link', 'theme'].includes(e.target.name)){ readBanner(); bannerEditor(true); } });
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-banner-new],[data-banner],[data-banner-del],[data-banner-move]');
+  if(!x) return;
+  if(x.matches('[data-banner-move]')){
+    e.stopPropagation();
+    const [i, d] = x.dataset.bannerMove.split('|').map(Number), j = i + d; if(j < 0 || j >= banners.length) return;
+    const list = banners.slice(); [list[i], list[j]] = [list[j], list[i]];
+    try{ busy(t('working')); await commitSite({ banners: list }); busy(); render(); }catch(err){ fail(err); }
+    return;
+  }
+  if(x.matches('[data-banner-new]')){ editBanner = { _new: true, id: '', on: true, img: '', link: '#/departments', theme: 'navy', en: '', ar: '', textEn: '', textAr: '', ctaEn: '', ctaAr: '', start: '', end: '' }; bannerEditor(); }
+  else if(x.matches('[data-banner]')){ editBanner = Object.assign({}, banners[+x.dataset.banner], { _i: +x.dataset.banner }); bannerEditor(); }
+  else if(x.matches('[data-banner-del]')){
+    if(!confirm(t('bDelAsk'))) return;
+    try{ busy(t('working')); await commitSite({ banners: banners.filter((b, i) => i !== editBanner._i) }); busy(); closeEditor(); render(); toast(t('deleted')); }catch(err){ fail(err); }
+  }
+});
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'bannerForm') return;
+  e.preventDefault(); readBanner();
+  const b = editBanner, rec = { id: b._new ? uniq('b-' + Date.now().toString(36), banners.map(x => x.id)) : b.id, on: b.on, img: b.img, link: b.link || '#/departments', theme: b.theme,
+    en: b.en, ar: b.ar, textEn: b.textEn, textAr: b.textAr, ctaEn: b.ctaEn, ctaAr: b.ctaAr, start: b.start, end: b.end };
+  const list = b._new ? banners.concat(rec) : banners.map((x, i) => i === b._i ? rec : x);
+  try{ busy(t('working')); await commitSite({ banners: list }); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }catch(err){ fail(err); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS
+   ═══════════════════════════════════════════════════════════ */
+function viewSettings(){
+  const s = settings, sec = (key, on, title, p, body) => `<section class="set ${on === false ? 'dim' : ''}" data-sec="${key}"><div class="head2"><h2>${esc(title)}</h2>${on == null ? '' : sw(key + '.on', on, on ? t('on') : t('off'))}</div><p>${esc(p)}</p>${body ? `<div class="body">${body}</div>` : ''}</section>`;
+  const f = (name, label, val, extra = '') => `<label class="field"><span>${label}</span><input name="${name}" value="${esc(val ?? '')}" ${extra}></label>`;
+  return `<div class="head"><div><h1>${t('setT')}</h1><p>${t('setP')}</p></div></div><form id="setForm" novalidate>
+    ${sec('delivery', s.delivery.on, t('setDel'), t('setDelP'), `<div class="grid2">${f('delivery.en', t('dTEn'), s.delivery.en, 'dir="ltr"')}${f('delivery.ar', t('dTAr'), s.delivery.ar, 'dir="rtl"')}${f('delivery.noteEn', t('dNEn'), s.delivery.noteEn, 'dir="ltr"')}${f('delivery.noteAr', t('dNAr'), s.delivery.noteAr, 'dir="rtl"')}
+      ${f('delivery.feeIqd', t('dFee') + ` <i>${t('dFeeP')}</i>`, s.delivery.feeIqd, 'inputmode="numeric" dir="ltr"')}</div>`)}
+    ${sec('payments', null, t('setPay'), t('setPayP'), `<div class="checks">${C.PAYMENTS.map(m => `<label><input type="checkbox" name="pay.${m.key}" ${s.payments[m.key] ? 'checked' : ''}>${esc(L(m))}</label>`).join('')}</div>`)}
+    ${sec('rentals', s.rentals.on, t('setRent'), t('setRentP'), `<div class="grid2">${f('rentals.minMonths', t('rMin'), s.rentals.minMonths, 'type="number" min="1" max="24"')}<span></span>${f('rentals.depositEn', t('rDEn'), s.rentals.depositEn, 'dir="ltr"')}${f('rentals.depositAr', t('rDAr'), s.rentals.depositAr, 'dir="rtl"')}${f('rentals.includedEn', t('rIEn'), s.rentals.includedEn, 'dir="ltr"')}${f('rentals.includedAr', t('rIAr'), s.rentals.includedAr, 'dir="rtl"')}</div>`)}
+    ${sec('nurse', s.nurse.on, t('setNurse'), t('setNurseP'), `<div class="grid2"><label class="field" data-f="nurse"><span>${t('nNum')}</span><input name="nurse.whatsapp" value="${esc(s.nurse.whatsapp)}" inputmode="tel" dir="ltr" class="mono"><em class="err">${t('eNum')}</em></label></div>`)}
+    ${sec('finder', s.finder.on, t('setFinder'), t('setFinderP'))}
+    ${sec('kits', s.kits.on, t('setKits'), t('setKitsP'))}
+    ${sec('clinics', s.clinics.on, t('setClinic'), t('setClinicP'), `${sw('clinics.bulkOn', s.clinics.bulkOn, t('cBulk'))}<div id="tiers" style="margin-top:12px">${s.clinics.tiers.map((x, i) => tierRow(x, i)).join('')}</div><button class="btn sm" type="button" data-tier-add>${icon('i-plus')}${t('cAdd')}</button>`)}
+    ${sec('reminders', s.reminders.on, t('setRem'), t('setRemP'), `<div class="grid2">${f('reminders.days', t('remDays'), s.reminders.days, 'type="number" min="7" max="120"')}</div>`)}
+    ${sec('showStore', null, t('setStore'), t('setStoreP'), sw('showStore', s.showStore, s.showStore ? t('on') : t('off')))}
+    ${sec('publicUrl', null, t('setUrl'), t('setUrlP'), `<div class="grid2">${f('publicUrl', t('setUrl'), s.publicUrl, 'dir="ltr" placeholder="https://…"')}</div>`)}
+    <div class="saveBar"><button class="btn or" type="submit">${icon('i-check')}${t('saveSet')}</button></div>
+  </form>`;
+}
+const tierRow = (x, i) => `<div class="tierRow"><label class="field" style="margin:0"><span>${t('cMin')}</span><input class="mono" name="tmin" type="number" min="2" value="${x.min}"></label><label class="field pctIn" style="margin:0"><span>${t('cPct')}</span><input class="mono" name="tpct" inputmode="decimal" value="${x.pct}"></label><button class="btn sm red" type="button" data-tier-rm aria-label="${esc(t('del'))}">${icon('i-x')}</button></div>`;
+document.addEventListener('change', e => {
+  // a section's switch dims its fields straight away
+  const f = e.target; if(!f.closest('#setForm') || !/\.on$/.test(f.name)) return;
+  const sec = f.closest('.set'); sec.classList.toggle('dim', !f.checked); f.parentElement.lastChild.textContent = f.checked ? t('on') : t('off');
+});
+document.addEventListener('click', e => {
+  if(e.target.closest('[data-tier-add]')){ $('#tiers').insertAdjacentHTML('beforeend', tierRow({ min: 50, pct: 15 }, 0)); }
+  const rm = e.target.closest('[data-tier-rm]'); if(rm) rm.closest('.tierRow').remove();
+});
+document.addEventListener('submit', async e => {
+  if(e.target.id !== 'setForm') return;
+  e.preventDefault();
+  const f = e.target, v = n => (f.elements[n] || {}).value, c = n => !!(f.elements[n] || {}).checked;
+  const nurse = String(v('nurse.whatsapp') || '').replace(/\D/g, '');
+  const bad = c('nurse.on') && !/^9647\d{9}$/.test(nurse);
+  f.querySelector('[data-f=nurse]').classList.toggle('bad', bad);
+  if(bad){ f.elements['nurse.whatsapp'].focus(); return; }
+  const next = JSON.parse(JSON.stringify(settings));
+  Object.assign(next.delivery, { on: c('delivery.on'), en: v('delivery.en'), ar: v('delivery.ar'), noteEn: v('delivery.noteEn'), noteAr: v('delivery.noteAr'), feeIqd: v('delivery.feeIqd') });
+  C.PAYMENTS.forEach(m => { next.payments[m.key] = c('pay.' + m.key); });
+  Object.assign(next.rentals, { on: c('rentals.on'), minMonths: v('rentals.minMonths'), depositEn: v('rentals.depositEn'), depositAr: v('rentals.depositAr'), includedEn: v('rentals.includedEn'), includedAr: v('rentals.includedAr') });
+  Object.assign(next.nurse, { on: c('nurse.on'), whatsapp: nurse });
+  next.finder.on = c('finder.on'); next.kits.on = c('kits.on');
+  Object.assign(next.clinics, { on: c('clinics.on'), bulkOn: c('clinics.bulkOn'), tiers: [...f.querySelectorAll('.tierRow')].map(r => ({ min: r.querySelector('[name=tmin]').value, pct: r.querySelector('[name=tpct]').value })) });
+  Object.assign(next.reminders, { on: c('reminders.on'), days: v('reminders.days') });
+  next.showStore = c('showStore'); next.publicUrl = String(v('publicUrl') || '').trim();
+  const clean = C.cleanSite({ settings: next }).settings;
+  try{ busy(t('working')); await commitSite({ settings: clean }); busy(); render(); toast(t('setSaved')); }catch(err){ fail(err); }
+});
 
 /* ═══════════════════════════════════════════════════════════
    BULK UPLOAD
@@ -779,7 +1399,8 @@ function viewBulk(){
     <p class="note info">${icon('i-info')}<span>${t('rules')}</span></p>
     <details><summary>${t('guide')}</summary><table class="guide"><tr><th>${t('colCol')}</th><th>${t('colMeans')}</th></tr>
       ${LIB.COLUMNS.map(c => `<tr><td><code>${c.key}</code></td><td>${esc(c.help)}</td></tr>`).join('')}
-      <tr><td><code>department</code> · <code>section</code></td><td>${DEPTS.map(d => `<b>${d.key}</b> (${esc(L(d))}): ${d.subs.map(s => s.key).join(', ')}`).join('<br>')}</td></tr></table></details>
+      <tr><td><code>department</code> · <code>section</code></td><td>${DEPTS.map(d => `<b>${d.key}</b> (${esc(L(d))}): ${d.subs.map(s => s.key).join(', ')}`).join('<br>')}</td></tr>
+      <tr><td><code>store</code></td><td>${stores.length ? stores.map(s => `<b>${esc(s.id)}</b> (${esc(L(s))})`).join(', ') : esc(t('noStores'))}</td></tr></table></details>
   </section>
   <section class="panel"><h2><span class="step">2</span>${t('s2')}</h2><p>${t('s2p')}</p>
     <label class="drop" id="sheetDrop" data-pick-sheet>${icon('i-sheet')}<strong>${t('dropSheet')}</strong><span>.xlsx · .csv</span></label>
@@ -801,23 +1422,25 @@ document.addEventListener('change', e => { if(e.target.name === 'missing'){ plan
 $('#pickSheet').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; readSheetFile(f); });
 
 function exportSheet(kind){
-  const rows = kind === 'blank' ? [LIB.COLUMNS.map(c => c.key), ['', 'Example product', 'منتج تجريبي', 'mobility', 'walking', 2, 25000, '', 'no', 'no', 'no', 'physio', 'available', 'Why a patient needs it', 'ليش يحتاجه المريض', '']]
+  const keys = LIB.COLUMNS.map(c => c.key);
+  const rows = kind === 'blank' ? [keys, keys.map(k => ({ name_en: 'Example product', name_ar: 'منتج تجريبي', department: 'mobility', section: 'walking', tier: 2, buy_price_iqd: 25000, rentable: 'no', monthly_refill: 'no', clinic_only: 'no', services: 'physio', status: 'available', why_en: 'Why a patient needs it', why_ar: 'ليش يحتاجه المريض', store: stores[0] ? stores[0].id : '' })[k] ?? '')]
                                 : LIB.toRows(products);
   const name = 'saleem-products-' + (kind === 'blank' ? 'template' : stamp());
   if(kind === 'csv'){ download(new Blob([LIB.csvWrite(rows)], { type: 'text/csv;charset=utf-8' }), name + '.csv'); return; }
-  const lists = [{ col: 3, list: DEPTS.map(d => d.key) }, { col: 5, list: ['1', '2', '3'] }, { col: 8, list: ['yes', 'no'] }, { col: 9, list: ['yes', 'no'] },
-                 { col: 10, list: ['yes', 'no'] }, { col: 12, list: ['available', 'out_of_stock', 'hidden'] }];
-  const deptRows = [['department', 'section', 'department (EN)', 'section (EN)', 'القسم', 'القسم الفرعي'],
-                    ...DEPTS.flatMap(d => d.subs.map(s => [d.key, s.key, d.en, s.en, d.ar, s.ar]))];
-  const help = [['column', 'what it means', 'بالعربي'], ...LIB.COLUMNS.map(c => [c.key, c.help, c.ar]),
-                ['', ''], ['Rules', 'Blank cell = leave as is. "-" = clear it. No id = new product. Delete columns you don’t need, but keep id.']];
+  const col = k => keys.indexOf(k);
+  const lists = [{ col: col('department'), list: DEPTS.map(d => d.key) }, { col: col('tier'), list: ['1', '2', '3'] }, { col: col('rentable'), list: ['yes', 'no'] }, { col: col('monthly_refill'), list: ['yes', 'no'] },
+                 { col: col('clinic_only'), list: ['yes', 'no'] }, { col: col('status'), list: ['available', 'out_of_stock', 'hidden'] }, ...(stores.length ? [{ col: col('store'), list: stores.map(s => s.id) }] : [])];
+  const deptRows = [['department', 'section', 'department (EN)', 'section (EN)', 'القسم', 'القسم الفرعي'], ...DEPTS.flatMap(d => d.subs.map(s => [d.key, s.key, d.en, s.en, d.ar, s.ar]))];
+  const storeRows = [['store', 'name (EN)', 'الاسم', 'area', 'commission %'], ...stores.map(s => [s.id, s.en, s.ar, s.area, s.commission])];
+  const help = [['column', 'what it means', 'بالعربي'], ...LIB.COLUMNS.map(c => [c.key, c.help, c.ar]), ['', ''], ['Rules', 'Blank cell = leave as is. "-" = clear it. No id = new product. Delete columns you don’t need, but keep id.'],
+                ['Private', 'commission_pct and the Stores sheet are internal — don’t send this file to a partner store.']];
   download(LIB.xlsxWrite([
     { name: 'Products', rows, widths: LIB.COLUMNS.map(c => c.width), validations: lists },
     { name: 'Departments', rows: deptRows, widths: [14, 14, 26, 26, 26, 26] },
+    { name: 'Stores', rows: storeRows, widths: [16, 28, 28, 18, 14] },
     { name: 'Help', rows: help, widths: [22, 80, 26] },
   ]), name + '.xlsx');
 }
-
 async function readSheetFile(file){
   if(!file) return;
   try{
@@ -825,17 +1448,17 @@ async function readSheetFile(file){
     const isX = /\.xlsx$/i.test(file.name) || file.type.includes('spreadsheetml');
     const rows = isX ? await LIB.xlsxRead(await file.arrayBuffer()) : LIB.csvParse(await file.text());
     busy(); makePlan(rows, file.name);
-  }catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+  }catch(x){ fail(x); }
 }
 function makePlan(rows, name){
-  try{ plan = LIB.planImport(rows, products, DEPTS); plan.file = name || ''; planShow = 'changes'; planMissing = 'keep'; }
+  try{ plan = LIB.planImport(rows, products, DEPTS, stores); plan.file = name || ''; planShow = 'changes'; planMissing = 'keep'; }
   catch(x){ toast(x.message, true); return; }
   $('#planBox').innerHTML = planHtml();
   $('#planBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-const fieldLabel = { en:'name_en', ar:'name_ar', dept:'department', sub:'section', tier:'tier', price:'buy_price_iqd', rentPrice:'rent_price_iqd_month', rent:'rentable', refill:'monthly_refill', b2b:'clinic_only', services:'services', status:'status', whyEn:'why_en', whyAr:'why_ar', img:'photo_url' };
+const fieldLabel = Object.fromEntries(LIB.COLUMNS.map(c => [c.field, c.key]));
 const show = v => v == null || v === '' ? '∅' : Array.isArray(v) ? (v.join(', ') || '∅') : typeof v === 'boolean' ? (v ? 'yes' : 'no') : String(v).length > 60 ? String(v).slice(0, 57) + '…' : String(v);
-const showField = (f, v) => f === 'status' ? t('st')[v] || v : f === 'dept' ? L(DEPT[v]) || v : show(v);
+const showField = (f, v) => f === 'status' ? t('st')[v] || v : f === 'dept' ? L(DEPT[v]) || v : f === 'store' ? (storeById(v) ? L(storeById(v)) : show(v)) : show(v);
 function planToApply(){
   const list = plan.rows.filter(r => r.kind === 'new' || r.kind === 'update').map(r => r.product);
   const hide = planMissing === 'hide' ? plan.missing.map(id => products.find(p => p.id === id)).filter(p => p && p.status !== 'hidden').map(p => Object.assign({}, p, { status: 'hidden' })) : [];
@@ -855,7 +1478,7 @@ function planHtml(){
     <div class="plan"><div class="pr hd"><span>${t('hLine')}</span><span>${t('hKind')}</span><span>${t('hId')}</span><span>${t('hProduct')}</span><span>${t('hWhat')}</span></div>
       ${rows.slice(0, 400).map(r => `<div class="pr"><span class="mono">${r.line}</span><span><span class="pill p-${r.kind}">${t('kinds')[r.kind]}</span></span><span class="mono">${r.id ?? '—'}</span><span>${esc(r.name || '')}</span>
         <span>${r.errors.length ? `<span class="errs">${r.errors.map(esc).join('<br>')}</span>` : ''}
-          ${r.kind === 'update' ? r.changes.map(c => `<span class="chg">${fieldLabel[c]}: <em>${esc(showField(c, r.before[c]))}</em> → <strong>${esc(showField(c, r.product[c]))}</strong></span>`).join('') : ''}
+          ${r.kind === 'update' ? r.changes.map(c => `<span class="chg">${fieldLabel[c] || c}: <em>${esc(showField(c, r.before[c]))}</em> → <strong>${esc(showField(c, r.product[c]))}</strong></span>`).join('') : ''}
           ${r.kind === 'new' ? `<span class="chg">${esc(L(DEPT[r.product.dept]))} › ${esc(L(subOf(r.product)))}${r.product.price ? ' · ' + iqd(r.product.price) + ' IQD' : ''}</span>` : ''}
           ${r.warnings.length && r.kind !== 'error' ? `<span class="warns">${r.warnings.map(esc).join('<br>')}</span>` : ''}</span></div>`).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn or" type="button" data-apply ${n ? '' : 'disabled'}>${icon('i-check')}${n ? t('apply', { n }) : t('nothing')}</button><button class="btn" type="button" data-plan-reset>${t('reupload')}</button></div>
@@ -864,7 +1487,7 @@ function planHtml(){
 async function applyPlan(){
   const list = planToApply(); if(!list.length) return;
   try{ busy(t('working')); await commit(list); busy(); plan = null; render(); toast(t('applied', { n: list.length })); }
-  catch(x){ busy(); toast(t('fail', { e: x.message }), true); }
+  catch(x){ fail(x); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -879,7 +1502,7 @@ function viewPhotos(){
   </section>
   <div class="tools"><div class="sum" style="margin:0">${[['all', products.length], ['own', own], ['web', products.length - own]].map(([k, n]) => `<button type="button" data-pf="${k}" aria-pressed="${photoFilter === k}"><b>${n}</b><span>${t({ all:'fAll', own:'fOwn', web:'fWeb' }[k])}</span></button>`).join('')}</div></div>
   <div class="pgrid" id="pgrid"></div>
-  <datalist id="plist">${products.map(p => `<option value="#${p.id} ${esc(p.en || p.ar)}"></option>`).join('')}</datalist>`;
+  <datalist id="plist">${products.map(p => `<option value="${esc(pLabel(p))}"></option>`).join('')}</datalist>`;
 }
 function paintPhotoGrid(){
   const g = $('#pgrid'); if(!g) return;
@@ -902,7 +1525,7 @@ async function queuePhotos(files){
 }
 function queueHtml(){
   if(!pendingPhotos.length) return '';
-  const ok = pendingPhotos.filter(x => x.id), no = pendingPhotos.filter(x => !x.id), name = id => { const p = products.find(x => x.id === id); return p ? `#${p.id} ${p.en || p.ar}` : ''; };
+  const ok = pendingPhotos.filter(x => x.id), no = pendingPhotos.filter(x => !x.id), name = id => pLabel(products.find(x => x.id === id));
   const row = (x, i) => `<div class="match"><img src="${x.dataUrl}" alt=""><span><b class="mono" style="font-size:12px">${esc(x.name)}</b></span>
     <input class="inp" list="plist" data-q="${i}" placeholder="${esc(t('pickProduct'))}" value="${esc(name(x.id))}"></div>`;
   return `<div style="margin-top:14px">${ok.length ? `<p class="note ok">${icon('i-check')}<span>${t('matched', { n: ok.length })}</span></p>` : ''}${no.length ? `<p class="note warn">${icon('i-info')}<span>${t('unmatched', { n: no.length })}</span></p>` : ''}
@@ -923,17 +1546,17 @@ document.addEventListener('click', async e => {
   if(x.matches('[data-pick-many]')){ e.preventDefault(); $('#pickMany').click(); }
   else if(x.matches('[data-clear-photos]')){ pendingPhotos = []; $('#queue').innerHTML = ''; }
   else if(x.dataset.pf){ photoFilter = x.dataset.pf; render(); }
-  else if(x.dataset.photoUp){ pickTarget = +x.dataset.photoUp; $('#pickOne').click(); }
+  else if(x.dataset.photoUp){ pickTarget = x.dataset.photoUp; $('#pickOne').click(); }
   else if(x.dataset.photoRm){
     const p = products.find(y => y.id === +x.dataset.photoRm);
-    try{ busy(t('working')); await commit([Object.assign({}, p, { img: '' })]); busy(); render(); }catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+    try{ busy(t('working')); await commit([Object.assign({}, p, { img: '' })]); busy(); render(); }catch(err){ fail(err); }
   }
   else if(x.matches('[data-save-photos]')){
     const ok = pendingPhotos.filter(y => y.id), latest = new Map();
     ok.forEach(y => latest.set(y.id, y.dataUrl));               // two files for one product: the last wins
     const list = [...latest].map(([id, img]) => Object.assign({}, products.find(p => p.id === id), { img }));
     try{ busy(t('working')); await commit(list); busy(); pendingPhotos = pendingPhotos.filter(y => !y.id); render(); toast(t('photosSaved', { n: list.length })); }
-    catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+    catch(err){ fail(err); }
   }
 });
 $('#pickMany').addEventListener('change', e => { const f = [...e.target.files]; e.target.value = ''; queuePhotos(f); });
@@ -944,7 +1567,7 @@ $('#pickMany').addEventListener('change', e => { const f = [...e.target.files]; 
 function viewPublish(){
   const pc = pendingChanges();
   const local = `<section class="panel"><h2>${icon('i-send')}${t('pending')}</h2><p>${t('pubLocalP')}</p>
-      <div class="stat"><div><b>${pc.edited.length}</b><span>${t('edited')}</span></div><div><b>${pc.added.length}</b><span>${t('added')}</span></div><div><b>${pc.removed.length}</b><span>${t('removed')}</span></div><div><b>${pc.photos.length}</b><span>${t('photosN')}</span></div></div>
+      <div class="stat"><div><b>${pc.edited.length}</b><span>${t('edited')}</span></div><div><b>${pc.added.length}</b><span>${t('added')}</span></div><div><b>${pc.removed.length}</b><span>${t('removed')}</span></div><div><b>${pc.photos.length}</b><span>${t('photosN')}</span></div><div><b>${pc.other}</b><span>${t('other')}</span></div></div>
       ${pc.total ? '' : `<p class="note ok">${icon('i-check')}<span>${t('noPending')}</span></p>`}
       <div class="row"><a class="btn" href="${ADMIN.shopUrl}?preview=1" target="_blank" rel="noopener">${icon('i-eye')}${t('preview')}</a>
         <button class="btn or" type="button" data-bundle ${pc.total ? '' : 'disabled'}>${icon('i-down')}${t('download')}</button>
@@ -966,7 +1589,7 @@ document.addEventListener('click', async e => {
   const x = e.target.closest('[data-bundle],[data-discard],[data-test],[data-connect],[data-disconnect],[data-seed]');
   if(!x) return;
   if(x.matches('[data-bundle]')) bundle();
-  else if(x.matches('[data-discard]')){ if(confirm(t('discardAsk'))){ await C.kv.del('draft'); await loadProducts(); paintPending(); render(); } }
+  else if(x.matches('[data-discard]')){ if(confirm(t('discardAsk'))){ await C.kv.del('draft'); await loadAll(); paintPending(); render(); } }
   else if(x.matches('[data-test]')){
     const url = $('#beUrl').value.trim();
     try{ busy(t('working')); const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=catalog'); const j = await r.json(); busy(); if(!j.ok) throw new Error(j.error); toast(t('testOk', { n: j.products.length })); }
@@ -975,34 +1598,48 @@ document.addEventListener('click', async e => {
   else if(x.matches('[data-connect]')){
     const url = $('#beUrl').value.trim(); if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){ toast(t('testBad', { e: 'https://script.google.com/…/exec' }), true); return; }
     const prev = backend; backend = url;
-    try{ busy(t('working')); await api('login'); await loadProducts(); ls.set('backend', url); busy(); paintChrome(); paintPending(); render(); toast(t('connected', { n: products.length })); }
+    try{ busy(t('working')); await api('login'); await loadAll(); ls.set('backend', url); busy(); paintChrome(); paintPending(); render(); loadOrders(true); toast(t('connected', { n: products.length })); }
     catch(err){ busy(); backend = prev; toast(t('fail', { e: err.message }), true); }
   }
-  else if(x.matches('[data-disconnect]')){ backend = ''; ls.set('backend', ''); await loadProducts(); paintChrome(); paintPending(); render(); }
+  else if(x.matches('[data-disconnect]')){ backend = ''; ls.set('backend', ''); await loadAll(); paintChrome(); paintPending(); render(); $('#dueN').hidden = true; }
   else if(x.matches('[data-seed]')){
-    // the local draft if there is one (it may carry uploaded photos), else the published file
-    const d = await C.kv.get('draft'), list = (d && d.products ? d.products : PUBLISHED).map(p => Object.assign(C.clean(p), { img: p.img || '' }));
-    if(!confirm(t('seedAsk', { n: list.length }))) return;
+    // the local draft if there is one (it may carry uploaded photos), else the published files
+    const d = await C.kv.get('draft'), src = d && d.products ? d : null;
+    const list = (src ? src.products : PUB.products).map(p => Object.assign(C.clean(p), { img: p.img || '' }));
+    if(!confirm(t('seedAsk'))) return;
+    if(src && src.site){ stores = (src.site.stores || []).map(fullStore); useSite(src.site); } else { stores = PUB.stores.map(fullStore); useSite(PUB); }
     try{ busy(t('working')); await commit(list, { replace: true }); busy(); render(); toast(t('seeded', { n: products.length })); }
-    catch(err){ busy(); toast(t('fail', { e: err.message }), true); }
+    catch(err){ fail(err); }
   }
 });
 
-// data/products.js + the uploaded photos, laid out like the saleem-store folder
+// the files of the saleem-store folder that changed, laid out the same way
 function bundle(){
-  const files = [], out = products.map(p => {
+  const files = [], ext = u => u.startsWith('data:image/webp') ? 'webp' : u.startsWith('data:image/png') ? 'png' : 'jpg';
+  const out = products.map(p => {
     if(!/^data:/.test(p.img)) return p;
-    const ext = p.img.startsWith('data:image/webp') ? 'webp' : p.img.startsWith('data:image/png') ? 'png' : 'jpg', path = `assets/products/${p.id}.${ext}`;
+    const path = `assets/products/${p.id}.${ext(p.img)}`;
     files.push({ name: path, data: LIB.dataUrlBytes(p.img) });
     return Object.assign({}, p, { img: path });
   });
-  files.unshift({ name: 'data/products.js', data: C.serialize(DEPTS, out) });
+  const bs = banners.map(b => {
+    if(!/^data:/.test(b.img)) return b;
+    const path = `assets/banners/${b.id}.${ext(b.img)}`;
+    files.push({ name: path, data: LIB.dataUrlBytes(b.img) });
+    return Object.assign({}, b, { img: path });
+  });
+  const images = files.length;
+  files.unshift({ name: 'data/products.js', data: C.serialize(DEPTS, out) },
+                { name: 'data/site.js', data: C.serializeSite({ settings, kits, banners: bs, stores }) },
+                { name: 'private/commercial.js', data: C.serializePrivate(stores, out) });
   files.push({ name: 'UPDATE-README.txt', data: [
-    'Saleem Store catalog update — ' + new Date().toISOString(),
+    'Saleem Store update — ' + new Date().toISOString(),
     '', 'Unzip this inside the saleem-store folder, replacing files when asked:',
-    '  data/products.js       the full product list (' + out.length + ' products)',
-    '  assets/products/       ' + (files.length - 1) + ' uploaded photo(s)',
-    '', 'Then upload the folder to your host, or commit it to the repo.', '' ].join('\r\n') });
+    '  data/products.js        the full product list (' + out.length + ' products)',
+    '  data/site.js            settings, partner stores (public part), kits, banners',
+    '  private/commercial.js   PRIVATE: commission and store contacts — never upload this folder',
+    '  assets/                 ' + images + ' uploaded image(s)',
+    '', 'Then upload the folder to your host (without private/), or commit it to the repo.', '' ].join('\r\n') });
   download(LIB.zip(files), 'saleem-store-update-' + stamp() + '.zip');
 }
 
