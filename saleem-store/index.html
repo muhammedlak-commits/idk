@@ -285,9 +285,9 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 .field{display:block;margin-bottom:12px}
 .field span{display:block;font-size:13.5px;font-weight:800;color:var(--navy2);margin-bottom:5px}
 .field span i{font-style:normal;color:var(--mut);font-weight:600}
-.field input,.field textarea{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;background:var(--card)}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;background:var(--card)}
 .field textarea{min-height:84px;resize:vertical}
-.field input:focus,.field textarea:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(28,117,188,.12)}
+.field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(28,117,188,.12)}
 .field.bad input{border-color:var(--red)}
 .field .err{display:none;color:var(--red);font-size:12.5px;margin-top:4px}
 .field.bad .err{display:block}
@@ -537,6 +537,7 @@ details.facts .fact .ic{display:none}
 .note.warn{background:var(--or50);color:var(--orInk);margin:18px 0 0}
 .linkBtn{border:0;background:none;padding:0;color:var(--navy);font-weight:800;text-decoration:underline;text-underline-offset:3px;min-height:24px}
 .sentP{color:var(--mut);margin:14px 0 0}
+.telLink{color:var(--blue);font-weight:800;white-space:nowrap}
 .sentP bdi{color:var(--navy2);font-weight:800;white-space:nowrap}
 .sentItems{text-align:start;margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--paper)}
 .sentItems h2{font-size:14px;color:var(--mut);margin:0 0 6px}
@@ -767,7 +768,7 @@ html.vt .view{animation:none}
 <footer><div class="wrap">
   <img src="assets/logo-saleem.png" alt="Saleem" width="91" height="36">
   <div><p id="footText"></p><p id="footDelivery" style="margin-top:8px"></p></div>
-  <div style="display:grid;gap:10px"><div class="pays-f" id="footPays"></div><p><a id="footWa" target="_blank" rel="noopener"></a></p></div>
+  <div style="display:grid;gap:4px"><div class="pays-f" id="footPays"></div><p><a id="footWa" target="_blank" rel="noopener"></a></p><p><a id="footTel"></a></p></div>
 </div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <dialog class="sheet" id="sheet" aria-labelledby="sheetT"></dialog>
@@ -824,7 +825,7 @@ const T = {
     orderTitle:'طلبي', orderSub:'راجع المستلزمات واكتب معلوماتك، والطلب يوصل لفريق سليم على واتساب.',
     yourItems:'المستلزمات', emptyT:'طلبك فارغ', emptyP:'تصفّح الأقسام وأضف اللي تحتاجه.', remove:'حذف',
     total:'بطلبك', totalN:'{n} منتج', totalNQ:'{n} منتج · {q} قطعة', details:'معلوماتك', detailsP:'منو نتواصل وياه، ووين شركة التوصيل توصّل الطلب.',
-    fName:'اسمك', fNameHint:'الشخص اللي نتواصل وياه، مو لازم يكون المريض.', fPhone:'رقم الموبايل (واتساب)', fArea:'منطقة التوصيل', fAreaPh:'مثلاً: المنصور، الكرادة، زيونة', fAddr:'أقرب نقطة دالّة للتوصيل', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
+    fName:'اسمك', fNameHint:'الشخص اللي نتواصل وياه، مو لازم يكون المريض.', fPhone:'رقم الموبايل (واتساب)', fArea:'المنطقة أو الحي', fAreaPh:'مثلاً: المنصور، العشّار، عينكاوة', fAddr:'أقرب نقطة دالّة للتوصيل', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
     fNotesPh:'لمن الطلب، المقاس، أو أي شي لازم نعرفه', eName:'اكتب الاسم', ePhone:'اكتب رقم عراقي صحيح، مثلاً 07701234567', eArea:'اكتب المنطقة',
     send:'أرسل الطلب على واتساب', sendNote:'ما تدفع شي هسه. فريقنا يأكد السعر والتوفّر والتوصيل وياك قبل ما يتأكد الطلب.',
     sentT:'آخر خطوة: اضغط «إرسال» بواتساب', sentP:'فريقنا يرد عليك من الرقم {phone} بالسعر وموعد التوصيل.', sentItems:'اللي بالرسالة', sentAgain:'واتساب ما انفتح؟ افتحه مرة ثانية', sentNew:'ابدأ طلب جديد', sentBack:'عدّل الطلب', orderNoL:'رقم طلبك',
@@ -843,6 +844,7 @@ const T = {
     priceSet:'السعر المعروض تقريبي ويأكده فريقنا على واتساب قبل التوصيل. ما تدفع شي هسه.',
     estimate:'المجموع التقريبي', subtotal:'المستلزمات', bulkOff:'خصم الكمية', deliveryFee:'التوصيل', estAll:'فريقنا يأكد السعر النهائي والتوصيل على واتساب.', estPartial:'بعض المنتجات بدون سعر، وفريقنا يكمّل السعر على واتساب.',
     previewing:'معاينة: هذي تعديلات لوحة الإدارة اللي ما انتشرت بعد. محد يشوفها غيرك.', previewExit:'عرض المتجر المنشور',
+    orCall:'أو اتصل على {phone}', footTel:'اتصل: ', province:'المحافظة', msgProvince:'المحافظة',
     foot:'متجر سليم للمستلزمات الطبية المنزلية، من شركة المستقبل السليم للخدمات الصحية المحدودة. الصور مرجعية بهذي النسخة التجريبية.', footWa:'واتساب: ',
     // new
     payT:'طرق الدفع', payWith:'طرق الدفع: {m}', payField:'شلون تحب تدفع؟',
@@ -893,7 +895,7 @@ const T = {
     orderTitle:'My order', orderSub:'Check your items, add your details, and your order goes to Saleem’s team on WhatsApp.',
     yourItems:'Items', emptyT:'Your order is empty', emptyP:'Browse the departments and add what you need.', remove:'Remove',
     total:'In your order', totalN:'{n} items', totalNQ:'{n} items · {q} pieces', details:'Your details', detailsP:'Who we contact, and where the delivery company brings the order.',
-    fName:'Your name', fNameHint:'The person we contact, not necessarily the patient.', fPhone:'Mobile number (WhatsApp)', fArea:'Delivery area', fAreaPh:'e.g. Mansour, Karrada, Zayouna', fAddr:'Nearest landmark for delivery', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
+    fName:'Your name', fNameHint:'The person we contact, not necessarily the patient.', fPhone:'Mobile number (WhatsApp)', fArea:'Area or neighbourhood', fAreaPh:'e.g. Mansour, Ashar, Ankawa', fAddr:'Nearest landmark for delivery', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
     fNotesPh:'Who it’s for, sizes, anything we should know', eName:'Enter your name', ePhone:'Enter a valid Iraqi number, e.g. 07701234567', eArea:'Enter your area',
     send:'Send order on WhatsApp', sendNote:'You pay nothing now. Our team confirms price, stock and delivery with you before the order is final.',
     sentT:'Last step: press Send in WhatsApp', sentP:'Our team replies from {phone} with the price and a delivery time.', sentItems:'In the message', sentAgain:'WhatsApp didn’t open? Open it again', sentNew:'Start a new order', sentBack:'Edit the order', orderNoL:'Your order number',
@@ -912,6 +914,7 @@ const T = {
     priceSet:'Prices shown are a guide. Our team confirms on WhatsApp before delivery, and you pay nothing now.',
     estimate:'Estimated total', subtotal:'Items', bulkOff:'Bulk discount', deliveryFee:'Delivery', estAll:'Our team confirms the final price and delivery on WhatsApp.', estPartial:'Some items have no price yet. Our team will complete it on WhatsApp.',
     previewing:'Preview: unpublished changes from the admin portal. Only you can see this.', previewExit:'View the published shop',
+    orCall:'or call {phone}', footTel:'Call: ', province:'Province', msgProvince:'Province',
     foot:'Saleem Store for home medical supplies, by Almostaqbal Alsaleem for Healthcare Services LLC. Photos are references in this prototype.', footWa:'WhatsApp: ',
     payT:'Payment', payWith:'Ways to pay: {m}', payField:'How would you like to pay?',
     nurseT:'Not sure? Ask our nurse', nurseP:'We answer on WhatsApp and help you choose.', nurseBtn:'Ask our nurse', nurseMsg:'Hello, I need help choosing medical supplies.', nurseMsgP:'Hello, I have a question about: {p}',
@@ -969,7 +972,8 @@ const store = {
 
 let lang = store.get('lang', 'ar') === 'en' ? 'en' : 'ar';
 let cart = [];
-let customer = Object.assign({name:'', phone:'', area:'', addr:'', notes:'', clinic:'', payment:'', remind:true, isClinic:false}, store.get('customer', {}));
+let customer = Object.assign({name:'', phone:'', province:'baghdad', area:'', addr:'', notes:'', clinic:'', payment:'', remind:true, isClinic:false}, store.get('customer', {}));
+const provinceOf = () => CAT.PROVINCES.find(x => x.key === customer.province) || CAT.PROVINCES[0];
 let shown = CONFIG.pageSize;
 // the last order sent from this browser: survives a reload, so the same list isn't
 // sent twice by accident. Kept for 3 days.
@@ -1008,7 +1012,13 @@ const qtyOf = (id, mode) => (cart.find(l => l.id === String(id) && l.mode === mo
 const pieces = () => cart.reduce((a, l) => a + l.qty, 0);
 const byNeed = (a, b) => a.tier - b.tier || PRODUCTS.indexOf(a) - PRODUCTS.indexOf(b);
 const byName = (a, b) => pName(a).localeCompare(pName(b), lang);
-const wa = text => 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text);
+// the call centre, from admin → Settings (config.js is the fallback)
+const bizWa = () => (S && S.contact && S.contact.whatsapp) || CONFIG.whatsapp;
+const fmtPhone = d => /^964\d{10}$/.test(d) ? `+964 ${d.slice(3, 6)} ${d.slice(6, 9)} ${d.slice(9)}` : '+' + d;
+const waPhone = () => S ? fmtPhone(bizWa()) : CONFIG.bizPhone;                 // the number that replies on WhatsApp
+const callPhone = () => (S && S.contact && S.contact.phone) || waPhone();       // the number to call
+const telHref = () => 'tel:' + callPhone().replace(/[^\d+]/g, '');
+const wa = text => 'https://wa.me/' + bizWa() + '?text=' + encodeURIComponent(text);
 const nurseOn = () => S.nurse.on && S.nurse.whatsapp;
 const nurseWa = text => 'https://wa.me/' + S.nurse.whatsapp + '?text=' + encodeURIComponent(text || t('nurseMsg'));
 const payments = () => CAT.PAYMENTS.filter(m => S.payments[m.key]);
@@ -1561,7 +1571,7 @@ async function share(){
 let listFiles = [];
 const canShareFiles = () => { try{ return !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] })); }catch(e){ return false; } };
 function viewList(){
-  const phone = `<bdi dir="ltr">${esc(CONFIG.bizPhone)}</bdi>`, direct = canShareFiles();
+  const phone = `<bdi dir="ltr">${esc(waPhone())}</bdi>`, direct = canShareFiles();
   return pageHead({ crumbs: [['#/', t('tHome')]], title: t('listT'), sub: t('listSub'), iconId: 'i-camera' })
     + `<div class="wrap" style="max-width:720px"><section class="panel listPanel">
       <ol class="listHow">${t('listHow').map(x => `<li>${esc(x)}</li>`).join('')}</ol>
@@ -1664,7 +1674,7 @@ function viewSent(){
   const items = sent.lines.map(l => { const p = BYID.get(String(l.id)); return p ? `<li><b>${num(l.qty)} ×</b> ${esc(pName(p))} <span>${modeLabel(l.mode)}</span></li>` : ''; }).join('');
   return `<div class="wrap" style="max-width:640px;margin-top:32px"><div class="panel sent"><span class="dIcon">${icon('i-chat')}</span><h1 style="font-size:24px">${t('sentT')}</h1>
       <p style="margin:8px 0 0;color:var(--mut)">${t('orderNoL')}</p><span class="orderNo">${esc(sent.no)}</span>
-      <p class="sentP">${t('sentP', {phone: `<bdi dir="ltr">${esc(CONFIG.bizPhone)}</bdi>`})}</p>
+      <p class="sentP">${t('sentP', {phone: `<bdi dir="ltr">${esc(waPhone())}</bdi>`})}${callPhone() !== waPhone() ? ` <a class="telLink" href="${esc(telHref())}">${t('orCall', {phone: `<bdi dir="ltr">${esc(callPhone())}</bdi>`})}</a>` : ''}</p>
       ${items ? `<div class="sentItems"><h2>${t('sentItems')}</h2><ul>${items}</ul></div>` : ''}
       <div class="sentActs"><a class="btn wa" href="${esc(sent.wa)}" target="_blank" rel="noopener">${icon('i-chat')}${t('sentAgain')}</a>
         ${CONFIG.catalogUrl ? `<a class="btn ghost" href="#/track/${esc(sent.no)}">${icon('i-truck')}${t('trackLink')}</a>` : ''}
@@ -1700,8 +1710,9 @@ function viewOrder(){
     <form class="panel" id="orderForm" novalidate><h2>${t('details')}</h2><p>${t('detailsP')}</p>
       ${f('name', t('fName'), 'text', 'autocomplete="name" required aria-describedby="nameHint"').replace('</span>', `</span><small class="hint" id="nameHint">${t('fNameHint')}</small>`)}
       ${f('phone', t('fPhone'), 'tel', 'autocomplete="tel" inputmode="tel" dir="ltr" placeholder="07XX XXX XXXX" required')}
-      <div class="two">${f('area', t('fArea'), 'text', `placeholder="${esc(t('fAreaPh'))}" required`)}
-      <label class="field"><span>${t('fAddr')} <i>${t('opt')}</i></span><input name="addr" value="${esc(customer.addr)}" autocomplete="street-address"></label></div>
+      <div class="two"><label class="field"><span>${t('province')}</span><select name="province" autocomplete="address-level1">${CAT.PROVINCES.map(x => `<option value="${x.key}" ${x.key === provinceOf().key ? 'selected' : ''}>${esc(L(x))}</option>`).join('')}</select></label>
+      ${f('area', t('fArea'), 'text', `placeholder="${esc(t('fAreaPh'))}" autocomplete="address-level2" required`)}</div>
+      <label class="field"><span>${t('fAddr')} <i>${t('opt')}</i></span><input name="addr" value="${esc(customer.addr)}" autocomplete="street-address"></label>
       ${S.clinics.on && !hasQuote ? `<label class="check"><input type="checkbox" name="isClinic" ${customer.isClinic ? 'checked' : ''}><span>${t('clinicBox')}</span></label>` : ''}
       ${showClinic ? `<label class="field"><span>${t('fClinic')} <i>${t('opt')}</i></span><input name="clinic" value="${esc(customer.clinic)}" autocomplete="organization"></label>` : ''}
       ${pays.length > 1 ? `<fieldset style="border:0;padding:0;margin:0"><legend class="lbl" style="margin-top:4px">${t('payField')}</legend><div class="pays">${pays.map(m => `<label><input type="radio" name="payment" value="${m.key}" ${customer.payment === m.key ? 'checked' : ''}>${esc(L(m))}</label>`).join('')}</div></fieldset>` : ''}
@@ -1771,7 +1782,7 @@ const newOrderNo = () => 'S-' + (Date.now().toString(36).slice(-4) + Math.random
 function buildMessage(no, updates){
   const c = customer, pay = payments().find(m => m.key === c.payment), remind = S.reminders.on && c.remind && cart.some(l => l.mode === 'refill');
   const lines = [ '*' + t('msgHead') + '*', t('msgNo') + ': ' + no, ...(updates ? [t('msgUpdates') + ': ' + updates] : []), '',
-    t('msgName') + ': ' + c.name.trim(), t('msgPhone') + ': ' + normPhone(c.phone), t('msgArea') + ': ' + c.area.trim() ];
+    t('msgName') + ': ' + c.name.trim(), t('msgPhone') + ': ' + normPhone(c.phone), t('msgProvince') + ': ' + L(provinceOf()), t('msgArea') + ': ' + c.area.trim() ];
   if(c.addr.trim()) lines.push(t('msgAddr') + ': ' + c.addr.trim());
   if(c.clinic.trim() && (cart.some(l => l.mode === 'quote') || c.isClinic)) lines.push(t('msgClinic') + ': ' + c.clinic.trim());
   if(pay) lines.push(t('msgPay') + ': ' + L(pay));
@@ -1794,7 +1805,7 @@ function buildMessage(no, updates){
 function logOrder(no){
   if(!CONFIG.catalogUrl || SOURCE === 'draft') return;
   const c = customer, body = JSON.stringify({ action: 'order', order: {
-    id: no, lang, name: c.name.trim(), phone: normPhone(c.phone), area: c.area.trim(), addr: c.addr.trim(),
+    id: no, lang, name: c.name.trim(), phone: normPhone(c.phone), area: provinceOf().en + ' · ' + c.area.trim(), addr: c.addr.trim(),
     clinic: (cart.some(l => l.mode === 'quote') || c.isClinic) ? c.clinic.trim() : '', notes: c.notes.trim(),
     payment: c.payment, remind: !!(S.reminders.on && c.remind && cart.some(l => l.mode === 'refill')),
     lines: cart.map(l => ({ id: Number(l.id), mode: l.mode, qty: l.qty })) } });
@@ -1919,7 +1930,7 @@ document.addEventListener('change', e => {
     if(e.target.checked) kitSkip.delete(e.target.dataset.kitItem); else kitSkip.add(e.target.dataset.kitItem);
     if(k && btn) btn.outerHTML = kitButton(k);
   }
-  if(e.target.closest('#orderForm') && ['payment', 'remind', 'isClinic'].includes(e.target.name)){
+  if(e.target.closest('#orderForm') && ['payment', 'remind', 'isClinic', 'province'].includes(e.target.name)){
     const f = e.target; customer[f.name] = f.type === 'checkbox' ? f.checked : f.value; store.set('customer', customer);
     if(f.name === 'isClinic'){ const y = window.scrollY; render(); window.scrollTo(0, y); }
   }
@@ -2020,7 +2031,8 @@ function applyLang(){
   applyTheme();
   $('#orderPill').textContent = t('orderPill');
   $('#footText').textContent = t('foot');
-  const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(CONFIG.bizPhone) + '</bdi>'; fw.href = wa(t('askMsg'));
+  const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(waPhone()) + '</bdi>'; fw.href = wa(t('askMsg'));
+  const ft = $('#footTel'); ft.innerHTML = esc(t('footTel')) + '<bdi dir="ltr">' + esc(callPhone()) + '</bdi>'; ft.href = telHref();
   if(S){
     previewBar();
     $('#footDelivery').textContent = S.delivery.on ? (L(S.delivery)) + ' · ' + LF(S.delivery, 'note') : '';

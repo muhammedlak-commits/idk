@@ -3,7 +3,8 @@
  */
 window.SALEEM_CONFIG = {
   // Orders and questions go to this WhatsApp. Same number as the Ozempic
-  // funnel for now — swap in the store's own line when it has one.
+  // funnel for now. Change it in admin → Settings → Call centre number; these two
+  // are only the starting values (and the fallback if the settings are missing).
   whatsapp : "9647710335500",           // digits only, no +, for wa.me links
   bizPhone : "+964 771 033 5500",       // shown in the footer
 

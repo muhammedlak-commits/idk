@@ -14,8 +14,8 @@ window.SALEEM_SITE = {
     "on": true,
     "en": "Delivered in 1–2 days",
     "ar": "التوصيل خلال 1–2 يوم",
-    "noteEn": "By our delivery partner, across Baghdad",
-    "noteAr": "عن طريق شركة التوصيل، داخل بغداد",
+    "noteEn": "By our delivery partner, to every province in Iraq",
+    "noteAr": "عن طريق شركة التوصيل، لكل محافظات العراق",
     "feeIqd": null
   },
   "payments": {

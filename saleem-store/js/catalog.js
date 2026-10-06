@@ -36,10 +36,23 @@
     { key: 'baby',      icon: 'baby',   en: 'Pregnancy or a new baby',          ar: 'حمل أو طفل جديد',             depts: ['baby'] },
   ];
 
+  // the provinces the delivery company covers; the order form asks for one
+  const PROVINCES = [
+    { key: 'baghdad', en: 'Baghdad', ar: 'بغداد' }, { key: 'basra', en: 'Basra', ar: 'البصرة' }, { key: 'nineveh', en: 'Nineveh', ar: 'نينوى' },
+    { key: 'erbil', en: 'Erbil', ar: 'أربيل' }, { key: 'sulaymaniyah', en: 'Sulaymaniyah', ar: 'السليمانية' }, { key: 'duhok', en: 'Duhok', ar: 'دهوك' },
+    { key: 'kirkuk', en: 'Kirkuk', ar: 'كركوك' }, { key: 'anbar', en: 'Anbar', ar: 'الأنبار' }, { key: 'babil', en: 'Babil', ar: 'بابل' },
+    { key: 'karbala', en: 'Karbala', ar: 'كربلاء' }, { key: 'najaf', en: 'Najaf', ar: 'النجف' }, { key: 'diyala', en: 'Diyala', ar: 'ديالى' },
+    { key: 'salahaldin', en: 'Salah al-Din', ar: 'صلاح الدين' }, { key: 'wasit', en: 'Wasit', ar: 'واسط' }, { key: 'maysan', en: 'Maysan', ar: 'ميسان' },
+    { key: 'dhiqar', en: 'Dhi Qar', ar: 'ذي قار' }, { key: 'muthanna', en: 'Muthanna', ar: 'المثنى' }, { key: 'qadisiyyah', en: 'Al-Qadisiyyah', ar: 'القادسية' },
+    { key: 'halabja', en: 'Halabja', ar: 'حلبجة' },
+  ];
+
   /* ── site settings: every key always present, whatever an older file or the Sheet holds ── */
   const DEFAULT_SETTINGS = {
     publicUrl: '',
-    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال 1–2 يوم', noteEn: 'By our delivery partner, across Baghdad', noteAr: 'عن طريق شركة التوصيل، داخل بغداد', feeIqd: null },
+    // the call centre: orders and questions go to this WhatsApp; phone is the number customers can call
+    contact:   { whatsapp: CFG.whatsapp || '', phone: CFG.bizPhone || '' },
+    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال 1–2 يوم', noteEn: 'By our delivery partner, to every province in Iraq', noteAr: 'عن طريق شركة التوصيل، لكل محافظات العراق', feeIqd: null },
     payments:  { cod: true, zaincash: true, qicard: true, fastpay: false, card: false },
     rentals:   { on: true, minMonths: 1, depositEn: 'Refundable deposit, amount confirmed on WhatsApp', depositAr: 'تأمين يرجعلك بعد الإرجاع، ومبلغه يتأكد على واتساب', includedEn: 'Delivery and pickup', includedAr: 'التوصيل والاستلام' },
     nurse:     { on: true, whatsapp: CFG.whatsapp || '' },
@@ -70,6 +83,9 @@
     settings.reminders.days = Math.max(7, Math.min(120, Math.floor(Number(settings.reminders.days)) || 30));
     settings.rentals.minMonths = Math.max(1, Math.floor(Number(settings.rentals.minMonths)) || 1);
     settings.nurse.whatsapp = str(settings.nurse.whatsapp).replace(/\D/g, '');
+    settings.contact.whatsapp = str(settings.contact.whatsapp).replace(/\D/g, '');
+    if (!/^\d{8,15}$/.test(settings.contact.whatsapp)) settings.contact.whatsapp = str(CFG.whatsapp).replace(/\D/g, '');
+    settings.contact.phone = str(settings.contact.phone).trim().slice(0, 30);
     const stores = (s.stores || []).map(x => ({ id: str(x.id), en: str(x.en), ar: str(x.ar), area: str(x.area), on: x.on !== false })).filter(x => x.id);
     const kits = (s.kits || []).map(k => ({
       id: str(k.id), on: k.on !== false, icon: str(k.icon || 'heart'),
@@ -308,7 +324,7 @@ window.SALEEM_PRIVATE = {
   }
 
   window.SaleemCatalog = {
-    config: CFG, bundled: BUNDLED, bundledSite: BUNDLED_SITE, SERVICES, STATUSES, PAYMENTS, SITUATIONS, DEFAULT_SETTINGS,
+    config: CFG, bundled: BUNDLED, bundledSite: BUNDLED_SITE, SERVICES, STATUSES, PAYMENTS, SITUATIONS, PROVINCES, DEFAULT_SETTINGS,
     clean, publicProduct, cleanSite, liveBanners, linePrice, encodeLines, decodeLines, pct,
     load, photo, bing, serialize, serializeSite, serializePrivate, kv,
   };

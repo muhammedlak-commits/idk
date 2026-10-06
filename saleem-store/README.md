@@ -57,6 +57,9 @@ product stays visible with an "ask about availability" button. A **hidden** one 
 
 Everything below is set in **admin → Settings / Kits / Banners**:
 
+- **Call centre number**: the WhatsApp number orders and questions go to, and (optionally) a separate number customers can call. Both show in the footer and after an order. `config.js` only holds the starting value.
+- **Delivery across Iraq**: the delivery note says every province, and the order form asks for the customer's province (it goes into the WhatsApp message and the Orders tab).
+
 - **Banners**: the home page carousel. Each banner has an image (or a colour), a title, text and a button in both languages. The whole banner is one link (a department, a kit, a product, rentals, the finder, WhatsApp, or any web address). Optional start and end dates let you schedule offers.
 - **Delivery promise**: "Delivered in 1–2 days", shown on the home page, every product and the order page. An optional delivery fee is added to the estimated total.
 - **Payment methods**: cash on delivery, ZainCash, Qi Card, FastPay, card on delivery. Each is switched on or off; the customer picks one, and it goes into the order message.
@@ -102,7 +105,7 @@ Delivery is done by the delivery company. Saleem earns a percentage on each part
 
 ## The admin portal (`admin.html`)
 
-Behind a 6-digit code (**335500**). Besides Stores, Orders, Kits, Banners and Settings (above), these tabs:
+Behind a 6-digit code (**335500**). It uses the shop's look, including dark mode (the moon/sun button; the choice is shared with the shop). Besides Stores, Orders, Kits, Banners and Settings (above), these tabs:
 
 - **Products:** search and filter all products; click one to edit names, department,
   prices, rent/refill/clinic, services, status, descriptions and photo. You can add new
