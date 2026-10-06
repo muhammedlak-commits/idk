@@ -943,12 +943,17 @@ function startBanners(){
   let paused = false;
   ['mouseenter', 'focusin', 'touchstart'].forEach(ev => tr.addEventListener(ev, () => paused = true, { passive: true }));
   ['mouseleave', 'focusout'].forEach(ev => tr.addEventListener(ev, () => paused = false));
-  bTimer = setInterval(() => { if(!paused && !document.hidden) goBanner((at() + 1) % n); }, 6000);
+  // no point turning slides nobody can see
+  const onScreen = () => { const r = tr.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+  bTimer = setInterval(() => { if(!paused && !document.hidden && onScreen()) goBanner((at() + 1) % n); }, 6000);
 }
 function goBanner(i){
   const tr = $('#bTrack'); if(!tr) return;
   const n = tr.children.length; i = (i + n) % n;
-  tr.children[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  // scroll the track sideways only — scrollIntoView would also drag the page up to the banner.
+  // Right-to-left tracks count scrollLeft from 0 downwards.
+  const x = i * tr.clientWidth * (getComputedStyle(tr).direction === 'rtl' ? -1 : 1);
+  tr.scrollTo({ left: x, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 
 function trustStrip(){
