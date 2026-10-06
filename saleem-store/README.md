@@ -10,6 +10,7 @@ home-care supplies, plus the admin portal to run it.
 - **No framework, no build step.** Every page opens straight off disk.
 
 ```
+CHANGELOG.md          what changed in each version (v0.001, v0.002 …)
 index.html            the shop: home, departments, kits, finder, search, product pages, order → WhatsApp
 admin.html            the admin portal (code 335500): products, stores, orders, kits, banners, settings…
 supplies.html         INTERNAL buying list by clinical tier
@@ -19,6 +20,7 @@ sw.js                 keeps an offline copy of the shop in the browser
 data/products.js      the product list (or the fallback, once a Google Sheet is connected)
 data/site.js          settings, partner stores (public part), kits, banners
 private/commercial.js PRIVATE: commission %, store contacts. Never deployed
+js/version.js         the version number: the one place it is set
 js/catalog.js         loads the catalog for all three pages
 js/admin-lib.js       Excel / CSV / zip reading and writing, bulk-upload rules (admin only)
 apps-script/          optional Google Sheet backend + SETUP.md
@@ -165,6 +167,16 @@ Other notes:
 - **Orders are logged only with the Google Sheet connected.** Without it, they exist only as the WhatsApp message (each with an order number).
 - **`private/` is committed to this repo** so the admin works off disk. If the repo is ever made public, move that file out of it first.
 
+## Versions
+
+The version lives in `js/version.js` (now **v0.001**). Every change that's handed over
+goes up by 0.001 (v0.002, v0.003 … v0.010 …): bump the number there, add an entry to
+[`CHANGELOG.md`](CHANGELOG.md), and tag the commit with the same name (`git tag v0.002`).
+
+The shop footer and the admin header show the running version. The single-file previews and
+the admin's update zip carry it in their names. The offline copy in visitors' browsers is
+keyed to it, so a new version replaces the old copy.
+
 ## Deploying
 
 **Deploy `dist/`, not this folder.**
@@ -185,8 +197,8 @@ funnel, so on Netlify the store needs its own site:
   `saleem-store/dist`.
 
 **Single files:** for a preview you can send or open with no server,
-`python3 build-standalone.py` writes `Saleem_Store_standalone.html`,
-`Saleem_Admin_standalone.html` and `Saleem_Supplies_standalone.html`. Keep the admin and
+`python3 build-standalone.py` writes `Saleem_Store_v0.001.html`,
+`Saleem_Admin_v0.001.html` and `Saleem_Supplies_v0.001.html` (named after the version). Keep the admin and
 store files in the same folder, so that preview works. Don't deploy these files.
 
 ## Editing products by hand

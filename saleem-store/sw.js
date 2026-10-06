@@ -8,11 +8,12 @@
  *   - Bing placeholder photos and Drive photos: kept once seen, up to 300 of them
  *   - the Google Sheet (catalog and orders) is never cached here; js/catalog.js keeps its
  *     own copy of the catalog
- * Bump VERSION when this file changes, so old copies are cleared.
+ * The copies are keyed to the version in js/version.js, so a new version clears the old ones.
  */
-const VERSION = 'v1';
+importScripts('js/version.js');   // the shop's version: a new one clears the old copies
+const VERSION = self.SALEEM_VERSION || 'v0';
 const CORE = 'saleem-core-' + VERSION, IMGS = 'saleem-img-' + VERSION;
-const PRECACHE = ['./', './index.html', './config.js', './js/catalog.js', './data/products.js', './data/site.js',
+const PRECACHE = ['./', './index.html', './config.js', './js/version.js', './js/catalog.js', './data/products.js', './data/site.js',
   './manifest.webmanifest', './assets/logo-saleem.png', './assets/icons/icon-192.png'];
 
 self.addEventListener('install', e => {

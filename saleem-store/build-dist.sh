@@ -28,7 +28,7 @@ done
 
 rm -rf dist && mkdir -p dist/js
 cp index.html config.js _headers manifest.webmanifest sw.js dist/
-cp js/catalog.js dist/js/
+cp js/catalog.js js/version.js dist/js/
 cp -r assets data dist/
 
 if [ "$admin" = 1 ]; then
@@ -48,4 +48,5 @@ fi
 if grep -rqs '"commission"' dist/data dist/index.html; then echo "refusing: commission found in dist/" >&2; exit 1; fi
 [ -e dist/private ] && { echo "refusing: dist/private exists" >&2; exit 1; }
 
-echo "dist/ ready — $(find dist -type f | wc -l | tr -d ' ') files, $(du -sh dist | cut -f1)"
+version=$(sed -n "s/.*SALEEM_VERSION = '\([^']*\)'.*/\1/p" js/version.js)
+echo "dist/ ready — $version, $(find dist -type f | wc -l | tr -d ' ') files, $(du -sh dist | cut -f1)"

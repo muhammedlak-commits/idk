@@ -54,6 +54,8 @@ input,textarea{caret-color:var(--blue)}
 .bar img{height:30px;border-radius:7px}
 .bar b{color:var(--navy);font-size:14px}
 .sp{flex:1}
+.gateVer{display:inline-block;margin:14px 0 0;border:0}
+.ver{font-size:12px;font-weight:700;color:var(--mut);padding:2px 8px;border:1px solid var(--line);border-radius:999px}
 .mode{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
 .mode.local{background:var(--amber50);color:var(--amber)}
 .mode.sheet{background:var(--green50);color:var(--green)}
@@ -373,13 +375,14 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
     <div class="gateErr" id="gateErr" role="alert"></div>
     <button class="btn navy" type="submit"><svg class="ic"><use href="#i-lock"/></svg><span data-t="unlock"></span></button>
     <button class="gateLang" type="button" data-lang></button>
+    <p class="ver gateVer"></p>
   </form>
 </section>
 
 <!-- ─── the portal ─── -->
 <div id="app" hidden>
   <header class="bar"><div class="wrap">
-    <img src="assets/logo-saleem.png" alt="Saleem"><b class="hideSm" data-t="title"></b>
+    <img src="assets/logo-saleem.png" alt="Saleem"><b class="hideSm" data-t="title"></b><span class="ver mono hideSm" title="Version"></span>
     <span class="mode" id="mode"><i></i><span></span></span>
     <span class="sp"></span>
     <a class="btn sm hideSm" id="toShop" target="_blank" rel="noopener"><svg class="ic"><use href="#i-eye"/></svg><span data-t="openShop"></span></a>
@@ -409,6 +412,7 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="busy" id="busy" hidden><div id="busyText"></div></div>
 
+<script src="js/version.js"></script>
 <script src="config.js"></script>
 <script src="data/products.js"></script>
 <script src="data/site.js"></script>
@@ -864,6 +868,7 @@ document.addEventListener('click', e => {
 });
 function paintChrome(){
   paintTheme();
+  $$('.ver').forEach(el => el.textContent = window.SALEEM_VERSION || '');
   document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.title = t('_title');
   $$('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
   $$('[data-lang]').forEach(el => el.textContent = t('lang'));
@@ -1715,7 +1720,7 @@ function bundle(){
     '  private/commercial.js   PRIVATE: commission and store contacts — never upload this folder',
     '  assets/                 ' + images + ' uploaded image(s)',
     '', 'Then upload the folder to your host (without private/), or commit it to the repo.', '' ].join('\r\n') });
-  download(LIB.zip(files), 'saleem-store-update-' + stamp() + '.zip');
+  download(LIB.zip(files), 'saleem-store-update-' + (window.SALEEM_VERSION || '') + '-' + stamp() + '.zip');
 }
 
 /* ═══════════════════════════════════════════════════════════

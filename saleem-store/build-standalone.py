@@ -7,12 +7,13 @@ handy for sharing a preview before the shop is hosted anywhere.
 
     python3 build-standalone.py
 
-writes Saleem_Store_standalone.html (the shop), Saleem_Supplies_standalone.html
-(the internal buying list) and Saleem_Admin_standalone.html (the admin portal).
+writes Saleem_Store_<version>.html (the shop), Saleem_Supplies_<version>.html
+(the internal buying list) and Saleem_Admin_<version>.html (the admin portal),
+named after the version in js/version.js (e.g. Saleem_Store_v0.001.html).
 Keep the admin and store files in the same folder: the admin's "Preview in the
 shop" opens the store file next to it.
 
-Saleem_Admin_standalone.html carries private/commercial.js inside it — commission
+Saleem_Admin_<version>.html carries private/commercial.js inside it — commission
 and partner-store contacts. Share it with staff only, never with a store or customer.
 The store file never includes it.
 
@@ -22,11 +23,13 @@ a third more bytes and can't be cached separately by the browser.
 import base64, mimetypes, pathlib, re
 
 HERE = pathlib.Path(__file__).parent
-PAGES = {"index.html": "Saleem_Store_standalone.html",
-         "supplies.html": "Saleem_Supplies_standalone.html",
-         "admin.html": "Saleem_Admin_standalone.html"}
+# the version from js/version.js names the files, e.g. Saleem_Store_v0.001.html
+VERSION = re.search(r"SALEEM_VERSION = '([^']+)'", (HERE / "js/version.js").read_text(encoding="utf-8")).group(1)
+PAGES = {"index.html": f"Saleem_Store_{VERSION}.html",
+         "supplies.html": f"Saleem_Supplies_{VERSION}.html",
+         "admin.html": f"Saleem_Admin_{VERSION}.html"}
 # links between the pages, pointed at their standalone names
-LINKS = {"admin.html": [("shopUrl    : 'index.html'", "shopUrl    : 'Saleem_Store_standalone.html'")]}
+LINKS = {"admin.html": [("shopUrl    : 'index.html'", f"shopUrl    : 'Saleem_Store_{VERSION}.html'")]}
 
 def bundle(src, out):
     html = (HERE / src).read_text(encoding="utf-8")

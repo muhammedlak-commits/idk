@@ -303,6 +303,7 @@ footer{background:var(--footBg);color:#A8BED0;padding:36px 0 30px;font-size:13.5
 footer .wrap{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
 footer img{height:40px;background:#fff;border-radius:10px;padding:6px 10px}
 footer p{margin:0;max-width:60ch}
+footer .ver{margin-top:8px;font:600 12px Montserrat,sans-serif;color:#7F98AE;letter-spacing:.02em;direction:ltr;text-align:start}
 footer a{color:#fff;font-weight:800;display:inline-flex;align-items:center;min-height:44px}
 .toast{position:fixed;z-index:80;inset-inline:0;bottom:24px;margin:auto;width:max-content;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--footBg);color:#fff;font-size:14px;font-weight:700;box-shadow:var(--shadow);transform:translateY(140%);opacity:0;transition:.22s}
 .toast.on{transform:none;opacity:1}
@@ -767,12 +768,13 @@ html.vt .view{animation:none}
 
 <footer><div class="wrap">
   <img src="assets/logo-saleem.png" alt="Saleem" width="91" height="36">
-  <div><p id="footText"></p><p id="footDelivery" style="margin-top:8px"></p></div>
+  <div><p id="footText"></p><p id="footDelivery" style="margin-top:8px"></p><p class="ver" id="footVer"></p></div>
   <div style="display:grid;gap:4px"><div class="pays-f" id="footPays"></div><p><a id="footWa" target="_blank" rel="noopener"></a></p><p><a id="footTel"></a></p></div>
 </div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <dialog class="sheet" id="sheet" aria-labelledby="sheetT"></dialog>
 
+<script src="js/version.js"></script>
 <script src="config.js"></script>
 <script src="data/products.js"></script>
 <script src="data/site.js"></script>
@@ -2031,6 +2033,7 @@ function applyLang(){
   applyTheme();
   $('#orderPill').textContent = t('orderPill');
   $('#footText').textContent = t('foot');
+  $('#footVer').textContent = (window.SALEEM_VERSION || '');
   const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(waPhone()) + '</bdi>'; fw.href = wa(t('askMsg'));
   const ft = $('#footTel'); ft.innerHTML = esc(t('footTel')) + '<bdi dir="ltr">' + esc(callPhone()) + '</bdi>'; ft.href = telHref();
   if(S){
