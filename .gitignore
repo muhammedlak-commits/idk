@@ -1,2 +1,5 @@
 saleem-ozempic-funnel/dist/
 saleem-ozempic-funnel/dist-single/
+
+# impeccable engine binary (platform-specific; the launcher fetches and sha256-verifies it on first use)
+.claude/skills/impeccable/scripts/bin/
