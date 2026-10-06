@@ -27,7 +27,7 @@ for a in "$@"; do
 done
 
 rm -rf dist && mkdir -p dist/js
-cp index.html config.js _headers dist/
+cp index.html config.js _headers manifest.webmanifest sw.js dist/
 cp js/catalog.js dist/js/
 cp -r assets data dist/
 

@@ -6,8 +6,11 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <title>لوحة متجر سليم</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* the brand faces, served with the shop (variable: every weight in one file). OFL — see assets/fonts/ */
+@font-face{font-family:Cairo;font-style:normal;font-display:swap;font-weight:200 1000;src:url(assets/fonts/cairo-arabic-wght-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:Cairo;font-style:normal;font-display:swap;font-weight:200 1000;src:url(assets/fonts/cairo-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Montserrat;font-style:normal;font-display:swap;font-weight:100 900;src:url(assets/fonts/montserrat-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{--navy:#003260;--navy2:#002444;--blue:#1C75BC;--blue50:#EDF6FD;--or:#F47B20;--or2:#D9611A;--or50:#FFF3E9;
   --green:#12806F;--green50:#E8F6F3;--red:#C0392B;--red50:#FBEBE9;--amber:#9A6700;--amber50:#FFF8E1;--purple:#5B3A85;--purple50:#F3EDF9;
   --ink:#10222F;--mut:#58708A;--line:#DDE6EE;--paper:#F4F8FB;--r:12px;--shadow:0 12px 32px rgba(0,36,68,.14)}
@@ -235,6 +238,7 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
 .switch input:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .switch input:checked{background:var(--green)}
 .switch input:checked:after{inset-inline-start:21px}
+.frameRow{margin-top:14px}.frameRow .lead{margin:4px 0 0;font-size:12.5px;padding-inline-start:52px}
 .set .head2{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .set .body{margin-top:12px}
 .set.dim .body{opacity:.5}
@@ -260,7 +264,7 @@ html[dir=rtl] .bPrev.hasImg:after{background:linear-gradient(270deg,rgba(0,24,45
 .sc .bPrev{margin:0 0 6px}
 .olist .li{grid-template-columns:110px 96px minmax(160px,1.3fr) minmax(110px,1fr) 70px 110px 110px 100px}
 .olist .li.hd{grid-template-columns:110px 96px minmax(160px,1.3fr) minmax(110px,1fr) 70px 110px 110px 100px}
-.st-new{background:var(--blue50);color:var(--blue)}.st-confirmed{background:var(--amber50);color:var(--amber)}.st-delivered{background:var(--green50);color:var(--green)}.st-cancelled{background:#EEF2F6;color:#4A6478}
+.st-new{background:var(--blue50);color:var(--blue)}.st-confirmed{background:var(--amber50);color:var(--amber)}.st-onway{background:#EEF0FB;color:#3E4C9E}.st-delivered{background:var(--green50);color:var(--green)}.st-cancelled{background:#EEF2F6;color:#4A6478}
 table.lines{width:100%;border-collapse:collapse;font-size:13px}
 table.lines th,table.lines td{padding:7px 6px;border-top:1px solid var(--line);text-align:start;vertical-align:middle}
 table.lines th{font-size:11.5px;color:var(--mut);font-weight:800}
@@ -431,7 +435,7 @@ const T = {
     dueT:'تذكيرات التجديد المستحقة', dueNone:'ماكو تذكيرات مستحقة اليوم.', dueSend:'أرسل التذكير', dueOn:'مستحق {d}', dueSent:'انرسل التذكير',
     remindMsgAr:'مرحبا {n}، صار وقت تجديد طلبك من متجر سليم ({i}). اضغط الرابط وطلبك يتجهّز: {u}', remindMsgEn:'Hi {n}, it’s time to refill your Saleem Store order ({i}). Tap to reorder: {u}',
     stmtT:'العمولة حسب المتجر', stmtP:'من الطلبات المنوصلة بهذا الشهر.', stmtStore:'المتجر', stmtOrders:'طلبات', stmtSales:'المبيعات', stmtComm:'العمولة', stmtCsv:'نزّل الكشف (CSV)', unassigned:'بدون متجر', stmtNone:'ماكو طلبات منوصلة بهذا الشهر.',
-    allSt:'الكل', ost:{new:'جديد', confirmed:'مؤكد', delivered:'انوصل', cancelled:'ملغي'}, hNo:'الرقم', hDate:'التاريخ', hCustomer:'الزبون', hArea:'المنطقة', hItems:'قطع', hTotal:'المجموع', hComm:'العمولة',
+    allSt:'الكل', ost:{new:'جديد', confirmed:'مؤكد', onway:'بالطريق', delivered:'انوصل', cancelled:'ملغي'}, hNo:'الرقم', hDate:'التاريخ', hCustomer:'الزبون', hArea:'المنطقة', hItems:'قطع', hTotal:'المجموع', hComm:'العمولة',
     orderT:'طلب {n}', oCustomer:'الزبون', oPhone:'الهاتف', oAddr:'العنوان', oClinic:'العيادة', oPay:'الدفع', oNotes:'ملاحظاته', oLines:'المستلزمات', lProd:'المنتج', lStore:'المتجر', lQty:'الكمية', lUnit:'سعر القطعة', lOff:'خصم', lTotal:'المجموع', lPct:'العمولة ٪', lComm:'العمولة',
     staffNote:'ملاحظة داخلية', oSaved:'انحفظ الطلب', refresh:'تحديث', noOrders:'ماكو طلبات بعد.',
     // kits
@@ -466,6 +470,7 @@ const T = {
     missingT:'{n} منتج موجود بالكتالوج بس مو بالملف:', keepMissing:'خلّيهم مثل ما هم', hideMissing:'أخفيهم من المتجر',
     ignoredCols:'أعمدة تم تجاهلها: {c}', errSkip:'الصفوف اللي بيها أخطاء ما راح تنطبق. صلّحها بالملف وارفعه مرة ثانية.',
     apply:'طبّق {n} تغيير', nothing:'ماكو تغييرات تنطبق.', applied:'انطبق: {n} تغيير', reupload:'ملف ثاني',
+    frameT:'أطّر كل الصور بنفس الطريقة', frameP:'يقص الفراغ حول المنتج، ويحطه بالنص على خلفية بيضاء مربعة وبنفس الحجم. الصور اللي بيها خلفية (غرفة، شخص) تبقى كاملة.',
     phT:'الصور', phP:'ارفع صور المنتجات. أي منتج بدون صورة يعرض صورة Bing مؤقتة.',
     dropMany:'اسحب صور كثيرة مرة وحدة', dropManyP:'سمّي كل ملف برقم المنتج — مثلاً 23.jpg أو 23-front.png — أو باسمه الإنكليزي، وتنربط تلقائياً.',
     matched:'{n} صورة انربطت', unmatched:'{n} صورة ما انربطت — اختار المنتج', pickProduct:'اكتب رقم أو اسم المنتج…', savePhotos:'احفظ {n} صورة', clear:'إلغاء',
@@ -511,7 +516,7 @@ const T = {
     dueT:'Refill reminders due', dueNone:'No reminders due today.', dueSend:'Send reminder', dueOn:'due {d}', dueSent:'Reminder sent',
     remindMsgAr:'مرحبا {n}، صار وقت تجديد طلبك من متجر سليم ({i}). اضغط الرابط وطلبك يتجهّز: {u}', remindMsgEn:'Hi {n}, it’s time to refill your Saleem Store order ({i}). Tap to reorder: {u}',
     stmtT:'Commission by store', stmtP:'From orders delivered this month.', stmtStore:'Store', stmtOrders:'Orders', stmtSales:'Sales', stmtComm:'Commission', stmtCsv:'Download statement (CSV)', unassigned:'No store', stmtNone:'No delivered orders this month.',
-    allSt:'All', ost:{new:'New', confirmed:'Confirmed', delivered:'Delivered', cancelled:'Cancelled'}, hNo:'No.', hDate:'Date', hCustomer:'Customer', hArea:'Area', hItems:'Pcs', hTotal:'Total', hComm:'Commission',
+    allSt:'All', ost:{new:'New', confirmed:'Confirmed', onway:'Out for delivery', delivered:'Delivered', cancelled:'Cancelled'}, hNo:'No.', hDate:'Date', hCustomer:'Customer', hArea:'Area', hItems:'Pcs', hTotal:'Total', hComm:'Commission',
     orderT:'Order {n}', oCustomer:'Customer', oPhone:'Phone', oAddr:'Address', oClinic:'Clinic', oPay:'Payment', oNotes:'Their notes', oLines:'Items', lProd:'Product', lStore:'Store', lQty:'Qty', lUnit:'Unit price', lOff:'Off', lTotal:'Total', lPct:'Comm. %', lComm:'Commission',
     staffNote:'Internal note', oSaved:'Order saved', refresh:'Refresh', noOrders:'No orders yet.',
     kitsT:'Care kits', kitsP:'Sets of products for one situation, shown in the shop. Customers add the whole kit in one tap.', addKit:'New kit', kitT:'Kit', kEn:'Name in English', kAr:'Name in Arabic', kBEn:'Description in English', kBAr:'Description in Arabic',
@@ -542,6 +547,7 @@ const T = {
     missingT:'{n} products are in the catalog but not in the file:', keepMissing:'Leave them as they are', hideMissing:'Hide them from the shop',
     ignoredCols:'Columns ignored: {c}', errSkip:'Rows with errors won’t be applied. Fix them in the file and upload it again.',
     apply:'Apply {n} changes', nothing:'Nothing to apply.', applied:'Applied {n} changes', reupload:'Another file',
+    frameT:'Frame every photo the same way', frameP:'Trims the empty space around the item and centres it on a white square at the same size. Photos with a real background (a room, a person) are kept whole.',
     phT:'Photos', phP:'Upload product photos. Any product without one shows a Bing placeholder.',
     dropMany:'Drop many photos at once', dropManyP:'Name each file with the product number — 23.jpg, 23-front.png — or its English name, and it’s matched automatically.',
     matched:'{n} photos matched', unmatched:'{n} photos not matched — choose the product', pickProduct:'Type a number or name…', savePhotos:'Save {n} photos', clear:'Cancel',
@@ -981,7 +987,7 @@ let pickTarget = null;      // 'editor' | 'banner' | product id (photos tab)
 async function photoFile(file, target){
   if(!file || !/^image\//.test(file.type)) return;
   if(target === 'banner'){ const dataUrl = await LIB.resizeImage(file, 1600); readBanner(); editBanner.img = dataUrl; bannerEditor(true); return; }
-  const dataUrl = await LIB.resizeImage(file);
+  const dataUrl = await LIB.resizeImage(file, 1000, { frame: framing() });
   if(target === 'editor'){ readForm(); keepNums(); editing.img = dataUrl; openEditor(editing.id, true); return; }
   const p = products.find(x => x.id === target); if(!p) return;
   try{ busy(t('working')); await commit([Object.assign({}, p, { img: dataUrl })]); busy(); paintPhotoGrid(); toast(t('photosSaved', { n: 1 })); }
@@ -1116,7 +1122,7 @@ function viewOrders(){
         ${stmt.map(r => `<tr><td>${esc(r.name || t('unassigned'))}</td><td class="n">${r.orders}</td><td class="n">${iqd(r.sales)}</td><td class="n">${iqd(r.commission)}</td></tr>`).join('')}</tbody>
         <tfoot><tr><td></td><td class="n">${del.length}</td><td class="n">${iqd(stmt.reduce((a, r) => a + r.sales, 0))}</td><td class="n">${iqd(stmt.reduce((a, r) => a + r.commission, 0))}</td></tr></tfoot></table>
         <div class="row" style="margin-top:12px"><button class="btn" type="button" data-stmt-csv>${icon('i-down')}${t('stmtCsv')}</button></div>` : `<p class="lead" style="margin:0">${t('stmtNone')}</p>`}</section>
-    <div class="sum" style="margin:6px 0 10px">${['', ...['new', 'confirmed', 'delivered', 'cancelled']].map(s => `<button type="button" data-ofilter="${s}" aria-pressed="${ordersFilter === s}"><b>${(s ? inMonth.filter(o => o.status === s) : inMonth).length}</b><span>${s ? t('ost')[s] : t('allSt')}</span></button>`).join('')}</div>
+    <div class="sum" style="margin:6px 0 10px">${['', ...['new', 'confirmed', 'onway', 'delivered', 'cancelled']].map(s => `<button type="button" data-ofilter="${s}" aria-pressed="${ordersFilter === s}"><b>${(s ? inMonth.filter(o => o.status === s) : inMonth).length}</b><span>${s ? t('ost')[s] : t('allSt')}</span></button>`).join('')}</div>
     ${list.length ? `<div class="list olist"><div class="li hd"><span>${t('hNo')}</span><span>${t('hDate')}</span><span>${t('hCustomer')}</span><span>${t('hArea')}</span><span>${t('hItems')}</span><span>${t('hTotal')}</span><span>${t('hComm')}</span><span>${t('hStatus')}</span></div>
       ${list.map(o => `<div class="li" data-order="${esc(o.id)}" tabindex="0" role="button"><span class="mono"><b>${esc(o.id)}</b></span><span class="mono">${esc(String(o.created_at).slice(0, 10))}</span>
         <span><b>${esc(o.name)}</b><small class="mono">${esc(o.phone)}</small></span><span><small>${esc(o.area)}</small></span><span class="mono">${pieceCount(o)}</span>
@@ -1132,7 +1138,7 @@ function orderEditor(o){
       <dt>${t('hArea')}</dt><dd>${esc(x.area)}</dd>${x.address ? `<dt>${t('oAddr')}</dt><dd>${esc(x.address)}</dd>` : ''}${x.clinic ? `<dt>${t('oClinic')}</dt><dd>${esc(x.clinic)}</dd>` : ''}
       ${pay ? `<dt>${t('oPay')}</dt><dd>${esc(L(pay))}</dd>` : ''}${x.notes ? `<dt>${t('oNotes')}</dt><dd>${esc(x.notes)}</dd>` : ''}
       <dt>${t('hDate')}</dt><dd class="mono">${esc(String(x.created_at).replace('T', ' ').slice(0, 16))}</dd></dl>
-    <label class="field"><span>${t('status')}</span><select name="status">${['new', 'confirmed', 'delivered', 'cancelled'].map(s => opt(s, t('ost')[s], x.status)).join('')}</select></label>
+    <label class="field"><span>${t('status')}</span><select name="status">${['new', 'confirmed', 'onway', 'delivered', 'cancelled'].map(s => opt(s, t('ost')[s], x.status)).join('')}</select></label>
     <b>${t('oLines')}</b>
     <div style="overflow-x:auto"><table class="lines"><thead><tr><th>${t('lProd')}</th><th>${t('lStore')}</th><th>${t('lQty')}</th><th>${t('lUnit')}</th><th>${t('lOff')}</th><th>${t('lTotal')}</th><th>${t('lPct')}</th><th>${t('lComm')}</th></tr></thead><tbody>
       ${x.lines.map((l, i) => `<tr data-ol="${i}"><td>${esc(l.name)} <small class="muted mono">#${l.id}</small></td><td><small>${esc(l.storeName || '—')}</small></td><td class="mono">${l.qty}× <small>${t('modes')[l.mode] || l.mode}</small></td>
@@ -1493,11 +1499,15 @@ async function applyPlan(){
 /* ═══════════════════════════════════════════════════════════
    PHOTOS
    ═══════════════════════════════════════════════════════════ */
+// product photos are framed the same way unless staff switch it off here
+const framing = () => ls.get('framePhotos', true) !== false;
+document.addEventListener('change', e => { if(e.target.matches('[data-framing]')) ls.set('framePhotos', e.target.checked); });
 function viewPhotos(){
   const own = products.filter(p => p.img).length;
   return `<div class="head"><div><h1>${t('phT')}</h1><p>${t('phP')}</p></div></div>
   <section class="panel">
     <label class="drop" id="photoDrop" data-pick-many>${icon('i-img')}<strong>${t('dropMany')}</strong><span>${t('dropManyP')}</span></label>
+    <div class="frameRow"><label class="switch"><input type="checkbox" data-framing ${framing() ? 'checked' : ''}>${t('frameT')}</label><p class="lead">${t('frameP')}</p></div>
     <div id="queue">${queueHtml()}</div>
   </section>
   <div class="tools"><div class="sum" style="margin:0">${[['all', products.length], ['own', own], ['web', products.length - own]].map(([k, n]) => `<button type="button" data-pf="${k}" aria-pressed="${photoFilter === k}"><b>${n}</b><span>${t({ all:'fAll', own:'fOwn', web:'fWeb' }[k])}</span></button>`).join('')}</div></div>
@@ -1520,7 +1530,7 @@ function matchFile(name){
 async function queuePhotos(files){
   files = files.filter(f => /^image\//.test(f.type)); if(!files.length) return;
   busy(t('working'));
-  for(const f of files){ try{ pendingPhotos.push({ name: f.name, dataUrl: await LIB.resizeImage(f), id: matchFile(f.name) }); }catch(e){ toast(f.name + ': ' + e.message, true); } }
+  for(const f of files){ try{ pendingPhotos.push({ name: f.name, dataUrl: await LIB.resizeImage(f, 1000, { frame: framing() }), id: matchFile(f.name) }); }catch(e){ toast(f.name + ': ' + e.message, true); } }
   busy(); $('#queue').innerHTML = queueHtml();
 }
 function queueHtml(){

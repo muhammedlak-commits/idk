@@ -41,7 +41,7 @@ def bundle(src, out):
             print(f"  ! missing, left as-is: {path}")
             return path
         if path not in seen:
-            mime = mimetypes.guess_type(f.name)[0] or ("image/webp" if f.suffix == ".webp" else "application/octet-stream")
+            mime = mimetypes.guess_type(f.name)[0] or {".webp": "image/webp", ".woff2": "font/woff2"}.get(f.suffix, "application/octet-stream")
             seen[path] = f"data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}"
             print(f"  + {path} ({f.stat().st_size:,} bytes)")
         return seen[path]
@@ -59,8 +59,12 @@ def bundle(src, out):
         # a literal </script> inside the data would end the tag early
         return "<script>\n" + js.replace("</script", "<\\/script") + "\n</script>"
 
+    # a page opened off disk can't install as an app or keep an offline copy
+    html = re.sub(r'<link [^>]*data-pwa[^>]*>\n?', '', html)
     html = re.sub(r'<script src="((?!https?:|//)[^"]+\.js)"></script>', inline_js, html)
     html = re.sub(r'\b(src|href)="((?!data:|https?:|//|#)[^"]+\.(?:png|jpe?g|webp|gif|svg))"', inline_img, html)
+    # the self-hosted fonts in the page's CSS
+    html = re.sub(r'url\((assets/fonts/[^)]+\.woff2)\)', lambda m: 'url(' + data_uri(m.group(1)) + ')', html)
     (HERE / out).write_text(html, encoding="utf-8")
     print(f"{out}: {(HERE / out).stat().st_size:,} bytes\n")
 

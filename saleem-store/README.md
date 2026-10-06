@@ -14,13 +14,16 @@ index.html            the shop: home, departments, kits, finder, search, product
 admin.html            the admin portal (code 335500): products, stores, orders, kits, banners, settings…
 supplies.html         INTERNAL buying list by clinical tier
 config.js             WhatsApp number, where the catalog comes from, placeholder photos
+manifest.webmanifest  lets phones install the shop as an app (name, icons, shortcuts)
+sw.js                 keeps an offline copy of the shop in the browser
 data/products.js      the product list (or the fallback, once a Google Sheet is connected)
 data/site.js          settings, partner stores (public part), kits, banners
 private/commercial.js PRIVATE: commission %, store contacts. Never deployed
 js/catalog.js         loads the catalog for all three pages
 js/admin-lib.js       Excel / CSV / zip reading and writing, bulk-upload rules (admin only)
 apps-script/          optional Google Sheet backend + SETUP.md
-assets/               logo, hero photo; assets/products/ holds published product photos
+assets/               logo, hero photo, app icons (icons/), the Cairo and Montserrat fonts (fonts/, OFL);
+                      assets/products/ holds published product photos
 build-dist.sh         assembles the public site into dist/
 build-standalone.py   bundles each page into one shareable file
 ```
@@ -43,6 +46,8 @@ views and returns to where you'd scrolled.
 | Search | `#/search?q=…` | results update in place. Arabic matching ignores hamza, taa marbuta and diacritics |
 | My order | `#/order` | per-line buy, rent or monthly, then name, phone and area → WhatsApp |
 | For clinics | `#/d/clinic` | the B2B-only items, ordered as a quote request |
+| Photo of the list | `#/list` | photograph the handwritten list from a visit and send it on WhatsApp |
+| Track an order | `#/track/<order no.>` | the status staff set in the Orders tab (needs the Google Sheet) |
 
 When a product has a price, it shows on the card and the product page, and the order adds
 up an estimated total. Without one, it says "price on WhatsApp". An **out-of-stock**
@@ -70,6 +75,13 @@ The shop also has:
 - an order number on every WhatsApp message
 - **Add** on a card adds as a purchase, except in the Rent and Monthly lists, which add in that mode. The toast and the card say which mode went in.
 - a sent order is remembered in the browser for 3 days. Opening the order again shows what was sent. Sending the same list again keeps its order number, so the Sheet logs it once. A changed list goes as a new order that names the one it updates. "Start a new order" asks before clearing the list.
+- **Add** on an item that can be bought, rented or sent monthly opens a small choice sheet (a bottom sheet on phones) with each option's price.
+- moving between pages animates: a product's photo grows from its card into the product page, and an added item flies into the order tab. People who turn off motion on their phone get no animation.
+- **install as an app**: phones offer "Install" (iPhone: Share → Add to Home Screen). The shop then opens from its own icon, instantly, and the catalogue still works with no connection. Only over http(s); a file opened off disk can't install.
+- **dark mode** follows the phone's setting; the moon/sun button in the header switches it.
+- **running low**: a month after an order with monthly refills, the home page offers "Refill now" (from a week before it's due).
+- **send a photo of the list**: on phones the photo goes straight into WhatsApp through the share menu; elsewhere the chat opens and the customer attaches it.
+- **track an order**: the order number plus the last 4 digits of the phone it was sent from. The answer is the status and the items, nothing personal.
 - on a kit page, untick what you already have. Adding a kit tops lines up to the kit's quantities rather than doubling them.
 
 ## Partner stores and commission
@@ -83,7 +95,7 @@ Delivery is done by the delivery company. Saleem earns a percentage on each part
   - In the Google Sheet, the public read leaves them out.
 - **Orders tab** (with the Sheet connected): every order from the shop is logged, and commission is worked out per line at the time of the order. Staff can:
   - set a final price on unpriced lines
-  - mark orders confirmed, delivered or cancelled
+  - mark orders confirmed, out for delivery, delivered or cancelled (the customer sees this on the tracking page)
   - see commission per store for any month (delivered orders only)
   - download the statement as CSV
 - **Refill reminders**: these show up in the Orders tab on the day they're due. **Send reminder** opens WhatsApp to the customer with a link that refills their basket in one tap (`#/reorder/…`).
@@ -108,7 +120,10 @@ Behind a 6-digit code (**335500**). Besides Stores, Orders, Kits, Banners and Se
   (`23.jpg`, `23-front.png`) or its English name (`folding walker.png`) are matched
   automatically; the rest you pick from a list. Photos are shrunk to 1000px WebP in the
   browser. **A product with no uploaded photo keeps the Bing reference image as its
-  placeholder.**
+  placeholder.** With *Frame every photo the same way* on (the default), each photo is
+  trimmed of its empty edges and centred on a white square at the same size, so photos
+  taken by different people still look like one set. Photos with a real background (a
+  room, a person) are kept whole.
 - **Publish & connect:** see below.
 
 ### Two ways to run it
@@ -150,7 +165,7 @@ Other notes:
 ## Deploying
 
 **Deploy `dist/`, not this folder.**
-- `./build-dist.sh` copies only the shop.
+- `./build-dist.sh` copies only the shop (with the app manifest and the offline worker).
 - `supplies.html`, `admin.html` and `apps-script/` stay out.
 - `--with-admin` adds the admin page. That's only useful once the Sheet is connected (see
   the script's comments).

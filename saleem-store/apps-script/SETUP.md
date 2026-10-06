@@ -72,7 +72,7 @@ The Sheet now has four tabs:
 | **Products** | the same columns as the bulk-upload spreadsheet, including the private `commission_pct` |
 | **Stores** | partner stores, their commission % and contacts (private) |
 | **Site** | settings, kits and banners, written by the admin. Don't edit this one by hand |
-| **Orders** | one row per order from the shop: customer, items, total, commission, reminder date, status |
+| **Orders** | one row per order from the shop: customer, items, total, commission, reminder date, status (new, confirmed, onway, delivered, cancelled) |
 
 ## 6 — Point the shop at it
 
@@ -100,6 +100,11 @@ visitor sees the last copy their browser saw, and a first-time visitor sees the 
   Sheet, not taken from the browser. Commission is fixed at that moment, so later changes
   to a store's % don't rewrite past orders. A cap of 60 orders per 10 minutes stops anyone
   flooding the tab.
+- **Order tracking.** The shop's tracking page asks for the order number and the last 4
+  digits of the phone it was sent from, and shows the status staff set in the Orders tab
+  (or the admin), plus the items. Nothing else about the customer is ever returned, and
+  lookups are capped at 300 per 10 minutes. If you set up the Sheet before this was
+  added, paste in the new `Code.gs` and deploy a new version (see below).
 - **Reminder links** point at the address in admin → Settings → *Published shop address*.
   Fill it in once the shop has a public URL.
 

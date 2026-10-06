@@ -6,7 +6,8 @@
  *   COLUMNS               the spreadsheet columns, shared with apps-script/Code.gs
  *   toRows                products → spreadsheet rows
  *   planImport            spreadsheet rows → what would change, row by row
- *   resizeImage           an uploaded photo → a ≤1000px WebP/JPEG data URL
+ *   resizeImage           an uploaded photo → a ≤1000px WebP/JPEG data URL; with
+ *                         { frame: true }, a 1000px square framed like every other product photo
  *
  * Written without libraries so the admin works offline and has nothing to keep
  * patched. Runs in the browser and in Node (for the tests).
@@ -349,19 +350,64 @@
   }
 
   /* ═══════════════ PHOTOS ═══════════════ */
-  async function resizeImage(file, max) {
-    max = max || 1000;
+  // opts.frame: product photos all come out the same — square, white, the item trimmed of its
+  // empty edges and centred at the same size. A photo with no plain background (a room, a
+  // person) is kept whole and fitted inside the square instead of being cut.
+  async function resizeImage(file, max, opts) {
+    max = max || 1000; opts = opts || {};
     const url = URL.createObjectURL(file);
     try {
       const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Not an image the browser can read')); i.src = url; });
-      const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-      const w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
-      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-      const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(img, 0, 0, w, h);
+      const cv = opts.frame ? framed(img, max) : scaled(img, max);
       let out = cv.toDataURL('image/webp', 0.82);
       if (!out.startsWith('data:image/webp')) out = cv.toDataURL('image/jpeg', 0.86);   // older Safari can't write WebP
       return out;
     } finally { URL.revokeObjectURL(url); }
+  }
+  function scaled(img, max) {
+    const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(img, 0, 0, w, h);
+    return cv;
+  }
+  function framed(img, size) {
+    // look at a copy at most 600px across: enough to find the edges, quick on a phone
+    const k = Math.min(1, 600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+    const a = document.createElement('canvas'); a.width = w; a.height = h;
+    const ax = a.getContext('2d', { willReadFrequently: true }); ax.fillStyle = '#fff'; ax.fillRect(0, 0, w, h); ax.drawImage(img, 0, 0, w, h);
+    const box = itemBox(ax.getImageData(0, 0, w, h).data, w, h);
+    const whole = !box || (box.w * box.h) / (w * h) > 0.9;
+    const sx = whole ? 0 : box.x / k, sy = whole ? 0 : box.y / k;
+    const sw = whole ? img.naturalWidth : box.w / k, sh = whole ? img.naturalHeight : box.h / k;
+    const fill = whole ? 1 : 0.82;                          // a trimmed item gets a margin around it
+    const s = Math.min(size * fill / sw, size * fill / sh, whole ? size / Math.max(sw, sh) : Infinity);
+    const dw = sw * s, dh = sh * s;
+    const cv = document.createElement('canvas'); cv.width = size; cv.height = size;
+    const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, size, size);
+    cx.imageSmoothingQuality = 'high';
+    cx.drawImage(img, sx, sy, sw, sh, (size - dw) / 2, (size - dh) / 2, dw, dh);
+    return cv;
+  }
+  // the box around everything that isn't the background (the colour of the four corners)
+  function itemBox(d, w, h) {
+    const px = (x, y) => { const i = (y * w + x) * 4; return [d[i], d[i + 1], d[i + 2]]; };
+    const corners = [px(0, 0), px(w - 1, 0), px(0, h - 1), px(w - 1, h - 1)];
+    const bg = [0, 1, 2].map(c => corners.reduce((a, p) => a + p[c], 0) / 4);
+    // corners that disagree mean there is no plain background to trim
+    if (corners.some(p => p.some((v, c) => Math.abs(v - bg[c]) > 40))) return null;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 60) {
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+    }
+    if (x1 < 0) return null;
+    const pad = 2;
+    x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(w - 1, x1 + pad); y1 = Math.min(h - 1, y1 + pad);
+    return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
   }
   const dataUrlBytes = u => { const b = atob(u.split(',')[1]); const a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; };
 

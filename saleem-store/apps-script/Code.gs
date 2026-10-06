@@ -11,6 +11,9 @@
  *
  *   doGet   ?action=catalog       public. Products + settings the shop shows.
  *                                 Commission and store contacts are never in it.
+ *   doGet   ?action=status&id=&phone=   public. One order's status, for the shop's tracking
+ *                                 page. Needs the order number AND the last 4 digits of
+ *                                 the phone it was sent from; answers nothing else.
  *   doPost  {action:'order'}      public. The shop logs an order as it opens WhatsApp.
  *   doPost  {action, code, ...}   the admin portal. Every other action needs ADMIN_CODE.
  *
@@ -47,12 +50,19 @@ var COLUMNS = [
 var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active'];
 var ORDER_COLUMNS = ['id', 'created_at', 'status', 'name', 'phone', 'area', 'address', 'clinic', 'payment', 'notes', 'lang',
                      'remind', 'remind_on', 'reminded_at', 'items', 'est_total_iqd', 'commission_iqd', 'staff_note', 'lines_json', 'updated_at'];
-var ORDER_STATUSES = ['new', 'confirmed', 'delivered', 'cancelled'];
+var ORDER_STATUSES = ['new', 'confirmed', 'onway', 'delivered', 'cancelled'];
+
+// The public status lookup is open to anyone with the URL; this caps how fast it can be tried.
+var MAX_STATUS_PER_10_MIN = 300;
 var SERVICES = ['doctor', 'nursing', 'physio', 'lab', 'direct'];
 
 /* ═══════════════ PUBLIC ═══════════════ */
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'status') {
+    try { return json_(orderStatus_(e.parameter.id, e.parameter.phone)); }
+    catch (err) { console.error(err); return json_({ ok: false, error: String(err.message || err) }); }
+  }
   try {
     var products = readProducts_().filter(function (p) { return p.status !== 'hidden'; }).map(publicProduct_);
     var site = readSite_();
@@ -384,6 +394,21 @@ function readOrders_() {
     out.push(o);
   }
   return out.reverse().slice(0, 1000);   // newest first
+}
+
+/** What the customer may see about their own order: status, dates and the items. Nothing
+ *  else, and only when the phone's last 4 digits match — an order number alone is not enough. */
+function orderStatus_(id, phone) {
+  var cache = CacheService.getScriptCache(), n = Number(cache.get('status10') || 0);
+  if (n >= MAX_STATUS_PER_10_MIN) return { ok: false, error: 'busy' };
+  cache.put('status10', String(n + 1), 600);
+  id = str_(id, 20).trim().toUpperCase();
+  var last4 = String(phone || '').replace(/\D/g, '').slice(-4);
+  if (!/^S-[A-Z0-9]{4,10}$/.test(id) || last4.length !== 4) return { ok: false, error: 'bad request' };
+  var o = readOrders_().filter(function (x) { return String(x.id).toUpperCase() === id; })[0];
+  if (!o || String(o.phone).replace(/\D/g, '').slice(-4) !== last4) return { ok: true, found: false };
+  return { ok: true, found: true, id: o.id, status: o.status || 'new', created_at: o.created_at, updated_at: o.updated_at || o.created_at,
+           lines: (o.lines || []).map(function (l) { return { id: l.id, mode: l.mode, qty: l.qty, total: l.total }; }) };
 }
 
 /** patch: { status, staff_note, reminded: true, lines: [{ unit, pct }] by position } */
