@@ -8,24 +8,27 @@
 <title>متجر سليم</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --navy:#003260;--navy2:#002444;--blue:#1C75BC;--blue50:#EDF6FD;--blue100:#D6E9F8;
-  --or:#F47B20;--or2:#D9611A;--or50:#FFF3E9;--green:#12806F;--green50:#E8F6F3;--red:#C0392B;
+  --or:#C4510F;--or2:#A8480F;--orBrand:#F47B20;--wa:#12733F;--wa2:#0E5C32;--or50:#FFF3E9;--green:#12806F;--green50:#E8F6F3;--red:#C0392B;
   --ink:#10222F;--mut:#58708A;--line:#DDE6EE;--paper:#F4F8FB;--white:#fff;
   --r:14px;--shadow:0 12px 32px rgba(0,36,68,.12);--tabH:56px;--barH:68px;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font:500 15px/1.6 Montserrat,system-ui,sans-serif;min-width:320px}
-html[lang=ar] body{font-family:Cairo,system-ui,sans-serif;font-weight:600}
+html[lang=ar] body{font-family:Cairo,system-ui,sans-serif;font-weight:500}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 img{max-width:100%}
 .ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-:focus-visible{outline:3px solid rgba(28,117,188,.45);outline-offset:2px}
+:focus-visible{outline:3px solid rgba(28,117,188,.55);outline-offset:2px}
+::selection{background:var(--blue100);color:var(--navy2)}
+input,textarea{caret-color:var(--blue)}
+::placeholder{color:#5F7488;opacity:1}
 .wrap{width:min(100% - 32px,1240px);margin-inline:auto}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;inset-inline-start:12px;top:-60px;z-index:100;background:var(--navy);color:#fff;padding:10px 14px;border-radius:10px}
@@ -34,7 +37,7 @@ img{max-width:100%}
 /* ── top bar ─────────────────────────────────────── */
 .bar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
 .bar .wrap{height:var(--barH);display:flex;align-items:center;gap:16px}
-.logo{display:flex;align-items:center;gap:10px;flex:none}
+.logo{display:flex;align-items:center;gap:10px;flex:none;min-height:44px}
 .logo img{height:36px;width:auto}
 .logo span{font-size:12px;font-weight:800;color:var(--mut);border-inline-start:1px solid var(--line);padding-inline-start:10px;line-height:1.2}
 .search{flex:1;display:flex;align-items:center;gap:8px;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);transition:border-color .15s,box-shadow .15s}
@@ -69,36 +72,34 @@ h1:focus{outline:0}
 .secHead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}
 .secHead h2{font-size:22px}
 .secHead p{margin:4px 0 0;color:var(--mut);font-size:14px}
-.more{color:var(--blue);font-weight:800;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.more{color:var(--blue);font-weight:800;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;min-height:44px}
 .more .ic{width:16px;height:16px}
 html[dir=rtl] .flip{transform:scaleX(-1)}
 
 /* ── home ────────────────────────────────────────── */
 .hero{background:linear-gradient(125deg,#EAF5FE 0%,#F8FCFF 50%,#FFF3E9 100%);border-bottom:1px solid var(--line)}
 .hero .wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:44px 0}
-.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.kicker:before{content:"";width:22px;height:3px;border-radius:3px;background:var(--or)}
-.hero h1{font-size:clamp(30px,3.4vw,46px);margin:12px 0 12px;letter-spacing:-.02em}
-.hero h1 em{font-style:normal;color:var(--blue)}
+.hero h2{font-size:clamp(28px,3vw,40px);margin:0 0 12px;letter-spacing:-.02em;text-wrap:balance}
+.hero h2 em{font-style:normal;color:var(--blue)}
 .hero p{margin:0 0 20px;color:#4D667B;font-size:16px;max-width:52ch}
 .hero .search{height:54px;background:#fff;box-shadow:0 6px 20px rgba(0,36,68,.07)}
 .hero .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .btn{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;border-radius:12px;border:1px solid transparent;font-size:15px;font-weight:800;transition:background .15s,transform .15s}
-.btn.or{background:var(--or);color:#fff;box-shadow:0 10px 22px rgba(217,97,26,.22)}
+.btn.or{background:var(--or);color:#fff;box-shadow:0 8px 20px rgba(168,72,15,.22)}
 .btn.or:hover{background:var(--or2)}
 .btn.navy{background:var(--navy);color:#fff}
 .btn.navy:hover{background:var(--navy2)}
 .btn.ghost{background:#fff;border-color:var(--line);color:var(--navy)}
 .btn.ghost:hover{border-color:var(--blue)}
-.btn.wa{background:#1FA855;color:#fff}
-.btn.wa:hover{background:#178A45}
+.btn.wa{background:var(--wa);color:#fff}
+.btn.wa:hover{background:var(--wa2)}
 .btn.block{width:100%}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 .heroImg{border-radius:20px;overflow:hidden;border:6px solid #fff;box-shadow:var(--shadow);aspect-ratio:16/10;background:#E8F1F8}
 .heroImg img{width:100%;height:100%;object-fit:cover;display:block}
 .quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
 .quick small{color:var(--mut);font-size:13px;font-weight:700}
-.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-size:13.5px;font-weight:700;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-size:13.5px;font-weight:700;white-space:nowrap}
 .chip:hover{border-color:var(--blue)}
 .chip[aria-current=true],.chip[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
 .chip b{font:700 12px Montserrat,sans-serif;opacity:.65}
@@ -144,17 +145,17 @@ html[dir=rtl] .flip{transform:scaleX(-1)}
 .ph .fb .ic{width:44px;height:44px;stroke-width:1.3}
 .ph.noimg img{display:none}
 .badges{position:absolute;z-index:2;top:8px;inset-inline-start:8px;display:flex;flex-wrap:wrap;gap:4px}
-.bdg{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:7px;font-size:11.5px;font-weight:800;line-height:1.4;background:#fff;box-shadow:0 1px 3px rgba(0,36,68,.12)}
+.bdg{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:7px;font-size:12.5px;font-weight:800;line-height:1.4;background:#fff;box-shadow:0 1px 3px rgba(0,36,68,.12)}
 .bdg .ic{width:13px;height:13px;stroke-width:2.2}
 .bdg.rent{color:var(--or2)}.bdg.refill{color:var(--green)}.bdg.quote{color:#5B3A85}
 .cBody{padding:12px 14px 4px;flex:1}
 .cBody small{display:block;color:var(--mut);font-size:12.5px;font-weight:700}
 .cBody h3{font-size:15px;margin-top:3px;line-height:1.35}
 .cFoot{padding:10px 14px 14px}
-.add{width:100%;height:42px;border:1px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.add{width:100%;height:44px;border:1px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px}
 .add:hover{background:var(--navy);color:#fff}
 .add .ic{width:18px;height:18px}
-.stepper{display:flex;align-items:center;height:42px;border:1px solid var(--navy);border-radius:10px;overflow:hidden;background:var(--navy);color:#fff}
+.stepper{display:flex;align-items:center;height:46px;border:1px solid var(--navy);border-radius:10px;overflow:hidden;background:var(--navy);color:#fff}
 .stepper button{width:44px;height:100%;border:0;background:transparent;color:inherit;display:grid;place-items:center}
 .stepper button:hover{background:rgba(255,255,255,.12)}
 .stepper span{flex:1;text-align:center;font-weight:800;font-size:14px}
@@ -169,11 +170,11 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 .add.ask{border-color:var(--line);color:var(--mut);font-size:13px}
 .add.ask:hover{background:var(--paper);color:var(--navy)}
 .optPrice{margin-inline-start:auto;text-align:end;color:var(--navy);font:800 14px Montserrat,sans-serif;white-space:nowrap}
-.optPrice small{display:block;color:var(--mut);font-size:11.5px;font-weight:700}
+.optPrice small{display:block;color:var(--mut);font-size:12px;font-weight:700}
 .note.out{background:#FBEBE9;color:#8E2A20;margin-top:18px}
 .sum.est{border-top:1px dashed var(--line);margin-top:0;color:var(--navy)}
 .estNote{margin:0;color:var(--mut);font-size:12.5px}
-.previewBar{position:relative;z-index:45;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:var(--or);color:#fff;font-size:13.5px;font-weight:800;text-align:center}
+.previewBar{position:relative;z-index:45;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:var(--or2);color:#fff;font-size:13.5px;font-weight:800;text-align:center}
 .previewBar[hidden]{display:none}
 .previewBar a{color:#fff;text-decoration:underline}
 .loading{height:60vh}
@@ -194,10 +195,10 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 .subtab[aria-current=page]{color:var(--navy);border-color:var(--or)}
 .subtab b{font:700 12px Montserrat,sans-serif;opacity:.6;margin-inline-start:4px}
 .tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 14px}
-.seg{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:11px;background:#fff;gap:2px;flex-wrap:wrap}
-.seg button{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:13.5px;font-weight:800;color:var(--mut)}
+.seg{display:inline-flex;padding:2px;border:1px solid var(--line);border-radius:11px;background:#fff;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;min-height:44px;padding:0 14px;border-radius:8px;font-size:13.5px;font-weight:800;color:var(--mut)}
 .seg button[aria-pressed=true]{background:var(--navy);color:#fff}
-.sel{height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13.5px;font-weight:700;color:var(--navy)}
+.sel{height:44px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13.5px;font-weight:700;color:var(--navy)}
 .found{color:var(--mut);font-size:14px;font-weight:700}
 .found b{color:var(--navy)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
@@ -259,10 +260,10 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 .line .ph .fb .ic{width:28px;height:28px}
 .line h3{font-size:14.5px}
 .line .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
-.line .sel{height:34px;font-size:13px}
-.line .stepper{height:34px;width:112px}
-.line .stepper button{width:34px}
-.rm{border:0;background:none;color:var(--mut);padding:6px;border-radius:8px}
+.line .sel{height:44px;font-size:13.5px}
+.line .stepper{height:46px;width:132px}
+.line .stepper button{width:44px}
+.rm{border:0;background:none;color:var(--mut);width:44px;height:44px;display:grid;place-items:center;border-radius:10px}
 .rm:hover{color:var(--red);background:#FBEBE9}
 .field{display:block;margin-bottom:12px}
 .field span{display:block;font-size:13.5px;font-weight:800;color:var(--navy2);margin-bottom:5px}
@@ -285,10 +286,10 @@ footer{background:var(--navy2);color:#A8BED0;padding:36px 0 30px;font-size:13.5p
 footer .wrap{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
 footer img{height:40px;background:#fff;border-radius:10px;padding:6px 10px}
 footer p{margin:0;max-width:60ch}
-footer a{color:#fff;font-weight:800}
+footer a{color:#fff;font-weight:800;display:inline-flex;align-items:center;min-height:44px}
 .toast{position:fixed;z-index:80;inset-inline:0;bottom:24px;margin:auto;width:max-content;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--navy2);color:#fff;font-size:14px;font-weight:700;box-shadow:var(--shadow);transform:translateY(140%);opacity:0;transition:.22s}
 .toast.on{transform:none;opacity:1}
-.toast a{color:#FFB37A;font-weight:800}
+.toast a{color:#FFB37A;font-weight:800;display:inline-flex;align-items:center;min-height:44px;margin-block:-12px;padding-inline:4px}
 
 /* ── responsive ─────────────────────────────────── */
 @media(max-width:1000px){
@@ -304,10 +305,10 @@ footer a{color:#fff;font-weight:800}
   .logo img{height:32px}
   .tabs{position:fixed;top:auto;bottom:0;inset-inline:0;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -6px 20px rgba(0,36,68,.08)}
   .tabs .wrap{width:100%;gap:0}
-  .tab{flex:1;flex-direction:column;justify-content:center;gap:2px;padding:0;font-size:11.5px;border-bottom:0;border-top:3px solid transparent;margin:0;position:relative}
+  .tab{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:2px;padding:0;font-size:12.5px;line-height:1.2;border-bottom:0;border-top:3px solid transparent;margin:0;position:relative}
   .tab[aria-current=page]{border-color:var(--or)}
   .tab .ic{width:22px;height:22px}
-  .tab .count{position:absolute;top:5px;inset-inline-start:calc(50% + 4px);min-width:18px;height:18px;font-size:11px;line-height:18px;padding:0 4px}
+  .tab .count{position:absolute;top:5px;inset-inline-start:calc(50% + 4px);min-width:20px;height:20px;font-size:12px;line-height:20px;padding:0 5px}
   .tab.clinic{display:none}
   .bar .order-pill{display:none}
   .hero .wrap{grid-template-columns:1fr;padding:26px 0 30px;gap:20px}
@@ -325,7 +326,7 @@ footer a{color:#fff;font-weight:800}
   .grid{grid-template-columns:1fr 1fr;gap:8px}
   .rail{grid-auto-columns:46%}
   .cBody{padding:10px 10px 2px}.cBody h3{font-size:14px}.cFoot{padding:8px 10px 10px}
-  .bdg{font-size:11px;padding:2px 6px}
+  .bdg{font-size:12.5px;padding:2px 6px}
   .deptList{grid-template-columns:1fr}
   .pd{grid-template-columns:1fr;gap:14px;margin-top:12px}
   .pd .ph{aspect-ratio:4/3}
@@ -346,7 +347,7 @@ footer a{color:#fff;font-weight:800}
 .bTrack::-webkit-scrollbar{display:none}
 .banner{position:relative;scroll-snap-align:start;aspect-ratio:1240/440;border-radius:22px;overflow:hidden;color:#fff;display:block;isolation:isolate}
 .banner.navy{background:linear-gradient(120deg,#002444,#003260 55%,#0A5A96)}
-.banner.orange{background:linear-gradient(120deg,#B4490C,#F47B20 60%,#FF9A52)}
+.banner.orange{background:linear-gradient(120deg,#7E3208,#A8440C 55%,#C4510F)}
 .banner.green{background:linear-gradient(120deg,#0B5247,#12806F 60%,#2BA392)}
 .banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
 .banner.hasImg:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(0,24,45,.82) 0%,rgba(0,24,45,.55) 42%,rgba(0,24,45,0) 72%)}
@@ -358,15 +359,16 @@ html[dir=rtl] .banner.hasImg:after{background:linear-gradient(270deg,rgba(0,24,4
 .bText p{margin:0;font-size:clamp(14px,1.4vw,17px);opacity:.92;max-width:46ch}
 .bCta{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:11px 18px;border-radius:12px;background:#fff;color:var(--navy2);font-weight:800;font-size:14.5px;box-shadow:0 10px 24px rgba(0,0,0,.18)}
 .banner:hover .bCta{background:var(--or50)}
-.bDots{display:flex;justify-content:center;gap:6px;margin-top:10px}
-.bDots button{width:8px;height:8px;border-radius:4px;border:0;padding:0;background:#C3D3E1;transition:width .2s,background .2s}
-.bDots button[aria-current=true]{width:24px;background:var(--navy)}
+.bDots{display:flex;justify-content:center;margin-top:2px}
+.bDots button{width:44px;height:44px;border:0;padding:0;background:none;display:grid;place-items:center}
+.bDots button:before{content:"";width:8px;height:8px;border-radius:4px;background:#8FA6BA;transition:width .2s cubic-bezier(.16,1,.3,1),background .2s}
+.bDots button[aria-current=true]:before{width:24px;background:var(--navy)}
 .bArrow{position:absolute;top:50%;margin-top:-20px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:var(--navy);display:grid;place-items:center;box-shadow:var(--shadow);z-index:2}
 .bArrow.prev{inset-inline-start:12px}.bArrow.next{inset-inline-end:12px}
 html[dir=ltr] .bArrow.prev .ic,html[dir=rtl] .bArrow.next .ic{transform:scaleX(-1)}
 
 /* search card + trust strip under the banner */
-.homeSearch{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.homeSearch{display:flex;flex-direction:column;gap:10px}
 .homeSearch .search{height:54px;background:#fff;box-shadow:0 6px 20px rgba(0,36,68,.06)}
 .homeSearch .quick{margin-top:0}
 .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:18px}
@@ -420,7 +422,7 @@ a.trustItem:hover{border-color:var(--blue)}
 .soldBy{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:4px 10px;border-radius:8px;background:var(--paper);color:var(--mut);font-size:12.5px;font-weight:800}
 .soldBy b{color:var(--navy)}
 .pActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.pActions .btn{min-height:40px;font-size:13.5px;padding:0 14px}
+.pActions .btn{min-height:44px;font-size:13.5px;padding:0 14px}
 .btn.soft{background:var(--blue50);color:var(--navy);border-color:var(--blue100)}
 .btn.soft:hover{border-color:var(--blue)}
 .tiersNote{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--or50);color:#7A3A0C;font-size:13px}
@@ -457,13 +459,113 @@ footer .pays-f span{padding:3px 9px;border-radius:6px;background:rgba(255,255,25
   .stickyBuy{position:fixed;z-index:38;inset-inline:0;bottom:calc(var(--tabH) + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,36,68,.1);transform:translateY(120%);transition:transform .2s}
   .stickyBuy.on{transform:none}
   .stickyBuy span{flex:1;min-width:0;font-size:13.5px;font-weight:800;color:var(--navy2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .stickyBuy small{display:block;color:var(--mut);font-weight:700}
+  .stickyBuy small{display:block;color:var(--mut);font-weight:700;font-size:12.5px}
   .stickyBuy .btn{min-height:44px}
 }
 
+/* ── home: the visit question leads ─────────────── */
+.lead{background:#fff;border-bottom:1px solid var(--line)}
+.lead .wrap{padding:28px 0 22px}
+.lead h1{font-size:clamp(24px,2.6vw,32px);letter-spacing:-.01em;text-wrap:balance}
+.lead>.wrap>p{margin:6px 0 0;color:var(--mut);font-size:15px;max-width:60ch}
+.visits{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.visit{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--paper);transition:border-color .15s,background .15s}
+.visit:hover{border-color:var(--blue);background:#fff}
+.visit .dIcon{grid-row:span 2;background:var(--or50);color:var(--or2)}
+.visit strong{display:block;color:var(--navy2);font-size:16px;line-height:1.3}
+.visit small{display:block;color:var(--mut);font-size:13px;line-height:1.45;margin-top:2px}
+.visit em{font-style:normal;color:var(--or2);font-weight:800;font-size:13px}
+.leadAlt{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;margin:12px 0 0;font-size:14px;color:var(--mut)}
+.leadAlt a{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--blue);font-weight:800}
+.leadAlt .ic{width:18px;height:18px}
+
+/* departments, grouped by kind of need */
+.homeSearch{margin:0 0 18px}
+.dGroups{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.dGroup h3{font-size:14px;color:var(--mut);margin:0 0 8px;font-weight:800}
+.dMini{display:grid;gap:2px}
+.dm{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 10px;margin-inline:-10px;border-radius:12px;color:var(--navy2);font-weight:800;font-size:15px;line-height:1.3}
+.dm:hover{background:#fff;box-shadow:0 2px 10px rgba(0,36,68,.06)}
+.dm .dIcon{width:40px;height:40px;border-radius:10px}
+.dm .dIcon .ic{width:22px;height:22px}
+.clinicRow{display:flex;align-items:center;gap:10px;min-height:52px;margin-top:18px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--navy);font-weight:800;font-size:14.5px}
+.clinicRow:hover{border-color:var(--blue)}
+.clinicRow span{flex:1}
+.clinicRow .ic{color:var(--mut)}
+.steps+.trust{margin-top:12px}
+
+/* cards say which mode is in the order */
+.stepper span small{display:block;font-size:12px;font-weight:700;opacity:.85;line-height:1.1}
+.stepper span{line-height:1.15}
+
+/* product page */
+.opt .terms{display:block;margin-top:4px;color:#3C566C;font-size:12.5px}
+details.facts{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+details.facts summary{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;cursor:pointer;list-style:none;font-size:14px;color:#3C566C}
+details.facts summary::-webkit-details-marker{display:none}
+details.facts summary>.ic:first-child{color:var(--blue)}
+details.facts summary span{flex:1}
+details.facts summary b{color:var(--navy2)}
+details.facts summary .ic.more{width:16px;height:16px;color:var(--mut);transform:rotate(90deg);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+details.facts[open] summary .ic.more{transform:rotate(-90deg)}
+details.facts .fact{padding:0 14px 12px 44px}
+html[dir=rtl] details.facts .fact{padding:0 44px 12px 14px}
+details.facts .fact .ic{display:none}
+
+/* order: sent state */
+.note.warn{background:var(--or50);color:#7A3A0C;margin:18px 0 0}
+.linkBtn{border:0;background:none;padding:0;color:var(--navy);font-weight:800;text-decoration:underline;text-underline-offset:3px;min-height:24px}
+.sentP{color:var(--mut);margin:14px 0 0}
+.sentP bdi{color:var(--navy2);font-weight:800;white-space:nowrap}
+.sentItems{text-align:start;margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--paper)}
+.sentItems h2{font-size:14px;color:var(--mut);margin:0 0 6px}
+.sentItems ul{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:14.5px;color:var(--navy2)}
+.sentItems li span{color:var(--mut);font-size:13px}
+.sentActs{display:grid;gap:10px;margin-top:18px}
+.confirm{padding:14px;border:1px solid var(--line);border-radius:12px;text-align:start}
+.confirm p{margin:0 0 10px;font-weight:800;color:var(--navy2)}
+.confirm div{display:flex;flex-wrap:wrap;gap:8px}
+.confirm .btn{flex:1}
+.field .hint{display:block;color:var(--mut);font-size:12.5px;font-weight:600;margin:-2px 0 6px}
+.kPick{display:grid;place-items:center;width:44px;height:44px;cursor:pointer}
+.kPick input{width:20px;height:20px;accent-color:var(--navy)}
+.kitLines>p{margin:0 0 4px;color:var(--mut);font-size:14px}
+.tShort{display:none}
+
+@media(max-width:1000px){
+  .visits{grid-template-columns:1fr 1fr}
+  .dGroups{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .tab .tLong{display:none}.tab .tShort{display:inline}
+  .homeSearch .quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+  .homeSearch .quick::-webkit-scrollbar{display:none}
+  .homeSearch .quick small{flex:none}
+  .tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+  .lead .wrap{padding:18px 0 16px}
+  .lead>.wrap>p{font-size:14px}
+  .visits{gap:8px;margin-top:14px}
+  .visit{grid-template-columns:1fr;grid-template-rows:auto;row-gap:2px;padding:12px}
+  .visit .dIcon{grid-row:auto;width:38px;height:38px;margin-bottom:4px}
+  .visit small{display:none}
+  .visit strong{font-size:15px}
+  .leadAlt{margin-top:6px;gap:0 16px}
+  .dGroups{grid-template-columns:1fr;gap:18px}
+  .dMini{grid-template-columns:1fr 1fr;gap:6px}
+  .dm{margin:0;padding:8px;background:#fff;border:1px solid var(--line);font-size:13.5px;gap:8px;min-height:56px}
+  .dm .dIcon{width:34px;height:34px}
+  .dm .dIcon .ic{width:20px;height:20px}
+  .pd .ph{aspect-ratio:2/1}
+  .pInfo h1{font-size:22px}
+  .pd .ph img{padding:12px}
+  .phNote{margin-top:4px}
+  .opt{padding:10px 12px}
+  .pdPage{padding-bottom:76px}
+  .sentActs .btn{width:100%}
+}
+
 .tab[hidden]{display:none!important}
-@media(min-width:761px){.homeSearch form{display:none}.homeSearch{margin-top:12px}}
-@media(max-width:760px){.tab.desk{display:none!important}}
+@media(min-width:761px){.homeSearch form{display:none}}
 </style>
 </head>
 <body>
@@ -524,8 +626,8 @@ footer .pays-f span{padding:3px 9px;border-radius:6px;background:rgba(255,255,25
 </header>
 <nav class="tabs" id="tabs" aria-label="Main"><div class="wrap">
   <a class="tab" href="#/" data-tab="home"><svg class="ic"><use href="#i-home"/></svg><span data-t="tHome"></span></a>
-  <a class="tab" href="#/departments" data-tab="departments"><svg class="ic"><use href="#i-grid"/></svg><span data-t="tDepts"></span></a>
-  <a class="tab desk" href="#/kits" data-tab="kits" hidden><svg class="ic"><use href="#i-box"/></svg><span data-t="tKits"></span></a>
+  <a class="tab" href="#/departments" data-tab="departments"><svg class="ic"><use href="#i-grid"/></svg><span data-t="tDepts" class="tLong"></span><span data-t="tDeptsShort" class="tShort"></span></a>
+  <a class="tab" href="#/kits" data-tab="kits" hidden><svg class="ic"><use href="#i-box"/></svg><span data-t="tKits"></span></a>
   <a class="tab" href="#/search" data-tab="search"><svg class="ic"><use href="#i-search"/></svg><span data-t="tSearch"></span></a>
   <a class="tab" href="#/order" data-tab="order"><svg class="ic"><use href="#i-bag"/></svg><span data-t="tOrder"></span><b class="count" data-count></b></a>
   <a class="tab clinic" href="#/d/clinic" data-tab="clinic" hidden><svg class="ic"><use href="#d-clinic"/></svg><span data-t="tClinic"></span></a>
@@ -561,7 +663,7 @@ const CAT = SaleemCatalog;
 const T = {
   ar: {
     _title:'متجر سليم', skip:'انتقل للمحتوى', logoSub:'متجر المستلزمات الطبية', search:'ابحث عن جهاز أو مستلزم…', lang:'English',
-    tHome:'الرئيسية', tDepts:'الأقسام', tKits:'الأطقم', tSearch:'بحث', tOrder:'طلبي', tClinic:'للعيادات', orderPill:'طلبي',
+    tHome:'الرئيسية', tDepts:'الأقسام', tDeptsShort:'الأقسام', tKits:'الأطقم', tSearch:'بحث', tOrder:'طلبي', tClinic:'للعيادات', orderPill:'طلبي',
     heroK:'متجر سليم · مستلزمات طبية منزلية', heroA:'كل اللي تحتاجه رعاية المريض بالبيت،', heroB:'بمكان واحد.',
     heroP:'اشترِ أو استأجر أو خلّي المستلزمات توصلك كل شهر. فريق سليم يأكد السعر والتوفّر والتوصيل وياك على واتساب.',
     browse:'تصفّح الأقسام', ask:'اسأل على واتساب', popular:'الأكثر بحثاً:',
@@ -571,7 +673,9 @@ const T = {
     secRent:'استأجر بدل ما تشتري', secRentP:'أجهزة غالية تحتاجها لفترة محدودة — إيجار شهري.',
     secRefill:'توصيل شهري', secRefillP:'مستلزمات تخلص كل شهر — نرسلها لك بدون ما تطلب كل مرة.',
     secKits:'أطقم رعاية جاهزة', secKitsP:'كل اللي تحتاجه لحالة وحدة، بضغطة وحدة.', secRecent:'شفتها مؤخراً',
-    secHow:'شلون تطلب؟', seeAll:'شوف الكل',
+    secHow:'شلون تطلب؟', seeAll:'شوف الكل', notSure:'مو متأكد؟', products:'المنتجات',
+    grpEquip:'أجهزة ومعدّات للبيت', grpCare:'مستلزمات الرعاية اليومية', grpLiving:'التعافي والحياة اليومية', clinicRow:'للعيادات والمراكز — أسعار جملة بعرض سعر',
+    bPrev:'الإعلان السابق', bNext:'الإعلان التالي', bDot:'إعلان {i} من {n}',
     how:[['اختار المستلزمات','أضف اللي تحتاجه لطلبك — شراء أو إيجار أو توصيل شهري.'],['أرسل الطلب على واتساب','اكتب اسمك ورقمك ومنطقتك، والطلب يوصل لفريقنا برسالة وحدة.'],['نأكد وياك ونوصّل','نرجعلك بالسعر والتوفّر، وشركة التوصيل توصله لباب البيت.']],
     svc:{doctor:['زيارة طبيب','دعامات وأجهزة قياس ومستلزمات بعد الفحص'],nursing:['تمريض منزلي','ضمادات وقساطر وحفاضات وأدوات رعاية المريض'],physio:['علاج طبيعي','أدوات مشي وتمارين وأجهزة تخفيف الألم'],lab:['تحليل منزلي','شرائح فحص ومستلزمات سحب الدم']},
     svcTitle:'مستلزمات ترافق {s}', svcSub:'كل المستلزمات اللي عادةً يطلبها فريق سليم وياها.', items:'منتج', itemsN:'{n} منتج',
@@ -583,19 +687,21 @@ const T = {
     srchNoneT:'ما لكينا «{q}»', srchNoneP:'جرّب كلمة أقصر، أو اسألنا على واتساب ونلكاه إلك.',
     rentT:'متوفّر للإيجار', refillT:'متوفّر بالتوصيل الشهري',
     bRent:'إيجار', bRefill:'شهري', bQuote:'عرض سعر',
-    add:'أضف للطلب', addQuote:'أضف لعرض السعر', added:'انضاف لطلبك', view:'شوف الطلب',
+    add:'أضف للطلب', addQuote:'أضف لعرض السعر', addRent:'استأجره', addRefill:'اطلبه شهرياً', added:'انضاف لطلبك', addedAs:'انضاف لطلبك: {m}', merged:'انضمّ للسطر «{m}» اللي بطلبك', view:'شوف الطلب',
     why:'ليش يحتاجه المريض؟', usedWith:'يطلبه عادةً فريق سليم وياه:', how2:'شلون تريده؟',
     mBuy:['شراء','يصير ملكك.'], mRent:['إيجار شهري','يوصلك وينرجع ينستلم بعد ما تخلص.'], mRefill:['توصيل شهري','يوصلك كل شهر بنفس الكمية، وتكدر توقفه بأي وقت.'], mQuote:['عرض سعر للعيادة','نرسل لك سعر الجملة والتوفّر.'],
     qty:'الكمية', price:'السعر يأكده فريقنا على واتساب قبل التوصيل — ما تدفع شي هسه.', clinicNote:'هذا القسم للعيادات والمراكز — الأسعار جملة وبعرض سعر لكل طلب.',
     photoNote:'صورة مرجعية — العلامة والموديل ممكن تختلف.', moreIn:'من نفس القسم',
     orderTitle:'طلبي', orderSub:'راجع المستلزمات واكتب معلوماتك، والطلب يوصل لفريق سليم على واتساب.',
     yourItems:'المستلزمات', emptyT:'طلبك فارغ', emptyP:'تصفّح الأقسام وأضف اللي تحتاجه.', remove:'حذف',
-    total:'عدد القطع', details:'معلوماتك', detailsP:'حتى نتواصل وياك ونوصّل الطلب.',
-    fName:'الاسم الكامل', fPhone:'رقم الموبايل (واتساب)', fArea:'المنطقة', fAreaPh:'مثلاً: المنصور، الكرادة، زيونة', fAddr:'أقرب نقطة دالّة', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
+    total:'بطلبك', totalN:'{n} منتج', totalNQ:'{n} منتج · {q} قطعة', details:'معلوماتك', detailsP:'منو نتواصل وياه، ووين شركة التوصيل توصّل الطلب.',
+    fName:'اسمك', fNameHint:'الشخص اللي نتواصل وياه — مو لازم يكون المريض.', fPhone:'رقم الموبايل (واتساب)', fArea:'منطقة التوصيل', fAreaPh:'مثلاً: المنصور، الكرادة، زيونة', fAddr:'أقرب نقطة دالّة للتوصيل', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
     fNotesPh:'لمن الطلب، المقاس، أو أي شي لازم نعرفه', eName:'اكتب الاسم', ePhone:'اكتب رقم عراقي صحيح، مثلاً 07701234567', eArea:'اكتب المنطقة',
     send:'أرسل الطلب على واتساب', sendNote:'ما تدفع شي هسه. فريقنا يأكد السعر والتوفّر والتوصيل وياك قبل ما يتأكد الطلب.',
-    sentT:'تمام — كمّل على واتساب', sentP:'إذا انفتح واتساب ودزّيت الرسالة، فريقنا راح يرجعلك بالسعر وموعد التوصيل.', sentAgain:'افتح واتساب مرة ثانية', sentNew:'ابدأ طلب جديد', sentBack:'رجوع للطلب', orderNoL:'رقم طلبك',
-    msgHead:'طلب من متجر سليم', msgNo:'رقم الطلب', msgName:'الاسم', msgPhone:'الرقم', msgArea:'المنطقة', msgAddr:'العنوان', msgClinic:'العيادة', msgItems:'المستلزمات', msgNotes:'ملاحظات', msgPay:'الدفع', msgRemind:'ذكّروني بالتجديد بعد {d} يوم', msgDiscount:'خصم الكمية', msgDelivery:'التوصيل', msgTotal:'المجموع التقريبي', msgFoot:'رجاءً أكدوا التوفّر والسعر والتوصيل.',
+    sentT:'آخر خطوة: اضغط «إرسال» بواتساب', sentP:'فريقنا يرد عليك من الرقم {phone} بالسعر وموعد التوصيل.', sentItems:'اللي بالرسالة', sentAgain:'واتساب ما انفتح؟ افتحه مرة ثانية', sentNew:'ابدأ طلب جديد', sentBack:'عدّل الطلب', orderNoL:'رقم طلبك',
+    newConfirm:'تمسح هذي القائمة وتبدأ طلب جديد؟', newYes:'امسح وابدأ من جديد', newNo:'لا، خلّيها',
+    sentSame:'أرسلت هذا الطلب ({no}) الساعة {time}. إذا ترسله مرة ثانية يروح بنفس الرقم.', sentChanged:'أرسلت الطلب {no} الساعة {time}، وبعدها غيّرت عليه. التغييرات ما وصلت بعد — أرسله مرة ثانية.', sentShow:'شوف اللي أرسلته',
+    msgHead:'طلب من متجر سليم', msgNo:'رقم الطلب', msgUpdates:'يحدّث الطلب', msgName:'الاسم', msgPhone:'الرقم', msgArea:'المنطقة', msgAddr:'العنوان', msgClinic:'العيادة', msgItems:'المستلزمات', msgNotes:'ملاحظات', msgPay:'الدفع', msgRemind:'ذكّروني بالتجديد بعد {d} يوم', msgDiscount:'خصم الكمية', msgDelivery:'التوصيل', msgTotal:'المجموع التقريبي', msgFoot:'رجاءً أكدوا التوفّر والسعر والتوصيل.',
     askMsg:'مرحبا، عندي سؤال عن متجر سليم للمستلزمات الطبية.',
     bOut:'غير متوفر', askAvail:'اسأل عن التوفّر', askOut:'مرحبا، أريد أسأل متى يتوفّر: {p}', outNote:'هذا المنتج غير متوفر حالياً. راسلنا ونخبرك أول ما يوصل.',
     orRent:'أو إيجار {p} بالشهر', rentFrom:'إيجار من {p} بالشهر', perMonth:'بالشهر', perDelivery:'لكل توصيلة',
@@ -604,11 +710,11 @@ const T = {
     previewing:'معاينة — هذي تعديلات لوحة الإدارة اللي ما انتشرت بعد. محد يشوفها غيرك.', previewExit:'عرض المتجر المنشور',
     foot:'متجر سليم للمستلزمات الطبية المنزلية — شركة المستقبل السليم للخدمات الصحية المحدودة. الصور مرجعية بهذي النسخة التجريبية.', footWa:'واتساب: ',
     // new
-    payT:'طرق الدفع', payWith:'الدفع عند الاستلام: {m}', payField:'شلون تحب تدفع؟',
+    payT:'طرق الدفع', payWith:'طرق الدفع: {m}', payField:'شلون تحب تدفع؟',
     nurseT:'محتار؟ اسأل ممرضتنا', nurseP:'نجاوبك على واتساب ونساعدك تختار.', nurseBtn:'اسأل الممرضة', nurseMsg:'مرحبا، أحتاج مساعدة أختار مستلزمات طبية.', nurseMsgP:'مرحبا، عندي سؤال عن: {p}',
     finderT:'ساعدني أختار', finderP:'جاوب سؤال واحد ونقترح عليك الأطقم والأقسام المناسبة.', finderQ:'شنو الحالة؟', finderFor:'لـ: {s}', finderKits:'أطقم تناسب هذي الحالة', finderDepts:'أقسام تفيدك', finderAgain:'ابدأ من جديد', finderGo:'ابدأ',
     kitsTitle:'أطقم رعاية جاهزة', kitsSub:'مجموعة مستلزمات لحالة وحدة، اخترناها حسب خبرة فريق سليم. تكدر تعدّلها بعد ما تضيفها.',
-    kitItems:'{n} منتج', kitFrom:'من {p}', kitAdd:'أضف الطقم كامل للطلب', kitAdded:'انضاف الطقم لطلبك', kitOut:'غير متوفر حالياً — ما راح ينضاف', kitIncl:'شنو بالطقم',
+    kitItems:'{n} منتج', kitFrom:'من {p}', kitAdd:'أضف الطقم كامل للطلب', kitAddN:'أضف {n} منتجات للطلب', kitPick:'شيل العلامة عن اللي عندك من قبل.', kitNone:'اختار منتج واحد على الأقل', kitAdded:'انضاف الطقم لطلبك', kitAlready:'هذا الطقم بطلبك من قبل', kitInOrder:'الطقم بطلبك — شوف الطلب', kitInclude:'ضيف {p}', kitOut:'غير متوفر حالياً — ما راح ينضاف', kitIncl:'شنو بالطقم',
     rentTerms:'شروط الإيجار', rentMin:'أقل مدة: {n} شهر', rentDeposit:'التأمين: {p} يرجعلك بعد الإرجاع', rentIncl:'يشمل: {s}',
     soldBy:'يجهّزه', share:'شارك', shareMsg:'شوف هذا بمتجر سليم: {p}', copied:'انتسخ الرابط',
     bulkT:'خصم الكميات', bulkLine:'{n} قطعة أو أكثر: خصم {p}٪',
@@ -620,7 +726,7 @@ const T = {
   },
   en: {
     _title:'Saleem Store', skip:'Skip to content', logoSub:'Medical supplies store', search:'Search for a device or supply…', lang:'العربية',
-    tHome:'Home', tDepts:'Departments', tKits:'Kits', tSearch:'Search', tOrder:'My order', tClinic:'For clinics', orderPill:'My order',
+    tHome:'Home', tDepts:'Departments', tDeptsShort:'Browse', tKits:'Kits', tSearch:'Search', tOrder:'My order', tClinic:'For clinics', orderPill:'My order',
     heroK:'Saleem Store · Home medical supplies', heroA:'Everything home care needs,', heroB:'in one place.',
     heroP:'Buy, rent, or have supplies sent every month. Saleem’s team confirms price, stock and delivery with you on WhatsApp.',
     browse:'Browse departments', ask:'Ask on WhatsApp', popular:'Popular:',
@@ -630,7 +736,9 @@ const T = {
     secRent:'Rent instead of buying', secRentP:'Costly equipment you only need for a while — rented by the month.',
     secRefill:'Monthly refills', secRefillP:'Supplies that run out every month — sent to you without reordering.',
     secKits:'Ready-made care kits', secKitsP:'Everything for one situation, in one tap.', secRecent:'Recently viewed',
-    secHow:'How ordering works', seeAll:'See all',
+    secHow:'How ordering works', seeAll:'See all', notSure:'Not sure?', products:'Products',
+    grpEquip:'Equipment for the home', grpCare:'Everyday care supplies', grpLiving:'Recovery & daily living', clinicRow:'For clinics and centres — wholesale, by quote',
+    bPrev:'Previous banner', bNext:'Next banner', bDot:'Banner {i} of {n}',
     how:[['Pick your supplies','Add what you need to your order — to buy, rent, or refill monthly.'],['Send it on WhatsApp','Add your name, number and area, and your order reaches our team in one message.'],['We confirm, it’s delivered','We come back with price and stock, and our delivery partner brings it to your door.']],
     svc:{doctor:['Doctor visit','Braces, monitors and supplies after an examination'],nursing:['Home nursing','Dressings, catheters, diapers and bedside care'],physio:['Physiotherapy','Walking aids, exercise kit and pain relief'],lab:['Home lab test','Test strips and blood-draw supplies']},
     svcTitle:'Supplies for a {s}', svcSub:'Everything Saleem’s team usually recommends alongside it.', items:'items', itemsN:'{n} items',
@@ -642,19 +750,21 @@ const T = {
     srchNoneT:'Nothing found for “{q}”', srchNoneP:'Try a shorter word, or ask us on WhatsApp and we’ll find it for you.',
     rentT:'Available to rent', refillT:'Available as a monthly refill',
     bRent:'Rent', bRefill:'Monthly', bQuote:'Quote',
-    add:'Add to order', addQuote:'Add to quote', added:'Added to your order', view:'View order',
+    add:'Add to order', addQuote:'Add to quote', addRent:'Rent it', addRefill:'Get it monthly', added:'Added to your order', addedAs:'Added to your order: {m}', merged:'Combined with the “{m}” line already in your order', view:'View order',
     why:'Why a patient needs it', usedWith:'Saleem’s team usually recommends it with:', how2:'How do you want it?',
     mBuy:['Buy','It’s yours to keep.'], mRent:['Monthly rental','Delivered, and collected when you’re done.'], mRefill:['Monthly refill','Sent every month in the same quantity — stop any time.'], mQuote:['Clinic quote','We send you wholesale price and stock.'],
     qty:'Quantity', price:'Our team confirms the price on WhatsApp before delivery — you pay nothing now.', clinicNote:'This department is for clinics and centres — wholesale prices, quoted per order.',
     photoNote:'Reference photo — brand and model may differ.', moreIn:'More in this section',
     orderTitle:'My order', orderSub:'Check your items, add your details, and your order goes to Saleem’s team on WhatsApp.',
     yourItems:'Items', emptyT:'Your order is empty', emptyP:'Browse the departments and add what you need.', remove:'Remove',
-    total:'Total pieces', details:'Your details', detailsP:'So we can reach you and deliver.',
-    fName:'Full name', fPhone:'Mobile number (WhatsApp)', fArea:'Area', fAreaPh:'e.g. Mansour, Karrada, Zayouna', fAddr:'Nearest landmark', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
+    total:'In your order', totalN:'{n} items', totalNQ:'{n} items · {q} pieces', details:'Your details', detailsP:'Who we contact, and where the delivery company brings the order.',
+    fName:'Your name', fNameHint:'The person we contact — not necessarily the patient.', fPhone:'Mobile number (WhatsApp)', fArea:'Delivery area', fAreaPh:'e.g. Mansour, Karrada, Zayouna', fAddr:'Nearest landmark for delivery', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
     fNotesPh:'Who it’s for, sizes, anything we should know', eName:'Enter your name', ePhone:'Enter a valid Iraqi number, e.g. 07701234567', eArea:'Enter your area',
     send:'Send order on WhatsApp', sendNote:'You pay nothing now. Our team confirms price, stock and delivery with you before the order is final.',
-    sentT:'Done — finish in WhatsApp', sentP:'Once WhatsApp opens and you send the message, our team will reply with the price and a delivery time.', sentAgain:'Open WhatsApp again', sentNew:'Start a new order', sentBack:'Back to my order', orderNoL:'Your order number',
-    msgHead:'Saleem Store order', msgNo:'Order', msgName:'Name', msgPhone:'Phone', msgArea:'Area', msgAddr:'Address', msgClinic:'Clinic', msgItems:'Items', msgNotes:'Notes', msgPay:'Payment', msgRemind:'Please remind me to refill in {d} days', msgDiscount:'Bulk discount', msgDelivery:'Delivery', msgTotal:'Estimated total', msgFoot:'Please confirm availability, price and delivery.',
+    sentT:'Last step: press Send in WhatsApp', sentP:'Our team replies from {phone} with the price and a delivery time.', sentItems:'In the message', sentAgain:'WhatsApp didn’t open? Open it again', sentNew:'Start a new order', sentBack:'Edit the order', orderNoL:'Your order number',
+    newConfirm:'Clear this list and start a new order?', newYes:'Clear it and start over', newNo:'No, keep it',
+    sentSame:'You sent this order ({no}) at {time}. Sending it again keeps the same number.', sentChanged:'You sent order {no} at {time}, then changed it. The changes haven’t been sent — send it again.', sentShow:'See what I sent',
+    msgHead:'Saleem Store order', msgNo:'Order', msgUpdates:'Updates order', msgName:'Name', msgPhone:'Phone', msgArea:'Area', msgAddr:'Address', msgClinic:'Clinic', msgItems:'Items', msgNotes:'Notes', msgPay:'Payment', msgRemind:'Please remind me to refill in {d} days', msgDiscount:'Bulk discount', msgDelivery:'Delivery', msgTotal:'Estimated total', msgFoot:'Please confirm availability, price and delivery.',
     askMsg:'Hello, I have a question about Saleem’s medical supplies store.',
     bOut:'Out of stock', askAvail:'Ask about availability', askOut:'Hello, when will this be back in stock: {p}', outNote:'This item is out of stock right now. Message us and we’ll tell you as soon as it’s back.',
     orRent:'or rent for {p} / month', rentFrom:'Rent from {p} / month', perMonth:'/ month', perDelivery:'per delivery',
@@ -662,11 +772,11 @@ const T = {
     estimate:'Estimated total', subtotal:'Items', bulkOff:'Bulk discount', deliveryFee:'Delivery', estAll:'Our team confirms the final price and delivery on WhatsApp.', estPartial:'Some items have no price yet — our team will complete it on WhatsApp.',
     previewing:'Preview — unpublished changes from the admin portal. Only you can see this.', previewExit:'View the published shop',
     foot:'Saleem Store for home medical supplies — Almostaqbal Alsaleem for Healthcare Services LLC. Photos are references in this prototype.', footWa:'WhatsApp: ',
-    payT:'Payment', payWith:'Pay on delivery: {m}', payField:'How would you like to pay?',
+    payT:'Payment', payWith:'Ways to pay: {m}', payField:'How would you like to pay?',
     nurseT:'Not sure? Ask our nurse', nurseP:'We answer on WhatsApp and help you choose.', nurseBtn:'Ask our nurse', nurseMsg:'Hello, I need help choosing medical supplies.', nurseMsgP:'Hello, I have a question about: {p}',
     finderT:'Help me choose', finderP:'Answer one question and we’ll suggest the right kits and departments.', finderQ:'What’s the situation?', finderFor:'For: {s}', finderKits:'Kits for this situation', finderDepts:'Departments that help', finderAgain:'Start over', finderGo:'Start',
     kitsTitle:'Ready-made care kits', kitsSub:'A set of supplies for one situation, chosen from Saleem’s care experience. You can change it once it’s in your order.',
-    kitItems:'{n} items', kitFrom:'from {p}', kitAdd:'Add the whole kit to my order', kitAdded:'Kit added to your order', kitOut:'Out of stock right now — won’t be added', kitIncl:'What’s in the kit',
+    kitItems:'{n} items', kitFrom:'from {p}', kitAdd:'Add the whole kit to my order', kitAddN:'Add {n} items to my order', kitPick:'Untick anything you already have.', kitNone:'Tick at least one item', kitAdded:'Kit added to your order', kitAlready:'This kit is already in your order', kitInOrder:'The kit is in your order — view it', kitInclude:'Include {p}', kitOut:'Out of stock right now — won’t be added', kitIncl:'What’s in the kit',
     rentTerms:'Rental terms', rentMin:'Minimum: {n} month(s)', rentDeposit:'Deposit: {p}, returned when it comes back', rentIncl:'Includes: {s}',
     soldBy:'Supplied by', share:'Share', shareMsg:'Have a look at this on Saleem Store: {p}', copied:'Link copied',
     bulkT:'Bulk pricing', bulkLine:'{n}+ pieces: {p}% off',
@@ -720,7 +830,11 @@ let lang = store.get('lang', 'ar') === 'en' ? 'en' : 'ar';
 let cart = [];
 let customer = Object.assign({name:'', phone:'', area:'', addr:'', notes:'', clinic:'', payment:'', remind:true, isClinic:false}, store.get('customer', {}));
 let shown = CONFIG.pageSize;
-let lastSent = null, lastOrderNo = '';
+// the last order sent from this browser: survives a reload, so the same list isn't
+// sent twice by accident. Kept for 3 days.
+const cartSig = () => cart.map(l => l.id + '.' + l.mode + '.' + l.qty).sort().join('_');
+let sent = (() => { const x = store.get('sent', null); return x && x.no && x.wa && Date.now() - x.at < 3 * 864e5 ? x : null; })();
+let editingSent = false, confirmNew = false;
 
 function loadCart(){
   const raw = store.get('cart', []);
@@ -781,28 +895,36 @@ function badges(p){
   return b ? `<div class="badges">${b}</div>` : '';
 }
 
-function addControl(p){
+// Buy unless the card sits in a Rent or Monthly list. When an item has more than one
+// mode, the stepper says which one is in the order.
+const cardMode = (p, want) => modesFor(p).includes(want) ? want : modesFor(p)[0];
+const shortMode = m => t({buy:'fBuy', rent:'bRent', refill:'bRefill', quote:'bQuote'}[m]);
+const addedMsg = (p, mode) => modesFor(p).length > 1 ? t('addedAs', {m: modeLabel(mode)}) : t('added');
+function addControl(p, want){
   if(isOut(p)) return `<a class="add ask" href="${wa(t('askOut', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('askAvail')}</a>`;
-  const mode = modesFor(p)[0], q = qtyOf(p.id, mode);
-  if(q) return `<div class="stepper" data-line="${p.id}|${mode}"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(q)}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div>`;
-  return `<button type="button" class="add" data-add="${p.id}|${mode}">${icon('i-plus')}${p.b2b ? t('addQuote') : t('add')}</button>`;
+  const mode = cardMode(p, want), q = qtyOf(p.id, mode), many = modesFor(p).length > 1;
+  if(q) return `<div class="stepper" data-line="${p.id}|${mode}"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(q)}${many ? `<small>${shortMode(mode)}</small>` : ''}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div>`;
+  return `<button type="button" class="add" data-add="${p.id}|${mode}">${icon('i-plus')}${p.b2b ? t('addQuote') : mode === 'rent' ? t('addRent') : mode === 'refill' && many ? t('addRefill') : t('add')}</button>`;
 }
 
 // "25,000 IQD", or "Rent from 40,000 IQD / month" when only the rental is priced
-function priceLine(p){
+function priceLine(p, mode){
   if(p.b2b) return '';
+  if(mode === 'rent' && p.rentPrice && rentOn()) return `<p class="price">${fmtIqd(p.rentPrice)}<small>${t('perMonth')}</small></p>`;
   const rent = p.rent && rentOn() && p.rentPrice;
   if(p.price) return `<p class="price">${fmtIqd(p.price)}${rent ? `<small>${t('orRent', {p: fmtIqd(p.rentPrice)})}</small>` : ''}</p>`;
   if(rent) return `<p class="price">${t('rentFrom', {p: fmtIqd(p.rentPrice)})}</p>`;
   return '';
 }
 
-function card(p){
-  return `<article class="card" data-card="${p.id}">
+function card(p, want){
+  const mode = cardMode(p, want);
+  return `<article class="card" data-card="${p.id}" data-mode="${mode}">
     <a href="#/p/${p.id}">${badges(p)}${photo(p, 400)}
-      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${priceLine(p)}</div></a>
-    <div class="cFoot">${addControl(p)}</div></article>`;
+      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${priceLine(p, mode)}</div></a>
+    <div class="cFoot">${addControl(p, mode)}</div></article>`;
 }
+const cardAs = mode => p => card(p, mode);
 
 /* search — matches Arabic regardless of hamza, taa marbuta, alef maqsura or diacritics */
 const norm = s => String(s).toLowerCase()
@@ -915,7 +1037,7 @@ function bannerHref(link){
 function viewBanners(){
   const list = CAT.liveBanners(SITE);
   if(!list.length) return `<section class="hero"><div class="wrap">
-    <div><span class="kicker">${t('heroK')}</span><h1>${t('heroA')} <em>${t('heroB')}</em></h1><p>${t('heroP')}</p>
+    <div><h2>${t('heroA')} <em>${t('heroB')}</em></h2><p>${t('heroP')}</p>
       <div class="acts"><a class="btn navy" href="#/departments">${icon('i-grid')}${t('browse')}</a><a class="btn ghost" href="${wa(t('askMsg'))}" target="_blank" rel="noopener">${icon('i-chat')}${t('ask')}</a></div></div>
     <div class="heroImg"><img src="assets/hero-supplies.webp" alt="" width="1600" height="900"></div></div></section>`;
   const deco = { navy: 'i-shieldok', orange: 'i-box', green: 'd-heart' };
@@ -928,8 +1050,8 @@ function viewBanners(){
   const many = list.length > 1;
   return `<div class="wrap bannerWrap"><section class="banners" aria-roledescription="carousel">
     <div class="bTrack" id="bTrack">${slides}</div>
-    ${many ? `<button class="bArrow prev" type="button" data-bnav="-1" aria-label="‹">${icon('i-chev')}</button><button class="bArrow next" type="button" data-bnav="1" aria-label="›">${icon('i-chev')}</button>` : ''}
-    ${many ? `<div class="bDots">${list.map((b, i) => `<button type="button" data-bdot="${i}" aria-label="${i + 1}" ${i ? '' : 'aria-current="true"'}></button>`).join('')}</div>` : ''}
+    ${many ? `<button class="bArrow prev" type="button" data-bnav="-1" aria-label="${esc(t('bPrev'))}">${icon('i-chev')}</button><button class="bArrow next" type="button" data-bnav="1" aria-label="${esc(t('bNext'))}">${icon('i-chev')}</button>` : ''}
+    ${many ? `<div class="bDots">${list.map((b, i) => `<button type="button" data-bdot="${i}" aria-label="${esc(t('bDot', {i: num(i + 1), n: num(list.length)}))}" ${i ? '' : 'aria-current="true"'}></button>`).join('')}</div>` : ''}
   </section></div>`;
 }
 let bTimer = null;
@@ -964,34 +1086,53 @@ function trustStrip(){
   return items.length ? `<div class="trust">${items.join('')}</div>` : '';
 }
 
+// the home page groups the departments by kind of need; a department not listed here
+// (one added later in products.js) joins the last group
+const DEPT_GROUPS = [
+  { key: 'grpEquip',  depts: ['mobility', 'bedroom', 'breathing', 'bathroom', 'monitoring'] },
+  { key: 'grpCare',   depts: ['continence', 'wound', 'nursing', 'diabetes'] },
+  { key: 'grpLiving', depts: ['supports', 'physio', 'daily', 'personal', 'baby'] },
+];
+function deptGroups(){
+  const listed = new Set(DEPT_GROUPS.flatMap(g => g.depts));
+  const groups = DEPT_GROUPS.map(g => ({ key: g.key, list: g.depts.map(k => DEPT[k]).filter(Boolean) }));
+  groups[groups.length - 1].list.push(...DEPTS.filter(d => d.key !== 'clinic' && !listed.has(d.key)));
+  const mini = d => `<a class="dm" href="#/d/${d.key}"><span class="dIcon">${icon('d-' + d.icon)}</span><span>${esc(L(d))}</span></a>`;
+  return `<div class="dGroups">${groups.filter(g => g.list.length).map(g => `<div class="dGroup"><h3>${t(g.key)}</h3><div class="dMini">${g.list.map(mini).join('')}</div></div>`).join('')}</div>
+    ${DEPT.clinic ? `<a class="clinicRow" href="#/d/clinic">${icon('d-clinic')}<span>${t('clinicRow')}</span>${icon('i-chev', 'ic flip')}</a>` : ''}`;
+}
+
 function viewHome(){
   const rent = rentOn() ? RETAIL.filter(p => p.rent).sort(byNeed) : [], refill = RETAIL.filter(p => p.refill).sort(byNeed);
   const recent = store.get('recent', []).map(id => BYID.get(String(id))).filter(Boolean).slice(0, 10);
   const last = lastOrder();
-  return `${viewBanners()}
+  const alt = [S.finder.on ? `<a href="#/finder">${icon('i-spark')}${t('finderT')}</a>` : '', nurseOn() ? `<a href="${nurseWa()}" target="_blank" rel="noopener">${icon('i-chat')}${t('nurseBtn')}</a>` : ''].filter(Boolean);
+  // 1. what the Saleem visit asked for — the reason most people arrive
+  return `<section class="lead"><div class="wrap">
+      <h1>${t('secSvc')}</h1><p>${t('secSvcP')}</p>
+      <div class="visits">${SERVICES.map(s => `<a class="visit" href="#/s/${s}"><span class="dIcon">${icon('s-' + s)}</span><span><strong>${t('svc')[s][0]}</strong><small>${t('svc')[s][1]}</small></span><em>${t('itemsN', {n: num(RETAIL.filter(p => p.services.includes(s)).length)})}</em></a>`).join('')}</div>
+      ${alt.length ? `<p class="leadAlt"><span>${t('notSure')}</span>${alt.join('')}</p>` : ''}
+    </div></section>
+  ${last ? `<div class="wrap"><div class="again" style="margin-top:16px"><span class="dIcon">${icon('i-refill')}</span><span><strong>${t('againT')}</strong><small>${t('againP', {n: num(last.lines.length), d: new Date(last.at).toLocaleDateString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB', {day:'numeric', month:'short'})})}</small></span>
+    <button type="button" class="btn navy" data-again>${icon('i-bag')}${t('againBtn')}</button></div></div>` : ''}
+  ${viewBanners()}
   <div class="wrap">
-    <div class="homeSearch">
-      <form data-search-form><label class="search" data-search-box><svg class="ic"><use href="#i-search"/></svg><span class="sr">${t('search')}</span><input type="search" data-search autocomplete="off" enterkeyhint="search" placeholder="${esc(t('search'))}"><button type="button" class="clear" data-clear aria-label="Clear">${icon('i-x')}</button></label></form>
-      <div class="quick"><small>${t('popular')}</small>${t('popularQ').map(q => `<a class="chip" href="${withQs('#/search', {q})}">${esc(q)}</a>`).join('')}</div>
-    </div>
-    ${trustStrip()}
-    ${last ? `<section class="sec"><div class="again"><span class="dIcon">${icon('i-refill')}</span><span><strong>${t('againT')}</strong><small>${t('againP', {n: num(last.lines.length), d: new Date(last.at).toLocaleDateString(lang === 'ar' ? 'ar-IQ' : 'en-GB', {day:'numeric', month:'short'})})}</small></span>
-      <button type="button" class="btn navy" data-again>${icon('i-bag')}${t('againBtn')}</button></div></section>` : ''}
-    ${S.finder.on ? `<section class="sec"><div class="finderCta"><span class="dIcon">${icon('i-spark')}</span><span><strong>${t('finderT')}</strong><p>${t('finderP')}</p></span>
-      <span class="acts"><a class="btn navy" href="#/finder">${t('finderGo')}</a>${nurseOn() ? `<a class="btn ghost" href="${nurseWa()}" target="_blank" rel="noopener">${icon('i-chat')}${t('nurseBtn')}</a>` : ''}</span></div></section>` : ''}
     ${KITS.length ? `<section class="sec"><div class="secHead"><div><h2>${t('secKits')}</h2><p>${t('secKitsP')}</p></div><a class="more" href="#/kits">${t('seeAll')}${icon('i-chev', 'ic flip')}</a></div>
       <div class="kits">${KITS.slice(0, 3).map(kitCard).join('')}</div></section>` : ''}
     <section class="sec"><div class="secHead"><div><h2>${t('secDepts')}</h2><p>${t('secDeptsP')}</p></div><a class="more" href="#/departments">${t('seeAll')}${icon('i-chev', 'ic flip')}</a></div>
-      <div class="depts">${DEPTS.map(deptTile).join('')}</div></section>
-    ${recent.length > 1 ? `<section class="sec"><div class="secHead"><div><h2>${t('secRecent')}</h2></div></div><div class="rail">${recent.map(card).join('')}</div></section>` : ''}
-    <section class="sec"><div class="secHead"><div><h2>${t('secSvc')}</h2><p>${t('secSvcP')}</p></div></div>
-      <div class="services">${SERVICES.map(s => `<a class="svc" href="#/s/${s}"><span class="dIcon">${icon('s-' + s)}</span><strong>${t('svc')[s][0]}</strong><small>${t('svc')[s][1]}</small><em>${t('itemsN', {n: num(RETAIL.filter(p => p.services.includes(s)).length)})}</em></a>`).join('')}</div></section>
+      <div class="homeSearch">
+        <form data-search-form><label class="search" data-search-box><svg class="ic"><use href="#i-search"/></svg><span class="sr">${t('search')}</span><input type="search" data-search autocomplete="off" enterkeyhint="search" placeholder="${esc(t('search'))}"><button type="button" class="clear" data-clear aria-label="Clear">${icon('i-x')}</button></label></form>
+        <div class="quick"><small>${t('popular')}</small>${t('popularQ').map(q => `<a class="chip" href="${withQs('#/search', {q})}">${esc(q)}</a>`).join('')}</div>
+      </div>
+      ${deptGroups()}</section>
+    ${recent.length > 1 ? `<section class="sec"><div class="secHead"><div><h2>${t('secRecent')}</h2></div></div><div class="rail">${recent.map(cardAs()).join('')}</div></section>` : ''}
     ${rent.length ? `<section class="sec"><div class="secHead"><div><h2>${t('secRent')}</h2><p>${t('secRentP')}</p></div><a class="more" href="#/rent">${t('seeAll')} (${num(rent.length)})${icon('i-chev', 'ic flip')}</a></div>
-      <div class="rail">${rent.slice(0, 10).map(card).join('')}</div></section>` : ''}
-    <section class="sec"><div class="secHead"><div><h2>${t('secRefill')}</h2><p>${t('secRefillP')}</p></div><a class="more" href="#/refill">${t('seeAll')} (${num(refill.length)})${icon('i-chev', 'ic flip')}</a></div>
-      <div class="rail">${refill.slice(0, 10).map(card).join('')}</div></section>
+      <div class="rail">${rent.slice(0, 10).map(cardAs('rent')).join('')}</div></section>` : ''}
+    ${refill.length ? `<section class="sec"><div class="secHead"><div><h2>${t('secRefill')}</h2><p>${t('secRefillP')}</p></div><a class="more" href="#/refill">${t('seeAll')} (${num(refill.length)})${icon('i-chev', 'ic flip')}</a></div>
+      <div class="rail">${refill.slice(0, 10).map(cardAs('refill')).join('')}</div></section>` : ''}
     <section class="sec"><div class="secHead"><div><h2>${t('secHow')}</h2></div></div>
-      <div class="steps">${t('how').map(([h, p]) => `<div class="step"><strong>${h}</strong><p>${p}</p></div>`).join('')}</div></section>
+      <div class="steps">${t('how').map(([h, p]) => `<div class="step"><strong>${h}</strong><p>${p}</p></div>`).join('')}</div>
+      ${trustStrip()}</section>
   </div>`;
 }
 
@@ -1013,25 +1154,43 @@ function viewKits(){
   return pageHead({ crumbs: [['#/', t('tHome')]], title: t('kitsTitle'), sub: t('kitsSub'), iconId: 'i-box' })
     + `<div class="wrap" style="margin-top:20px"><div class="kits">${KITS.map(kitCard).join('')}</div>${nurseBlock()}</div>`;
 }
+// every in-stock kit line is already in the order at the kit's quantity or more
+const kitSkip = new Set();   // kit lines the customer unticked (already has them)
+const kitKey = i => i.p.id + '|' + i.mode;
+const kitInCart = k => k.items.some(i => !isOut(i.p) && !kitSkip.has(kitKey(i))) && k.items.every(i => isOut(i.p) || kitSkip.has(kitKey(i)) || qtyOf(i.p.id, i.mode) >= i.qty);
+function kitButton(k, n){
+  if(kitInCart(k)) return `<a class="btn navy block" href="#/order" data-kit-btn>${icon('i-check')}${t('kitInOrder')}</a>`;
+  const all = k.items.filter(i => !isOut(i.p)).length;
+  n = n == null ? k.items.filter(i => !isOut(i.p) && !kitSkip.has(kitKey(i))).length : n;
+  return `<button type="button" class="btn or block" data-kit="${esc(k.id)}" data-kit-btn ${n ? '' : 'disabled'}>${icon('i-bag')}${n === all ? t('kitAdd') : n ? t('kitAddN', {n: num(n)}) : t('kitNone')}</button>`;
+}
 function viewKit(k){
   const tot = kitTotal(k);
   return pageHead({ crumbs: [['#/', t('tHome')], ['#/kits', t('tKits')]], title: L(k), sub: esc(LF(k, 'blurb')), iconId: 'd-' + k.icon })
     + `<div class="wrap"><div class="order">
-      <section class="panel kitLines"><h2>${t('kitIncl')}</h2>
+      <section class="panel kitLines"><h2>${t('kitIncl')}</h2><p>${t('kitPick')}</p>
         ${k.items.map(i => `<div class="line"><a href="#/p/${i.p.id}">${photo(i.p, 160)}</a>
           <div><h3><a href="#/p/${i.p.id}">${esc(pName(i.p))}</a></h3><div class="meta"><span class="found">${num(i.qty)} × ${modeLabel(i.mode)}</span>
-          ${isOut(i.p) ? `<span class="found" style="color:var(--red)">${t('kitOut')}</span>` : (linePrice(i.p, i.mode, i.qty) ? `<span class="found">${fmtIqd(linePrice(i.p, i.mode, i.qty).total)}${i.mode === 'rent' ? ' ' + t('perMonth') : ''}</span>` : '')}</div></div><span></span></div>`).join('')}
+          ${isOut(i.p) ? `<span class="found" style="color:var(--red)">${t('kitOut')}</span>` : (linePrice(i.p, i.mode, i.qty) ? `<span class="found">${fmtIqd(linePrice(i.p, i.mode, i.qty).total)}${i.mode === 'rent' ? ' ' + t('perMonth') : ''}</span>` : '')}</div></div>
+          <label class="kPick">${isOut(i.p) ? '' : `<input type="checkbox" data-kit-item="${i.p.id}|${i.mode}" ${kitSkip.has(kitKey(i)) ? '' : 'checked'}><span class="sr">${esc(t('kitInclude', {p: pName(i.p)}))}</span>`}</label></div>`).join('')}
       </section>
       <section class="panel kitAdd">${tot ? `<div class="sum" style="border-top:0;margin-top:0"><span>${t('estimate')}</span><span>${fmtIqd(tot)}</span></div>` : ''}
-        <button type="button" class="btn or block" data-kit="${esc(k.id)}">${icon('i-bag')}${t('kitAdd')}</button>
+        ${kitButton(k)}
         <p class="priceNote">${icon('i-shieldok')}<span>${t(tot ? 'priceSet' : 'price')}</span></p>
         ${nurseOn() ? `<a class="btn ghost block" style="margin-top:10px" href="${nurseWa(t('nurseMsgP', {p: L(k)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('nurseBtn')}</a>` : ''}
       </section></div></div>`;
 }
+// tops each ticked line up to the kit's quantity, so adding a kit twice doesn't double it
 function addKit(k){
+  const picked = new Set($$('[data-kit-item]:checked').map(x => x.dataset.kitItem));
   let n = 0;
-  k.items.forEach(i => { if(isOut(i.p)) return; setQty(i.p.id, i.mode, qtyOf(i.p.id, i.mode) + i.qty); n++; });
-  toast(t('kitAdded'));
+  k.items.forEach(i => {
+    if(isOut(i.p) || !picked.has(i.p.id + '|' + i.mode)) return;
+    const q = qtyOf(i.p.id, i.mode);
+    if(q < i.qty){ setQty(i.p.id, i.mode, i.qty); n++; }
+  });
+  toast(n ? t('kitAdded') : t('kitAlready'));
+  const y = window.scrollY; render(); window.scrollTo(0, y);
   return n;
 }
 function viewFinder(key){
@@ -1066,7 +1225,7 @@ function pageHead({ crumbs = [], title, sub, iconId, tabs = '' }){
 }
 
 // filter + sort + grid, shared by department, service, collection and search views
-function listing(items, { base, qs, filters = true, sortable = true, chips = '' }){
+function listing(items, { base, qs, filters = true, sortable = true, chips = '', mode }){
   const f = qs.get('show') || '', sort = qs.get('sort') || '';
   let list = items;
   if(f === 'buy')    list = list.filter(p => !p.b2b);
@@ -1075,10 +1234,10 @@ function listing(items, { base, qs, filters = true, sortable = true, chips = '' 
   if(sortable) list = [...list].sort(sort === 'az' ? byName : byNeed);
   const avail = ['rent', 'refill'].filter(k => items.some(p => p[k] && (k !== 'rent' || rentOn())));
   const seg = filters && avail.length && !items.every(p => p.b2b)
-    ? `<div class="seg" role="group" aria-label="${esc(t('show'))}">${['', 'buy', ...avail].map(k => `<button type="button" data-filter="${k}" aria-pressed="${f === k}">${t({'':'fAll', buy:'fBuy', rent:'fRent', refill:'fRefill'}[k])}</button>`).join('')}</div>` : '<span></span>';
+    ? `<div class="seg" role="group" aria-label="${esc(t('show'))}">${['', ...avail].map(k => `<button type="button" data-filter="${k}" aria-pressed="${f === k}">${t({'':'fAll', buy:'fBuy', rent:'fRent', refill:'fRefill'}[k])}</button>`).join('')}</div>` : '<span></span>';
   const sorter = sortable ? `<label><span class="sr">${t('sort')}</span><select class="sel" data-sort><option value="">${t('sortRec')}</option><option value="az" ${sort === 'az' ? 'selected' : ''}>${t('sortAz')}</option></select></label>` : '';
   const grid = list.length
-    ? `<div class="grid">${list.slice(0, shown).map(card).join('')}</div>${list.length > shown ? `<div class="loadMore"><button type="button" class="btn ghost" data-more>${t('loadMore')} (${num(list.length - shown)})</button></div>` : ''}`
+    ? `<h2 class="sr">${t('products')}</h2><div class="grid">${list.slice(0, shown).map(cardAs(mode || (f === 'rent' || f === 'refill' ? f : ''))).join('')}</div>${list.length > shown ? `<div class="loadMore"><button type="button" class="btn ghost" data-more>${t('loadMore')} (${num(list.length - shown)})</button></div>` : ''}`
     : `<div class="empty"><span class="dIcon">${icon('i-search')}</span><strong>${t('noneT')}</strong><p>${t('noneP')}</p><a class="btn ghost" href="#/departments">${t('browse')}</a></div>`;
   return `<div class="wrap">${chips}<div class="tools">${seg}<div style="display:flex;gap:10px;align-items:center"><span class="found">${t('found', {n: num(list.length)})}</span>${sorter}</div></div>${grid}</div>`;
 }
@@ -1117,7 +1276,7 @@ function viewCollection(kind, qs){
   const all = RETAIL.filter(p => p[kind]);
   const d = qs.get('dept'), items = d ? all.filter(p => p.dept === d) : all;
   return pageHead({ crumbs: [['#/', t('tHome')]], title: t(kind === 'rent' ? 'secRent' : 'secRefill'), sub: t(kind === 'rent' ? 'secRentP' : 'secRefillP'), iconId: kind === 'rent' ? 'i-rent' : 'i-refill' })
-       + listing(items, { base: '#/' + kind, qs, filters: false, chips: deptChips(all, '#/' + kind, qs) });
+       + listing(items, { base: '#/' + kind, qs, filters: false, mode: kind, chips: deptChips(all, '#/' + kind, qs) });
 }
 
 function viewSearch(q){
@@ -1142,45 +1301,54 @@ function searchResults(q){
 function remember(id){
   const r = store.get('recent', []).filter(x => x !== id); r.unshift(id); store.set('recent', r.slice(0, 12));
 }
+// the line under the product name in the phone add-to-order bar: the chosen mode and its price
+function stickySub(p, mode){
+  const pr = unitPrice(p, mode);
+  return [modesFor(p).length > 1 ? modeLabel(mode) : '', pr ? fmtIqd(pr) + (mode === 'rent' ? ' ' + t('perMonth') : '') : ''].filter(Boolean).join(' · ');
+}
 function viewProduct(p){
   const d = DEPT[p.dept], s = subOf(p), modes = modesFor(p), st = storeOf(p);
   const optDesc = {buy:'mBuy', rent:'mRent', refill:'mRefill', quote:'mQuote'};
   const sel = modes.find(m => qtyOf(p.id, m)) || modes[0];
   const related = PRODUCTS.filter(x => x.sub === s.key && x.dept === d.key && x.id !== p.id).sort(byNeed).slice(0, 8);
   const R = S.rentals, tiers = S.clinics.on && S.clinics.bulkOn && !p.b2b && p.price ? S.clinics.tiers : [];
-  const facts = [];
-  if(S.delivery.on) facts.push(`<div class="fact">${icon('i-truck')}<span><b>${esc(L(S.delivery))}</b> — ${esc(LF(S.delivery, 'note'))}</span></div>`);
-  if(payments().length && !p.b2b) facts.push(`<div class="fact">${icon('i-card')}<span>${esc(t('payWith', {m: payments().map(m => L(m)).join(' · ')}))}</span></div>`);
-  if(modes.includes('rent')) facts.push(`<div class="fact">${icon('i-rent')}<span><b>${t('rentTerms')}:</b> ${esc(t('rentMin', {n: R.minMonths}))} · ${esc(p.deposit ? t('rentDeposit', {p: fmtIqd(p.deposit)}) : LF(R, 'deposit'))} · ${esc(t('rentIncl', {s: LF(R, 'included')}))}</span></div>`);
-  return `<div class="wrap">
+  // rental terms sit on the Rent choice itself, where the decision is made
+  const rentTerms = `${esc(t('rentMin', {n: R.minMonths}))} · ${esc(p.deposit ? t('rentDeposit', {p: fmtIqd(p.deposit)}) : LF(R, 'deposit'))} · ${esc(t('rentIncl', {s: LF(R, 'included')}))}`;
+  const opt = m => `<label class="opt"><input type="radio" name="mode" value="${m}" ${m === sel ? 'checked' : ''}><span><strong>${t(optDesc[m])[0]}</strong><small>${t(optDesc[m])[1]}</small>${m === 'rent' ? `<small class="terms">${rentTerms}</small>` : ''}</span>${unitPrice(p, m) ? `<b class="optPrice">${fmtIqd(unitPrice(p, m))}${m === 'rent' ? `<small>${t('perMonth')}</small>` : m === 'refill' ? `<small>${t('perDelivery')}</small>` : ''}</b>` : ''}</label>`;
+  // delivery and payment fold into one line that opens
+  const more = [];
+  if(S.delivery.on) more.push(`<div class="fact">${icon('i-truck')}<span>${esc(LF(S.delivery, 'note'))}</span></div>`);
+  if(payments().length && !p.b2b) more.push(`<div class="fact">${icon('i-card')}<span>${esc(t('payWith', {m: payments().map(m => L(m)).join(' · ')}))}</span></div>`);
+  const facts = more.length ? `<details class="facts"><summary>${icon(S.delivery.on ? 'i-truck' : 'i-card')}<span>${S.delivery.on ? `<b>${esc(L(S.delivery))}</b>` : t('payT')}</span>${icon('i-chev', 'ic more')}</summary>${more.join('')}</details>` : '';
+  return `<div class="wrap pdPage">
     <nav class="crumbs" aria-label="Breadcrumb" style="margin-top:18px"><a href="#/departments">${t('tDepts')}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}">${esc(L(d))}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}/${s.key}">${esc(L(s))}</a></nav>
     <div class="pd">
-      <div>${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
+      <div class="pdPhoto">${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
       <div class="pInfo" data-product="${p.id}">
         <h1>${esc(pName(p))}</h1><p class="alt" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(lang === 'ar' ? p.en : p.ar)}</p>
         ${badges(p)}${S.showStore && st ? `<span class="soldBy">${icon('i-store')}${t('soldBy')}: <b>${esc(L(st))}</b></span>` : ''}
         ${modes.length === 1 && unitPrice(p, modes[0]) ? `<p class="price big">${fmtIqd(unitPrice(p, modes[0]))}</p>` : ''}
-        <p class="why"><b>${t('why')}</b>${esc(pWhy(p))}</p>
-        ${p.services.some(x => SERVICES.includes(x)) ? `<span class="lbl">${t('usedWith')}</span><div class="svcList">${p.services.filter(x => SERVICES.includes(x)).map(x => `<a class="chip" href="#/s/${x}">${icon('s-' + x)}${t('svc')[x][0]}</a>`).join('')}</div>` : ''}
-        ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(m => `<label class="opt"><input type="radio" name="mode" value="${m}" ${m === sel ? 'checked' : ''}><span><strong>${t(optDesc[m])[0]}</strong><small>${t(optDesc[m])[1]}</small></span>${unitPrice(p, m) ? `<b class="optPrice">${fmtIqd(unitPrice(p, m))}${m === 'rent' ? `<small>${t('perMonth')}</small>` : m === 'refill' ? `<small>${t('perDelivery')}</small>` : ''}</b>` : ''}</label>`).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
+        ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(opt).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
         ${tiers.length ? `<div class="tiersNote"><b>${t('bulkT')}:</b> ${tiers.map(x => t('bulkLine', {n: x.min, p: x.pct})).join(' · ')}</div>` : ''}
         ${isOut(p) ? `<div class="note out">${icon('i-x')}<span>${t('outNote')}</span></div><a class="btn wa block" href="${wa(t('askOut', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('askAvail')}</a>` : `
-        <div class="buy"><div class="stepper light" aria-label="${esc(t('qty'))}"><button type="button" data-pdec aria-label="−">${icon('i-minus')}</button><span data-pqty>1</span><button type="button" data-pinc aria-label="+">${icon('i-plus')}</button></div>
+        <div class="buy"><div class="stepper light" role="group" aria-label="${esc(t('qty'))}"><button type="button" data-pdec aria-label="−">${icon('i-minus')}</button><span data-pqty aria-live="polite">1</span><button type="button" data-pinc aria-label="+">${icon('i-plus')}</button></div>
           <button type="button" class="btn or" data-padd>${icon('i-bag')}${p.b2b ? t('addQuote') : t('add')}</button></div>
         <p class="priceNote">${icon('i-shieldok')}<span>${t(modes.some(m => unitPrice(p, m)) ? 'priceSet' : 'price')}</span></p>`}
-        ${facts.length ? `<div class="facts">${facts.join('')}</div>` : ''}
+        ${facts}
+        <p class="why"><b>${t('why')}</b>${esc(pWhy(p))}</p>
+        ${p.services.some(x => SERVICES.includes(x)) ? `<span class="lbl">${t('usedWith')}</span><div class="svcList">${p.services.filter(x => SERVICES.includes(x)).map(x => `<a class="chip" href="#/s/${x}">${icon('s-' + x)}${t('svc')[x][0]}</a>`).join('')}</div>` : ''}
         <div class="pActions">${nurseOn() ? `<a class="btn soft" href="${nurseWa(t('nurseMsgP', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('nurseBtn')}</a>` : ''}<button type="button" class="btn ghost" data-share>${icon('i-share')}${t('share')}</button></div>
       </div>
     </div>
-    ${related.length ? `<section class="sec"><div class="secHead"><h2>${t('moreIn')}</h2><a class="more" href="#/d/${d.key}/${s.key}">${esc(L(s))}${icon('i-chev', 'ic flip')}</a></div><div class="rail">${related.map(card).join('')}</div></section>` : ''}
-    ${isOut(p) ? '' : `<div class="stickyBuy" id="stickyBuy"><span>${esc(pName(p))}${unitPrice(p, modes[0]) ? `<small>${fmtIqd(unitPrice(p, modes[0]))}</small>` : ''}</span><button type="button" class="btn or" data-sticky-add>${icon('i-bag')}${p.b2b ? t('addQuote') : t('add')}</button></div>`}
+    ${related.length ? `<section class="sec"><div class="secHead"><h2>${t('moreIn')}</h2><a class="more" href="#/d/${d.key}/${s.key}">${esc(L(s))}${icon('i-chev', 'ic flip')}</a></div><div class="rail">${related.map(cardAs()).join('')}</div></section>` : ''}
+    ${isOut(p) ? '' : `<div class="stickyBuy" id="stickyBuy" aria-hidden="true"><span>${esc(pName(p))}<small data-sticky-sub>${esc(stickySub(p, sel))}</small></span><button type="button" class="btn or" data-sticky-add tabindex="-1">${icon('i-bag')}${p.b2b ? t('addQuote') : t('add')}</button></div>`}
   </div>`;
 }
 function addFromProduct(){
   const box = $('[data-product]'); if(!box) return;
   const p = BYID.get(box.dataset.product), qty = $('[data-pqty]');
   const mode = (box.querySelector('input[name=mode]:checked') || {}).value || modesFor(p)[0];
-  setQty(p.id, mode, qtyOf(p.id, mode) + (qty ? +qty.textContent : 1)); refreshControls(p.id); toast(t('added'));
+  setQty(p.id, mode, qtyOf(p.id, mode) + (qty ? +qty.textContent : 1)); refreshControls(p.id); toast(addedMsg(p, mode));
 }
 function shareUrl(){ const u = new URL(location.href); u.searchParams.delete('preview'); return u.toString(); }
 async function share(){
@@ -1198,11 +1366,21 @@ function totals(){
   const fee = S.delivery.on && S.delivery.feeIqd && cart.length ? S.delivery.feeIqd : 0;
   return { sub, off, fee, total: sub - off + fee, priced, all: priced === cart.length };
 }
+const sentTime = () => new Date(sent.at).toLocaleTimeString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB', {hour:'numeric', minute:'2-digit'});
+function viewSent(){
+  const newBox = confirmNew
+    ? `<div class="confirm" role="group" aria-labelledby="newQ"><p id="newQ">${t('newConfirm')}</p><div><button type="button" class="btn navy" data-new-order data-sure>${t('newYes')}</button><button type="button" class="btn ghost" data-new-cancel>${t('newNo')}</button></div></div>`
+    : `<button type="button" class="btn ghost" data-new-order>${t('sentNew')}</button>`;
+  const items = sent.lines.map(l => { const p = BYID.get(String(l.id)); return p ? `<li><b>${num(l.qty)} ×</b> ${esc(pName(p))} <span>${modeLabel(l.mode)}</span></li>` : ''; }).join('');
+  return `<div class="wrap" style="max-width:640px;margin-top:32px"><div class="panel sent"><span class="dIcon">${icon('i-chat')}</span><h1 style="font-size:24px">${t('sentT')}</h1>
+      <p style="margin:8px 0 0;color:var(--mut)">${t('orderNoL')}</p><span class="orderNo">${esc(sent.no)}</span>
+      <p class="sentP">${t('sentP', {phone: `<bdi dir="ltr">${esc(CONFIG.bizPhone)}</bdi>`})}</p>
+      ${items ? `<div class="sentItems"><h2>${t('sentItems')}</h2><ul>${items}</ul></div>` : ''}
+      <div class="sentActs"><a class="btn wa" href="${esc(sent.wa)}" target="_blank" rel="noopener">${icon('i-chat')}${t('sentAgain')}</a>
+        <button type="button" class="btn ghost" data-back-order>${t('sentBack')}</button>${newBox}</div></div></div>`;
+}
 function viewOrder(){
-  if(lastSent) return `<div class="wrap" style="max-width:640px;margin-top:32px"><div class="panel sent"><span class="dIcon">${icon('i-check')}</span><h1 style="font-size:24px">${t('sentT')}</h1>
-      ${lastOrderNo ? `<p style="margin:8px 0 0;color:var(--mut)">${t('orderNoL')}</p><span class="orderNo">${esc(lastOrderNo)}</span>` : ''}
-      <p style="color:var(--mut)">${t('sentP')}</p>
-      <div style="display:grid;gap:10px;margin-top:18px"><a class="btn wa" href="${lastSent}" target="_blank" rel="noopener">${icon('i-chat')}${t('sentAgain')}</a><button type="button" class="btn navy" data-new-order>${t('sentNew')}</button><button type="button" class="btn ghost" data-back-order>${t('sentBack')}</button></div></div></div>`;
+  if(sent && cart.length && sent.sig === cartSig() && !editingSent) return viewSent();
   const head = pageHead({ crumbs: [['#/', t('tHome')]], title: t('orderTitle'), sub: t('orderSub') });
   if(!cart.length) return head + `<div class="wrap" style="margin-top:20px"><div class="empty"><span class="dIcon">${icon('i-bag')}</span><strong>${t('emptyT')}</strong><p>${t('emptyP')}</p><a class="btn navy" href="#/departments">${icon('i-grid')}${t('browse')}</a>
       ${lastOrder() ? ` <button type="button" class="btn ghost" data-again>${icon('i-refill')}${t('againBtn')}</button>` : ''}</div>${nurseBlock()}</div>`;
@@ -1210,7 +1388,9 @@ function viewOrder(){
   if(pays.length && !pays.some(m => m.key === customer.payment)) customer.payment = pays[0].key;
   const f = (k, label, type = 'text', extra = '') => `<label class="field" data-field="${k}"><span>${label}</span><input name="${k}" type="${type}" value="${esc(customer[k])}" ${extra}><em class="err">${t('e' + k[0].toUpperCase() + k.slice(1))}</em></label>`;
   const tt = totals(), showClinic = hasQuote || (S.clinics.on && customer.isClinic);
-  return head + `<div class="wrap"><div class="order">
+  const same = sent && sent.sig === cartSig();
+  const sentNote = sent ? `<div class="note warn" role="status">${icon('i-clock')}<span>${esc(t(same ? 'sentSame' : 'sentChanged', {no: sent.no, time: sentTime()}))}${same ? ` <button type="button" class="linkBtn" data-show-sent>${t('sentShow')}</button>` : ''}</span></div>` : '';
+  return head + `<div class="wrap">${sentNote}<div class="order">
     <section class="panel"><h2>${t('yourItems')}</h2>
       ${cart.map(l => { const p = BYID.get(l.id), modes = modesFor(p), lp = linePrice(p, l.mode, l.qty); return `<div class="line" data-line="${l.id}|${l.mode}">
         <a href="#/p/${p.id}">${photo(p, 160)}</a>
@@ -1219,7 +1399,7 @@ function viewOrder(){
           <div class="stepper light"><button type="button" data-dec aria-label="−">${icon('i-minus')}</button><span>${num(l.qty)}</span><button type="button" data-inc aria-label="+">${icon('i-plus')}</button></div>
           ${lp ? `<span class="found">${fmtIqd(lp.total)}${l.mode === 'rent' ? ' ' + t('perMonth') : ''}${lp.off ? ` <b style="color:var(--or2)">−${lp.off}%</b>` : ''}</span>` : ''}</div></div>
         <button type="button" class="rm" data-rm aria-label="${esc(t('remove'))}">${icon('i-trash')}</button></div>`; }).join('')}
-      <div class="sum"><span>${t('total')}</span><span>${num(pieces())}</span></div>
+      <div class="sum"><span>${t('total')}</span><span>${pieces() === cart.length ? t('totalN', {n: num(cart.length)}) : t('totalNQ', {n: num(cart.length), q: num(pieces())})}</span></div>
       ${tt.priced ? `${tt.off || tt.fee ? `<div class="sum small"><span>${t('subtotal')}</span><span>${fmtIqd(tt.sub)}</span></div>` : ''}
         ${tt.off ? `<div class="sum small"><span>${t('bulkOff')}</span><span>−${fmtIqd(tt.off)}</span></div>` : ''}
         ${tt.fee ? `<div class="sum small"><span>${t('deliveryFee')}</span><span>${fmtIqd(tt.fee)}</span></div>` : ''}
@@ -1227,7 +1407,7 @@ function viewOrder(){
       ${S.delivery.on ? `<div class="facts"><div class="fact">${icon('i-truck')}<span><b>${esc(L(S.delivery))}</b> — ${esc(LF(S.delivery, 'note'))}</span></div></div>` : ''}
     </section>
     <form class="panel" id="orderForm" novalidate><h2>${t('details')}</h2><p>${t('detailsP')}</p>
-      ${f('name', t('fName'), 'text', 'autocomplete="name" required')}
+      ${f('name', t('fName'), 'text', 'autocomplete="name" required aria-describedby="nameHint"').replace('</span>', `</span><small class="hint" id="nameHint">${t('fNameHint')}</small>`)}
       ${f('phone', t('fPhone'), 'tel', 'autocomplete="tel" inputmode="tel" dir="ltr" placeholder="07XX XXX XXXX" required')}
       <div class="two">${f('area', t('fArea'), 'text', `placeholder="${esc(t('fAreaPh'))}" required`)}
       <label class="field"><span>${t('fAddr')} <i>${t('opt')}</i></span><input name="addr" value="${esc(customer.addr)}" autocomplete="street-address"></label></div>
@@ -1249,13 +1429,12 @@ function setQty(id, mode, qty){
   if(i < 0 && qty) cart.push({id, mode, qty});
   else if(i >= 0 && qty) cart[i].qty = qty;
   else if(i >= 0) cart.splice(i, 1);
-  lastSent = null;
   saveCart();
 }
 
 // repaint just the bits a quantity change touches, so the page never jumps
 function refreshControls(id){
-  $$(`[data-card="${id}"] .cFoot`).forEach(el => el.innerHTML = addControl(BYID.get(String(id))));
+  $$(`[data-card="${id}"]`).forEach(c => c.querySelector('.cFoot').innerHTML = addControl(BYID.get(String(id)), c.dataset.mode));
 }
 
 let toastT;
@@ -1271,9 +1450,9 @@ const normPhone = s => { let d = String(s).replace(/[^\d]/g, ''); if(d.startsWit
 const phoneOk = s => /^07\d{9}$/.test(normPhone(s));
 const newOrderNo = () => 'S-' + (Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 4)).toUpperCase();
 
-function buildMessage(no){
+function buildMessage(no, updates){
   const c = customer, pay = payments().find(m => m.key === c.payment), remind = S.reminders.on && c.remind && cart.some(l => l.mode === 'refill');
-  const lines = [ '*' + t('msgHead') + '*', t('msgNo') + ': ' + no, '',
+  const lines = [ '*' + t('msgHead') + '*', t('msgNo') + ': ' + no, ...(updates ? [t('msgUpdates') + ': ' + updates] : []), '',
     t('msgName') + ': ' + c.name.trim(), t('msgPhone') + ': ' + normPhone(c.phone), t('msgArea') + ': ' + c.area.trim() ];
   if(c.addr.trim()) lines.push(t('msgAddr') + ': ' + c.addr.trim());
   if(c.clinic.trim() && (cart.some(l => l.mode === 'quote') || c.isClinic)) lines.push(t('msgClinic') + ': ' + c.clinic.trim());
@@ -1336,7 +1515,7 @@ document.addEventListener('click', e => {
   }
   const b = e.target.closest('button');
   if(!b) return;
-  if(b.dataset.add){ const [id, mode] = b.dataset.add.split('|'); setQty(id, mode, 1); refreshControls(id); toast(t('added')); return; }
+  if(b.dataset.add){ const [id, mode] = b.dataset.add.split('|'); setQty(id, mode, 1); refreshControls(id); toast(addedMsg(BYID.get(id), mode)); return; }
   const line = b.closest('[data-line]');
   if(line && (b.hasAttribute('data-inc') || b.hasAttribute('data-dec') || b.hasAttribute('data-rm'))){
     const [id, mode] = line.dataset.line.split('|'), q = qtyOf(id, mode);
@@ -1356,8 +1535,14 @@ document.addEventListener('click', e => {
   if(b.dataset.filter !== undefined){ updateListQs({ show: b.dataset.filter }); return; }
   if(b.hasAttribute('data-more')){ shown += CONFIG.pageSize; shownMemo[location.hash] = shown; const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if(b.hasAttribute('data-clear')){ setSearch(''); const i = b.parentElement.querySelector('input'); i && i.focus(); return; }
-  if(b.hasAttribute('data-new-order')){ cart = []; lastSent = null; lastOrderNo = ''; saveCart(); render(); return; }
-  if(b.hasAttribute('data-back-order')){ lastSent = null; render(); return; }
+  if(b.hasAttribute('data-new-order')){
+    // clearing the list asks first, in place
+    if(!b.hasAttribute('data-sure')){ confirmNew = true; render(); const y = $('[data-sure]'); y && y.focus(); return; }
+    cart = []; sent = null; store.set('sent', null); confirmNew = editingSent = false; saveCart(); render(); window.scrollTo(0, 0); return;
+  }
+  if(b.hasAttribute('data-new-cancel')){ confirmNew = false; render(); const n = $('[data-new-order]'); n && n.focus(); return; }
+  if(b.hasAttribute('data-back-order')){ editingSent = true; confirmNew = false; render(); window.scrollTo(0, 0); return; }
+  if(b.hasAttribute('data-show-sent')){ editingSent = false; render(); window.scrollTo(0, 0); return; }
   if(b.id === 'lang'){ lang = lang === 'ar' ? 'en' : 'ar'; store.set('lang', lang); applyLang(); const y = window.scrollY; render(); window.scrollTo(0, y); }
 });
 
@@ -1373,9 +1558,18 @@ function updateListQs(patch){
 document.addEventListener('change', e => {
   if(e.target.matches('[data-sort]')) updateListQs({ sort: e.target.value });
   if(e.target.matches('[data-mode]')){
-    const [id, mode] = e.target.closest('[data-line]').dataset.line.split('|'), to = e.target.value, q = qtyOf(id, mode);
-    setQty(id, mode, 0); setQty(id, to, qtyOf(id, to) + q);
+    const [id, mode] = e.target.closest('[data-line]').dataset.line.split('|'), to = e.target.value, q = qtyOf(id, mode), had = qtyOf(id, to);
+    setQty(id, mode, 0); setQty(id, to, had + q);
     const y = window.scrollY; render(); window.scrollTo(0, y);
+    if(had) toast(t('merged', {m: modeLabel(to)}));
+  }
+  if(e.target.matches('[data-product] input[name=mode]')){
+    const el = $('[data-sticky-sub]'), p = BYID.get($('[data-product]').dataset.product); if(el) el.textContent = stickySub(p, e.target.value);
+  }
+  if(e.target.matches('[data-kit-item]')){
+    const k = kitById(parse().parts[1]), btn = $('[data-kit-btn]');
+    if(e.target.checked) kitSkip.delete(e.target.dataset.kitItem); else kitSkip.add(e.target.dataset.kitItem);
+    if(k && btn) btn.outerHTML = kitButton(k);
   }
   if(e.target.closest('#orderForm') && ['payment', 'remind', 'isClinic'].includes(e.target.name)){
     const f = e.target; customer[f.name] = f.type === 'checkbox' ? f.checked : f.value; store.set('customer', customer);
@@ -1418,10 +1612,14 @@ document.addEventListener('submit', e => {
     if(!customer.area.trim()) bad.push('area');
     $$('#orderForm [data-field]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.field)));
     if(bad.length){ const first = $(`#orderForm [name=${bad[0]}]`); first.focus(); return; }
-    const no = newOrderNo();
-    lastSent = wa(buildMessage(no)); lastOrderNo = no;
-    window.open(lastSent, '_blank', 'noopener');
-    logOrder(no); saveOrderLocally(no);
+    // the same list sent again keeps its number (the Sheet ignores a repeat); a changed list
+    // is a new order that says which one it updates
+    const same = sent && sent.sig === cartSig(), no = same ? sent.no : newOrderNo();
+    const url = wa(buildMessage(no, sent && !same ? sent.no : ''));
+    window.open(url, '_blank', 'noopener');
+    if(!same){ logOrder(no); saveOrderLocally(no); }
+    sent = { no, at: Date.now(), wa: url, sig: cartSig(), lines: cart.map(l => ({ id: l.id, mode: l.mode, qty: l.qty })) };
+    store.set('sent', sent); editingSent = confirmNew = false;
     render(); window.scrollTo(0, 0);
   }
 });
@@ -1435,11 +1633,12 @@ function afterRender(){
   // opening the Search tab on a phone puts the cursor straight in the box
   if(parse().parts[0] === 'search' && freshNav && !searchFocus && !parse().qs.get('q')){ const i = $('.mSearch input'); if(i && i.offsetParent) setTimeout(() => i.focus(), 50); }
   startBanners();
-  // the add-to-order bar slides up on phones once the main button has scrolled away
+  // the add-to-order bar is up on phones whenever the main button is off screen
   if(stickyObs){ stickyObs.disconnect(); stickyObs = null; }
   const btn = $('[data-padd]'), bar = $('#stickyBuy');
   if(btn && bar && 'IntersectionObserver' in window){
-    stickyObs = new IntersectionObserver(([en]) => bar.classList.toggle('on', !en.isIntersecting && en.boundingClientRect.top < 0));
+    const tabs = $('#tabs'), below = tabs && getComputedStyle(tabs).position === 'fixed' ? tabs.offsetHeight : 0;
+    stickyObs = new IntersectionObserver(([en]) => bar.classList.toggle('on', en.intersectionRatio < 1), { rootMargin: `0px 0px -${below}px 0px`, threshold: [0, 1] });
     stickyObs.observe(btn);
   }
 }

@@ -38,7 +38,7 @@ views and returns to where you'd scrolled.
 
 | Tab | Address | What's there |
 |---|---|---|
-| Home | `#/` | search, the departments, "what did your Saleem visit recommend?", rent and monthly-refill rails |
+| Home | `#/` | "what did your Saleem visit recommend?" first, then banners, kits, search and the departments grouped by need, then rent and monthly-refill rails |
 | Departments | `#/departments`, `#/d/<dept>/<section>` | section sub-tabs, a Buy / Rent / Monthly filter, sorting |
 | Search | `#/search?q=…` | results update in place. Arabic matching ignores hamza, taa marbuta and diacritics |
 | My order | `#/order` | per-line buy, rent or monthly, then name, phone and area → WhatsApp |
@@ -68,6 +68,9 @@ The shop also has:
 - a **Share** button on each product
 - an **add-to-order bar** that stays on screen on phones
 - an order number on every WhatsApp message
+- **Add** on a card adds as a purchase, except in the Rent and Monthly lists, which add in that mode. The toast and the card say which mode went in.
+- a sent order is remembered in the browser for 3 days. Opening the order again shows what was sent. Sending the same list again keeps its order number, so the Sheet logs it once. A changed list goes as a new order that names the one it updates. "Start a new order" asks before clearing the list.
+- on a kit page, untick what you already have. Adding a kit tops lines up to the kit's quantities rather than doubling them.
 
 ## Partner stores and commission
 
