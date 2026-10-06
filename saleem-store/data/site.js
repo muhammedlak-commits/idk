@@ -13,7 +13,7 @@ window.SALEEM_SITE = {
   "delivery": {
     "on": true,
     "en": "Delivered in 1–2 days",
-    "ar": "التوصيل خلال ١–٢ يوم",
+    "ar": "التوصيل خلال 1–2 يوم",
     "noteEn": "By our delivery partner, across Baghdad",
     "noteAr": "عن طريق شركة التوصيل، داخل بغداد",
     "feeIqd": null
@@ -28,8 +28,8 @@ window.SALEEM_SITE = {
   "rentals": {
     "on": true,
     "minMonths": 1,
-    "depositEn": "A refundable cash deposit may apply",
-    "depositAr": "ممكن يكون في تأمين نقدي يرجعلك بعد الإرجاع",
+    "depositEn": "Refundable deposit, amount confirmed on WhatsApp",
+    "depositAr": "تأمين يرجعلك بعد الإرجاع، ومبلغه يتأكد على واتساب",
     "includedEn": "Delivery and pickup",
     "includedAr": "التوصيل والاستلام"
   },
@@ -75,7 +75,7 @@ window.SALEEM_SITE = {
   {"id":"newborn","on":true,"icon":"baby","en":"Mother & newborn","ar":"الأم والمولود","blurbEn":"Breastfeeding, recovery and the first baby checks.","blurbAr":"الرضاعة والتعافي وأول فحوصات الطفل.","situations":["baby"],"items":[{"id":216,"qty":1,"mode":"rent"},{"id":217,"qty":1,"mode":"refill"},{"id":218,"qty":1,"mode":"refill"},{"id":222,"qty":1,"mode":"buy"},{"id":220,"qty":1,"mode":"buy"},{"id":219,"qty":1,"mode":"buy"}]}
 ],
 "banners": [
-  {"id":"welcome","on":true,"img":"assets/hero-supplies.webp","link":"#/departments","en":"Everything home care needs, in one place.","ar":"كل اللي تحتاجه رعاية المريض بالبيت، بمكان واحد.","textEn":"Buy, rent or get monthly refills — delivered in 1–2 days.","textAr":"اشترِ أو استأجر أو خلّي المستلزمات توصلك كل شهر — التوصيل خلال ١–٢ يوم.","ctaEn":"Browse departments","ctaAr":"تصفّح الأقسام","start":"","end":"","theme":"navy"},
+  {"id":"welcome","on":true,"img":"assets/hero-supplies.webp","link":"#/departments","en":"Everything home care needs, in one place.","ar":"كل اللي تحتاجه رعاية المريض بالبيت، بمكان واحد.","textEn":"Buy, rent or get monthly refills — delivered in 1–2 days.","textAr":"اشترِ أو استأجر أو خلّي المستلزمات توصلك كل شهر — التوصيل خلال 1–2 يوم.","ctaEn":"Browse departments","ctaAr":"تصفّح الأقسام","start":"","end":"","theme":"navy"},
   {"id":"kits","on":true,"img":"","link":"#/kits","en":"Ready-made care kits","ar":"أطقم رعاية جاهزة","textEn":"Everything for one situation — bedridden care, after surgery, diabetes — in one tap.","textAr":"كل اللي تحتاجه لحالة وحدة — طريح الفراش، بعد العملية، السكري — بضغطة وحدة.","ctaEn":"See the kits","ctaAr":"شوف الأطقم","start":"","end":"","theme":"orange"}
 ]
 };

@@ -140,7 +140,8 @@ html[dir=rtl] .flip{transform:scaleX(-1)}
 .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--blue100)}
 .card>a{display:flex;flex-direction:column;flex:1}
 .ph{position:relative;aspect-ratio:4/3;background:linear-gradient(145deg,#F8FBFD,#EAF2F8);display:grid;place-items:center;overflow:hidden}
-.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12px;background:#fff}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12px;background:#fff;opacity:0;transition:opacity .25s cubic-bezier(.16,1,.3,1)}
+.ph img.in{opacity:1}
 .ph .fb{color:#9DB8CE;display:grid;place-items:center}
 .ph .fb .ic{width:44px;height:44px;stroke-width:1.3}
 .ph.noimg img{display:none}
@@ -150,6 +151,7 @@ html[dir=rtl] .flip{transform:scaleX(-1)}
 .bdg.rent{color:var(--or2)}.bdg.refill{color:var(--green)}.bdg.quote{color:#5B3A85}
 .cBody{padding:12px 14px 4px;flex:1}
 .cBody small{display:block;color:var(--mut);font-size:12.5px;font-weight:700}
+.grid.noSub .cBody small{display:none}
 .cBody h3{font-size:15px;margin-top:3px;line-height:1.35}
 .cFoot{padding:10px 14px 14px}
 .add{width:100%;height:44px;border:1px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -165,6 +167,7 @@ html[dir=rtl] .flip{transform:scaleX(-1)}
 .price{margin:6px 0 0;color:var(--navy);font:800 14px Montserrat,sans-serif}
 html[lang=ar] .price{font-family:Cairo,sans-serif}
 .price small{display:block;color:var(--mut);font-size:12px;font-weight:700}
+.price.ask{color:var(--mut);font-size:13px;font-weight:700}
 .price.big{font-size:22px;margin-top:12px}
 .bdg.out{color:var(--red)}
 .add.ask{border-color:var(--line);color:var(--mut);font-size:13px}
@@ -181,9 +184,9 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 
 /* ── list pages ─────────────────────────────────── */
 .pageHead{background:#fff;border-bottom:1px solid var(--line)}
-.pageHead .wrap{padding:24px 0 0}
-.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--mut);font-size:13px;font-weight:700;margin-bottom:12px}
-.crumbs a{color:var(--blue)}
+.pageHead .wrap{padding:12px 0 0}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;column-gap:6px;color:var(--mut);font-size:13px;font-weight:700;margin-bottom:4px}
+.crumbs a{color:var(--blue);display:inline-flex;align-items:center;min-height:44px}
 .crumbs .ic{width:14px;height:14px}
 .ttl{display:flex;gap:14px;align-items:center}
 .ttl h1{font-size:clamp(24px,2.6vw,32px)}
@@ -289,6 +292,7 @@ footer p{margin:0;max-width:60ch}
 footer a{color:#fff;font-weight:800;display:inline-flex;align-items:center;min-height:44px}
 .toast{position:fixed;z-index:80;inset-inline:0;bottom:24px;margin:auto;width:max-content;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:var(--navy2);color:#fff;font-size:14px;font-weight:700;box-shadow:var(--shadow);transform:translateY(140%);opacity:0;transition:.22s}
 .toast.on{transform:none;opacity:1}
+.toast button{border:0;background:none;color:#FFB37A;font-weight:800;min-height:44px;margin-block:-12px;padding-inline:4px;text-decoration:underline;text-underline-offset:3px}
 .toast a{color:#FFB37A;font-weight:800;display:inline-flex;align-items:center;min-height:44px;margin-block:-12px;padding-inline:4px}
 
 /* ── responsive ─────────────────────────────────── */
@@ -335,7 +339,7 @@ footer a{color:#fff;font-weight:800;display:inline-flex;align-items:center;min-h
   .mSearch{display:flex}
   .two{grid-template-columns:1fr}
   .toast{bottom:calc(var(--tabH) + 14px + env(safe-area-inset-bottom))}
-  .pageHead .wrap{padding-top:16px}
+  .pageHead .wrap{padding-top:6px}
 }
 @media(max-width:360px){.grid{grid-template-columns:1fr}.buy{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -670,58 +674,58 @@ const T = {
     popularQ:['كرسي متحرك','حفاضات كبار','أوكسجين','جهاز ضغط','مشاية','جهاز سكر'],
     secDepts:'تسوّق حسب الحاجة', secDeptsP:'الأقسام مرتّبة حسب حاجة المريض، مو حسب نوع المنتج.',
     secSvc:'شنو نصحك فريق سليم بالزيارة؟', secSvcP:'المستلزمات اللي عادةً يطلبها الطبيب أو الممرض أو المعالج.',
-    secRent:'استأجر بدل ما تشتري', secRentP:'أجهزة غالية تحتاجها لفترة محدودة — إيجار شهري.',
-    secRefill:'توصيل شهري', secRefillP:'مستلزمات تخلص كل شهر — نرسلها لك بدون ما تطلب كل مرة.',
+    secRent:'استأجر بدل ما تشتري', secRentP:'أجهزة غالية تحتاجها لفترة محدودة، بإيجار شهري.',
+    secRefill:'توصيل شهري', secRefillP:'مستلزمات تخلص كل شهر. نرسلها لك بدون ما تطلب كل مرة.',
     secKits:'أطقم رعاية جاهزة', secKitsP:'كل اللي تحتاجه لحالة وحدة، بضغطة وحدة.', secRecent:'شفتها مؤخراً',
     secHow:'شلون تطلب؟', seeAll:'شوف الكل', notSure:'مو متأكد؟', products:'المنتجات',
-    grpEquip:'أجهزة ومعدّات للبيت', grpCare:'مستلزمات الرعاية اليومية', grpLiving:'التعافي والحياة اليومية', clinicRow:'للعيادات والمراكز — أسعار جملة بعرض سعر',
+    grpEquip:'أجهزة ومعدّات للبيت', grpCare:'مستلزمات الرعاية اليومية', grpLiving:'التعافي والحياة اليومية', clinicRow:'للعيادات والمراكز: أسعار جملة بعرض سعر',
     bPrev:'الإعلان السابق', bNext:'الإعلان التالي', bDot:'إعلان {i} من {n}',
-    how:[['اختار المستلزمات','أضف اللي تحتاجه لطلبك — شراء أو إيجار أو توصيل شهري.'],['أرسل الطلب على واتساب','اكتب اسمك ورقمك ومنطقتك، والطلب يوصل لفريقنا برسالة وحدة.'],['نأكد وياك ونوصّل','نرجعلك بالسعر والتوفّر، وشركة التوصيل توصله لباب البيت.']],
+    how:[['اختار المستلزمات','أضف اللي تحتاجه لطلبك: شراء أو إيجار أو توصيل شهري.'],['أرسل الطلب على واتساب','اكتب اسمك ورقمك ومنطقتك، والطلب يوصل لفريقنا برسالة وحدة.'],['نأكد وياك ونوصّل','نرجعلك بالسعر والتوفّر، وشركة التوصيل توصله لباب البيت.']],
     svc:{doctor:['زيارة طبيب','دعامات وأجهزة قياس ومستلزمات بعد الفحص'],nursing:['تمريض منزلي','ضمادات وقساطر وحفاضات وأدوات رعاية المريض'],physio:['علاج طبيعي','أدوات مشي وتمارين وأجهزة تخفيف الألم'],lab:['تحليل منزلي','شرائح فحص ومستلزمات سحب الدم']},
     svcTitle:'مستلزمات ترافق {s}', svcSub:'كل المستلزمات اللي عادةً يطلبها فريق سليم وياها.', items:'منتج', itemsN:'{n} منتج',
     deptsTitle:'كل الأقسام', deptsSub:'اختار القسم، وبعدين القسم الفرعي.',
     all:'الكل', show:'عرض:', fAll:'الكل', fBuy:'شراء', fRent:'إيجار', fRefill:'شهري',
     sort:'الترتيب', sortRec:'الأكثر حاجة أولاً', sortAz:'أبجدياً',
     found:'<b>{n}</b> منتج', loadMore:'عرض المزيد', noneT:'ما لكينا منتجات', noneP:'جرّب كلمة ثانية أو تصفّح الأقسام.',
-    srchTitle:'البحث', srchFor:'نتائج «{q}»', srchEmptyT:'شنو تدور عليه؟', srchEmptyP:'اكتب اسم الجهاز أو المستلزم — بالعربي أو بالإنكليزي.',
+    srchTitle:'البحث', srchFor:'نتائج «{q}»', srchEmptyT:'شنو تدور عليه؟', srchEmptyP:'اكتب اسم الجهاز أو المستلزم، بالعربي أو بالإنكليزي.',
     srchNoneT:'ما لكينا «{q}»', srchNoneP:'جرّب كلمة أقصر، أو اسألنا على واتساب ونلكاه إلك.',
     rentT:'متوفّر للإيجار', refillT:'متوفّر بالتوصيل الشهري',
-    bRent:'إيجار', bRefill:'شهري', bQuote:'عرض سعر',
+    bRent:'إيجار', bRefill:'توصيل شهري', bQuote:'عرض سعر', priceAsk:'السعر على واتساب', removed:'انشال {p} من طلبك', undo:'تراجع',
     add:'أضف للطلب', addQuote:'أضف لعرض السعر', addRent:'استأجره', addRefill:'اطلبه شهرياً', added:'انضاف لطلبك', addedAs:'انضاف لطلبك: {m}', merged:'انضمّ للسطر «{m}» اللي بطلبك', view:'شوف الطلب',
-    why:'ليش يحتاجه المريض؟', usedWith:'يطلبه عادةً فريق سليم وياه:', how2:'شلون تريده؟',
+    why:'ليش يحتاجه المريض؟', usedWith:'يطلبه عادةً فريق سليم بهذي الزيارات:', how2:'شلون تريده؟',
     mBuy:['شراء','يصير ملكك.'], mRent:['إيجار شهري','يوصلك وينرجع ينستلم بعد ما تخلص.'], mRefill:['توصيل شهري','يوصلك كل شهر بنفس الكمية، وتكدر توقفه بأي وقت.'], mQuote:['عرض سعر للعيادة','نرسل لك سعر الجملة والتوفّر.'],
-    qty:'الكمية', price:'السعر يأكده فريقنا على واتساب قبل التوصيل — ما تدفع شي هسه.', clinicNote:'هذا القسم للعيادات والمراكز — الأسعار جملة وبعرض سعر لكل طلب.',
-    photoNote:'صورة مرجعية — العلامة والموديل ممكن تختلف.', moreIn:'من نفس القسم',
+    qty:'الكمية', price:'السعر يأكده فريقنا على واتساب قبل التوصيل. ما تدفع شي هسه.', clinicNote:'هذا القسم للعيادات والمراكز. الأسعار جملة، وبعرض سعر لكل طلب.',
+    photoNote:'صورة مرجعية. العلامة والموديل ممكن تختلف.', moreIn:'من نفس القسم',
     orderTitle:'طلبي', orderSub:'راجع المستلزمات واكتب معلوماتك، والطلب يوصل لفريق سليم على واتساب.',
     yourItems:'المستلزمات', emptyT:'طلبك فارغ', emptyP:'تصفّح الأقسام وأضف اللي تحتاجه.', remove:'حذف',
     total:'بطلبك', totalN:'{n} منتج', totalNQ:'{n} منتج · {q} قطعة', details:'معلوماتك', detailsP:'منو نتواصل وياه، ووين شركة التوصيل توصّل الطلب.',
-    fName:'اسمك', fNameHint:'الشخص اللي نتواصل وياه — مو لازم يكون المريض.', fPhone:'رقم الموبايل (واتساب)', fArea:'منطقة التوصيل', fAreaPh:'مثلاً: المنصور، الكرادة، زيونة', fAddr:'أقرب نقطة دالّة للتوصيل', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
+    fName:'اسمك', fNameHint:'الشخص اللي نتواصل وياه، مو لازم يكون المريض.', fPhone:'رقم الموبايل (واتساب)', fArea:'منطقة التوصيل', fAreaPh:'مثلاً: المنصور، الكرادة، زيونة', fAddr:'أقرب نقطة دالّة للتوصيل', fNotes:'ملاحظات', fClinic:'اسم العيادة أو الشركة', opt:'(اختياري)',
     fNotesPh:'لمن الطلب، المقاس، أو أي شي لازم نعرفه', eName:'اكتب الاسم', ePhone:'اكتب رقم عراقي صحيح، مثلاً 07701234567', eArea:'اكتب المنطقة',
     send:'أرسل الطلب على واتساب', sendNote:'ما تدفع شي هسه. فريقنا يأكد السعر والتوفّر والتوصيل وياك قبل ما يتأكد الطلب.',
     sentT:'آخر خطوة: اضغط «إرسال» بواتساب', sentP:'فريقنا يرد عليك من الرقم {phone} بالسعر وموعد التوصيل.', sentItems:'اللي بالرسالة', sentAgain:'واتساب ما انفتح؟ افتحه مرة ثانية', sentNew:'ابدأ طلب جديد', sentBack:'عدّل الطلب', orderNoL:'رقم طلبك',
     newConfirm:'تمسح هذي القائمة وتبدأ طلب جديد؟', newYes:'امسح وابدأ من جديد', newNo:'لا، خلّيها',
-    sentSame:'أرسلت هذا الطلب ({no}) الساعة {time}. إذا ترسله مرة ثانية يروح بنفس الرقم.', sentChanged:'أرسلت الطلب {no} الساعة {time}، وبعدها غيّرت عليه. التغييرات ما وصلت بعد — أرسله مرة ثانية.', sentShow:'شوف اللي أرسلته',
+    sentSame:'أرسلت هذا الطلب ({no}) الساعة {time}. إذا ترسله مرة ثانية يروح بنفس الرقم.', sentChanged:'أرسلت الطلب {no} الساعة {time}، وبعدها غيّرت عليه. التغييرات ما وصلت بعد، أرسله مرة ثانية.', sentShow:'شوف اللي أرسلته',
     msgHead:'طلب من متجر سليم', msgNo:'رقم الطلب', msgUpdates:'يحدّث الطلب', msgName:'الاسم', msgPhone:'الرقم', msgArea:'المنطقة', msgAddr:'العنوان', msgClinic:'العيادة', msgItems:'المستلزمات', msgNotes:'ملاحظات', msgPay:'الدفع', msgRemind:'ذكّروني بالتجديد بعد {d} يوم', msgDiscount:'خصم الكمية', msgDelivery:'التوصيل', msgTotal:'المجموع التقريبي', msgFoot:'رجاءً أكدوا التوفّر والسعر والتوصيل.',
     askMsg:'مرحبا، عندي سؤال عن متجر سليم للمستلزمات الطبية.',
     bOut:'غير متوفر', askAvail:'اسأل عن التوفّر', askOut:'مرحبا، أريد أسأل متى يتوفّر: {p}', outNote:'هذا المنتج غير متوفر حالياً. راسلنا ونخبرك أول ما يوصل.',
     orRent:'أو إيجار {p} بالشهر', rentFrom:'إيجار من {p} بالشهر', perMonth:'بالشهر', perDelivery:'لكل توصيلة',
-    priceSet:'السعر المعروض تقريبي ويأكده فريقنا على واتساب قبل التوصيل — ما تدفع شي هسه.',
-    estimate:'المجموع التقريبي', subtotal:'المستلزمات', bulkOff:'خصم الكمية', deliveryFee:'التوصيل', estAll:'فريقنا يأكد السعر النهائي والتوصيل على واتساب.', estPartial:'بعض المنتجات بدون سعر — فريقنا يكمّل السعر على واتساب.',
-    previewing:'معاينة — هذي تعديلات لوحة الإدارة اللي ما انتشرت بعد. محد يشوفها غيرك.', previewExit:'عرض المتجر المنشور',
-    foot:'متجر سليم للمستلزمات الطبية المنزلية — شركة المستقبل السليم للخدمات الصحية المحدودة. الصور مرجعية بهذي النسخة التجريبية.', footWa:'واتساب: ',
+    priceSet:'السعر المعروض تقريبي ويأكده فريقنا على واتساب قبل التوصيل. ما تدفع شي هسه.',
+    estimate:'المجموع التقريبي', subtotal:'المستلزمات', bulkOff:'خصم الكمية', deliveryFee:'التوصيل', estAll:'فريقنا يأكد السعر النهائي والتوصيل على واتساب.', estPartial:'بعض المنتجات بدون سعر، وفريقنا يكمّل السعر على واتساب.',
+    previewing:'معاينة: هذي تعديلات لوحة الإدارة اللي ما انتشرت بعد. محد يشوفها غيرك.', previewExit:'عرض المتجر المنشور',
+    foot:'متجر سليم للمستلزمات الطبية المنزلية، من شركة المستقبل السليم للخدمات الصحية المحدودة. الصور مرجعية بهذي النسخة التجريبية.', footWa:'واتساب: ',
     // new
     payT:'طرق الدفع', payWith:'طرق الدفع: {m}', payField:'شلون تحب تدفع؟',
     nurseT:'محتار؟ اسأل ممرضتنا', nurseP:'نجاوبك على واتساب ونساعدك تختار.', nurseBtn:'اسأل الممرضة', nurseMsg:'مرحبا، أحتاج مساعدة أختار مستلزمات طبية.', nurseMsgP:'مرحبا، عندي سؤال عن: {p}',
     finderT:'ساعدني أختار', finderP:'جاوب سؤال واحد ونقترح عليك الأطقم والأقسام المناسبة.', finderQ:'شنو الحالة؟', finderFor:'لـ: {s}', finderKits:'أطقم تناسب هذي الحالة', finderDepts:'أقسام تفيدك', finderAgain:'ابدأ من جديد', finderGo:'ابدأ',
     kitsTitle:'أطقم رعاية جاهزة', kitsSub:'مجموعة مستلزمات لحالة وحدة، اخترناها حسب خبرة فريق سليم. تكدر تعدّلها بعد ما تضيفها.',
-    kitItems:'{n} منتج', kitFrom:'من {p}', kitAdd:'أضف الطقم كامل للطلب', kitAddN:'أضف {n} منتجات للطلب', kitPick:'شيل العلامة عن اللي عندك من قبل.', kitNone:'اختار منتج واحد على الأقل', kitAdded:'انضاف الطقم لطلبك', kitAlready:'هذا الطقم بطلبك من قبل', kitInOrder:'الطقم بطلبك — شوف الطلب', kitInclude:'ضيف {p}', kitOut:'غير متوفر حالياً — ما راح ينضاف', kitIncl:'شنو بالطقم',
+    kitItems:'{n} منتج', kitFrom:'من {p}', kitAdd:'أضف الطقم كامل للطلب', kitAddN:'أضف {n} منتجات للطلب', kitPick:'شيل العلامة عن اللي عندك من قبل.', kitNone:'اختار منتج واحد على الأقل', kitAdded:'انضاف الطقم لطلبك', kitAlready:'هذا الطقم بطلبك من قبل', kitInOrder:'الطقم بطلبك. شوف الطلب', kitInclude:'ضيف {p}', kitOut:'غير متوفر حالياً، ما راح ينضاف', kitIncl:'شنو بالطقم',
     rentTerms:'شروط الإيجار', rentMin:'أقل مدة: {n} شهر', rentDeposit:'التأمين: {p} يرجعلك بعد الإرجاع', rentIncl:'يشمل: {s}',
     soldBy:'يجهّزه', share:'شارك', shareMsg:'شوف هذا بمتجر سليم: {p}', copied:'انتسخ الرابط',
     bulkT:'خصم الكميات', bulkLine:'{n} قطعة أو أكثر: خصم {p}٪',
     clinicBox:'أطلب لعيادة أو مركز أو منظمة',
     remind:'ذكّروني على واتساب لما يقرب وقت التجديد ({d} يوم)',
     againT:'طلبك السابق', againP:'{n} منتج · {d}', againBtn:'اطلب نفسه مرة ثانية', againDone:'انضافت {n} منتجات من طلبك السابق',
-    reorderT:'تجديد الطلب', reorderDone:'انضافت {n} منتجات لطلبك — راجعها وأرسل.', reorderNone:'المنتجات بهذا الرابط ما عادت متوفرة.',
+    reorderT:'تجديد الطلب', reorderDone:'انضافت {n} منتجات لطلبك. راجعها وأرسل.', reorderNone:'المنتجات بهذا الرابط ما عادت متوفرة.',
     deliveryNote:'{t} — {n}',
   },
   en: {
@@ -733,57 +737,57 @@ const T = {
     popularQ:['Wheelchair','Adult diapers','Oxygen','Blood pressure','Walker','Glucometer'],
     secDepts:'Shop by need', secDeptsP:'Departments are organised around what the patient needs, not product type.',
     secSvc:'What did your Saleem visit recommend?', secSvcP:'Supplies our doctors, nurses and physiotherapists usually ask for.',
-    secRent:'Rent instead of buying', secRentP:'Costly equipment you only need for a while — rented by the month.',
-    secRefill:'Monthly refills', secRefillP:'Supplies that run out every month — sent to you without reordering.',
+    secRent:'Rent instead of buying', secRentP:'Costly equipment you only need for a while, rented by the month.',
+    secRefill:'Monthly refills', secRefillP:'Supplies that run out every month, sent to you without reordering.',
     secKits:'Ready-made care kits', secKitsP:'Everything for one situation, in one tap.', secRecent:'Recently viewed',
     secHow:'How ordering works', seeAll:'See all', notSure:'Not sure?', products:'Products',
-    grpEquip:'Equipment for the home', grpCare:'Everyday care supplies', grpLiving:'Recovery & daily living', clinicRow:'For clinics and centres — wholesale, by quote',
+    grpEquip:'Equipment for the home', grpCare:'Everyday care supplies', grpLiving:'Recovery & daily living', clinicRow:'For clinics and centres: wholesale, by quote',
     bPrev:'Previous banner', bNext:'Next banner', bDot:'Banner {i} of {n}',
-    how:[['Pick your supplies','Add what you need to your order — to buy, rent, or refill monthly.'],['Send it on WhatsApp','Add your name, number and area, and your order reaches our team in one message.'],['We confirm, it’s delivered','We come back with price and stock, and our delivery partner brings it to your door.']],
+    how:[['Pick your supplies','Add what you need to your order, to buy, rent, or refill monthly.'],['Send it on WhatsApp','Add your name, number and area, and your order reaches our team in one message.'],['We confirm, it’s delivered','We come back with price and stock, and our delivery partner brings it to your door.']],
     svc:{doctor:['Doctor visit','Braces, monitors and supplies after an examination'],nursing:['Home nursing','Dressings, catheters, diapers and bedside care'],physio:['Physiotherapy','Walking aids, exercise kit and pain relief'],lab:['Home lab test','Test strips and blood-draw supplies']},
     svcTitle:'Supplies for a {s}', svcSub:'Everything Saleem’s team usually recommends alongside it.', items:'items', itemsN:'{n} items',
     deptsTitle:'All departments', deptsSub:'Pick a department, then a section.',
     all:'All', show:'Show:', fAll:'All', fBuy:'Buy', fRent:'Rent', fRefill:'Monthly',
     sort:'Sort', sortRec:'Most needed first', sortAz:'A–Z',
     found:'<b>{n}</b> items', loadMore:'Show more', noneT:'No products here', noneP:'Try another word, or browse the departments.',
-    srchTitle:'Search', srchFor:'Results for “{q}”', srchEmptyT:'What are you looking for?', srchEmptyP:'Type a device or supply name — in English or Arabic.',
+    srchTitle:'Search', srchFor:'Results for “{q}”', srchEmptyT:'What are you looking for?', srchEmptyP:'Type a device or supply name, in English or Arabic.',
     srchNoneT:'Nothing found for “{q}”', srchNoneP:'Try a shorter word, or ask us on WhatsApp and we’ll find it for you.',
     rentT:'Available to rent', refillT:'Available as a monthly refill',
-    bRent:'Rent', bRefill:'Monthly', bQuote:'Quote',
+    bRent:'Rent', bRefill:'Monthly refill', bQuote:'Quote', priceAsk:'Price on WhatsApp', removed:'Removed {p} from your order', undo:'Undo',
     add:'Add to order', addQuote:'Add to quote', addRent:'Rent it', addRefill:'Get it monthly', added:'Added to your order', addedAs:'Added to your order: {m}', merged:'Combined with the “{m}” line already in your order', view:'View order',
-    why:'Why a patient needs it', usedWith:'Saleem’s team usually recommends it with:', how2:'How do you want it?',
-    mBuy:['Buy','It’s yours to keep.'], mRent:['Monthly rental','Delivered, and collected when you’re done.'], mRefill:['Monthly refill','Sent every month in the same quantity — stop any time.'], mQuote:['Clinic quote','We send you wholesale price and stock.'],
-    qty:'Quantity', price:'Our team confirms the price on WhatsApp before delivery — you pay nothing now.', clinicNote:'This department is for clinics and centres — wholesale prices, quoted per order.',
-    photoNote:'Reference photo — brand and model may differ.', moreIn:'More in this section',
+    why:'Why a patient needs it', usedWith:'Saleem’s team usually asks for it on these visits:', how2:'How do you want it?',
+    mBuy:['Buy','It’s yours to keep.'], mRent:['Monthly rental','Delivered, and collected when you’re done.'], mRefill:['Monthly refill','Sent every month in the same quantity. Stop any time.'], mQuote:['Clinic quote','We send you wholesale price and stock.'],
+    qty:'Quantity', price:'Our team confirms the price on WhatsApp before delivery. You pay nothing now.', clinicNote:'This department is for clinics and centres: wholesale prices, quoted per order.',
+    photoNote:'Reference photo. Brand and model may differ.', moreIn:'More in this section',
     orderTitle:'My order', orderSub:'Check your items, add your details, and your order goes to Saleem’s team on WhatsApp.',
     yourItems:'Items', emptyT:'Your order is empty', emptyP:'Browse the departments and add what you need.', remove:'Remove',
     total:'In your order', totalN:'{n} items', totalNQ:'{n} items · {q} pieces', details:'Your details', detailsP:'Who we contact, and where the delivery company brings the order.',
-    fName:'Your name', fNameHint:'The person we contact — not necessarily the patient.', fPhone:'Mobile number (WhatsApp)', fArea:'Delivery area', fAreaPh:'e.g. Mansour, Karrada, Zayouna', fAddr:'Nearest landmark for delivery', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
+    fName:'Your name', fNameHint:'The person we contact, not necessarily the patient.', fPhone:'Mobile number (WhatsApp)', fArea:'Delivery area', fAreaPh:'e.g. Mansour, Karrada, Zayouna', fAddr:'Nearest landmark for delivery', fNotes:'Notes', fClinic:'Clinic or company name', opt:'(optional)',
     fNotesPh:'Who it’s for, sizes, anything we should know', eName:'Enter your name', ePhone:'Enter a valid Iraqi number, e.g. 07701234567', eArea:'Enter your area',
     send:'Send order on WhatsApp', sendNote:'You pay nothing now. Our team confirms price, stock and delivery with you before the order is final.',
     sentT:'Last step: press Send in WhatsApp', sentP:'Our team replies from {phone} with the price and a delivery time.', sentItems:'In the message', sentAgain:'WhatsApp didn’t open? Open it again', sentNew:'Start a new order', sentBack:'Edit the order', orderNoL:'Your order number',
     newConfirm:'Clear this list and start a new order?', newYes:'Clear it and start over', newNo:'No, keep it',
-    sentSame:'You sent this order ({no}) at {time}. Sending it again keeps the same number.', sentChanged:'You sent order {no} at {time}, then changed it. The changes haven’t been sent — send it again.', sentShow:'See what I sent',
+    sentSame:'You sent this order ({no}) at {time}. Sending it again keeps the same number.', sentChanged:'You sent order {no} at {time}, then changed it. The changes haven’t been sent, so send it again.', sentShow:'See what I sent',
     msgHead:'Saleem Store order', msgNo:'Order', msgUpdates:'Updates order', msgName:'Name', msgPhone:'Phone', msgArea:'Area', msgAddr:'Address', msgClinic:'Clinic', msgItems:'Items', msgNotes:'Notes', msgPay:'Payment', msgRemind:'Please remind me to refill in {d} days', msgDiscount:'Bulk discount', msgDelivery:'Delivery', msgTotal:'Estimated total', msgFoot:'Please confirm availability, price and delivery.',
     askMsg:'Hello, I have a question about Saleem’s medical supplies store.',
     bOut:'Out of stock', askAvail:'Ask about availability', askOut:'Hello, when will this be back in stock: {p}', outNote:'This item is out of stock right now. Message us and we’ll tell you as soon as it’s back.',
     orRent:'or rent for {p} / month', rentFrom:'Rent from {p} / month', perMonth:'/ month', perDelivery:'per delivery',
-    priceSet:'Prices shown are a guide; our team confirms on WhatsApp before delivery — you pay nothing now.',
-    estimate:'Estimated total', subtotal:'Items', bulkOff:'Bulk discount', deliveryFee:'Delivery', estAll:'Our team confirms the final price and delivery on WhatsApp.', estPartial:'Some items have no price yet — our team will complete it on WhatsApp.',
-    previewing:'Preview — unpublished changes from the admin portal. Only you can see this.', previewExit:'View the published shop',
-    foot:'Saleem Store for home medical supplies — Almostaqbal Alsaleem for Healthcare Services LLC. Photos are references in this prototype.', footWa:'WhatsApp: ',
+    priceSet:'Prices shown are a guide. Our team confirms on WhatsApp before delivery, and you pay nothing now.',
+    estimate:'Estimated total', subtotal:'Items', bulkOff:'Bulk discount', deliveryFee:'Delivery', estAll:'Our team confirms the final price and delivery on WhatsApp.', estPartial:'Some items have no price yet. Our team will complete it on WhatsApp.',
+    previewing:'Preview: unpublished changes from the admin portal. Only you can see this.', previewExit:'View the published shop',
+    foot:'Saleem Store for home medical supplies, by Almostaqbal Alsaleem for Healthcare Services LLC. Photos are references in this prototype.', footWa:'WhatsApp: ',
     payT:'Payment', payWith:'Ways to pay: {m}', payField:'How would you like to pay?',
     nurseT:'Not sure? Ask our nurse', nurseP:'We answer on WhatsApp and help you choose.', nurseBtn:'Ask our nurse', nurseMsg:'Hello, I need help choosing medical supplies.', nurseMsgP:'Hello, I have a question about: {p}',
     finderT:'Help me choose', finderP:'Answer one question and we’ll suggest the right kits and departments.', finderQ:'What’s the situation?', finderFor:'For: {s}', finderKits:'Kits for this situation', finderDepts:'Departments that help', finderAgain:'Start over', finderGo:'Start',
     kitsTitle:'Ready-made care kits', kitsSub:'A set of supplies for one situation, chosen from Saleem’s care experience. You can change it once it’s in your order.',
-    kitItems:'{n} items', kitFrom:'from {p}', kitAdd:'Add the whole kit to my order', kitAddN:'Add {n} items to my order', kitPick:'Untick anything you already have.', kitNone:'Tick at least one item', kitAdded:'Kit added to your order', kitAlready:'This kit is already in your order', kitInOrder:'The kit is in your order — view it', kitInclude:'Include {p}', kitOut:'Out of stock right now — won’t be added', kitIncl:'What’s in the kit',
+    kitItems:'{n} items', kitFrom:'from {p}', kitAdd:'Add the whole kit to my order', kitAddN:'Add {n} items to my order', kitPick:'Untick anything you already have.', kitNone:'Tick at least one item', kitAdded:'Kit added to your order', kitAlready:'This kit is already in your order', kitInOrder:'The kit is in your order. View it', kitInclude:'Include {p}', kitOut:'Out of stock right now, so it won’t be added', kitIncl:'What’s in the kit',
     rentTerms:'Rental terms', rentMin:'Minimum: {n} month(s)', rentDeposit:'Deposit: {p}, returned when it comes back', rentIncl:'Includes: {s}',
     soldBy:'Supplied by', share:'Share', shareMsg:'Have a look at this on Saleem Store: {p}', copied:'Link copied',
     bulkT:'Bulk pricing', bulkLine:'{n}+ pieces: {p}% off',
     clinicBox:'I’m ordering for a clinic, centre or organisation',
     remind:'Remind me on WhatsApp when it’s time to refill ({d} days)',
     againT:'Your last order', againP:'{n} items · {d}', againBtn:'Order the same again', againDone:'Added {n} items from your last order',
-    reorderT:'Reorder', reorderDone:'Added {n} items to your order — check them and send.', reorderNone:'The items in this link aren’t available any more.',
+    reorderT:'Reorder', reorderDone:'Added {n} items to your order. Check them and send.', reorderNone:'The items in this link aren’t available any more.',
     deliveryNote:'{t} — {n}',
   }
 };
@@ -881,7 +885,8 @@ function photo(p, w){
   if(!ph.src) return `<div class="ph noimg">${fb}</div>`;
   return `<div class="ph ${ph.placeholder ? 'web' : 'own'}">${fb}<img src="${esc(ph.src)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>`;
 }
-// a thumbnail that fails to load falls back to the department icon behind it
+// a photo shows once it has loaded; until then (or if it fails) the department icon behind it does
+document.addEventListener('load', e => { if(e.target.tagName === 'IMG' && e.target.closest('.ph')) e.target.classList.add('in'); }, true);
 document.addEventListener('error', e => {
   if(e.target.tagName === 'IMG'){ const ph = e.target.closest('.ph'); if(ph) ph.classList.add('noimg'); }
 }, true);
@@ -914,7 +919,7 @@ function priceLine(p, mode){
   const rent = p.rent && rentOn() && p.rentPrice;
   if(p.price) return `<p class="price">${fmtIqd(p.price)}${rent ? `<small>${t('orRent', {p: fmtIqd(p.rentPrice)})}</small>` : ''}</p>`;
   if(rent) return `<p class="price">${t('rentFrom', {p: fmtIqd(p.rentPrice)})}</p>`;
-  return '';
+  return `<p class="price ask">${t('priceAsk')}</p>`;
 }
 
 function card(p, want){
@@ -988,6 +993,7 @@ function render(){
 function onRoute(){
   const key = location.hash;
   if(quietHash === key){ quietHash = null; return; }
+  hideToast();
   // back/forward restores how far you'd scrolled and how many cards were open
   shown = freshNav ? CONFIG.pageSize : (shownMemo[key] || CONFIG.pageSize);
   render();
@@ -1225,7 +1231,7 @@ function pageHead({ crumbs = [], title, sub, iconId, tabs = '' }){
 }
 
 // filter + sort + grid, shared by department, service, collection and search views
-function listing(items, { base, qs, filters = true, sortable = true, chips = '', mode }){
+function listing(items, { base, qs, filters = true, sortable = true, chips = '', mode, noSub }){
   const f = qs.get('show') || '', sort = qs.get('sort') || '';
   let list = items;
   if(f === 'buy')    list = list.filter(p => !p.b2b);
@@ -1237,7 +1243,7 @@ function listing(items, { base, qs, filters = true, sortable = true, chips = '',
     ? `<div class="seg" role="group" aria-label="${esc(t('show'))}">${['', ...avail].map(k => `<button type="button" data-filter="${k}" aria-pressed="${f === k}">${t({'':'fAll', buy:'fBuy', rent:'fRent', refill:'fRefill'}[k])}</button>`).join('')}</div>` : '<span></span>';
   const sorter = sortable ? `<label><span class="sr">${t('sort')}</span><select class="sel" data-sort><option value="">${t('sortRec')}</option><option value="az" ${sort === 'az' ? 'selected' : ''}>${t('sortAz')}</option></select></label>` : '';
   const grid = list.length
-    ? `<h2 class="sr">${t('products')}</h2><div class="grid">${list.slice(0, shown).map(cardAs(mode || (f === 'rent' || f === 'refill' ? f : ''))).join('')}</div>${list.length > shown ? `<div class="loadMore"><button type="button" class="btn ghost" data-more>${t('loadMore')} (${num(list.length - shown)})</button></div>` : ''}`
+    ? `<h2 class="sr">${t('products')}</h2><div class="grid ${noSub ? 'noSub' : ''}">${list.slice(0, shown).map(cardAs(mode || (f === 'rent' || f === 'refill' ? f : ''))).join('')}</div>${list.length > shown ? `<div class="loadMore"><button type="button" class="btn ghost" data-more>${t('loadMore')} (${num(list.length - shown)})</button></div>` : ''}`
     : `<div class="empty"><span class="dIcon">${icon('i-search')}</span><strong>${t('noneT')}</strong><p>${t('noneP')}</p><a class="btn ghost" href="#/departments">${t('browse')}</a></div>`;
   return `<div class="wrap">${chips}<div class="tools">${seg}<div style="display:flex;gap:10px;align-items:center"><span class="found">${t('found', {n: num(list.length)})}</span>${sorter}</div></div>${grid}</div>`;
 }
@@ -1253,7 +1259,7 @@ function viewDept(d, subKey, qs){
   const crumbs = [['#/', t('tHome')], ['#/departments', t('tDepts')], ...(sub ? [['#/d/' + d.key, L(d)]] : [])];
   const note = d.key === 'clinic' ? `<div class="wrap"><div class="note" style="margin-bottom:0">${icon('i-quote')}<span>${t('clinicNote')}</span></div></div>` : '';
   return pageHead({ crumbs, title: sub ? L(sub) : L(d), sub: sub ? esc(L(d)) : esc(lang === 'ar' ? d.blurbAr : d.blurbEn), iconId: 'd-' + d.icon, tabs })
-       + note + listing(items, { base: '#/d/' + d.key + (sub ? '/' + sub.key : ''), qs });
+       + note + listing(items, { base: '#/d/' + d.key + (sub ? '/' + sub.key : ''), qs, noSub: !!sub });
 }
 
 function deptChips(items, base, qs){
@@ -1321,7 +1327,7 @@ function viewProduct(p){
   if(payments().length && !p.b2b) more.push(`<div class="fact">${icon('i-card')}<span>${esc(t('payWith', {m: payments().map(m => L(m)).join(' · ')}))}</span></div>`);
   const facts = more.length ? `<details class="facts"><summary>${icon(S.delivery.on ? 'i-truck' : 'i-card')}<span>${S.delivery.on ? `<b>${esc(L(S.delivery))}</b>` : t('payT')}</span>${icon('i-chev', 'ic more')}</summary>${more.join('')}</details>` : '';
   return `<div class="wrap pdPage">
-    <nav class="crumbs" aria-label="Breadcrumb" style="margin-top:18px"><a href="#/departments">${t('tDepts')}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}">${esc(L(d))}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}/${s.key}">${esc(L(s))}</a></nav>
+    <nav class="crumbs" aria-label="Breadcrumb" style="margin-top:8px"><a href="#/departments">${t('tDepts')}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}">${esc(L(d))}</a>${icon('i-chev', 'ic flip')}<a href="#/d/${d.key}/${s.key}">${esc(L(s))}</a></nav>
     <div class="pd">
       <div class="pdPhoto">${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
       <div class="pInfo" data-product="${p.id}">
@@ -1404,7 +1410,7 @@ function viewOrder(){
         ${tt.off ? `<div class="sum small"><span>${t('bulkOff')}</span><span>−${fmtIqd(tt.off)}</span></div>` : ''}
         ${tt.fee ? `<div class="sum small"><span>${t('deliveryFee')}</span><span>${fmtIqd(tt.fee)}</span></div>` : ''}
         <div class="sum est"><span>${t('estimate')}</span><span>${fmtIqd(tt.total)}</span></div><p class="estNote">${t(tt.all ? 'estAll' : 'estPartial')}</p>` : ''}
-      ${S.delivery.on ? `<div class="facts"><div class="fact">${icon('i-truck')}<span><b>${esc(L(S.delivery))}</b> — ${esc(LF(S.delivery, 'note'))}</span></div></div>` : ''}
+      ${S.delivery.on ? `<div class="facts"><div class="fact">${icon('i-truck')}<span><b>${esc(L(S.delivery))}</b> · ${esc(LF(S.delivery, 'note'))}</span></div></div>` : ''}
     </section>
     <form class="panel" id="orderForm" novalidate><h2>${t('details')}</h2><p>${t('detailsP')}</p>
       ${f('name', t('fName'), 'text', 'autocomplete="name" required aria-describedby="nameHint"').replace('</span>', `</span><small class="hint" id="nameHint">${t('fNameHint')}</small>`)}
@@ -1437,12 +1443,14 @@ function refreshControls(id){
   $$(`[data-card="${id}"]`).forEach(c => c.querySelector('.cFoot').innerHTML = addControl(BYID.get(String(id)), c.dataset.mode));
 }
 
-let toastT;
-function toast(msg){
+let toastT, undoFn = null;
+function toast(msg, undo){
   const el = $('#toast');
-  el.innerHTML = `<span>${esc(msg)}</span>${parse().parts[0] !== 'order' ? `<a href="#/order">${t('view')}</a>` : ''}`;
-  el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600);
+  undoFn = undo || null;
+  el.innerHTML = `<span>${esc(msg)}</span>${undo ? `<button type="button" data-undo>${t('undo')}</button>` : parse().parts[0] !== 'order' ? `<a href="#/order">${t('view')}</a>` : ''}`;
+  el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(hideToast, undo ? 6000 : 2600);
 }
+function hideToast(){ $('#toast').classList.remove('on'); undoFn = null; }
 
 function paintCounts(){ $$('[data-count]').forEach(el => { el.textContent = num(pieces()); el.dataset.n = pieces(); }); }
 
@@ -1518,8 +1526,11 @@ document.addEventListener('click', e => {
   if(b.dataset.add){ const [id, mode] = b.dataset.add.split('|'); setQty(id, mode, 1); refreshControls(id); toast(addedMsg(BYID.get(id), mode)); return; }
   const line = b.closest('[data-line]');
   if(line && (b.hasAttribute('data-inc') || b.hasAttribute('data-dec') || b.hasAttribute('data-rm'))){
-    const [id, mode] = line.dataset.line.split('|'), q = qtyOf(id, mode);
-    setQty(id, mode, b.hasAttribute('data-rm') ? 0 : q + (b.hasAttribute('data-inc') ? 1 : -1));
+    const [id, mode] = line.dataset.line.split('|'), q = qtyOf(id, mode), at = cart.findIndex(l => l.id === id && l.mode === mode);
+    const to = b.hasAttribute('data-rm') ? 0 : q + (b.hasAttribute('data-inc') ? 1 : -1);
+    setQty(id, mode, to);
+    // taking a line out can be undone from the toast, back in the same place
+    if(!to && q) toast(t('removed', {p: pName(BYID.get(id))}), () => { cart.splice(Math.min(at, cart.length), 0, {id, mode, qty: q}); saveCart(); });
     if(parse().parts[0] === 'order'){ const y = window.scrollY; render(); window.scrollTo(0, y); } else refreshControls(id);
     return;
   }
@@ -1528,6 +1539,11 @@ document.addEventListener('click', e => {
   }
   if(b.hasAttribute('data-padd') || b.hasAttribute('data-sticky-add')){ addFromProduct(); return; }
   if(b.hasAttribute('data-share')){ share(); return; }
+  if(b.hasAttribute('data-undo')){
+    const fn = undoFn; hideToast(); if(!fn) return; fn();
+    if(parse().parts[0] === 'order'){ const y = window.scrollY; render(); window.scrollTo(0, y); } else $$('[data-card]').forEach(c => refreshControls(c.dataset.card));
+    return;
+  }
   if(b.dataset.kit){ const k = kitById(b.dataset.kit); if(k){ addKit(k); } return; }
   if(b.hasAttribute('data-again')){ const o = lastOrder(); if(o){ const n = addLines(o.lines); freshNav = true; location.hash = '#/order'; setTimeout(() => toast(t('againDone', {n})), 50); } return; }
   if(b.dataset.bnav){ const tr = $('#bTrack'); goBanner(Math.round(Math.abs(tr.scrollLeft) / tr.clientWidth) + Number(b.dataset.bnav)); return; }
@@ -1633,6 +1649,7 @@ function afterRender(){
   // opening the Search tab on a phone puts the cursor straight in the box
   if(parse().parts[0] === 'search' && freshNav && !searchFocus && !parse().qs.get('q')){ const i = $('.mSearch input'); if(i && i.offsetParent) setTimeout(() => i.focus(), 50); }
   startBanners();
+  $$('.ph img').forEach(i => { if(i.complete && i.naturalWidth) i.classList.add('in'); });
   // the add-to-order bar is up on phones whenever the main button is off screen
   if(stickyObs){ stickyObs.disconnect(); stickyObs = null; }
   const btn = $('[data-padd]'), bar = $('#stickyBuy');
@@ -1657,7 +1674,7 @@ function applyLang(){
   const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(CONFIG.bizPhone) + '</bdi>'; fw.href = wa(t('askMsg'));
   if(S){
     previewBar();
-    $('#footDelivery').textContent = S.delivery.on ? (L(S.delivery)) + ' — ' + LF(S.delivery, 'note') : '';
+    $('#footDelivery').textContent = S.delivery.on ? (L(S.delivery)) + ' · ' + LF(S.delivery, 'note') : '';
     $('#footPays').innerHTML = payments().map(m => `<span>${esc(L(m))}</span>`).join('');
   }
 }

@@ -39,9 +39,9 @@
   /* ── site settings: every key always present, whatever an older file or the Sheet holds ── */
   const DEFAULT_SETTINGS = {
     publicUrl: '',
-    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال ١–٢ يوم', noteEn: 'By our delivery partner, across Baghdad', noteAr: 'عن طريق شركة التوصيل، داخل بغداد', feeIqd: null },
+    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال 1–2 يوم', noteEn: 'By our delivery partner, across Baghdad', noteAr: 'عن طريق شركة التوصيل، داخل بغداد', feeIqd: null },
     payments:  { cod: true, zaincash: true, qicard: true, fastpay: false, card: false },
-    rentals:   { on: true, minMonths: 1, depositEn: 'A refundable cash deposit may apply', depositAr: 'ممكن يكون في تأمين نقدي يرجعلك بعد الإرجاع', includedEn: 'Delivery and pickup', includedAr: 'التوصيل والاستلام' },
+    rentals:   { on: true, minMonths: 1, depositEn: 'Refundable deposit, amount confirmed on WhatsApp', depositAr: 'تأمين يرجعلك بعد الإرجاع، ومبلغه يتأكد على واتساب', includedEn: 'Delivery and pickup', includedAr: 'التوصيل والاستلام' },
     nurse:     { on: true, whatsapp: CFG.whatsapp || '' },
     finder:    { on: true },
     kits:      { on: true },

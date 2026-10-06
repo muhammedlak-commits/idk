@@ -190,7 +190,7 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
 .toast.on{transform:none;opacity:1}
 .toast.bad{background:var(--red)}
 .busy{position:fixed;inset:0;z-index:90;background:rgba(255,255,255,.7);display:grid;place-items:center;font-weight:800;color:var(--navy)}
-.busy div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 24px;box-shadow:var(--shadow)}
+.busy div{background:#fff;border-radius:14px;padding:18px 24px;box-shadow:var(--shadow)}
 
 @media(max-width:860px){
   .li.hd{display:none}
@@ -215,7 +215,7 @@ textarea.paste{width:100%;min-height:110px;border:1px solid #C9D7E3;border-radiu
 /* ── v3: stores, orders, kits, banners, settings ── */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .sc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:6px;position:relative}
-.sc:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.sc:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(0,36,68,.08)}
 .sc h3{font-size:16px}
 .sc .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--mut);font-size:12.5px}
 .sc .big{font:800 26px Montserrat,sans-serif;color:var(--navy)}
@@ -438,7 +438,7 @@ const T = {
     kitsT:'أطقم الرعاية', kitsP:'مجموعات منتجات لحالة وحدة تظهر بالمتجر. الزبون يضيف الطقم كامل بضغطة.', addKit:'طقم جديد', kitT:'طقم', kEn:'الاسم بالإنكليزي', kAr:'الاسم بالعربي', kBEn:'الوصف بالإنكليزي', kBAr:'الوصف بالعربي',
     kIcon:'الأيقونة', kSit:'يظهر بأداة «ساعدني أختار» لـ', kItems:'المنتجات', kAddItem:'أضف منتج', kOn:'ظاهر بالمتجر', kN:'{n} منتج', kDelAsk:'تحذف الطقم «{n}»؟', eKit:'الطقم يحتاج اسم ومنتج واحد على الأقل', kPick:'اكتب رقم أو اسم المنتج…', modes:{buy:'شراء', rent:'إيجار', refill:'شهري', quote:'عرض سعر'},
     // banners
-    bannersT:'البانرات', bannersP:'تظهر أعلى الصفحة الرئيسية وتتبدّل كل ٦ ثواني. كل بانر رابط — للإعلانات والعروض.', addBanner:'بانر جديد', bannerT:'بانر',
+    bannersT:'البانرات', bannersP:'تظهر أعلى الصفحة الرئيسية وتتبدّل كل 6 ثواني. كل بانر رابط — للإعلانات والعروض.', addBanner:'بانر جديد', bannerT:'بانر',
     bImg:'الصورة', bImgP:'1600×570 تقريباً. بدون صورة، البانر يكون بلون.', bTheme:'اللون', themes:{navy:'كحلي', orange:'برتقالي', green:'أخضر'},
     bEn:'العنوان بالإنكليزي', bAr:'العنوان بالعربي', bTEn:'النص بالإنكليزي', bTAr:'النص بالعربي', bCEn:'زر بالإنكليزي', bCAr:'زر بالعربي', bLink:'لوين يودّي', bCustom:'رابط ثاني', bCustomP:'#/p/21 لمنتج، أو https://… لموقع',
     bStart:'يبدأ', bEnd:'ينتهي', bOn:'ظاهر', bLive:'ظاهر هسه', bSched:'مجدول', bOff:'مخفي', bDelAsk:'تحذف هذا البانر؟', noBanners:'ماكو بانرات — المتجر يعرض الواجهة الافتراضية.',
