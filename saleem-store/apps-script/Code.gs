@@ -44,9 +44,11 @@ var PHOTO_FOLDER = 'Saleem Store photos';    // created in your Drive on the fir
 // Same names, same order as the admin portal's spreadsheet (js/admin-lib.js).
 var COLUMNS = [
   'id', 'name_en', 'name_ar', 'department', 'section', 'tier',
-  'buy_price_iqd', 'rent_price_iqd_month', 'rentable', 'monthly_refill', 'clinic_only',
-  'services', 'status', 'why_en', 'why_ar', 'photo_url', 'store', 'commission_pct', 'deposit_iqd'
+  'sell_price_iqd', 'rent_price_iqd_month', 'rentable', 'monthly_refill', 'clinic_only',
+  'services', 'status', 'why_en', 'why_ar', 'photo_url', 'store', 'vendors', 'commission_pct', 'deposit_iqd'
 ];
+// a column under an older heading is read and written as the new one (and renamed on the next save)
+var HEADING_ALIASES = { buy_price_iqd: 'sell_price_iqd' };
 var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active', 'logo_url', 'about_en', 'about_ar'];
 var ORDER_COLUMNS = ['id', 'created_at', 'status', 'name', 'phone', 'area', 'address', 'clinic', 'payment', 'notes', 'lang',
                      'remind', 'remind_on', 'reminded_at', 'items', 'est_total_iqd', 'commission_iqd', 'staff_note', 'lines_json', 'updated_at'];
@@ -160,7 +162,7 @@ function getSheet_() { return sheet_('Products', COLUMNS); }
 // header → column index, so staff can reorder columns or add their own
 function headerMap_(head, columns, required) {
   var m = {};
-  head.forEach(function (h, i) { var k = String(h).trim().toLowerCase(); if (columns.indexOf(k) !== -1 && !(k in m)) m[k] = i; });
+  head.forEach(function (h, i) { var k = String(h).trim().toLowerCase(); k = HEADING_ALIASES[k] || k; if (columns.indexOf(k) !== -1 && !(k in m)) m[k] = i; });
   (required || []).forEach(function (k) { if (!(k in m)) throw new Error('A sheet is missing its "' + k + '" column heading.'); });
   return m;
 }
@@ -169,7 +171,7 @@ function headerMap_(head, columns, required) {
 function writeRows_(sheet, columns, rows, keyCol, replace) {
   var values = sheet.getDataRange().getValues();
   var head = values[0], m = headerMap_(head, columns, [keyCol]);
-  columns.forEach(function (k) { if (!(k in m)) { m[k] = head.length; head.push(k); } });
+  columns.forEach(function (k) { if (!(k in m)) { m[k] = head.length; head.push(k); } else head[m[k]] = k; });
   var width = head.length;
   var grid = [head].concat(replace ? [] : values.slice(1)).map(function (r) { while (r.length < width) r.push(''); return r; });
   var rowOf = {};
@@ -213,26 +215,46 @@ function fromRow_(row, m) {
     id: id, en: en, ar: ar,
     dept: String(get('department')).trim(), sub: String(get('section')).trim(),
     tier: [1, 2, 3].indexOf(Number(get('tier'))) !== -1 ? Number(get('tier')) : 2,
-    price: money_(get('buy_price_iqd')), rentPrice: money_(get('rent_price_iqd_month')), deposit: money_(get('deposit_iqd')),
+    price: money_(get('sell_price_iqd')), rentPrice: money_(get('rent_price_iqd_month')), deposit: money_(get('deposit_iqd')),
     rent: yes_(get('rentable')), refill: yes_(get('monthly_refill')), b2b: yes_(get('clinic_only')),
     services: String(get('services')).split(/[,;|\/]/).map(function (s) { return s.trim().toLowerCase(); })
                 .filter(function (s) { return SERVICES.indexOf(s) !== -1; }),
     status: status === 'hidden' ? 'hidden' : (status === 'out_of_stock' || status === 'out') ? 'out' : 'available',
     whyEn: String(get('why_en')), whyAr: String(get('why_ar')),
-    img: String(get('photo_url')).trim(), store: String(get('store')).trim(),
+    img: String(get('photo_url')).trim(), offers: offers_(get('vendors'), get('store')),
     commission: pct_(get('commission_pct'))
   };
 }
-function publicProduct_(p) { var o = {}; for (var k in p) if (k !== 'commission') o[k] = p[k]; return o; }
+// every vendor of a product and our buying price from each, default first: "mitech=120000; al-nahrain"
+// The vendors column is PRIVATE (what we pay). store is the default vendor; a store missing from vendors is put first.
+function offers_(text, store) {
+  var seen = {}, out = [];
+  String(text == null ? '' : text).split(/[;\n،]+/).forEach(function (x) {
+    x = x.trim(); if (!x) return;
+    var m = x.match(/^(.+?)\s*[=:]\s*([\d,.\s]+)$/), id = (m ? m[1] : x).trim();
+    if (seen[id]) return; seen[id] = true;
+    out.push({ store: id, cost: m ? money_(m[2]) : null });
+  });
+  store = String(store == null ? '' : store).trim();
+  if (store) { var i = out.map(function (o) { return o.store; }).indexOf(store); var o = i === -1 ? { store: store, cost: null } : out.splice(i, 1)[0]; out.unshift(o); }
+  return out;
+}
+function offersText_(offers) { return (offers || []).map(function (o) { return o.cost ? o.store + '=' + o.cost : o.store; }).join('; '); }
+// the shop sees which stores sell it, never what we pay them or our commission
+function publicProduct_(p) {
+  var o = {}; for (var k in p) if (k !== 'commission' && k !== 'offers') o[k] = p[k];
+  o.stores = (p.offers || []).map(function (x) { return x.store; }); o.store = o.stores[0] || '';
+  return o;
+}
 
 function toCells_(p) {
   return {
     id: p.id, name_en: p.en, name_ar: p.ar, department: p.dept, section: p.sub, tier: p.tier,
-    buy_price_iqd: p.price || '', rent_price_iqd_month: p.rentPrice || '', deposit_iqd: p.deposit || '',
+    sell_price_iqd: p.price || '', rent_price_iqd_month: p.rentPrice || '', deposit_iqd: p.deposit || '',
     rentable: p.rent ? 'yes' : 'no', monthly_refill: p.refill ? 'yes' : 'no', clinic_only: p.b2b ? 'yes' : 'no',
     services: p.services.join(', '),
     status: p.status === 'out' ? 'out_of_stock' : p.status,
-    why_en: p.whyEn, why_ar: p.whyAr, photo_url: p.img, store: p.store,
+    why_en: p.whyEn, why_ar: p.whyAr, photo_url: p.img, store: p.offers.length ? p.offers[0].store : '', vendors: offersText_(p.offers),
     commission_pct: p.commission == null ? '' : p.commission
   };
 }
@@ -252,7 +274,10 @@ function clean_(p) {
     services: (p.services || []).filter(function (x) { return SERVICES.indexOf(x) !== -1; }),
     status: ['available', 'out', 'hidden'].indexOf(p.status) !== -1 ? p.status : 'available',
     whyEn: str_(p.whyEn, 1000), whyAr: str_(p.whyAr, 1000), img: img,
-    store: str_(p.store, 40), commission: pct_(p.commission)
+    offers: (Array.isArray(p.offers) ? p.offers : p.store ? [{ store: p.store }] : []).slice(0, 30).map(function (o) {
+      return { store: str_(o && o.store, 40).trim(), cost: money_(o && o.cost != null ? o.cost : '') };
+    }).filter(function (o, i, a) { return o.store && a.map(function (x) { return x.store; }).indexOf(o.store) === i; }),
+    commission: pct_(p.commission)
   };
 }
 
@@ -357,8 +382,9 @@ function logOrder_(o) {
     var p = products[Math.floor(Number(l.id))]; if (!p) return null;
     var mode = ['buy', 'rent', 'refill', 'quote'].indexOf(l.mode) !== -1 ? l.mode : 'buy';
     var qty = Math.max(1, Math.min(99, Math.floor(Number(l.qty)) || 1));
-    var lp = linePrice_(p, mode, qty, cfg.tiers), st = stores[p.store];
-    var line = { id: p.id, name: p.en || p.ar, store: p.store, storeName: st ? (st.en || st.ar) : '', mode: mode, qty: qty,
+    var dv = p.offers[0] || { store: '', cost: null };          // the default vendor fills the order
+    var lp = linePrice_(p, mode, qty, cfg.tiers), st = stores[dv.store];
+    var line = { id: p.id, name: p.en || p.ar, store: dv.store, storeName: st ? (st.en || st.ar) : '', cost: mode === 'buy' || mode === 'refill' ? dv.cost : null, mode: mode, qty: qty,
                  unit: lp ? lp.unit : null, off: lp ? lp.off : 0, total: lp ? lp.total : null,
                  pct: p.commission != null ? p.commission : (st ? st.commission : 0) };
     line.commission = commissionOf_(line);

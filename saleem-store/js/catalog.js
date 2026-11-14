@@ -141,6 +141,26 @@
     },
   };
 
+  /* ── vendors: every store that supplies a product, each with our buying price (cost).
+   *  offers  [{ store, cost }] in order of preference: PRIVATE, admin only (the cost is ours)
+   *  stores  the same store ids, no prices: public, shown in the shop
+   *  store   the first (preferred) one; orders name it
+   *  Accepts the private list, the public list or an older single store. ── */
+  function offersOf(p) {
+    const raw = Array.isArray(p.offers) ? p.offers
+      : Array.isArray(p.stores) ? p.stores.map(s => ({ store: s }))
+      : p.store ? [{ store: p.store }] : [];
+    const seen = new Set();
+    return raw.map(o => typeof o === 'string' ? { store: o } : o || {})
+      .map(o => ({ store: str(o.store).trim(), cost: num(o.cost) }))
+      .filter(o => o.store && !seen.has(o.store) && seen.add(o.store));
+  }
+  // "mitech=120000; al-nahrain=118000; other" ⇄ offers (the Sheet and the bulk upload use this)
+  const offersText = offers => (offers || []).map(o => o.cost ? o.store + '=' + o.cost : o.store).join('; ');
+  const parseOffers = text => String(text || '').split(/[;\n،]+/).map(x => x.trim()).filter(Boolean).map(x => {
+    const m = x.match(/^(.+?)\s*[=:]\s*([\d,.\s]+)$/); return m ? { store: m[1].trim(), cost: num(m[2]) } : { store: x, cost: null };
+  });
+
   /* ── one product, with every field present and the right type ── */
   function clean(p) {
     const services = Array.isArray(p.services) ? p.services : String(p.services || '').split(/[,;]/);
@@ -153,12 +173,13 @@
       en: str(p.en), ar: str(p.ar), whyEn: str(p.whyEn), whyAr: str(p.whyAr),
       price: num(p.price), rentPrice: num(p.rentPrice), deposit: num(p.deposit),
       status: STATUSES.includes(p.status) ? p.status : 'available',
-      img: str(p.img), store: str(p.store),
+      img: str(p.img),
+      ...(() => { const offers = offersOf(p); return { offers, stores: offers.map(o => o.store), store: offers.length ? offers[0].store : '' }; })(),
       // private: only the admin ever has it, and no public writer emits it
       commission: pct(p.commission),
     };
   }
-  const publicProduct = p => { const o = clean(p); delete o.commission; return o; };
+  const publicProduct = p => { const o = clean(p); delete o.commission; delete o.offers; return o; };
 
   function bing(name, w) {
     return 'https://tse1.mm.bing.net/th?q=' + encodeURIComponent(name + ' medical supply product white background') +
@@ -257,12 +278,13 @@
  *   status     optional: "out" (shown, can't be ordered) or "hidden" (not shown)
  *   img        optional photo: a path like assets/products/23.webp, or a URL.
  *              Empty = a Bing reference thumbnail as a placeholder.
- *   store      the partner store that supplies it (an id from data/site.js)
+ *   stores     the partner stores that supply it, preferred first (ids from data/site.js)
  *
- * Commission is NOT in this file — it's private (private/commercial.js).
+ * Commission and our buying prices are NOT in this file: they're private
+ * (private/commercial.js).
  */
 `;
-  const ORDER = ['id', 'tier', 'dept', 'sub', 'rent', 'refill', 'b2b', 'services', 'en', 'ar', 'whyEn', 'whyAr', 'price', 'rentPrice', 'deposit', 'status', 'img', 'store'];
+  const ORDER = ['id', 'tier', 'dept', 'sub', 'rent', 'refill', 'b2b', 'services', 'en', 'ar', 'whyEn', 'whyAr', 'price', 'rentPrice', 'deposit', 'status', 'img', 'stores'];
   function serialize(departments, products) {
     const q = s => JSON.stringify(s);
     const deps = departments.map(d =>
@@ -273,7 +295,8 @@
         // optional fields stay out of the file until they're used
         if (['price', 'rentPrice', 'deposit'].includes(k) && p[k] == null) return;
         if (k === 'status' && p.status === 'available') return;
-        if ((k === 'img' || k === 'store') && !p[k]) return;
+        if (k === 'img' && !p[k]) return;
+        if (k === 'stores' && !p.stores.length) return;
         o[k] = p[k];
       });
       return '  ' + JSON.stringify(o) + ',';
@@ -310,25 +333,33 @@ ${s.banners.map(x => '  ' + j(x)).join(',\n')}
 
   // store contacts + commission, and per-product commission overrides
   function serializePrivate(stores, products) {
-    const st = {}, ov = {};
+    const st = {}, ov = {}, of = {};
     (stores || []).forEach(s => { st[s.id] = { commission: pct(s.commission) ?? 0, phone: str(s.phone), contact: str(s.contact), notes: str(s.notes) }; });
-    (products || []).forEach(p => { const c = pct(p.commission); if (c != null) ov[p.id] = c; });
-    return `/* Saleem Store — PRIVATE. Commission and partner-store contacts.
+    (products || []).forEach(p => {
+      const c = pct(p.commission); if (c != null) ov[p.id] = c;
+      const offers = offersOf(p); if (offers.some(o => o.cost)) of[p.id] = offers;
+    });
+    return `/* Saleem Store — PRIVATE. Commission, buying prices and partner-store contacts.
  * Read only by admin.html. Never deploy this folder (build-dist.sh leaves it out).
  *
  * stores      store id → { commission %, phone, contact, notes }
  * commission  product id → commission % that overrides its store's
+ * offers      product id → [{ store, cost }]: every vendor of the item and our buying price
+ *             from it (IQD), in order of preference. The shop only knows the store ids.
  */
 window.SALEEM_PRIVATE = {
 "stores": ${JSON.stringify(st, null, 2)},
-"commission": ${JSON.stringify(ov)}
+"commission": ${JSON.stringify(ov)},
+"offers": {
+${Object.entries(of).map(([id, o]) => '  ' + JSON.stringify(id) + ': ' + JSON.stringify(o)).join(',\n')}
+}
 };
 `;
   }
 
   window.SaleemCatalog = {
     config: CFG, bundled: BUNDLED, bundledSite: BUNDLED_SITE, SERVICES, STATUSES, PAYMENTS, SITUATIONS, PROVINCES, DEFAULT_SETTINGS,
-    clean, publicProduct, cleanSite, liveBanners, linePrice, encodeLines, decodeLines, pct,
+    clean, publicProduct, cleanSite, liveBanners, linePrice, encodeLines, decodeLines, pct, num, offersOf, offersText, parseOffers,
     load, photo, bing, serialize, serializeSite, serializePrivate, kv,
   };
 })();

@@ -108,6 +108,7 @@ html[lang=ar] .li.hd{font-family:Cairo,sans-serif;letter-spacing:0;font-size:12p
 .li.hd:hover{background:var(--card2)}
 .li .id{font:700 12px Montserrat,sans-serif;color:var(--mut)}
 .li b{display:block;font-size:13.5px;color:var(--ink)}
+.li .c-opts b{display:inline;font-size:inherit}
 .li small{display:block;color:var(--mut);font-size:12px}
 .li .dot{position:absolute;inset-inline-start:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--or)}
 .thumb{position:relative;width:64px;height:48px;border-radius:8px;border:1px solid var(--line);background:var(--phBg);overflow:hidden}
@@ -255,6 +256,19 @@ textarea.paste{width:100%;min-height:110px;border:1px solid var(--line2);border-
 .storeLogo .ic{width:34px;height:34px}
 .scHead{display:flex;align-items:center;gap:10px}
 .scLogo{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#fff;object-fit:contain;flex:none}
+.vendorsBox{margin:0 0 14px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
+.vendorsBox legend{padding:0 6px}
+.vendorsBox.bad{border-color:var(--red)}
+.vendorsBox .err{display:none;color:var(--red);font-size:12px}
+.vendorsBox.bad .err{display:block}
+.offerRow{display:grid;grid-template-columns:56px minmax(0,1.2fr) minmax(0,1fr) auto 44px;gap:4px 8px;align-items:center;margin-bottom:10px}
+.offerRow select,.offerRow input{height:44px;border:1px solid var(--line2);border-radius:12px;background:var(--card);padding:0 10px;font-size:14px;width:100%}
+.oRank{font-size:12px;font-weight:800;color:var(--mut)}
+.offerRow:first-child .oRank{color:var(--green)}
+.oMargin{grid-column:2/-1;grid-row:2;font-size:12.5px;color:var(--greenInk);font-weight:700}
+.oMargin:empty{display:none}
+.oMargin .neg{color:var(--red)}
+@media(max-width:560px){.offerRow{grid-template-columns:52px minmax(0,1fr) 44px}.offerRow select{grid-column:2;grid-row:1}.offerRow .x{grid-column:3;grid-row:1}.offerRow input{grid-column:2;grid-row:2}.offerRow .oMargin{grid-column:2;grid-row:3}.offerRow [data-offer-top]{grid-column:2;grid-row:4;justify-self:start}.offerRow>span:empty{display:none}}
 .frameRow{margin-top:14px}.frameRow .lead{margin:4px 0 0;font-size:12.5px;padding-inline-start:52px}
 .set .head2{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .set .body{margin-top:12px}
@@ -452,15 +466,16 @@ const T = {
     modeLocal:'مسودة محلية', modeSheet:'مربوط بالشيت',
     prodT:'المنتجات', prodP:'اضغط على أي منتج حتى تعدّله.', add:'منتج جديد', search:'ابحث بالاسم أو الرقم…',
     allDepts:'كل الأقسام', allStatus:'كل الحالات', allPhotos:'كل الصور', allStores:'كل المتاجر', noStore:'بدون متجر', withPhoto:'صورة مرفوعة', placeholder:'صورة Bing مؤقتة', changedOnly:'المعدّلة فقط',
-    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة', hStore:'المتجر · العمولة',
+    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة', hStore:'الموردون · الكلفة',
     st:{available:'متوفر', out:'غير متوفر', hidden:'مخفي'}, oRent:'إيجار', oRefill:'شهري', oB2b:'عيادات', perMonth:'/شهر', noPrice:'—',
     edT:'تعديل منتج', newT:'منتج جديد', photo:'الصورة', upload:'رفع صورة', link:'رابط صورة', removePhoto:'حذف الصورة', linkAsk:'الصق رابط الصورة (يبدأ بـ https://)',
     dropHere:'اسحب صورة هنا', bingTag:'Bing — مؤقتة', ownTag:'مرفوعة', pendingTag:'جديدة — تنحفظ مع المنتج',
     photoHelp:'بدون صورة مرفوعة، المتجر يعرض صورة من بحث Bing على الاسم الإنكليزي كصورة مؤقتة.',
     nameEn:'الاسم بالإنكليزي', nameAr:'الاسم بالعربي', dept:'القسم', sub:'القسم الفرعي', tier:'الأهمية (داخلي)', tiers:{1:'1 — إلزامي',2:'2 — مفيد',3:'3 — إضافي'},
-    price:'سعر الشراء (د.ع)', rentPrice:'الإيجار الشهري (د.ع)', deposit:'تأمين الإيجار (د.ع)', optional:'(اختياري)', sell:'طرق البيع', rent:'إيجار', refill:'توصيل شهري', b2b:'للعيادات فقط (عرض سعر)',
+    price:'سعر البيع للزبون (د.ع)', rentPrice:'الإيجار الشهري (د.ع)', deposit:'تأمين الإيجار (د.ع)', optional:'(اختياري)', sell:'طرق البيع', rent:'إيجار', refill:'توصيل شهري', b2b:'للعيادات فقط (عرض سعر)',
     services:'يطلبه عادةً', svc:{doctor:'زيارة طبيب', nursing:'تمريض', physio:'علاج طبيعي', lab:'مختبر', direct:'طلب مباشر'},
     status:'الحالة', whyEn:'ليش يحتاجه المريض (إنكليزي)', whyAr:'ليش يحتاجه المريض (عربي)',
+    vendors:'الموردون وأسعار شرائنا', vendorsP:'كل متجر يجهّز هذا المنتج وبكم نشتريه منه. الأول هو الافتراضي للطلبات. أسعار الشراء خاصة — ما تظهر بالمتجر.', addVendor:'أضف مورّد', defaultV:'الافتراضي', makeDefault:'اجعله الافتراضي', cost:'سعر شرائنا منه (د.ع)', margin:'الهامش', noVendors:'ما مضاف أي مورّد بعد.', moreV:'+{n}', costShort:'الكلفة {p}',
     store:'المتجر الشريك', commission:'العمولة على هذا المنتج', commissionP:'فارغ = عمولة المتجر ({p}٪). خاص — ما يظهر بالمتجر.', commissionNone:'اختار متجر أولاً',
     save:'حفظ', cancel:'إلغاء', del:'حذف', delAsk:'تحذف «{n}» نهائياً؟\nإذا تريد تشيله من المتجر بس، خلّي الحالة «مخفي».',
     eName:'اكتب اسم واحد على الأقل', eDept:'اختار القسم', eSub:'اختار القسم الفرعي', ePrice:'رقم صحيح بالدينار', ePct:'رقم بين 0 و 100',
@@ -503,6 +518,8 @@ const T = {
     setStore:'المتاجر الشريكة', setStoreP:'إظهار «يجهّزه: …» بصفحة المنتج.', setUrl:'رابط المتجر المنشور', setUrlP:'يُستخدم بروابط التذكير. مثلاً https://store.saleem.iq/',
     on:'شغّال', off:'طافي',
     // bulk
+    impKind:'شنو هذا الملف؟', impCatalog:'ملف المنتجات (أسعار البيع، الأقسام، الموردون…)', impVendor:'قائمة أسعار من {s}', impCatalogP:'الملف المصدّر من هنا أو القالب. عمود سعر البيع هو سعر الزبون.',
+    impVendorP:'استمارة الأسعار اللي عبّاها {s}: عمود السعر يُحفظ كسعر شرائنا منه لكل منتج، ويصير من موردي المنتج. ما يتغير سعر البيع ولا الأسماء.',
     bulkT:'رفع جماعي', bulkP:'عدّل المنتجات بملف Excel أو CSV — أسعار، أقسام، متاجر، عمولات، حالات، منتجات جديدة — وارفعه مرة وحدة.',
     s1:'نزّل الملف', s1p:'فيه كل المنتجات الحالية. عدّله بـ Excel أو Google Sheets وخلّي صف العناوين مثل ما هو.',
     xlsx:'Excel ‏(.xlsx)', csv:'CSV', blank:'قالب فارغ',
@@ -538,15 +555,16 @@ const T = {
     modeLocal:'Local draft', modeSheet:'Connected to Sheet',
     prodT:'Products', prodP:'Click any product to edit it.', add:'New product', search:'Search by name or number…',
     allDepts:'All departments', allStatus:'Any status', allPhotos:'Any photo', allStores:'All stores', noStore:'No store', withPhoto:'Photo uploaded', placeholder:'Bing placeholder', changedOnly:'Changed only',
-    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status', hStore:'Store · commission',
+    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status', hStore:'Vendors · cost',
     st:{available:'Available', out:'Out of stock', hidden:'Hidden'}, oRent:'Rent', oRefill:'Monthly', oB2b:'Clinic', perMonth:'/mo', noPrice:'—',
     edT:'Edit product', newT:'New product', photo:'Photo', upload:'Upload photo', link:'Photo link', removePhoto:'Remove photo', linkAsk:'Paste the photo link (starts with https://)',
     dropHere:'Drop a photo here', bingTag:'Bing — placeholder', ownTag:'Uploaded', pendingTag:'New — saved with the product',
     photoHelp:'With no uploaded photo, the shop shows a Bing image search on the English name as a placeholder.',
     nameEn:'Name in English', nameAr:'Name in Arabic', dept:'Department', sub:'Section', tier:'Priority (internal)', tiers:{1:'1 — Mandatory',2:'2 — Useful',3:'3 — Bonus'},
-    price:'Buy price (IQD)', rentPrice:'Monthly rent (IQD)', deposit:'Rental deposit (IQD)', optional:'(optional)', sell:'Sold as', rent:'Rentable', refill:'Monthly refill', b2b:'Clinics only (quote)',
+    price:'Selling price to customers (IQD)', rentPrice:'Monthly rent (IQD)', deposit:'Rental deposit (IQD)', optional:'(optional)', sell:'Sold as', rent:'Rentable', refill:'Monthly refill', b2b:'Clinics only (quote)',
     services:'Usually requested with', svc:{doctor:'Doctor visit', nursing:'Nursing', physio:'Physiotherapy', lab:'Lab', direct:'Direct order'},
     status:'Status', whyEn:'Why a patient needs it (English)', whyAr:'Why a patient needs it (Arabic)',
+    vendors:'Vendors and our buying prices', vendorsP:'Every store that supplies this item and what we pay them. The first is the default for orders. Buying prices are private — never shown in the shop.', addVendor:'Add a vendor', defaultV:'Default', makeDefault:'Make default', cost:'Our buying price (IQD)', margin:'Margin', noVendors:'No vendors yet.', moreV:'+{n}', costShort:'cost {p}',
     store:'Partner store', commission:'Commission on this item', commissionP:'Empty = the store’s ({p}%). Private — never shown in the shop.', commissionNone:'Choose a store first',
     save:'Save', cancel:'Cancel', del:'Delete', delAsk:'Delete “{n}” for good?\nTo just take it off the shop, set its status to Hidden.',
     eName:'Enter at least one name', eDept:'Choose a department', eSub:'Choose a section', ePrice:'A whole number in IQD', ePct:'A number from 0 to 100',
@@ -583,6 +601,8 @@ const T = {
     setRem:'Refill reminders', setRemP:'Customers can ask to be reminded; the Orders tab collects the ones that are due (needs the Sheet).', remDays:'After how many days',
     setStore:'Partner stores', setStoreP:'Show “Supplied by: …” on product pages.', setUrl:'Published shop address', setUrlP:'Used in reminder links. e.g. https://store.saleem.iq/',
     on:'On', off:'Off',
+    impKind:'What is this file?', impCatalog:'The product file (selling prices, departments, vendors…)', impVendor:'A price list from {s}', impCatalogP:'The file exported here, or the template. The price column is what customers pay.',
+    impVendorP:'The price form {s} filled in: its price column is saved as our buying price from them for each item, and they become one of its vendors. Selling prices and names aren’t touched.',
     bulkT:'Bulk upload', bulkP:'Change many products at once with an Excel or CSV file — prices, departments, stores, commission, status, new products.',
     s1:'Download the spreadsheet', s1p:'It holds every current product. Edit it in Excel or Google Sheets and keep the heading row as it is.',
     xlsx:'Excel (.xlsx)', csv:'CSV', blank:'Blank template',
@@ -623,7 +643,7 @@ const PRIV = window.SALEEM_PRIVATE || { stores: {}, commission: {} };
 const PUB = (() => {
   const site = C.cleanSite(C.bundledSite);
   return {
-    products: C.bundled.products.map(p => C.clean(Object.assign({}, p, { commission: (PRIV.commission || {})[p.id] }))),
+    products: C.bundled.products.map(p => C.clean(Object.assign({}, p, { commission: (PRIV.commission || {})[p.id], offers: (PRIV.offers || {})[p.id] }))),
     stores: site.stores.map(s => Object.assign({ commission: 0, phone: '', contact: '', notes: '' }, s, (PRIV.stores || {})[s.id] || {})),
     settings: site.settings, kits: site.kits, banners: site.banners,
   };
@@ -935,7 +955,7 @@ function filtered(){
   return products.filter(p => (!q || String(p.id) === q || LIB.norm(p.en + ' ' + p.ar).includes(q))
     && (!filters.dept || p.dept === filters.dept) && (!filters.status || p.status === filters.status)
     && (!filters.photo || (filters.photo === 'own') === !!p.img)
-    && (!filters.store || (filters.store === '-' ? !p.store : p.store === filters.store))
+    && (!filters.store || (filters.store === '-' ? !p.stores.length : p.stores.includes(filters.store)))
     && (!filters.changed || !pub.has(p.id) || !same(pub.get(p.id), p)));
 }
 function paintList(){
@@ -948,7 +968,7 @@ function paintList(){
         <span><b>${esc(pName(p))}</b><small>${esc(lang === 'ar' ? p.en : p.ar)}</small></span>
         <span class="c-dept"><small>${esc(L(DEPT[p.dept]) || p.dept)} › ${esc(L(s) || p.sub)}</small><span class="chips">${p.rent ? `<span class="chip c-rent">${t('oRent')}</span>` : ''}${p.refill ? `<span class="chip c-refill">${t('oRefill')}</span>` : ''}${p.b2b ? `<span class="chip c-b2b">${t('oB2b')}</span>` : ''}</span></span>
         <span class="c-price price">${p.price ? iqd(p.price) : p.rentPrice ? '' : `<span class="muted">${t('noPrice')}</span>`}${p.rentPrice ? `<small>${iqd(p.rentPrice)} ${t('perMonth')}</small>` : ''}</span>
-        <span class="c-opts"><small>${st ? esc(L(st)) : `<span class="muted">${t('noStore')}</span>`}${pc != null && st ? ` · <b class="mono">${pc}%</b>${p.commission != null ? ' ✎' : ''}` : ''}</small></span>
+        <span class="c-opts"><small>${st ? esc(L(st)) + (p.stores.length > 1 ? ` <b dir="ltr">${t('moreV', { n: p.stores.length - 1 })}</b>` : '') : `<span class="muted">${t('noStore')}</span>`}${pc != null && st ? ` · <b class="mono" dir="ltr">${pc}%</b>${p.commission != null ? ' ✎' : ''}` : ''}${p.offers[0] && p.offers[0].cost ? `<br><span>${t('costShort', { p: `<bdi class="mono">${iqd(p.offers[0].cost)}</bdi>` })}</span>` : ''}</small></span>
         <span class="c-status"><span class="st st-${p.status}">${t('st')[p.status]}</span></span></div>`;
     }).join('');
 }
@@ -967,7 +987,7 @@ function openEditor(id, keep){
   if(!keep) editing = isNew ? C.clean({ id: Math.max(0, ...products.map(p => p.id), ...PUB.products.map(p => p.id)) + 1, dept: '', sub: '', status: 'available' })
                             : Object.assign({}, products.find(p => p.id === id));
   editing._new = isNew || editing._new;
-  const p = editing, d = DEPT[p.dept], st = storeById(p.store);
+  const p = editing, d = DEPT[p.dept], st = storeById((p.offers[0] || {}).store);
   const ph = C.photo(p, 500), saved = (products.find(x => x.id === p.id) || {}).img || '', pending = !!p.img && p.img !== saved;
   openDrawer(`${p._new ? t('newT') : t('edT')} <span class="id mono">#${p.id}</span>`, `<form id="edForm" novalidate>
       <div class="photoBox">
@@ -980,10 +1000,12 @@ function openEditor(id, keep){
         <label class="field" data-f="ar"><span>${t('nameAr')}</span><input name="ar" value="${esc(p.ar)}" dir="rtl"></label>
         <label class="field" data-f="dept"><span>${t('dept')}</span><select name="dept">${opt('', '—', p.dept)}${DEPTS.map(x => opt(x.key, L(x), p.dept)).join('')}</select><em class="err">${t('eDept')}</em></label>
         <label class="field" data-f="sub"><span>${t('sub')}</span><select name="sub">${opt('', '—', p.sub)}${(d ? d.subs : []).map(x => opt(x.key, L(x), p.sub)).join('')}</select><em class="err">${t('eSub')}</em></label>
-        <label class="field"><span>${t('store')}</span><select name="store">${opt('', '— ' + t('noStore'), p.store)}${stores.map(s => opt(s.id, L(s) + ' (' + s.commission + '%)', p.store)).join('')}</select></label>
         <label class="field pctIn" data-f="commission"><span>${t('commission')} <i>${t('optional')}</i></span><input name="commission" inputmode="decimal" dir="ltr" value="${p.commission ?? ''}" placeholder="${st ? st.commission : ''}" ${st ? '' : 'disabled'}><em class="err">${t('ePct')}</em></label>
       </div>
       <p class="lead" style="margin:-6px 0 12px;font-size:12px">${st ? t('commissionP', { p: st.commission }) : t('commissionNone')}</p>
+      <fieldset class="vendorsBox" data-f="offers"><legend>${t('vendors')}</legend><p class="lead" style="margin:0 0 8px;font-size:12px">${t('vendorsP')}</p>
+        <div id="offers">${p.offers.length ? p.offers.map((o, i) => offerRow(o, i, p)).join('') : `<p class="muted" style="margin:0 0 8px">${t('noVendors')}</p>`}</div>
+        ${stores.length > p.offers.length ? `<button class="btn sm" type="button" data-offer-add>${icon('i-plus')}${t('addVendor')}</button>` : ''}<em class="err">${t('ePrice')}</em></fieldset>
       <div class="grid2">
         <label class="field" data-f="price"><span>${t('price')} <i>${t('optional')}</i></span><input name="price" inputmode="numeric" value="${p.price ?? ''}" dir="ltr"><em class="err">${t('ePrice')}</em></label>
         <label class="field" data-f="rentPrice"><span>${t('rentPrice')} <i>${t('optional')}</i></span><input name="rentPrice" inputmode="numeric" value="${p.rentPrice ?? ''}" dir="ltr" ${p.rent ? '' : 'disabled'}><em class="err">${t('ePrice')}</em></label>
@@ -1004,10 +1026,26 @@ function openEditor(id, keep){
 }
 const parsePrice = v => { v = String(v || '').replace(/[,\s]/g, ''); if(!v) return null; const n = Number(v); return Number.isInteger(n) && n > 0 ? n : NaN; };
 const parsePct = v => { v = String(v || '').replace(/[%\s]/g, ''); if(!v) return null; const n = Number(v); return isFinite(n) && n >= 0 && n <= 100 ? Math.round(n * 100) / 100 : NaN; };
+// one vendor of the product being edited: store, our buying price, the margin it leaves
+function marginText(price, cost){
+  const pr = parsePrice(price), c = parsePrice(cost);
+  if(!pr || !c || Number.isNaN(pr) || Number.isNaN(c)) return '';
+  const m = pr - c; return `<span class="${m < 0 ? 'neg' : ''}">${t('margin')}: <bdi dir="ltr">${iqd(m)} (${Math.round(m / pr * 100)}%)</bdi></span>`;
+}
+function offerRow(o, i, p){
+  const taken = new Set(p.offers.map(x => x.store));
+  return `<div class="offerRow" data-i="${i}"><span class="oRank">${i === 0 ? t('defaultV') : i + 1}</span>
+    <select name="ostore" aria-label="${esc(t('store'))}">${stores.filter(s => s.id === o.store || !taken.has(s.id)).map(s => opt(s.id, L(s), o.store)).join('')}</select>
+    <input name="ocost" inputmode="numeric" dir="ltr" value="${esc(o.cost ?? '')}" placeholder="${esc(t('cost'))}" aria-label="${esc(t('cost'))}">
+    <span class="oMargin">${marginText(p.price ?? (p._raw || {}).price, o.cost)}</span>
+    ${i ? `<button class="btn sm" type="button" data-offer-top="${i}">${t('makeDefault')}</button>` : '<span></span>'}
+    <button class="x" type="button" data-offer-rm="${i}" aria-label="${esc(t('del'))}">${icon('i-x')}</button></div>`;
+}
 function readForm(){
   const f = $('#edForm'); if(!f) return;
   const g = n => f.elements[n];
-  Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value, store: g('store').value,
+  editing.offers = [...f.querySelectorAll('.offerRow')].map(r => ({ store: r.querySelector('[name=ostore]').value, cost: r.querySelector('[name=ocost]').value.trim() }));
+  Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value,
     status: g('status').value, tier: +g('tier').value, rent: g('rent').checked, refill: g('refill').checked, b2b: g('b2b').checked,
     services: [...f.querySelectorAll('[name=svc]:checked')].map(x => x.value), whyEn: g('whyEn').value, whyAr: g('whyAr').value,
     _raw: { price: g('price').value, rentPrice: g('rentPrice').value, deposit: g('deposit').value, commission: g('commission').value } });
@@ -1015,7 +1053,20 @@ function readForm(){
 const keepNums = () => { const r = editing._raw || {}; ['price', 'rentPrice', 'deposit'].forEach(k => { const v = parsePrice(r[k]); editing[k] = Number.isNaN(v) ? null : v; }); const c = parsePct(r.commission); editing.commission = Number.isNaN(c) ? null : c; };
 document.addEventListener('change', e => {
   if(!e.target.closest('#edForm')) return;
-  if(['dept', 'rent', 'store'].includes(e.target.name)){ readForm(); if(e.target.name === 'dept') editing.sub = ''; keepNums(); openEditor(editing.id, true); }
+  if(['dept', 'rent', 'ostore'].includes(e.target.name)){ readForm(); if(e.target.name === 'dept') editing.sub = ''; keepNums(); openEditor(editing.id, true); }
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-offer-add],[data-offer-rm],[data-offer-top]'); if(!b || !editing) return;
+  readForm(); keepNums();
+  if(b.matches('[data-offer-add]')){ const free = stores.find(s => !editing.offers.some(o => o.store === s.id)); if(free) editing.offers.push({ store: free.id, cost: '' }); }
+  else if(b.matches('[data-offer-rm]')) editing.offers.splice(+b.dataset.offerRm, 1);
+  else { const [o] = editing.offers.splice(+b.dataset.offerTop, 1); editing.offers.unshift(o); }
+  openEditor(editing.id, true);
+});
+document.addEventListener('input', e => {
+  if(!e.target.closest('#edForm') || !['price', 'ocost'].includes(e.target.name)) return;
+  const price = $('#edForm [name=price]').value;
+  $$('#edForm .offerRow').forEach(r => { r.querySelector('.oMargin').innerHTML = marginText(price, r.querySelector('[name=ocost]').value); });
 });
 document.addEventListener('submit', async e => {
   if(e.target.id !== 'edForm') return;
@@ -1024,11 +1075,13 @@ document.addEventListener('submit', async e => {
   if(!p.en && !p.ar) bad.push('en');
   if(!p.dept) bad.push('dept');
   if(!p.sub) bad.push('sub');
-  const price = parsePrice(r.price), rentPrice = p.rent ? parsePrice(r.rentPrice) : null, deposit = p.rent ? parsePrice(r.deposit) : null, commission = p.store ? parsePct(r.commission) : null;
+  const price = parsePrice(r.price), rentPrice = p.rent ? parsePrice(r.rentPrice) : null, deposit = p.rent ? parsePrice(r.deposit) : null, commission = p.offers.length ? parsePct(r.commission) : null;
+  const offers = p.offers.map(o => ({ store: o.store, cost: parsePrice(o.cost) }));
   [['price', price], ['rentPrice', rentPrice], ['deposit', deposit], ['commission', commission]].forEach(([k, v]) => { if(Number.isNaN(v)) bad.push(k); });
+  if(offers.some(o => Number.isNaN(o.cost))) bad.push('offers');
   $$('#edForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
   if(bad.length) return;
-  const out = C.clean(Object.assign({}, p, { price, rentPrice, deposit, commission }));
+  const out = C.clean(Object.assign({}, p, { price, rentPrice, deposit, commission, offers }));
   try{ busy(t('working')); await commit([out]); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }
   catch(x){ fail(x); }
 });
@@ -1092,7 +1145,7 @@ let editStore = null;
 function viewStores(){
   return `<div class="head"><div><h1>${t('storesT')}</h1><p>${t('storesP')}</p></div><button class="btn or" type="button" data-store-new>${icon('i-plus')}${t('addStore')}</button></div>
     <p class="note info">${icon('i-lock')}<span>${t('sPrivate')}</span></p>
-    ${stores.length ? `<div class="cards">${stores.map(s => { const n = products.filter(p => p.store === s.id).length, o = products.filter(p => p.store === s.id && p.commission != null).length;
+    ${stores.length ? `<div class="cards">${stores.map(s => { const n = products.filter(p => p.stores.includes(s.id)).length, o = products.filter(p => p.store === s.id && p.commission != null).length;
       return `<div class="sc ${s.on ? '' : 'off'}" data-store="${esc(s.id)}" tabindex="0" role="button"><div class="scHead">${s.logo ? `<img class="scLogo" src="${esc(s.logo)}" alt="">` : ''}<h3>${esc(L(s))}</h3></div>
         <div class="meta">${s.area ? esc(s.area) + ' · ' : ''}<span class="mono">${esc(s.id)}</span>${s.on ? '' : ` · <span class="st st-hidden">${t('off')}</span>`}</div>
         <div class="big">${s.commission}%<small> ${t('sComm')}</small></div>
@@ -1109,7 +1162,7 @@ function readStore(){
 }
 function storeEditor(s, keep){
   if(!keep) editStore = s ? Object.assign({}, s) : fullStore({ _new: true });
-  const x = editStore, n = products.filter(p => p.store === x.id).length;
+  const x = editStore, n = products.filter(p => p.stores.includes(x.id)).length;
   openDrawer(x._new ? t('addStore') : esc(L(x)), `<form id="storeForm" novalidate>
     <div class="logoBox"><div class="storeLogo">${x.logo ? `<img src="${esc(x.logo)}" alt="">` : icon('i-store')}</div>
       <div><b>${t('sLogo')}</b><p class="lead" style="margin:2px 0 8px;font-size:12.5px">${t('sLogoP')}</p>
@@ -1146,9 +1199,9 @@ document.addEventListener('click', async e => {
   else if(x.matches('[data-store-products]')){ filters = Object.assign(filters, { store: x.dataset.storeProducts, q: '', dept: '' }); closeEditor(); location.hash = '#/products'; }
   else if(x.matches('[data-store]')) storeEditor(storeById(x.dataset.store));
   else if(x.matches('[data-store-del]')){
-    const s = editStore, own = products.filter(p => p.store === s.id);
+    const s = editStore, own = products.filter(p => p.stores.includes(s.id));
     if(!confirm(t('sDelAsk', { n: L(s), c: own.length }))) return;
-    try{ busy(t('working')); await commitStores(stores.filter(y => y.id !== s.id)); if(own.length) await commit(own.map(p => Object.assign({}, p, { store: '', commission: null }))); busy(); closeEditor(); render(); toast(t('deleted')); }
+    try{ busy(t('working')); await commitStores(stores.filter(y => y.id !== s.id)); if(own.length) await commit(own.map(p => { const offers = p.offers.filter(o => o.store !== s.id); return C.clean(Object.assign({}, p, { offers, commission: offers.length ? p.commission : null })); })); busy(); closeEditor(); render(); toast(t('deleted')); }
     catch(err){ fail(err); }
   }
 });
@@ -1508,8 +1561,10 @@ function viewBulk(){
       <tr><td><code>store</code></td><td>${stores.length ? stores.map(s => `<b>${esc(s.id)}</b> (${esc(L(s))})`).join(', ') : esc(t('noStores'))}</td></tr></table></details>
   </section>
   <section class="panel"><h2><span class="step">2</span>${t('s2')}</h2><p>${t('s2p')}</p>
+    <label class="field" style="max-width:520px"><span>${t('impKind')}</span><select id="impVendor">${opt('', t('impCatalog'), importVendor)}${stores.map(s => opt(s.id, t('impVendor', { s: L(s) }), importVendor)).join('')}</select></label>
+    <p class="lead" style="margin:-4px 0 12px;font-size:12.5px">${importVendor ? t('impVendorP', { s: esc(L(storeById(importVendor) || {})) }) : t('impCatalogP')}</p>
     <label class="drop" id="sheetDrop" data-pick-sheet>${icon('i-sheet')}<strong>${t('dropSheet')}</strong><span>.xlsx · .csv</span></label>
-    <details style="margin-top:10px"><summary>${t('pasteT')}</summary><textarea class="paste" id="paste" placeholder="id	name_en	buy_price_iqd&#10;21	Digital blood pressure monitor	45000"></textarea><div class="row" style="margin-top:8px"><button class="btn" type="button" data-check-paste>${t('check')}</button></div></details>
+    <details style="margin-top:10px"><summary>${t('pasteT')}</summary><textarea class="paste" id="paste" placeholder="id	name_en	sell_price_iqd&#10;21	Digital blood pressure monitor	45000"></textarea><div class="row" style="margin-top:8px"><button class="btn" type="button" data-check-paste>${t('check')}</button></div></details>
   </section>
   <div id="planBox">${plan ? planHtml() : ''}</div>`;
 }
@@ -1523,12 +1578,12 @@ document.addEventListener('click', e => {
   else if(x.matches('[data-apply]')) applyPlan();
   else if(x.matches('[data-plan-reset]')){ plan = null; $('#planBox').innerHTML = ''; }
 });
-document.addEventListener('change', e => { if(e.target.name === 'missing'){ planMissing = e.target.value; $('#planBox').innerHTML = planHtml(); } });
+document.addEventListener('change', e => { if(e.target.id === 'impVendor'){ importVendor = e.target.value; plan = null; render(); return; } if(e.target.name === 'missing'){ planMissing = e.target.value; $('#planBox').innerHTML = planHtml(); } });
 $('#pickSheet').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; readSheetFile(f); });
 
 function exportSheet(kind){
   const keys = LIB.COLUMNS.map(c => c.key);
-  const rows = kind === 'blank' ? [keys, keys.map(k => ({ name_en: 'Example product', name_ar: 'منتج تجريبي', department: 'mobility', section: 'walking', tier: 2, buy_price_iqd: 25000, rentable: 'no', monthly_refill: 'no', clinic_only: 'no', services: 'physio', status: 'available', why_en: 'Why a patient needs it', why_ar: 'ليش يحتاجه المريض', store: stores[0] ? stores[0].id : '' })[k] ?? '')]
+  const rows = kind === 'blank' ? [keys, keys.map(k => ({ name_en: 'Example product', name_ar: 'منتج تجريبي', department: 'mobility', section: 'walking', tier: 2, sell_price_iqd: 25000, rentable: 'no', monthly_refill: 'no', clinic_only: 'no', services: 'physio', status: 'available', why_en: 'Why a patient needs it', why_ar: 'ليش يحتاجه المريض', store: stores[0] ? stores[0].id : '' })[k] ?? '')]
                                 : LIB.toRows(products);
   const name = 'saleem-products-' + (kind === 'blank' ? 'template' : stamp());
   if(kind === 'csv'){ download(new Blob([LIB.csvWrite(rows)], { type: 'text/csv;charset=utf-8' }), name + '.csv'); return; }
@@ -1538,7 +1593,7 @@ function exportSheet(kind){
   const deptRows = [['department', 'section', 'department (EN)', 'section (EN)', 'القسم', 'القسم الفرعي'], ...DEPTS.flatMap(d => d.subs.map(s => [d.key, s.key, d.en, s.en, d.ar, s.ar]))];
   const storeRows = [['store', 'name (EN)', 'الاسم', 'area', 'commission %'], ...stores.map(s => [s.id, s.en, s.ar, s.area, s.commission])];
   const help = [['column', 'what it means', 'بالعربي'], ...LIB.COLUMNS.map(c => [c.key, c.help, c.ar]), ['', ''], ['Rules', 'Blank cell = leave as is. "-" = clear it. No id = new product. Delete columns you don’t need, but keep id.'],
-                ['Private', 'commission_pct and the Stores sheet are internal — don’t send this file to a partner store.']];
+                ['Private', 'vendors (our buying prices), commission_pct and the Stores sheet are internal — don’t send this file to a partner store.']];
   download(LIB.xlsxWrite([
     { name: 'Products', rows, widths: LIB.COLUMNS.map(c => c.width), validations: lists },
     { name: 'Departments', rows: deptRows, widths: [14, 14, 26, 26, 26, 26] },
@@ -1556,14 +1611,15 @@ async function readSheetFile(file){
   }catch(x){ fail(x); }
 }
 function makePlan(rows, name){
-  try{ plan = LIB.planImport(rows, products, DEPTS, stores); plan.file = name || ''; planShow = 'changes'; planMissing = 'keep'; }
+  try{ plan = LIB.planImport(rows, products, DEPTS, stores, { vendor: importVendor }); plan.file = name || ''; planShow = 'changes'; planMissing = 'keep'; }
   catch(x){ toast(x.message, true); return; }
   $('#planBox').innerHTML = planHtml();
   $('#planBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+let importVendor = '';
 const fieldLabel = Object.fromEntries(LIB.COLUMNS.map(c => [c.field, c.key]));
 const show = v => v == null || v === '' ? '∅' : Array.isArray(v) ? (v.join(', ') || '∅') : typeof v === 'boolean' ? (v ? 'yes' : 'no') : String(v).length > 60 ? String(v).slice(0, 57) + '…' : String(v);
-const showField = (f, v) => f === 'status' ? t('st')[v] || v : f === 'dept' ? L(DEPT[v]) || v : f === 'store' ? (storeById(v) ? L(storeById(v)) : show(v)) : show(v);
+const showField = (f, v) => f === 'offers' ? (v || []).map(o => (storeById(o.store) ? L(storeById(o.store)) : o.store) + (o.cost ? ' ' + iqd(o.cost) : '')).join(' · ') || '∅' : f === 'status' ? t('st')[v] || v : f === 'dept' ? L(DEPT[v]) || v : f === 'store' ? (storeById(v) ? L(storeById(v)) : show(v)) : show(v);
 function planToApply(){
   const list = plan.rows.filter(r => r.kind === 'new' || r.kind === 'update').map(r => r.product);
   const hide = planMissing === 'hide' ? plan.missing.map(id => products.find(p => p.id === id)).filter(p => p && p.status !== 'hidden').map(p => Object.assign({}, p, { status: 'hidden' })) : [];
@@ -1752,7 +1808,7 @@ function bundle(){
     '', 'Unzip this inside the saleem-store folder, replacing files when asked:',
     '  data/products.js        the full product list (' + out.length + ' products)',
     '  data/site.js            settings, partner stores (public part), kits, banners',
-    '  private/commercial.js   PRIVATE: commission and store contacts — never upload this folder',
+    '  private/commercial.js   PRIVATE: commission, buying prices and store contacts — never upload this folder',
     '  assets/                 ' + images + ' uploaded image(s)',
     '', 'Then upload the folder to your host (without private/), or commit it to the repo.', '' ].join('\r\n') });
   download(LIB.zip(files), 'saleem-store-update-' + (window.SALEEM_VERSION || '') + '-' + stamp() + '.zip');

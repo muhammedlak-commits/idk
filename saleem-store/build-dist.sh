@@ -46,6 +46,7 @@ fi
 
 # belt and braces: nothing private may ride along
 if grep -rqs '"commission"' dist/data dist/index.html; then echo "refusing: commission found in dist/" >&2; exit 1; fi
+if grep -rqs '"offers"\|"cost"' dist/data dist/index.html; then echo "refusing: buying prices found in dist/" >&2; exit 1; fi
 [ -e dist/private ] && { echo "refusing: dist/private exists" >&2; exit 1; }
 
 version=$(sed -n "s/.*SALEEM_VERSION = '\([^']*\)'.*/\1/p" js/version.js)

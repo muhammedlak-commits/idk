@@ -7,6 +7,41 @@ has to do (redeploy the Sheet script, re-publish, change a setting).
 The shop footer and the admin header show the version that's running. The single-file previews
 are named after it (`Saleem_Store_v0.001.html`), and so is the admin's update zip.
 
+## v0.003 (14 Nov 2026)
+
+**Several vendors per product, each with our buying price**
+- A product can now be supplied by any number of partner stores. For each one the admin keeps
+  what we pay them: our buying price. It's private like commission. It lives in
+  `private/commercial.js`, or in the Sheet's `vendors` column, and never reaches the shop.
+- Admin → product editor: a Vendors section. Add or remove vendors, enter each one's buying
+  price, see the margin against the selling price (red when it's a loss), and pick the default.
+  The first vendor is the default: orders go to it.
+- The product's price is now labelled what it always was: the **selling price to customers**.
+- Products list: shows the default vendor, "+N" for the others, and the default's buying price.
+  The store filter finds an item under any of its vendors.
+- Bulk upload:
+  - a new `vendors` column (`mitech=120000; al-nahrain=118000`), and `store` now sets the
+    default vendor;
+  - the price column is now called `sell_price_iqd` (older files with `buy_price_iqd` still
+    work);
+  - new: "A price list from <store>". Upload a vendor's filled-in price form (the top-50 form)
+    and its price column is filed as that vendor's buying price for each item. Names, selling
+    prices and rent aren't touched, and an item that isn't in the catalogue is flagged.
+- Shop: the product page lists every vendor (each links to its page), cards show the default
+  vendor and "+N", each vendor's page lists every item it supplies, and search finds an item by
+  any of its vendors' names.
+- M-Tech's 44 items: the quote's "after" price is now our buying price from M-Tech. The selling
+  price is the quote's "before" price for now (e.g. rigid cervical collar: we buy at 100,000 and
+  sell at 160,000).
+- Google Sheet: the Products tab gains a private `vendors` column, and `buy_price_iqd` is
+  renamed `sell_price_iqd` on the next save. The public read lists only store ids. Each order
+  line records the default vendor and its buying price, but order tracking never shows it.
+  **Paste in the new `Code.gs` and deploy a new version.**
+
+**To do:** set the selling price on M-Tech's items wherever the "before" price isn't right. The
+vendor price form and the invitation letter still ask for "your selling price to the customer".
+If vendors should send their price to Saleem instead, they need rewording.
+
 ## v0.002 (14 Nov 2026)
 
 **M-Tech's catalogue and vendor profiles**

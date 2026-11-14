@@ -668,6 +668,10 @@ html.vt .view{animation:none}
 .cVend{display:flex;align-items:center;gap:4px;margin-top:4px;color:var(--mut);font-size:12.5px;font-weight:700;min-width:0}
 .cVend .ic{width:14px;height:14px;flex:none}
 .cVend span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cVend b{flex:none;font-size:11.5px;color:var(--navy);background:var(--paper);border-radius:6px;padding:0 5px}
+.soldByRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:10px}
+.soldByRow .lbl{margin:0;font-size:12.5px;color:var(--mut);font-weight:800;width:100%}
+.soldByRow a.soldBy{margin-top:0}
 a.soldBy{text-decoration:none;min-height:44px;padding:4px 10px 4px 6px;gap:8px}
 a.soldBy:hover{background:var(--blue50)}
 a.soldBy img{width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
@@ -984,8 +988,8 @@ function setCatalog(cat){
   RETAIL = PRODUCTS.filter(p => !p.b2b);
   STORES = new Map(SITE.stores.filter(x => x.on).map(x => [x.id, x]));
   HAY = new Map(PRODUCTS.map(p => {
-    const d = DEPT[p.dept], s = subOf(p), st = STORES.get(p.store) || {};
-    return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr, st.en || '', st.ar || ''].join(' ')) }];
+    const d = DEPT[p.dept], s = subOf(p), vs = storesOf(p).flatMap(st => [st.en || '', st.ar || '']);
+    return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr, ...vs].join(' ')) }];
   }));
   // a kit keeps only items still in the shop, each in a mode that's still offered
   KITS = !S.kits.on ? [] : SITE.kits.filter(k => k.on).map(k => Object.assign({}, k, {
@@ -1056,7 +1060,9 @@ const wa = text => 'https://wa.me/' + bizWa() + '?text=' + encodeURIComponent(te
 const nurseOn = () => S.nurse.on && S.nurse.whatsapp;
 const nurseWa = text => 'https://wa.me/' + S.nurse.whatsapp + '?text=' + encodeURIComponent(text || t('nurseMsg'));
 const payments = () => CAT.PAYMENTS.filter(m => S.payments[m.key]);
-const storeOf = p => STORES.get(p.store);
+// every partner store that sells it, the default (the one orders go to) first
+const storesOf = p => (p.stores || []).map(id => STORES.get(id)).filter(Boolean);
+const storeOf = p => storesOf(p)[0];
 const linePrice = (p, mode, qty) => CAT.linePrice(p, mode, qty, S);
 const kitById = id => KITS.find(k => k.id === id);
 
@@ -1111,7 +1117,7 @@ function card(p, want){
   const mode = fixedMode(p, want);
   return `<article class="card" data-card="${p.id}" data-mode="${mode}">
     <a href="#/p/${p.id}">${badges(p)}${photo(p, 400)}
-      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${S.showStore && storeOf(p) ? `<span class="cVend">${icon('i-store')}<span>${esc(L(storeOf(p)))}</span></span>` : ''}${priceLine(p, mode)}</div></a>
+      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${S.showStore && storeOf(p) ? `<span class="cVend">${icon('i-store')}<span>${esc(L(storeOf(p)))}</span>${storesOf(p).length > 1 ? `<b>+${storesOf(p).length - 1}</b>` : ''}</span>` : ''}${priceLine(p, mode)}</div></a>
     <div class="cFoot">${addControl(p, mode)}</div></article>`;
 }
 
@@ -1512,7 +1518,7 @@ function deptChips(items, base, qs){
 }
 
 /* partner stores: a directory, and a page for each with its own products */
-const vendorItems = st => PRODUCTS.filter(p => p.store === st.id);
+const vendorItems = st => PRODUCTS.filter(p => (p.stores || []).includes(st.id));
 const vendorLogo = (st, cls) => `<span class="${cls}">${st.logo ? `<img src="${esc(st.logo)}" alt="">` : icon('i-store')}</span>`;
 function viewVendors(){
   const list = [...STORES.values()].filter(st => vendorItems(st).length);
@@ -1593,7 +1599,7 @@ function viewProduct(p){
       <div class="pdPhoto">${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
       <div class="pInfo" data-product="${p.id}">
         <h1>${esc(pName(p))}</h1><p class="alt" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(lang === 'ar' ? p.en : p.ar)}</p>
-        ${badges(p)}${S.showStore && st ? `<a class="soldBy" href="#/v/${encodeURIComponent(st.id)}">${st.logo ? `<img src="${esc(st.logo)}" alt="">` : icon('i-store')}<span>${t('soldBy')}: <b>${esc(L(st))}</b></span>${icon('i-chev', 'ic flip')}</a>` : ''}
+        ${badges(p)}${S.showStore && st ? `<div class="soldByRow"><span class="lbl">${t('soldBy')}</span>${storesOf(p).map(v => `<a class="soldBy" href="#/v/${encodeURIComponent(v.id)}">${v.logo ? `<img src="${esc(v.logo)}" alt="">` : icon('i-store')}<b>${esc(L(v))}</b>${icon('i-chev', 'ic flip')}</a>`).join('')}</div>` : ''}
         ${modes.length === 1 && unitPrice(p, modes[0]) ? `<p class="price big">${fmtIqd(unitPrice(p, modes[0]))}</p>` : ''}
         ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(opt).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
         ${tiers.length ? `<div class="tiersNote"><b>${t('bulkT')}:</b> ${tiers.map(x => t('bulkLine', {n: x.min, p: x.pct})).join(' · ')}</div>` : ''}

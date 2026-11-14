@@ -19,7 +19,7 @@ manifest.webmanifest  lets phones install the shop as an app (name, icons, short
 sw.js                 keeps an offline copy of the shop in the browser
 data/products.js      the product list (or the fallback, once a Google Sheet is connected)
 data/site.js          settings, partner stores (public part), kits, banners
-private/commercial.js PRIVATE: commission %, store contacts. Never deployed
+private/commercial.js PRIVATE: commission %, our buying prices, store contacts. Never deployed
 js/version.js         the version number: the one place it is set
 js/catalog.js         loads the catalog for all three pages
 js/admin-lib.js       Excel / CSV / zip reading and writing, bulk-upload rules (admin only)
@@ -94,8 +94,16 @@ The shop also has:
 Delivery is done by the delivery company. Saleem earns a percentage on each partner store's sales:
 
 - **Stores tab**: each partner store has a commission %, plus private contact details and notes.
-- **On a product**: choose its store and, if needed, a different % for that one item. Bulk upload has `store` and `commission_pct` columns for doing this in one go.
-- **Kept private**: commission and store contacts never reach the shop.
+- **On a product**: list every vendor that supplies it and what we pay each one (our buying
+  price). The first is the default: orders go to it and the shop names it first. The editor
+  shows the margin against the selling price for each vendor, in red when it's a loss. An item
+  can also have its own commission % instead of its store's.
+- **Bulk upload**: `store` sets the default vendor, `vendors` sets the whole list with buying
+  prices (`mitech=120000; al-nahrain=118000`), `commission_pct` the item's own %. To file a
+  vendor's filled-in price form, pick "A price list from <store>": its price column is saved as
+  that vendor's buying price, and nothing else on the product changes.
+- **Kept private**: commission, buying prices and store contacts never reach the shop. The shop
+  only knows which stores sell an item.
   - Locally they live in `private/commercial.js`, which `build-dist.sh` refuses to publish.
   - In the Google Sheet, the public read leaves them out.
 - **Orders tab** (with the Sheet connected): every order from the shop is logged, and commission is worked out per line at the time of the order. Staff can:
@@ -212,10 +220,11 @@ store files in the same folder, so that preview works. Don't deploy these files.
 ```
 
 - `id` is stable. Saved baskets, reorder links and order messages (`[#2]`) refer to it, so never reuse one.
-- `store` is a partner store id from `data/site.js`. Commission is never in this file.
+- `stores` lists the partner store ids from `data/site.js` that sell it, the default first.
+  Commission and buying prices are never in this file; they're in `private/commercial.js`.
 - `tier` is buying priority (1 means the care plan breaks without it). The shop sorts by it
   but never shows it to customers.
-- `price`, `rentPrice`, `deposit`, `status` (`"out"` / `"hidden"`), `img` and `store` are optional.
+- `price`, `rentPrice`, `deposit`, `status` (`"out"` / `"hidden"`), `img` and `stores` are optional.
 - Departments and their sections are defined at the top of the file. The admin and bulk
   upload don't create new ones; add them there by hand.
 

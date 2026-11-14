@@ -5,7 +5,8 @@
  *   xlsxRead / xlsxWrite  the first sheet of an .xlsx in, a formatted .xlsx out
  *   COLUMNS               the spreadsheet columns, shared with apps-script/Code.gs
  *   toRows                products → spreadsheet rows
- *   planImport            spreadsheet rows → what would change, row by row
+ *   planImport            spreadsheet rows → what would change, row by row; with { vendor },
+ *                         the price column is that vendor's price to us (their filled-in form)
  *   resizeImage           an uploaded photo → a ≤1000px WebP/JPEG data URL; with
  *                         { frame: true }, a 1000px square framed like every other product photo
  *
@@ -199,7 +200,7 @@
     { key: 'department',    field: 'dept',      width: 14, help: 'Department key (see the Departments sheet) or its name', ar: 'القسم' },
     { key: 'section',       field: 'sub',       width: 14, help: 'Section key within that department, or its name', ar: 'القسم الفرعي' },
     { key: 'tier',          field: 'tier',      width: 6,  help: '1 mandatory · 2 useful · 3 bonus (internal, sorts the shop)', ar: 'الأهمية' },
-    { key: 'buy_price_iqd', field: 'price',     width: 14, help: 'Optional. Whole IQD, e.g. 45000. "-" clears it', ar: 'سعر الشراء' },
+    { key: 'sell_price_iqd', field: 'price',    width: 14, help: 'The price customers pay. Whole IQD, e.g. 45000. "-" clears it', ar: 'سعر البيع للزبون' },
     { key: 'rent_price_iqd_month', field: 'rentPrice', width: 16, help: 'Optional. IQD per month', ar: 'سعر الإيجار الشهري' },
     { key: 'rentable',      field: 'rent',      width: 10, help: 'yes / no', ar: 'إيجار' },
     { key: 'monthly_refill', field: 'refill',   width: 12, help: 'yes / no', ar: 'توصيل شهري' },
@@ -209,14 +210,18 @@
     { key: 'why_en',        field: 'whyEn',     width: 50, help: 'Why a patient needs it, English', ar: 'السبب بالإنكليزي' },
     { key: 'why_ar',        field: 'whyAr',     width: 50, help: 'Why a patient needs it, Arabic', ar: 'السبب بالعربي' },
     { key: 'photo_url',     field: 'img',       width: 30, help: 'Optional https:// link to a photo. Blank keeps the current photo; "-" removes it', ar: 'رابط الصورة' },
-    { key: 'store',         field: 'store',     width: 16, help: 'Partner store id or name (see the Stores sheet). "-" unassigns it', ar: 'المتجر الشريك' },
+    { key: 'store',         field: 'store',     width: 16, help: 'The default vendor: store id or name (see the Stores sheet). Moves it to the top of vendors. "-" removes every vendor', ar: 'المورّد الافتراضي' },
+    { key: 'vendors',       field: 'offers',    width: 34, help: 'PRIVATE. Every vendor and what we pay them, default first: "mitech=120000; al-nahrain=118000". Replaces the list. "-" removes every vendor', ar: 'الموردون وأسعار الشراء' },
     { key: 'commission_pct', field: 'commission', width: 14, help: 'PRIVATE. Optional % that overrides the store’s commission for this item. "-" goes back to the store’s', ar: 'نسبة العمولة' },
     { key: 'deposit_iqd',   field: 'deposit',   width: 12, help: 'Optional refundable deposit on a rental, IQD', ar: 'التأمين' },
   ];
   const ALIASES = {};
   COLUMNS.forEach(c => [c.key, c.field, c.ar].forEach(a => { ALIASES[norm(a)] = c; }));
   const byKey = k => COLUMNS.find(c => c.key === k);
-  Object.assign(ALIASES, { [norm('commission')]: byKey('commission_pct'), [norm('deposit')]: byKey('deposit_iqd'), [norm('supplier')]: byKey('store') });
+  Object.assign(ALIASES, { [norm('commission')]: byKey('commission_pct'), [norm('deposit')]: byKey('deposit_iqd'), [norm('supplier')]: byKey('store'), [norm('vendor')]: byKey('store'),
+    [norm('suppliers')]: byKey('vendors'), [norm('buying prices')]: byKey('vendors'),
+    // older files called the customer price buy_price_iqd ("سعر الشراء" = what the customer buys at)
+    [norm('buy_price_iqd')]: byKey('sell_price_iqd'), [norm('سعر الشراء')]: byKey('sell_price_iqd'), [norm('سعر البيع')]: byKey('sell_price_iqd'), [norm('selling price')]: byKey('sell_price_iqd') });
   Object.assign(ALIASES, { [norm('name')]: COLUMNS[1], [norm('english name')]: COLUMNS[1], [norm('arabic name')]: COLUMNS[2], [norm('price')]: COLUMNS[6],
     [norm('rent price')]: COLUMNS[7], [norm('photo')]: COLUMNS[15], [norm('image')]: COLUMNS[15], [norm('dept')]: COLUMNS[3], [norm('sub')]: COLUMNS[4] });
 
@@ -229,6 +234,7 @@
         case 'status': return STATUS_OUT[v] || 'available';
         case 'price': case 'rentPrice': case 'deposit': case 'commission': return v == null ? '' : v;
         case 'store': return v || '';
+        case 'offers': return (v || []).map(o => o.cost ? o.store + '=' + o.cost : o.store).join('; ');
         // a photo uploaded in this browser can't ride in a cell; blank keeps it on re-upload
         case 'img': return /^data:/.test(v || '') ? '' : (v || '');
         default: return v == null ? '' : v;
@@ -242,8 +248,13 @@
    * departments for checking department / section
    * → { columns, ignored, rows: [{ line, kind: new|update|same|error, id, name, changes, errors, warnings, product }], missing }
    */
-  function planImport(rows, products, departments, stores) {
-    stores = stores || [];
+  // opts.vendor: a store id. The file is that vendor's price list (the onboarding form): its price
+  // column — whatever it's called — is what they charge us, filed as their buying price on each
+  // product; the customer price isn't touched. Products they list get them as a vendor.
+  function planImport(rows, products, departments, stores, opts) {
+    stores = stores || []; opts = opts || {};
+    const vendor = opts.vendor ? stores.find(s => s.id === opts.vendor) : null;
+    if (opts.vendor && !vendor) throw new Error(`No partner store "${opts.vendor}".`);
     rows = rows.filter(r => r && r.some(c => String(c == null ? '' : c).trim() !== ''));
     if (!rows.length) throw new Error('The file is empty.');
     const header = rows[0].map(h => ALIASES[norm(h)] || null);
@@ -252,7 +263,7 @@
     if (!cols.length) throw new Error('No recognised column headings in the first row. Download the template to see them.');
     if (!cols.some(c => ['id', 'name_en', 'name_ar'].includes(c.key))) throw new Error('The file needs an id or a name column to know which product each row is.');
     const byId = new Map(products.map(p => [p.id, p]));
-    const byName = new Map(products.map(p => [norm(p.en), p]));
+    const byName = new Map(products.map(p => [norm(p.en), p])), byNameAr = new Map(products.filter(p => p.ar).map(p => [norm(p.ar), p]));
     const D = new Map(departments.map(d => [d.key, d]));
     const findDept = v => { const n = norm(v); return departments.find(d => [d.key, d.en, d.ar].some(x => norm(x) === n)); };
     const findStore = v => { const n = norm(v); return stores.find(s => [s.id, s.en, s.ar].some(x => norm(x) === n)); };
@@ -270,12 +281,16 @@
         if (!Number.isInteger(id) || id <= 0) { errors.push(`id "${cell.id}" isn’t a whole number`); id = null; }
         else base = byId.get(id) || null;
       } else if (cell.name_en && byName.has(norm(cell.name_en))) { base = byName.get(norm(cell.name_en)); id = base.id; }
+      else if (cell.name_ar && byNameAr.has(norm(cell.name_ar))) { base = byNameAr.get(norm(cell.name_ar)); id = base.id; }
       if (id != null && seen.has(id)) errors.push(`id ${id} appears twice in the file`);
 
       const patch = {};
       const set = (field, v) => { patch[field] = v; };
+      const baseOffers = () => (patch.offers || (base && base.offers) || (base && base.store ? [{ store: base.store, cost: null }] : [])).map(o => Object.assign({}, o));
+      const priceToIqd = v => { const n = Number(String(v).replace(/[,\s]|iqd|د\.?ع/gi, '')); return isFinite(n) && n > 0 ? Math.round(n) : NaN; };
       for (const c of COLUMNS) {
         if (!(c.key in cell) || c.key === 'id') continue;
+        if (vendor && c.field !== 'price') continue;               // a vendor's form only sets their price; names just find the row
         const v = cell[c.key];
         if (v === '') continue;                                    // blank: leave as is
         const clear = v === '-';
@@ -288,15 +303,29 @@
           }
           case 'sub': patch._subRaw = v; break;                    // checked once the department is known
           case 'tier': { const n = Number(v); if ([1, 2, 3].includes(n)) set('tier', n); else errors.push(`tier must be 1, 2 or 3 (got "${v}")`); break; }
-          case 'store': {
-            if (clear) { set('store', ''); break; }
-            const s = findStore(v); if (s) set('store', s.id); else errors.push(`no partner store "${v}"${stores.length ? ' — use one of: ' + stores.map(s => s.id).join(', ') : ' — add stores in the admin first'}`); break;
+          case 'store': patch._storeRaw = v; break;                // applied after the vendors column
+          case 'offers': {
+            if (clear) { set('offers', []); break; }
+            const list = [];
+            v.split(/[;\n،]+/).map(x => x.trim()).filter(Boolean).forEach(x => {
+              const m = x.match(/^(.+?)\s*[=:]\s*([\d,.\s]+(?:iqd|د\.?ع)?)$/i), s = findStore(m ? m[1].trim() : x);
+              if (!s) { errors.push(`no partner store "${m ? m[1].trim() : x}"${stores.length ? ' — use one of: ' + stores.map(s => s.id).join(', ') : ' — add stores in the admin first'}`); return; }
+              const cost = m ? priceToIqd(m[2]) : null;
+              if (Number.isNaN(cost)) { errors.push(`buying price for ${s.id} "${m[2]}" isn’t a price in IQD`); return; }
+              if (list.some(o => o.store === s.id)) { errors.push(`${s.id} is listed twice in vendors`); return; }
+              list.push({ store: s.id, cost });
+            });
+            set('offers', list); break;
           }
           case 'commission': {
             if (clear) { set('commission', null); break; }
             const n = Number(v.replace(/[%\s]/g, '')); if (isFinite(n) && n >= 0 && n <= 100) set('commission', Math.round(n * 100) / 100); else errors.push(`commission_pct must be 0–100 (got "${v}")`); break;
           }
           case 'price': case 'rentPrice': case 'deposit': {
+            if (vendor && c.field === 'price') {                   // the vendor's price to us
+              if (clear) { patch._cost = null; break; }
+              const n = priceToIqd(v); if (Number.isNaN(n)) errors.push(`${c.key} "${v}" isn’t a price in IQD`); else patch._cost = n; break;
+            }
             if (clear) { set(c.field, null); break; }
             const n = Number(v.replace(/[,\s]|iqd|د\.?ع/gi, ''));
             if (isFinite(n) && n > 0) set(c.field, Math.round(n)); else errors.push(`${c.key} "${v}" isn’t a price in IQD`); break;
@@ -317,6 +346,21 @@
           }
         }
       }
+      if (patch._storeRaw != null) {                           // the default vendor goes to the top
+        const v = patch._storeRaw; delete patch._storeRaw;
+        if (v === '-') set('offers', []);
+        else {
+          const s = findStore(v);
+          if (!s) errors.push(`no partner store "${v}"${stores.length ? ' — use one of: ' + stores.map(s => s.id).join(', ') : ' — add stores in the admin first'}`);
+          else { const list = baseOffers(), i = list.findIndex(o => o.store === s.id); const [o] = i >= 0 ? list.splice(i, 1) : [{ store: s.id, cost: null }]; list.unshift(o); set('offers', list); }
+        }
+      }
+      if (vendor && '_cost' in patch) {                         // the vendor's price list
+        const list = baseOffers(), o = list.find(o => o.store === vendor.id);
+        if (o) o.cost = patch._cost; else list.push({ store: vendor.id, cost: patch._cost });
+        delete patch._cost; set('offers', list);
+      }
+      if (patch.offers) set('store', patch.offers.length ? patch.offers[0].store : '');
       const deptKey = patch.dept || (base && base.dept);
       if (patch._subRaw != null) {
         const s = findSub(D.get(deptKey), patch._subRaw);
@@ -325,12 +369,13 @@
       } else if (patch.dept && base && patch.dept !== base.dept) errors.push(`moved to ${patch.dept}, so it needs a section too`);
 
       const isNew = !base;
-      if (isNew) {
+      if (vendor && isNew) errors.push(id != null ? `no product #${id} in the catalogue` : `no product called "${cell.name_en || cell.name_ar || ''}" — add it first, or put its id in the file`);
+      else if (isNew) {
         if (!patch.en && !patch.ar) errors.push('a new product needs a name');
         if (!patch.dept) errors.push('a new product needs a department');
         if (!patch.sub && patch.dept) errors.push('a new product needs a section');
       }
-      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, deposit: null, status: 'available', img: '', store: '', commission: null },
+      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, deposit: null, status: 'available', img: '', store: '', offers: [], commission: null },
                                    base || {}, patch);
       if (merged.b2b && merged.dept !== 'clinic') warnings.push('clinic-only items normally sit in the clinic department');
       if (!merged.b2b && merged.dept === 'clinic') warnings.push('items in the clinic department are normally clinic-only');
@@ -341,7 +386,7 @@
       if (!errors.length && isNew && id != null && id >= nextId) nextId = id + 1;
       if (id != null) seen.add(id);
       merged.id = id;
-      const changes = base ? Object.keys(patch).filter(k => JSON.stringify(patch[k]) !== JSON.stringify(base[k])) : [];
+      const changes = base ? Object.keys(patch).filter(k => k !== 'store' && JSON.stringify(patch[k]) !== JSON.stringify(base[k])) : [];
       out.push({ line, id, name: merged.en || merged.ar, errors, warnings, changes, product: merged, before: base,
                  kind: errors.length ? 'error' : isNew ? 'new' : changes.length ? 'update' : 'same' });
     });
