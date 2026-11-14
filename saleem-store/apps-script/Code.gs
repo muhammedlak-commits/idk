@@ -47,7 +47,7 @@ var COLUMNS = [
   'buy_price_iqd', 'rent_price_iqd_month', 'rentable', 'monthly_refill', 'clinic_only',
   'services', 'status', 'why_en', 'why_ar', 'photo_url', 'store', 'commission_pct', 'deposit_iqd'
 ];
-var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active'];
+var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active', 'logo_url', 'about_en', 'about_ar'];
 var ORDER_COLUMNS = ['id', 'created_at', 'status', 'name', 'phone', 'area', 'address', 'clinic', 'payment', 'notes', 'lang',
                      'remind', 'remind_on', 'reminded_at', 'items', 'est_total_iqd', 'commission_iqd', 'staff_note', 'lines_json', 'updated_at'];
 var ORDER_STATUSES = ['new', 'confirmed', 'onway', 'delivered', 'cancelled'];
@@ -66,7 +66,10 @@ function doGet(e) {
   try {
     var products = readProducts_().filter(function (p) { return p.status !== 'hidden'; }).map(publicProduct_);
     var site = readSite_();
-    site.stores = readStores_().filter(function (s) { return s.on; }).map(function (s) { return { id: s.id, en: s.en, ar: s.ar, area: s.area, on: true }; });
+    // the public store profile only: never commission, phone, contact or notes
+    site.stores = readStores_().filter(function (s) { return s.on; }).map(function (s) {
+      return { id: s.id, en: s.en, ar: s.ar, area: s.area, on: true, logo: s.logo, aboutEn: s.aboutEn, aboutAr: s.aboutAr };
+    });
     return json_({ ok: true, products: products, site: site, version: version_([products, site]), updatedAt: updatedAt_() });
   } catch (err) {
     console.error(err);
@@ -279,7 +282,8 @@ function readStores_() {
     var id = String(g('id')).trim(); if (!id) continue;
     out.push({ id: id, en: String(g('name_en')).trim(), ar: String(g('name_ar')).trim(), area: String(g('area')).trim(),
                commission: pct_(g('commission_pct')) || 0, phone: String(g('phone')).trim(), contact: String(g('contact')).trim(),
-               notes: String(g('notes')), on: String(g('active')) === '' || yes_(g('active')) });
+               notes: String(g('notes')), on: String(g('active')) === '' || yes_(g('active')),
+               logo: String(g('logo_url')).trim(), aboutEn: String(g('about_en')), aboutAr: String(g('about_ar')) });
   }
   return out;
 }
@@ -288,7 +292,8 @@ function saveStores_(list) {
   var rows = list.map(function (s) {
     var id = str_(s.id, 40).trim(); if (!id) throw new Error('Every store needs an id.');
     return { id: id, name_en: str_(s.en, 120), name_ar: str_(s.ar, 120), area: str_(s.area, 120), commission_pct: pct_(s.commission) || 0,
-             phone: str_(s.phone, 40), contact: str_(s.contact, 120), notes: str_(s.notes, 1000), active: s.on === false ? 'no' : 'yes' };
+             phone: str_(s.phone, 40), contact: str_(s.contact, 120), notes: str_(s.notes, 1000), active: s.on === false ? 'no' : 'yes',
+             logo_url: str_(s.logo, 500), about_en: str_(s.aboutEn, 600), about_ar: str_(s.aboutAr, 600) };
   });
   writeRows_(sheet_('Stores', STORE_COLUMNS), STORE_COLUMNS, rows, 'id', true);
 }

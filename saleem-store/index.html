@@ -664,6 +664,36 @@ html.vt .view{animation:none}
 .trackItems{list-style:none;margin:14px 0;padding:12px 14px;border-radius:12px;background:var(--paper);display:grid;gap:6px;font-size:14px;color:var(--navy2)}
 .trackItems span{color:var(--mut);font-size:13px}
 
+/* partner stores */
+.cVend{display:flex;align-items:center;gap:4px;margin-top:4px;color:var(--mut);font-size:12.5px;font-weight:700;min-width:0}
+.cVend .ic{width:14px;height:14px;flex:none}
+.cVend span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+a.soldBy{text-decoration:none;min-height:44px;padding:4px 10px 4px 6px;gap:8px}
+a.soldBy:hover{background:var(--blue50)}
+a.soldBy img{width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+a.soldBy .ic.flip{width:14px;height:14px}
+.vendors{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.vendor{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--navy2)}
+.vendor:hover{border-color:var(--blue)}
+.vendor>span:not(.vLogo){flex:1;min-width:0}
+.vendor strong{display:block;font-size:16px}
+.vendor small{display:block;color:var(--mut);font-size:13px}
+.vendor em{font-style:normal;color:var(--blue);font-weight:800;font-size:13px}
+.vendor .go{color:var(--mut)}
+.vLogo{width:60px;height:60px;flex:none;border-radius:14px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;overflow:hidden;color:var(--blue)}
+.vLogo img{width:100%;height:100%;object-fit:contain}
+.vLogo .ic{width:28px;height:28px}
+.vLogo.big{width:104px;height:104px;border-radius:20px}
+.vTop{display:flex;gap:18px;align-items:center}
+.vTop h1{font-size:clamp(24px,2.6vw,32px)}
+.vMeta{display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0 0;color:var(--mut);font-size:14px;font-weight:700}
+.vMeta span{display:inline-flex;align-items:center;gap:6px}
+.vMeta .ic{width:16px;height:16px;color:var(--blue)}
+.vAbout{margin:10px 0 0;color:var(--ink2);font-size:14.5px;max-width:70ch}
+.vNote{display:flex;gap:8px;margin:16px 0 0;padding:10px 12px;border-radius:12px;background:var(--green50);color:var(--greenInk);font-size:13.5px}
+.vNote .ic{flex:none;width:18px;height:18px;margin-top:2px}
+@media(max-width:760px){.vTop{align-items:flex-start;gap:14px}.vLogo.big{width:76px;height:76px;border-radius:16px}}
+
 .tab[hidden]{display:none!important}
 @media(min-width:761px){.homeSearch form{display:none}}
 
@@ -769,7 +799,7 @@ html.vt .view{animation:none}
 <footer><div class="wrap">
   <img src="assets/logo-saleem.png" alt="Saleem" width="91" height="36">
   <div><p id="footText"></p><p id="footDelivery" style="margin-top:8px"></p><p class="ver" id="footVer"></p></div>
-  <div style="display:grid;gap:4px"><div class="pays-f" id="footPays"></div><p><a id="footWa" target="_blank" rel="noopener"></a></p><p><a id="footTel"></a></p></div>
+  <div style="display:grid;gap:4px"><div class="pays-f" id="footPays"></div><p><a id="footWa" target="_blank" rel="noopener"></a></p><p><a id="footTel"></a></p><p><a id="footStores" href="#/stores"></a></p></div>
 </div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <dialog class="sheet" id="sheet" aria-labelledby="sheetT"></dialog>
@@ -841,6 +871,7 @@ const T = {
     st:{new:'وصل طلبك', confirmed:'تأكّد الطلب', onway:'بالطريق إلك', delivered:'انوصل', cancelled:'انلغى الطلب'},
     lowT:'مستلزماتك الشهرية تخلص بعد {n} يوم تقريباً', lowSoon:'مستلزماتك الشهرية تخلص باچر', lowNow:'صار وقت تجديد مستلزماتك الشهرية', lowBtn:'جدّد هسه',
     themeDark:'الوضع الليلي', themeLight:'الوضع النهاري',
+    storesT:'المتاجر الشريكة', storesSub:'الصيدليات ومتاجر المستلزمات اللي تجهّز طلباتكم.', vendorNote:'فريق سليم يأكد وياك السعر والتوفّر على واتساب، وشركة التوصيل توصل الطلب من المتجر لباب البيت.', vendorDelivery:'التوصيل عن طريق شركة التوصيل',
     bOut:'غير متوفر', askAvail:'اسأل عن التوفّر', askOut:'مرحبا، أريد أسأل متى يتوفّر: {p}', outNote:'هذا المنتج غير متوفر حالياً. راسلنا ونخبرك أول ما يوصل.',
     orRent:'أو إيجار {p} بالشهر', rentFrom:'إيجار من {p} بالشهر', perMonth:'بالشهر', perDelivery:'لكل توصيلة',
     priceSet:'السعر المعروض تقريبي ويأكده فريقنا على واتساب قبل التوصيل. ما تدفع شي هسه.',
@@ -911,6 +942,7 @@ const T = {
     st:{new:'Order received', confirmed:'Confirmed', onway:'Out for delivery', delivered:'Delivered', cancelled:'Cancelled'},
     lowT:'Your monthly supplies run out in about {n} days', lowSoon:'Your monthly supplies run out tomorrow', lowNow:'It’s time to refill your monthly supplies', lowBtn:'Refill now',
     themeDark:'Dark mode', themeLight:'Light mode',
+    storesT:'Partner stores', storesSub:'The pharmacies and supply stores that prepare your orders.', vendorNote:'Saleem’s team confirms price and stock with you on WhatsApp, and the delivery company brings your order from the store to your door.', vendorDelivery:'Delivered by our delivery partner',
     bOut:'Out of stock', askAvail:'Ask about availability', askOut:'Hello, when will this be back in stock: {p}', outNote:'This item is out of stock right now. Message us and we’ll tell you as soon as it’s back.',
     orRent:'or rent for {p} / month', rentFrom:'Rent from {p} / month', perMonth:'/ month', perDelivery:'per delivery',
     priceSet:'Prices shown are a guide. Our team confirms on WhatsApp before delivery, and you pay nothing now.',
@@ -950,11 +982,11 @@ function setCatalog(cat){
   PRODUCTS = cat.products.filter(p => DEPT[p.dept] && DEPT[p.dept].subs.some(s => s.key === p.sub) && (!p.b2b || clinicsOn()));
   BYID = new Map(PRODUCTS.map(p => [String(p.id), p]));
   RETAIL = PRODUCTS.filter(p => !p.b2b);
-  HAY = new Map(PRODUCTS.map(p => {
-    const d = DEPT[p.dept], s = subOf(p);
-    return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr].join(' ')) }];
-  }));
   STORES = new Map(SITE.stores.filter(x => x.on).map(x => [x.id, x]));
+  HAY = new Map(PRODUCTS.map(p => {
+    const d = DEPT[p.dept], s = subOf(p), st = STORES.get(p.store) || {};
+    return [p.id, { name: norm(p.en + ' ' + p.ar), rest: norm([d.en, d.ar, s.en, s.ar, p.whyEn, p.whyAr, st.en || '', st.ar || ''].join(' ')) }];
+  }));
   // a kit keeps only items still in the shop, each in a mode that's still offered
   KITS = !S.kits.on ? [] : SITE.kits.filter(k => k.on).map(k => Object.assign({}, k, {
     items: k.items.map(i => ({ p: BYID.get(String(i.id)), qty: i.qty, mode: i.mode })).filter(i => i.p)
@@ -1079,7 +1111,7 @@ function card(p, want){
   const mode = fixedMode(p, want);
   return `<article class="card" data-card="${p.id}" data-mode="${mode}">
     <a href="#/p/${p.id}">${badges(p)}${photo(p, 400)}
-      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${priceLine(p, mode)}</div></a>
+      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${S.showStore && storeOf(p) ? `<span class="cVend">${icon('i-store')}<span>${esc(L(storeOf(p)))}</span></span>` : ''}${priceLine(p, mode)}</div></a>
     <div class="cFoot">${addControl(p, mode)}</div></article>`;
 }
 
@@ -1147,6 +1179,8 @@ function render(){
   else if(a === 'reorder')       { reorder(b); return; }
   else if(a === 'list')          { tab = 'order'; title = t('listT'); html = viewList(); }
   else if(a === 'track')         { tab = 'order'; title = t('trackT'); html = viewTrack(b); }
+  else if(a === 'stores' && STORES.size) { tab = 'departments'; title = t('storesT'); html = viewVendors(); }
+  else if(a === 'v' && STORES.has(b)) { tab = 'departments'; title = L(STORES.get(b)); html = viewVendor(STORES.get(b), qs); }
   else if(a === 'search')        { tab = 'search'; title = t('srchTitle'); html = viewSearch(qs.get('q') || ''); }
   else if(a === 'p' && BYID.has(b)) { const p = BYID.get(b); tab = p.b2b ? 'clinic' : 'departments'; title = pName(p); html = viewProduct(p); remember(p.id); }
   else if(a === 'order')         { tab = 'order'; title = t('orderTitle'); html = viewOrder(); }
@@ -1420,11 +1454,14 @@ const nurseBlock = () => nurseOn() ? `<section class="sec"><div class="finderCta
    LISTS
    ═══════════════════════════════════════════════════════════ */
 function viewDepts(){
+  const vendors = [...STORES.values()].filter(st => vendorItems(st).length);
+  const vendorRow = vendors.length ? `<section class="sec"><div class="secHead"><div><h2>${t('storesT')}</h2><p>${t('storesSub')}</p></div><a class="more" href="#/stores">${t('seeAll')}${icon('i-chev', 'ic flip')}</a></div>
+    <div class="vendors">${vendors.slice(0, 6).map(st => `<a class="vendor" href="#/v/${encodeURIComponent(st.id)}">${vendorLogo(st, 'vLogo')}<span><strong>${esc(L(st))}</strong><em>${t('itemsN', {n: num(vendorItems(st).length)})}</em></span>${icon('i-chev', 'ic go flip')}</a>`).join('')}</div></section>` : '';
   return pageHead({ title: t('deptsTitle'), sub: t('deptsSub') }) + `<div class="wrap" style="margin-top:20px"><div class="deptList">${DEPTS.map(d => {
     const n = PRODUCTS.filter(p => p.dept === d.key).length;
     return `<div class="dRow ${d.key === 'clinic' ? 'clinic' : ''}"><a href="#/d/${d.key}"><span class="dIcon">${icon('d-' + d.icon)}</span><span><strong>${esc(L(d))}</strong><small>${esc(lang === 'ar' ? d.blurbAr : d.blurbEn)} · ${t('itemsN', {n: num(n)})}</small></span>${icon('i-chev', 'ic go flip')}</a>
       <div class="chips">${d.subs.map(s => `<a class="chip" href="#/d/${d.key}/${s.key}">${esc(L(s))} <b>${num(PRODUCTS.filter(p => p.dept === d.key && p.sub === s.key).length)}</b></a>`).join('')}</div></div>`;
-  }).join('')}</div></div>`;
+  }).join('')}</div>${vendorRow}</div>`;
 }
 
 function pageHead({ crumbs = [], title, sub, iconId, tabs = '' }){
@@ -1472,6 +1509,27 @@ function deptChips(items, base, qs){
   const keep = k => withQs(base, { q: qs.get('q'), dept: k, show: qs.get('show'), sort: qs.get('sort') });
   return `<div class="chips" style="margin-top:16px">${[['', t('all'), items.length], ...keys.map(d => [d.key, L(d), items.filter(p => p.dept === d.key).length])]
     .map(([k, l, n]) => `<a class="chip" href="${keep(k)}" ${cur === k ? 'aria-current="true"' : ''} data-quiet>${esc(l)} <b>${num(n)}</b></a>`).join('')}</div>`;
+}
+
+/* partner stores: a directory, and a page for each with its own products */
+const vendorItems = st => PRODUCTS.filter(p => p.store === st.id);
+const vendorLogo = (st, cls) => `<span class="${cls}">${st.logo ? `<img src="${esc(st.logo)}" alt="">` : icon('i-store')}</span>`;
+function viewVendors(){
+  const list = [...STORES.values()].filter(st => vendorItems(st).length);
+  return pageHead({ crumbs: [['#/', t('tHome')], ['#/departments', t('tDepts')]], title: t('storesT'), sub: t('storesSub'), iconId: 'i-store' })
+    + `<div class="wrap" style="margin-top:20px"><div class="vendors">${list.map(st => `<a class="vendor" href="#/v/${encodeURIComponent(st.id)}">${vendorLogo(st, 'vLogo')}
+      <span><strong>${esc(L(st))}</strong>${st.area ? `<small>${esc(st.area)}</small>` : ''}<em>${t('itemsN', {n: num(vendorItems(st).length)})}</em></span>${icon('i-chev', 'ic go flip')}</a>`).join('')}</div></div>`;
+}
+function viewVendor(st, qs){
+  const all = vendorItems(st), d = qs.get('dept'), items = d ? all.filter(p => p.dept === d) : all, about = LF(st, 'about');
+  return `<div class="pageHead vendorHead"><div class="wrap" style="padding-bottom:22px">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="#/">${t('tHome')}</a>${icon('i-chev', 'ic flip')}<a href="#/stores">${t('storesT')}</a></nav>
+      <div class="vTop">${vendorLogo(st, 'vLogo big')}<div><h1>${esc(L(st))}</h1>
+        <p class="vMeta">${st.area ? `<span>${icon('i-store')}${esc(st.area)}</span>` : ''}<span>${t('itemsN', {n: num(all.length)})}</span><span>${icon('i-truck')}${esc(S.delivery.on ? L(S.delivery) : t('vendorDelivery'))}</span></p>
+        ${about ? `<p class="vAbout">${esc(about)}</p>` : ''}</div></div>
+      <p class="vNote">${icon('i-shieldok')}<span>${t('vendorNote')}</span></p>
+    </div></div>`
+    + listing(items, { base: '#/v/' + st.id, qs, chips: deptChips(all, '#/v/' + encodeURIComponent(st.id), qs) });
 }
 
 function viewService(s, qs){
@@ -1535,7 +1593,7 @@ function viewProduct(p){
       <div class="pdPhoto">${photo(p, 700)}${!p.img && CONFIG.webPhotos ? `<p class="phNote">${t('photoNote')}</p>` : ''}</div>
       <div class="pInfo" data-product="${p.id}">
         <h1>${esc(pName(p))}</h1><p class="alt" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(lang === 'ar' ? p.en : p.ar)}</p>
-        ${badges(p)}${S.showStore && st ? `<span class="soldBy">${icon('i-store')}${t('soldBy')}: <b>${esc(L(st))}</b></span>` : ''}
+        ${badges(p)}${S.showStore && st ? `<a class="soldBy" href="#/v/${encodeURIComponent(st.id)}">${st.logo ? `<img src="${esc(st.logo)}" alt="">` : icon('i-store')}<span>${t('soldBy')}: <b>${esc(L(st))}</b></span>${icon('i-chev', 'ic flip')}</a>` : ''}
         ${modes.length === 1 && unitPrice(p, modes[0]) ? `<p class="price big">${fmtIqd(unitPrice(p, modes[0]))}</p>` : ''}
         ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(opt).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
         ${tiers.length ? `<div class="tiersNote"><b>${t('bulkT')}:</b> ${tiers.map(x => t('bulkLine', {n: x.min, p: x.pct})).join(' · ')}</div>` : ''}
@@ -2035,6 +2093,7 @@ function applyLang(){
   $('#footText').textContent = t('foot');
   $('#footVer').textContent = (window.SALEEM_VERSION || '');
   const fw = $('#footWa'); fw.innerHTML = esc(t('footWa')) + '<bdi dir="ltr">' + esc(waPhone()) + '</bdi>'; fw.href = wa(t('askMsg'));
+  const fs = $('#footStores'); fs.textContent = t('storesT'); fs.hidden = !(STORES && STORES.size);
   const ft = $('#footTel'); ft.innerHTML = esc(t('footTel')) + '<bdi dir="ltr">' + esc(callPhone()) + '</bdi>'; ft.href = telHref();
   if(S){
     previewBar();

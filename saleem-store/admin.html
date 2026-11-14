@@ -249,6 +249,12 @@ textarea.paste{width:100%;min-height:110px;border:1px solid var(--line2);border-
 .switch input:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .switch input:checked{background:var(--green)}
 .switch input:checked:after{inset-inline-start:21px}
+.logoBox{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;margin-bottom:14px}
+.storeLogo{width:96px;height:96px;border-radius:14px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;overflow:hidden;color:var(--mut)}
+.storeLogo img{width:100%;height:100%;object-fit:contain}
+.storeLogo .ic{width:34px;height:34px}
+.scHead{display:flex;align-items:center;gap:10px}
+.scLogo{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#fff;object-fit:contain;flex:none}
 .frameRow{margin-top:14px}.frameRow .lead{margin:4px 0 0;font-size:12.5px;padding-inline-start:52px}
 .set .head2{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .set .body{margin-top:12px}
@@ -461,6 +467,7 @@ const T = {
     savedLocal:'انحفظ بالمسودة', savedSheet:'انحفظ بالشيت', deleted:'انحذف',
     // stores
     storesT:'المتاجر الشريكة', storesP:'المتاجر اللي تجهّز المنتجات. لكل متجر نسبة عمولة، وتكدر تبدّلها لأي منتج من صفحة المنتج.',
+    sLogo:'الشعار', sLogoP:'يظهر بصفحة المتجر وبجانب منتجاته. يفضّل خلفية بيضاء.', sAboutEn:'نبذة بالإنكليزي (تظهر للزبائن)', sAboutAr:'نبذة بالعربي (تظهر للزبائن)', sPublic:'شوف صفحته بالمتجر',
     addStore:'متجر جديد', storeT:'متجر شريك', sId:'المعرّف (بالإنكليزي، بدون مسافات)', sEn:'الاسم بالإنكليزي', sAr:'الاسم بالعربي', sArea:'المنطقة', sPhone:'الهاتف / واتساب', sContact:'الشخص المسؤول', sNotes:'ملاحظات', sComm:'نسبة العمولة', sOn:'فعّال',
     sProducts:'{n} منتج', sOverrides:'{n} بعمولة خاصة', sShow:'شوف منتجاته', sPrivate:'العمولة والهاتف والملاحظات خاصة — ما تنشر ويا المتجر.',
     sDelAsk:'تحذف «{n}»؟ منتجاته ({c}) راح تصير بدون متجر.', eId:'معرّف بالإنكليزي بدون مسافات، وما مكرر', noStores:'ماكو متاجر بعد. أضف أول متجر شريك.',
@@ -545,6 +552,7 @@ const T = {
     eName:'Enter at least one name', eDept:'Choose a department', eSub:'Choose a section', ePrice:'A whole number in IQD', ePct:'A number from 0 to 100',
     savedLocal:'Saved to the draft', savedSheet:'Saved to the Sheet', deleted:'Deleted',
     storesT:'Partner stores', storesP:'The stores that supply the products. Each has a commission %, and any product can override it on its own page.',
+    sLogo:'Logo', sLogoP:'Shown on the store’s page and next to its products. A white background works best.', sAboutEn:'About, in English (customers see this)', sAboutAr:'About, in Arabic (customers see this)', sPublic:'See its page in the shop',
     addStore:'New store', storeT:'Partner store', sId:'ID (English, no spaces)', sEn:'Name in English', sAr:'Name in Arabic', sArea:'Area', sPhone:'Phone / WhatsApp', sContact:'Contact person', sNotes:'Notes', sComm:'Commission', sOn:'Active',
     sProducts:'{n} products', sOverrides:'{n} with their own %', sShow:'See its products', sPrivate:'Commission, phone and notes are private — never published with the shop.',
     sDelAsk:'Delete “{n}”? Its {c} products will have no store.', eId:'An English id with no spaces, not already used', noStores:'No stores yet. Add the first partner store.',
@@ -704,7 +712,7 @@ async function api(action, body){
   return j;
 }
 
-const fullStore = s => Object.assign({ id: '', en: '', ar: '', area: '', on: true, commission: 0, phone: '', contact: '', notes: '' }, s, { commission: C.pct(s.commission) ?? 0 });
+const fullStore = s => Object.assign({ id: '', en: '', ar: '', area: '', on: true, commission: 0, phone: '', contact: '', notes: '', logo: '', aboutEn: '', aboutAr: '' }, s, { commission: C.pct(s.commission) ?? 0 });
 function useSite(site){ const s = C.cleanSite(site); settings = s.settings; kits = s.kits; banners = s.banners; }
 async function loadAll(){
   orders = null;
@@ -768,6 +776,7 @@ async function commit(list, opts){
   if(list.length){
     const photos = list.filter(p => /^data:/.test(p.img));
     const rows = list.map(p => Object.assign({}, C.clean(p), /^data:/.test(p.img) ? { img: (products.find(x => x.id === p.id) || {}).img || '' } : {}));
+    if(opts.replace) stores = await Promise.all(stores.map(async s => Object.assign({}, s, { logo: await uploadInline(s.logo, 'store-' + s.id) })));
     const extra = opts.replace ? { stores, site: { settings, kits, banners: await Promise.all(banners.map(async b => Object.assign({}, b, { img: await uploadInline(b.img, 'banner-' + b.id) }))) } } : {};
     const j = await api(opts.replace ? 'replaceAll' : 'save', Object.assign({ products: rows }, extra));
     products = j.products.map(C.clean);
@@ -789,7 +798,7 @@ async function commitSite(patch){
   else await saveDraft();
 }
 async function commitStores(list){
-  stores = list.map(fullStore);
+  stores = await Promise.all(list.map(async s => Object.assign(fullStore(s), { logo: await uploadInline(s.logo, 'store-' + s.id) })));
   if(sheetMode()){ const j = await api('saveStores', { stores }); stores = j.stores.map(fullStore); }
   else await saveDraft();
 }
@@ -1031,11 +1040,13 @@ document.addEventListener('click', async e => {
   else if(el.matches('[data-pick-one]')){ pickTarget = el.dataset.pickOne || 'editor'; $('#pickOne').click(); }
   else if(el.matches('[data-link]')){
     const target = el.dataset.link || 'editor';
+    if(target === 'storeLogo'){ readStore(); const u = prompt(t('linkAsk'), /^https:/.test(editStore.logo) ? editStore.logo : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editStore.logo = u.trim(); storeEditor(null, true); } return; }
     if(target === 'banner'){ readBanner(); const u = prompt(t('linkAsk'), /^https:/.test(editBanner.img) ? editBanner.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editBanner.img = u.trim(); bannerEditor(true); } return; }
     readForm(); const u = prompt(t('linkAsk'), /^https:/.test(editing.img) ? editing.img : 'https://'); if(u && /^https:\/\/\S+$/.test(u.trim())){ editing.img = u.trim(); keepNums(); openEditor(editing.id, true); }
   }
   else if(el.matches('[data-unphoto]')){
     if(el.dataset.unphoto === 'banner'){ readBanner(); editBanner.img = ''; bannerEditor(true); return; }
+    if(el.dataset.unphoto === 'storeLogo'){ readStore(); editStore.logo = ''; storeEditor(null, true); return; }
     readForm(); editing.img = ''; keepNums(); openEditor(editing.id, true);
   }
   else if(el.matches('[data-del]')){
@@ -1051,13 +1062,14 @@ let pickTarget = null;      // 'editor' | 'banner' | product id (photos tab)
 async function photoFile(file, target){
   if(!file || !/^image\//.test(file.type)) return;
   if(target === 'banner'){ const dataUrl = await LIB.resizeImage(file, 1600); readBanner(); editBanner.img = dataUrl; bannerEditor(true); return; }
+  if(target === 'storeLogo'){ const dataUrl = await LIB.resizeImage(file, 512, { frame: true }); readStore(); editStore.logo = dataUrl; storeEditor(null, true); return; }
   const dataUrl = await LIB.resizeImage(file, 1000, { frame: framing() });
   if(target === 'editor'){ readForm(); keepNums(); editing.img = dataUrl; openEditor(editing.id, true); return; }
   const p = products.find(x => x.id === target); if(!p) return;
   try{ busy(t('working')); await commit([Object.assign({}, p, { img: dataUrl })]); busy(); paintPhotoGrid(); toast(t('photosSaved', { n: 1 })); }
   catch(x){ fail(x); }
 }
-$('#pickOne').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; photoFile(f, pickTarget === 'editor' || pickTarget === 'banner' ? pickTarget : +pickTarget); });
+$('#pickOne').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; photoFile(f, ['editor', 'banner', 'storeLogo'].includes(pickTarget) ? pickTarget : +pickTarget); });
 ['dragover', 'dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => {
   // a file dropped anywhere else would open in the tab and lose unsaved work
   if(ev !== 'dragleave') e.preventDefault();
@@ -1081,16 +1093,27 @@ function viewStores(){
   return `<div class="head"><div><h1>${t('storesT')}</h1><p>${t('storesP')}</p></div><button class="btn or" type="button" data-store-new>${icon('i-plus')}${t('addStore')}</button></div>
     <p class="note info">${icon('i-lock')}<span>${t('sPrivate')}</span></p>
     ${stores.length ? `<div class="cards">${stores.map(s => { const n = products.filter(p => p.store === s.id).length, o = products.filter(p => p.store === s.id && p.commission != null).length;
-      return `<div class="sc ${s.on ? '' : 'off'}" data-store="${esc(s.id)}" tabindex="0" role="button"><h3>${esc(L(s))}</h3>
+      return `<div class="sc ${s.on ? '' : 'off'}" data-store="${esc(s.id)}" tabindex="0" role="button"><div class="scHead">${s.logo ? `<img class="scLogo" src="${esc(s.logo)}" alt="">` : ''}<h3>${esc(L(s))}</h3></div>
         <div class="meta">${s.area ? esc(s.area) + ' · ' : ''}<span class="mono">${esc(s.id)}</span>${s.on ? '' : ` · <span class="st st-hidden">${t('off')}</span>`}</div>
         <div class="big">${s.commission}%<small> ${t('sComm')}</small></div>
         <div class="meta">${t('sProducts', { n })}${o ? ' · ' + t('sOverrides', { n: o }) : ''}</div></div>`; }).join('')}</div>`
       : `<div class="panel"><p class="lead" style="margin:0">${t('noStores')}</p></div>`}`;
 }
-function storeEditor(s){
-  editStore = s ? Object.assign({}, s) : fullStore({ _new: true });
+// copies what's typed into the open store form, so a logo change doesn't lose it
+function readStore(){
+  const f = $('#storeForm'); if(!f || !editStore) return;
+  const e = f.elements;
+  Object.assign(editStore, { en: e.en.value, ar: e.ar.value, area: e.area.value, commission: e.commission.value, phone: e.phone.value, contact: e.contact.value,
+    notes: e.notes.value, on: e.on.checked, aboutEn: e.aboutEn.value, aboutAr: e.aboutAr.value });
+  if(editStore._new) editStore.id = e.sid.value;
+}
+function storeEditor(s, keep){
+  if(!keep) editStore = s ? Object.assign({}, s) : fullStore({ _new: true });
   const x = editStore, n = products.filter(p => p.store === x.id).length;
   openDrawer(x._new ? t('addStore') : esc(L(x)), `<form id="storeForm" novalidate>
+    <div class="logoBox"><div class="storeLogo">${x.logo ? `<img src="${esc(x.logo)}" alt="">` : icon('i-store')}</div>
+      <div><b>${t('sLogo')}</b><p class="lead" style="margin:2px 0 8px;font-size:12.5px">${t('sLogoP')}</p>
+      <div class="row"><button class="btn sm navy" type="button" data-pick-one="storeLogo">${icon('i-up')}${t('upload')}</button><button class="btn sm" type="button" data-link="storeLogo">${t('link')}</button>${x.logo ? `<button class="btn sm red" type="button" data-unphoto="storeLogo">${t('removePhoto')}</button>` : ''}</div></div></div>
     <div class="grid2">
       <label class="field"><span>${t('sEn')}</span><input name="en" value="${esc(x.en)}" dir="ltr"></label>
       <label class="field"><span>${t('sAr')}</span><input name="ar" value="${esc(x.ar)}" dir="rtl"></label>
@@ -1101,8 +1124,13 @@ function storeEditor(s){
       <label class="field"><span>${t('sContact')}</span><input name="contact" value="${esc(x.contact)}"></label>
       <label class="field" style="align-self:end">${sw('on', x.on, t('sOn'))}</label>
     </div>
+    <div class="grid2">
+      <label class="field"><span>${t('sAboutEn')}</span><textarea name="aboutEn" dir="ltr" maxlength="600">${esc(x.aboutEn)}</textarea></label>
+      <label class="field"><span>${t('sAboutAr')}</span><textarea name="aboutAr" dir="rtl" maxlength="600">${esc(x.aboutAr)}</textarea></label>
+    </div>
     <label class="field"><span>${t('sNotes')}</span><textarea name="notes">${esc(x.notes)}</textarea></label>
     <p class="note info">${icon('i-lock')}<span>${t('sPrivate')}</span></p>
+    ${x._new ? '' : `<p style="margin:0 0 10px"><a href="${esc(ADMIN.shopUrl)}#/v/${encodeURIComponent(x.id)}" target="_blank" rel="noopener">${t('sPublic')}</a></p>`}
     ${x._new ? '' : `<button class="btn sm" type="button" data-store-products="${esc(x.id)}">${t('sShow')} (${n})</button>`}
   </form>`, `<button class="btn navy" type="submit" form="storeForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button><span class="sp"></span>${x._new ? '' : `<button class="btn red" type="button" data-store-del>${t('del')}</button>`}`);
 }
@@ -1134,7 +1162,8 @@ document.addEventListener('submit', async e => {
   if(pc == null || Number.isNaN(pc)) bad.push('commission');
   $$('#storeForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
   if(bad.length) return;
-  const rec = fullStore({ id, en: f.en.value.trim(), ar: f.ar.value.trim(), area: f.area.value.trim(), commission: pc, phone: f.phone.value.trim(), contact: f.contact.value.trim(), notes: f.notes.value, on: f.on.checked });
+  const rec = fullStore({ id, en: f.en.value.trim(), ar: f.ar.value.trim(), area: f.area.value.trim(), commission: pc, phone: f.phone.value.trim(), contact: f.contact.value.trim(), notes: f.notes.value, on: f.on.checked,
+    logo: x.logo || '', aboutEn: f.aboutEn.value.trim(), aboutAr: f.aboutAr.value.trim() });
   if(!rec.en && !rec.ar) rec.en = id;
   const list = x._new ? stores.concat(rec) : stores.map(s => s.id === id ? rec : s);
   try{ busy(t('working')); await commitStores(list); busy(); closeEditor(); render(); toast(t(sheetMode() ? 'savedSheet' : 'savedLocal')); }
@@ -1708,9 +1737,15 @@ function bundle(){
     files.push({ name: path, data: LIB.dataUrlBytes(b.img) });
     return Object.assign({}, b, { img: path });
   });
+  const ss = stores.map(s => {
+    if(!/^data:/.test(s.logo)) return s;
+    const path = `assets/stores/${s.id}.${ext(s.logo)}`;
+    files.push({ name: path, data: LIB.dataUrlBytes(s.logo) });
+    return Object.assign({}, s, { logo: path });
+  });
   const images = files.length;
   files.unshift({ name: 'data/products.js', data: C.serialize(DEPTS, out) },
-                { name: 'data/site.js', data: C.serializeSite({ settings, kits, banners: bs, stores }) },
+                { name: 'data/site.js', data: C.serializeSite({ settings, kits, banners: bs, stores: ss }) },
                 { name: 'private/commercial.js', data: C.serializePrivate(stores, out) });
   files.push({ name: 'UPDATE-README.txt', data: [
     'Saleem Store update — ' + new Date().toISOString(),

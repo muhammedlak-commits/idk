@@ -70,7 +70,7 @@ Everything below is set in **admin → Settings / Kits / Banners**:
 - **Care kits**: ready-made bundles ("Bedridden care", "After hip or knee surgery", …). Each kit has its own page and an **Add the whole kit** button. Six come pre-made.
 - **Clinics and bulk pricing**: the "For clinics" section, plus automatic quantity discounts (for example 10+ pieces 5% off, 25+ 10% off) shown on product pages and applied in the order.
 - **Refill reminders**: customers who order monthly refills can ask to be reminded (needs the Google Sheet; see below).
-- **Partner stores**: optionally show "Supplied by …" on product pages.
+- **Partner stores**: each store has a public page in the shop (`#/v/<id>`: logo, area, about text and its products) and a directory at `#/stores`. Product cards and pages show who supplies each item (switch: Settings → Partner stores).
 
 The shop also has:
 - **Order again** for returning customers
@@ -169,7 +169,7 @@ Other notes:
 
 ## Versions
 
-The version lives in `js/version.js` (now **v0.001**). Every change that's handed over
+The version lives in `js/version.js` (now **v0.002**). Every change that's handed over
 goes up by 0.001 (v0.002, v0.003 … v0.010 …): bump the number there, add an entry to
 [`CHANGELOG.md`](CHANGELOG.md), and tag the commit with the same name (`git tag v0.002`).
 
@@ -197,8 +197,8 @@ funnel, so on Netlify the store needs its own site:
   `saleem-store/dist`.
 
 **Single files:** for a preview you can send or open with no server,
-`python3 build-standalone.py` writes `Saleem_Store_v0.001.html`,
-`Saleem_Admin_v0.001.html` and `Saleem_Supplies_v0.001.html` (named after the version). Keep the admin and
+`python3 build-standalone.py` writes `Saleem_Store_v0.002.html`,
+`Saleem_Admin_v0.002.html` and `Saleem_Supplies_v0.002.html` (named after the version). Keep the admin and
 store files in the same folder, so that preview works. Don't deploy these files.
 
 ## Editing products by hand

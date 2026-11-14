@@ -2,8 +2,9 @@
  *
  * settings  the switches and texts: delivery promise, payment methods, rentals,
  *           ask-a-nurse, product finder, kits, clinics and bulk pricing, refill reminders
- * stores    the partner stores products come from — public details only. Their
- *           commission and contacts are in private/commercial.js, which is never published.
+ * stores    the partner stores products come from — public details only (name, area, logo,
+ *           about text). Their commission and contacts are in private/commercial.js,
+ *           which is never published.
  * kits      ready-made bundles shown in the shop (items: product id, qty, buy/rent/refill)
  * banners   the home-page banners; each is one link. Dates are optional (YYYY-MM-DD).
  */
@@ -64,7 +65,7 @@ window.SALEEM_SITE = {
   "showStore": true
 },
 "stores": [
-
+  {"id":"mitech","en":"M-Tech","ar":"التقنيات الحديثة (M-Tech)","area":"بغداد","on":true,"logo":"assets/stores/mitech.png","aboutEn":"Al-Masar Modern Technology Co. for medical devices and supplies: oxygen concentrators, CPAP and BiPAP machines, wound therapy, physiotherapy devices and patient monitors.","aboutAr":"شركة المسار التقني الحديث لتجارة المستلزمات والأجهزة الطبية: مولّدات الأوكسجين، أجهزة CPAP وBiPAP، علاج الجروح بالضغط السلبي، أجهزة العلاج الطبيعي ومونيتورات المرضى."}
 ],
 "kits": [
   {"id":"bedridden","on":true,"icon":"bed","en":"Bedridden care at home","ar":"رعاية المريض طريح الفراش","blurbEn":"Bed, pressure-relief mattress and the daily essentials for someone who can’t get up.","blurbAr":"سرير ومرتبة ضد التقرحات والمستلزمات اليومية لمريض ما يكدر يكوم.","situations":["bedridden","elderly"],"items":[{"id":66,"qty":1,"mode":"rent"},{"id":67,"qty":1,"mode":"rent"},{"id":53,"qty":2,"mode":"refill"},{"id":56,"qty":1,"mode":"refill"},{"id":57,"qty":1,"mode":"refill"},{"id":69,"qty":1,"mode":"buy"},{"id":68,"qty":1,"mode":"buy"},{"id":201,"qty":1,"mode":"refill"},{"id":210,"qty":1,"mode":"buy"}]},

@@ -7,6 +7,28 @@ has to do (redeploy the Sheet script, re-publish, change a setting).
 The shop footer and the admin header show the version that's running. The single-file previews
 are named after it (`Saleem_Store_v0.001.html`), and so is the admin's update zip.
 
+## v0.002 (14 Nov 2026)
+
+**M-Tech's catalogue and vendor profiles**
+- 44 items from M-Tech (التقنيات الحديثة, quote no. 617) are in the shop with their photos and the
+  quote's after-discount prices: 42 new products (ids 225–266) and M-Tech's price and photo on two
+  existing ones (rigid cervical collar #14, incentive spirometer #79).
+- The patient monitors (12B, 15B Plus), the Holter ECG and the two ear washing units are under
+  For clinics and sold by quote; their quoted prices are kept for the admin.
+- Every product shows the store that supplies it: on its card, and as a link on the product page.
+- Each partner store has its own page in the shop (`#/v/<store id>`): logo, area, about text and all
+  its products with department filters. A directory of partner stores is at `#/stores`, linked from
+  the Departments page and the footer. Searching a store's name finds its products.
+- Admin → Stores: each store now has a logo (upload or link) and an about text in both languages,
+  and a link to its page in the shop. Uploaded logos go into the update zip (`assets/stores/`) or,
+  with the Sheet connected, to Drive.
+- Google Sheet: the Stores tab gains `logo_url`, `about_en` and `about_ar`; the public read includes
+  them and still never commission or contacts. **Paste in the new `Code.gs` and deploy a new version.**
+
+**To do before going live:** set M-Tech's commission % in admin → Stores (it's 0 for now), upload
+their proper logo there (the current one is cropped from the quote's scan), and confirm the ear
+washing units' price (7,500,000 IQD looks like a typo).
+
 ## v0.001 (6 Oct 2026)
 
 The first named version: everything built up to now.

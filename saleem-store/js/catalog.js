@@ -86,7 +86,9 @@
     settings.contact.whatsapp = str(settings.contact.whatsapp).replace(/\D/g, '');
     if (!/^\d{8,15}$/.test(settings.contact.whatsapp)) settings.contact.whatsapp = str(CFG.whatsapp).replace(/\D/g, '');
     settings.contact.phone = str(settings.contact.phone).trim().slice(0, 30);
-    const stores = (s.stores || []).map(x => ({ id: str(x.id), en: str(x.en), ar: str(x.ar), area: str(x.area), on: x.on !== false })).filter(x => x.id);
+    // public store profile: name, area, logo and a short about text (commission and contacts stay private)
+    const stores = (s.stores || []).map(x => ({ id: str(x.id), en: str(x.en), ar: str(x.ar), area: str(x.area), on: x.on !== false,
+      logo: str(x.logo), aboutEn: str(x.aboutEn).slice(0, 600), aboutAr: str(x.aboutAr).slice(0, 600) })).filter(x => x.id);
     const kits = (s.kits || []).map(k => ({
       id: str(k.id), on: k.on !== false, icon: str(k.icon || 'heart'),
       en: str(k.en), ar: str(k.ar), blurbEn: str(k.blurbEn), blurbAr: str(k.blurbAr),
@@ -285,8 +287,9 @@
  *
  * settings  the switches and texts: delivery promise, payment methods, rentals,
  *           ask-a-nurse, product finder, kits, clinics and bulk pricing, refill reminders
- * stores    the partner stores products come from — public details only. Their
- *           commission and contacts are in private/commercial.js, which is never published.
+ * stores    the partner stores products come from — public details only (name, area, logo,
+ *           about text). Their commission and contacts are in private/commercial.js,
+ *           which is never published.
  * kits      ready-made bundles shown in the shop (items: product id, qty, buy/rent/refill)
  * banners   the home-page banners; each is one link. Dates are optional (YYYY-MM-DD).
  */
