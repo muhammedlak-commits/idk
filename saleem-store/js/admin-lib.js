@@ -214,6 +214,8 @@
     { key: 'vendors',       field: 'offers',    width: 34, help: 'PRIVATE. Every vendor and what we pay them, default first: "mitech=120000; al-nahrain=118000". Replaces the list. "-" removes every vendor', ar: 'الموردون وأسعار الشراء' },
     { key: 'commission_pct', field: 'commission', width: 14, help: 'PRIVATE. Optional % that overrides the store’s commission for this item. "-" goes back to the store’s', ar: 'نسبة العمولة' },
     { key: 'deposit_iqd',   field: 'deposit',   width: 12, help: 'Optional refundable deposit on a rental, IQD', ar: 'التأمين' },
+    { key: 'large',         field: 'large',     width: 9,  help: 'yes / no — big item, the delivery fee may be higher', ar: 'قطعة كبيرة' },
+    { key: 'free_delivery', field: 'freeDelivery', width: 12, help: 'yes / no — no delivery fee for this item', ar: 'توصيل مجاني' },
   ];
   const ALIASES = {};
   COLUMNS.forEach(c => [c.key, c.field, c.ar].forEach(a => { ALIASES[norm(a)] = c; }));
@@ -229,7 +231,7 @@
     return [COLUMNS.map(c => c.key), ...products.map(p => COLUMNS.map(c => {
       const v = p[c.field];
       switch (c.field) {
-        case 'rent': case 'refill': case 'b2b': return v ? 'yes' : 'no';
+        case 'rent': case 'refill': case 'b2b': case 'large': case 'freeDelivery': return v ? 'yes' : 'no';
         case 'services': return (v || []).join(', ');
         case 'status': return STATUS_OUT[v] || 'available';
         case 'price': case 'rentPrice': case 'deposit': case 'commission': return v == null ? '' : v;
@@ -330,7 +332,7 @@
             const n = Number(v.replace(/[,\s]|iqd|د\.?ع/gi, ''));
             if (isFinite(n) && n > 0) set(c.field, Math.round(n)); else errors.push(`${c.key} "${v}" isn’t a price in IQD`); break;
           }
-          case 'rent': case 'refill': case 'b2b': {
+          case 'rent': case 'refill': case 'b2b': case 'large': case 'freeDelivery': {
             const n = norm(v); if (YES.includes(n)) set(c.field, true); else if (NO.includes(n)) set(c.field, false); else errors.push(`${c.key} must be yes or no (got "${v}")`); break;
           }
           case 'services': {
@@ -375,7 +377,7 @@
         if (!patch.dept) errors.push('a new product needs a department');
         if (!patch.sub && patch.dept) errors.push('a new product needs a section');
       }
-      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, deposit: null, status: 'available', img: '', store: '', offers: [], commission: null },
+      const merged = Object.assign({ tier: 2, rent: false, refill: false, b2b: false, services: [], en: '', ar: '', whyEn: '', whyAr: '', price: null, rentPrice: null, deposit: null, status: 'available', img: '', store: '', offers: [], commission: null, large: false, freeDelivery: false },
                                    base || {}, patch);
       if (merged.b2b && merged.dept !== 'clinic') warnings.push('clinic-only items normally sit in the clinic department');
       if (!merged.b2b && merged.dept === 'clinic') warnings.push('items in the clinic department are normally clinic-only');

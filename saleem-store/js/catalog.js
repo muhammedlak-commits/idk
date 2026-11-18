@@ -52,7 +52,9 @@
     publicUrl: '',
     // the call centre: orders and questions go to this WhatsApp; phone is the number customers can call
     contact:   { whatsapp: CFG.whatsapp || '', phone: CFG.bizPhone || '' },
-    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال 1–2 يوم', noteEn: 'By our delivery partner, to every province in Iraq', noteAr: 'عن طريق شركة التوصيل، لكل محافظات العراق', feeIqd: null },
+    delivery:  { on: true, en: 'Delivered in 1–2 days', ar: 'التوصيل خلال 1–2 يوم', noteEn: 'By our delivery partner, to every province in Iraq', noteAr: 'عن طريق شركة التوصيل، لكل محافظات العراق', feeIqd: 5000,
+                 largeEn: 'Large items (beds, wheelchairs, oxygen machines…) can cost more to deliver. We confirm the fee on WhatsApp before sending.',
+                 largeAr: 'المواد الكبيرة (الأسرّة، الكراسي المتحركة، أجهزة الأوكسجين…) ممكن توصيلها يكلّف أكثر. نأكد الأجرة على واتساب قبل الإرسال.' },
     payments:  { cod: true, zaincash: true, qicard: true, fastpay: false, card: false },
     rentals:   { on: true, minMonths: 1, depositEn: 'Refundable deposit, amount confirmed on WhatsApp', depositAr: 'تأمين يرجعلك بعد الإرجاع، ومبلغه يتأكد على واتساب', includedEn: 'Delivery and pickup', includedAr: 'التوصيل والاستلام' },
     nurse:     { on: true, whatsapp: CFG.whatsapp || '' },
@@ -87,7 +89,7 @@
     if (!/^\d{8,15}$/.test(settings.contact.whatsapp)) settings.contact.whatsapp = str(CFG.whatsapp).replace(/\D/g, '');
     settings.contact.phone = str(settings.contact.phone).trim().slice(0, 30);
     // public store profile: name, area, logo and a short about text (commission and contacts stay private)
-    const stores = (s.stores || []).map(x => ({ id: str(x.id), en: str(x.en), ar: str(x.ar), area: str(x.area), on: x.on !== false,
+    const stores = (s.stores || []).map(x => ({ id: str(x.id), en: str(x.en), ar: str(x.ar), area: str(x.area), on: x.on !== false, freeDelivery: x.freeDelivery === true,
       logo: str(x.logo), aboutEn: str(x.aboutEn).slice(0, 600), aboutAr: str(x.aboutAr).slice(0, 600) })).filter(x => x.id);
     const kits = (s.kits || []).map(k => ({
       id: str(k.id), on: k.on !== false, icon: str(k.icon || 'heart'),
@@ -174,6 +176,8 @@
       price: num(p.price), rentPrice: num(p.rentPrice), deposit: num(p.deposit),
       status: STATUSES.includes(p.status) ? p.status : 'available',
       img: str(p.img),
+      // delivery: large items may cost more than the flat fee; freeDelivery waives it for this item
+      large: p.large === true || p.large === 'yes', freeDelivery: p.freeDelivery === true || p.freeDelivery === 'yes',
       ...(() => { const offers = offersOf(p); return { offers, stores: offers.map(o => o.store), store: offers.length ? offers[0].store : '' }; })(),
       // private: only the admin ever has it, and no public writer emits it
       commission: pct(p.commission),
@@ -189,6 +193,32 @@
   function photo(p, w) {
     if (p.img) return { src: p.img, placeholder: false };
     return { src: CFG.webPhotos && p.en ? bing(p.en, w) : '', placeholder: true };
+  }
+
+  /* ── is a product in the shop? Not when it's unpublished (hidden), or when every partner store
+   *  that sells it is unpublished. Store ids the site doesn't know are ignored. ── */
+  function inShop(p, stores) {
+    if (p.status === 'hidden') return false;
+    const known = (p.stores || []).map(id => (stores || []).find(s => s.id === id)).filter(Boolean);
+    return !known.length || known.some(s => s.on);
+  }
+  // the published vendor that fills the order: the first of its stores that's switched on
+  function defaultStore(p, stores) {
+    for (const id of p.stores || []) { const s = (stores || []).find(x => x.id === id); if (s && s.on) return s; }
+    return null;
+  }
+
+  /* ── delivery for a basket: one flat fee per order (settings.delivery.feeIqd).
+   *  Free when every item that's delivered is waived, on the item or by its store.
+   *  large: an item that isn't waived is big, so the fee may come out higher.
+   *  lines [{ p, mode }]; clinic quotes are priced separately, and a rental's delivery and pickup
+   *  are part of the rent, so neither counts. ── */
+  function deliveryFor(lines, site) {
+    const d = site.settings.delivery, goods = lines.filter(l => l.p && l.mode !== 'quote' && l.mode !== 'rent');
+    const waived = p => p.freeDelivery || !!(defaultStore(p, site.stores) || {}).freeDelivery;
+    const paid = goods.filter(l => !waived(l.p));
+    const on = !!(d.on && d.feeIqd && goods.length);
+    return { fee: on && paid.length ? d.feeIqd : 0, free: on && !paid.length, large: on && paid.some(l => l.p.large) };
   }
 
   /* ── what an order line costs: unit price, bulk discount, line total ── */
@@ -284,7 +314,7 @@
  * (private/commercial.js).
  */
 `;
-  const ORDER = ['id', 'tier', 'dept', 'sub', 'rent', 'refill', 'b2b', 'services', 'en', 'ar', 'whyEn', 'whyAr', 'price', 'rentPrice', 'deposit', 'status', 'img', 'stores'];
+  const ORDER = ['id', 'tier', 'dept', 'sub', 'rent', 'refill', 'b2b', 'services', 'en', 'ar', 'whyEn', 'whyAr', 'price', 'rentPrice', 'deposit', 'status', 'img', 'stores', 'large', 'freeDelivery'];
   function serialize(departments, products) {
     const q = s => JSON.stringify(s);
     const deps = departments.map(d =>
@@ -297,6 +327,7 @@
         if (k === 'status' && p.status === 'available') return;
         if (k === 'img' && !p[k]) return;
         if (k === 'stores' && !p.stores.length) return;
+        if ((k === 'large' || k === 'freeDelivery') && !p[k]) return;
         o[k] = p[k];
       });
       return '  ' + JSON.stringify(o) + ',';
@@ -359,7 +390,7 @@ ${Object.entries(of).map(([id, o]) => '  ' + JSON.stringify(id) + ': ' + JSON.st
 
   window.SaleemCatalog = {
     config: CFG, bundled: BUNDLED, bundledSite: BUNDLED_SITE, SERVICES, STATUSES, PAYMENTS, SITUATIONS, PROVINCES, DEFAULT_SETTINGS,
-    clean, publicProduct, cleanSite, liveBanners, linePrice, encodeLines, decodeLines, pct, num, offersOf, offersText, parseOffers,
+    clean, publicProduct, cleanSite, inShop, defaultStore, deliveryFor, liveBanners, linePrice, encodeLines, decodeLines, pct, num, offersOf, offersText, parseOffers,
     load, photo, bing, serialize, serializeSite, serializePrivate, kv,
   };
 })();

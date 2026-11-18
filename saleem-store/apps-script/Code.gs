@@ -45,13 +45,14 @@ var PHOTO_FOLDER = 'Saleem Store photos';    // created in your Drive on the fir
 var COLUMNS = [
   'id', 'name_en', 'name_ar', 'department', 'section', 'tier',
   'sell_price_iqd', 'rent_price_iqd_month', 'rentable', 'monthly_refill', 'clinic_only',
-  'services', 'status', 'why_en', 'why_ar', 'photo_url', 'store', 'vendors', 'commission_pct', 'deposit_iqd'
+  'services', 'status', 'why_en', 'why_ar', 'photo_url', 'store', 'vendors', 'commission_pct', 'deposit_iqd', 'large', 'free_delivery'
 ];
 // a column under an older heading is read and written as the new one (and renamed on the next save)
 var HEADING_ALIASES = { buy_price_iqd: 'sell_price_iqd' };
-var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active', 'logo_url', 'about_en', 'about_ar'];
+var STORE_COLUMNS = ['id', 'name_en', 'name_ar', 'area', 'commission_pct', 'phone', 'contact', 'notes', 'active', 'logo_url', 'about_en', 'about_ar', 'free_delivery'];
 var ORDER_COLUMNS = ['id', 'created_at', 'status', 'name', 'phone', 'area', 'address', 'clinic', 'payment', 'notes', 'lang',
-                     'remind', 'remind_on', 'reminded_at', 'items', 'est_total_iqd', 'commission_iqd', 'staff_note', 'lines_json', 'updated_at'];
+                     'remind', 'remind_on', 'reminded_at', 'items', 'est_total_iqd', 'commission_iqd', 'staff_note', 'lines_json', 'updated_at',
+                     'delivery_iqd', 'cost_iqd'];
 var ORDER_STATUSES = ['new', 'confirmed', 'onway', 'delivered', 'cancelled'];
 
 // The public status lookup is open to anyone with the URL; this caps how fast it can be tried.
@@ -66,11 +67,13 @@ function doGet(e) {
     catch (err) { console.error(err); return json_({ ok: false, error: String(err.message || err) }); }
   }
   try {
-    var products = readProducts_().filter(function (p) { return p.status !== 'hidden'; }).map(publicProduct_);
+    var stores = readStores_();
+    // unpublished items, and items whose partner stores are all unpublished, stay out
+    var products = readProducts_().filter(function (p) { return inShop_(p, stores); }).map(publicProduct_);
     var site = readSite_();
     // the public store profile only: never commission, phone, contact or notes
-    site.stores = readStores_().filter(function (s) { return s.on; }).map(function (s) {
-      return { id: s.id, en: s.en, ar: s.ar, area: s.area, on: true, logo: s.logo, aboutEn: s.aboutEn, aboutAr: s.aboutAr };
+    site.stores = stores.filter(function (s) { return s.on; }).map(function (s) {
+      return { id: s.id, en: s.en, ar: s.ar, area: s.area, on: true, logo: s.logo, aboutEn: s.aboutEn, aboutAr: s.aboutAr, freeDelivery: s.freeDelivery };
     });
     return json_({ ok: true, products: products, site: site, version: version_([products, site]), updatedAt: updatedAt_() });
   } catch (err) {
@@ -222,6 +225,7 @@ function fromRow_(row, m) {
     status: status === 'hidden' ? 'hidden' : (status === 'out_of_stock' || status === 'out') ? 'out' : 'available',
     whyEn: String(get('why_en')), whyAr: String(get('why_ar')),
     img: String(get('photo_url')).trim(), offers: offers_(get('vendors'), get('store')),
+    large: yes_(get('large')), freeDelivery: yes_(get('free_delivery')),
     commission: pct_(get('commission_pct'))
   };
 }
@@ -255,7 +259,8 @@ function toCells_(p) {
     services: p.services.join(', '),
     status: p.status === 'out' ? 'out_of_stock' : p.status,
     why_en: p.whyEn, why_ar: p.whyAr, photo_url: p.img, store: p.offers.length ? p.offers[0].store : '', vendors: offersText_(p.offers),
-    commission_pct: p.commission == null ? '' : p.commission
+    commission_pct: p.commission == null ? '' : p.commission,
+    large: p.large ? 'yes' : 'no', free_delivery: p.freeDelivery ? 'yes' : 'no'
   };
 }
 
@@ -277,7 +282,8 @@ function clean_(p) {
     offers: (Array.isArray(p.offers) ? p.offers : p.store ? [{ store: p.store }] : []).slice(0, 30).map(function (o) {
       return { store: str_(o && o.store, 40).trim(), cost: money_(o && o.cost != null ? o.cost : '') };
     }).filter(function (o, i, a) { return o.store && a.map(function (x) { return x.store; }).indexOf(o.store) === i; }),
-    commission: pct_(p.commission)
+    commission: pct_(p.commission),
+    large: p.large === true, freeDelivery: p.freeDelivery === true
   };
 }
 
@@ -308,7 +314,7 @@ function readStores_() {
     out.push({ id: id, en: String(g('name_en')).trim(), ar: String(g('name_ar')).trim(), area: String(g('area')).trim(),
                commission: pct_(g('commission_pct')) || 0, phone: String(g('phone')).trim(), contact: String(g('contact')).trim(),
                notes: String(g('notes')), on: String(g('active')) === '' || yes_(g('active')),
-               logo: String(g('logo_url')).trim(), aboutEn: String(g('about_en')), aboutAr: String(g('about_ar')) });
+               logo: String(g('logo_url')).trim(), aboutEn: String(g('about_en')), aboutAr: String(g('about_ar')), freeDelivery: yes_(g('free_delivery')) });
   }
   return out;
 }
@@ -318,7 +324,7 @@ function saveStores_(list) {
     var id = str_(s.id, 40).trim(); if (!id) throw new Error('Every store needs an id.');
     return { id: id, name_en: str_(s.en, 120), name_ar: str_(s.ar, 120), area: str_(s.area, 120), commission_pct: pct_(s.commission) || 0,
              phone: str_(s.phone, 40), contact: str_(s.contact, 120), notes: str_(s.notes, 1000), active: s.on === false ? 'no' : 'yes',
-             logo_url: str_(s.logo, 500), about_en: str_(s.aboutEn, 600), about_ar: str_(s.aboutAr, 600) };
+             logo_url: str_(s.logo, 500), about_en: str_(s.aboutEn, 600), about_ar: str_(s.aboutAr, 600), free_delivery: s.freeDelivery === true ? 'yes' : 'no' };
   });
   writeRows_(sheet_('Stores', STORE_COLUMNS), STORE_COLUMNS, rows, 'id', true);
 }
@@ -349,8 +355,8 @@ function writeSite_(patch) {
 /* ═══════════════ ORDERS ═══════════════ */
 
 function settings_() {
-  var s = readSite_().settings || {};
-  return { tiers: (s.clinics && s.clinics.on !== false && s.clinics.bulkOn !== false && s.clinics.tiers) || [],
+  var s = readSite_().settings || {}, d = s.delivery || {};
+  return { deliveryFee: d.on !== false && Number(d.feeIqd) > 0 ? Math.round(Number(d.feeIqd)) : 0, tiers: (s.clinics && s.clinics.on !== false && s.clinics.bulkOn !== false && s.clinics.tiers) || [],
            days: (s.reminders && Number(s.reminders.days)) || 30, remindOn: !(s.reminders && s.reminders.on === false) };
 }
 function linePrice_(p, mode, qty, tiers) {
@@ -359,6 +365,22 @@ function linePrice_(p, mode, qty, tiers) {
   var off = 0;
   if (mode !== 'rent') tiers.forEach(function (t) { if (qty >= Number(t.min) && Number(t.pct) > 0) off = Number(t.pct); });
   return { unit: unit, off: off, total: Math.round(unit * qty * (1 - off / 100)) };
+}
+// same rules as js/catalog.js inShop / defaultStore / deliveryFor
+function inShop_(p, stores) {
+  if (p.status === 'hidden') return false;
+  var known = (p.offers || []).map(function (o) { return stores.filter(function (s) { return s.id === o.store; })[0]; }).filter(Boolean);
+  return !known.length || known.some(function (s) { return s.on; });
+}
+function defaultStore_(p, stores) {
+  for (var i = 0; i < (p.offers || []).length; i++) { var s = stores[p.offers[i].store]; if (s && s.on) return { store: s, offer: p.offers[i] }; }
+  return null;
+}
+// one flat fee per order, unless every delivered item is waived (on the item or by its store); quotes and rentals don't count
+function deliveryFee_(lines, products, stores, fee) {
+  var goods = lines.filter(function (l) { return l.mode !== 'quote' && l.mode !== 'rent'; });   // rent includes delivery
+  var paid = goods.filter(function (l) { var p = products[l.id], d = defaultStore_(p, stores); return !(p.freeDelivery || (d && d.store.freeDelivery)); });
+  return fee && paid.length ? fee : 0;
 }
 // commission on one line: the item's own % if it has one, else its store's
 function commissionOf_(line) { return line.total ? Math.round(line.total * (line.pct || 0) / 100) : 0; }
@@ -382,7 +404,7 @@ function logOrder_(o) {
     var p = products[Math.floor(Number(l.id))]; if (!p) return null;
     var mode = ['buy', 'rent', 'refill', 'quote'].indexOf(l.mode) !== -1 ? l.mode : 'buy';
     var qty = Math.max(1, Math.min(99, Math.floor(Number(l.qty)) || 1));
-    var dv = p.offers[0] || { store: '', cost: null };          // the default vendor fills the order
+    var ds = defaultStore_(p, stores), dv = ds ? ds.offer : (p.offers[0] || { store: '', cost: null });   // the default published vendor fills the order
     var lp = linePrice_(p, mode, qty, cfg.tiers), st = stores[dv.store];
     var line = { id: p.id, name: p.en || p.ar, store: dv.store, storeName: st ? (st.en || st.ar) : '', cost: mode === 'buy' || mode === 'refill' ? dv.cost : null, mode: mode, qty: qty,
                  unit: lp ? lp.unit : null, off: lp ? lp.off : 0, total: lp ? lp.total : null,
@@ -397,14 +419,25 @@ function logOrder_(o) {
     area: str_(o.area, 120), address: str_(o.addr, 300), clinic: str_(o.clinic, 160), payment: str_(o.payment, 20), notes: str_(o.notes, 1000),
     lang: o.lang === 'en' ? 'en' : 'ar', remind: remind ? 'yes' : 'no',
     remind_on: remind ? new Date(now.getTime() + cfg.days * 86400000).toISOString().slice(0, 10) : '', reminded_at: '', staff_note: '' }, lines);
-  sheet.appendRow(ORDER_COLUMNS.map(function (k) { return row[k] == null ? '' : row[k]; }));
+  row.delivery_iqd = deliveryFee_(lines, products, stores, cfg.deliveryFee) || '';
+  appendByHeading_(sheet, ORDER_COLUMNS, row);
   return { ok: true, id: id };
 }
 
+// append one row under the sheet's own headings, adding any heading it doesn't have yet
+function appendByHeading_(sheet, columns, row) {
+  var head = sheet.getDataRange().getValues()[0], m = headerMap_(head, columns, []);
+  columns.forEach(function (k) { if (!(k in m)) { m[k] = head.length; head.push(k); sheet.getRange(1, m[k] + 1).setValue(k); } });
+  var out = new Array(head.length).fill('');
+  columns.forEach(function (k) { out[m[k]] = row[k] == null ? '' : row[k]; });
+  sheet.appendRow(out);
+}
 function orderCells_(base, lines) {
   base.items = lines.map(function (l) { return l.qty + '× ' + l.name + ' (' + l.mode + ')' + (l.storeName ? ' — ' + l.storeName : ''); }).join('; ');
   base.est_total_iqd = lines.reduce(function (a, l) { return a + (l.total || 0); }, 0) || '';
   base.commission_iqd = lines.reduce(function (a, l) { return a + (l.commission || 0); }, 0) || '';
+  // what the default vendors charge us for the priced lines (buying price × quantity)
+  base.cost_iqd = lines.reduce(function (a, l) { return a + (l.cost && l.total != null ? l.cost * l.qty : 0); }, 0) || '';
   base.lines_json = JSON.stringify(lines);
   base.updated_at = new Date().toISOString();
   return base;
@@ -442,7 +475,7 @@ function orderStatus_(id, phone) {
            lines: (o.lines || []).map(function (l) { return { id: l.id, mode: l.mode, qty: l.qty, total: l.total }; }) };
 }
 
-/** patch: { status, staff_note, reminded: true, lines: [{ unit, pct }] by position } */
+/** patch: { status, staff_note, reminded: true, delivery: IQD, lines: [{ unit, pct }] by position } */
 function updateOrder_(id, patch) {
   var sheet = sheet_('Orders', ORDER_COLUMNS), values = sheet.getDataRange().getValues(), m = headerMap_(values[0], ORDER_COLUMNS, ['id']);
   for (var r = 1; r < values.length; r++) {
@@ -452,6 +485,7 @@ function updateOrder_(id, patch) {
     if (patch.status && ORDER_STATUSES.indexOf(patch.status) !== -1) row.status = patch.status;
     if ('staff_note' in patch) row.staff_note = str_(patch.staff_note, 1000);
     if (patch.reminded) row.reminded_at = new Date().toISOString();
+    if ('delivery' in patch) row.delivery_iqd = money_(patch.delivery) || '';      // a large item cost more to deliver
     if (Array.isArray(patch.lines)) patch.lines.forEach(function (pl, i) {
       var l = lines[i]; if (!l || !pl) return;
       if ('unit' in pl) { l.unit = money_(pl.unit); l.total = l.unit ? Math.round(l.unit * l.qty * (1 - (l.off || 0) / 100)) : null; }

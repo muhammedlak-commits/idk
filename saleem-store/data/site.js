@@ -17,7 +17,7 @@ window.SALEEM_SITE = {
     "ar": "التوصيل خلال 1–2 يوم",
     "noteEn": "By our delivery partner, to every province in Iraq",
     "noteAr": "عن طريق شركة التوصيل، لكل محافظات العراق",
-    "feeIqd": null
+    "feeIqd": 5000
   },
   "payments": {
     "cod": true,

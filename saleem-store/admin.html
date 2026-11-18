@@ -100,7 +100,7 @@ main{padding:20px 0 60px}
 .tools label.btn input{width:16px;height:16px;accent-color:var(--navy)}
 .inp:focus,.tools input:focus,.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(28,117,188,.12)}
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.li{display:grid;grid-template-columns:64px 48px minmax(180px,2fr) minmax(140px,1.2fr) 110px minmax(120px,1fr) 96px;gap:12px;align-items:center;padding:8px 14px;border-top:1px solid var(--line);cursor:pointer;position:relative}
+.li{display:grid;grid-template-columns:56px 40px minmax(160px,2fr) minmax(110px,1fr) 92px 92px 96px minmax(110px,1fr) 128px;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid var(--line);cursor:pointer;position:relative}
 .li:first-child{border-top:0}
 .li:hover{background:var(--card2)}
 .li.hd{cursor:default;background:var(--card2);padding:10px 14px;font:800 11.5px Montserrat,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
@@ -110,6 +110,46 @@ html[lang=ar] .li.hd{font-family:Cairo,sans-serif;letter-spacing:0;font-size:12p
 .li b{display:block;font-size:13.5px;color:var(--ink)}
 .li .c-opts b{display:inline;font-size:inherit}
 .li small{display:block;color:var(--mut);font-size:12px}
+.li .mLbl{display:none}
+.c-margin .pos{color:var(--greenInk)}.c-margin .neg{color:var(--red)}
+.c-margin small{color:inherit;opacity:.85}
+.pubBar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}
+.pubBar .count{margin:0}
+.pubBar .sp{flex:1}
+.pubSw{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:4px 10px 4px 6px;border:1px solid var(--line2);border-radius:999px;background:var(--card);color:var(--mut);font:700 12px inherit;font-family:inherit;cursor:pointer}
+.pubSw i{position:relative;width:30px;height:18px;border-radius:9px;background:var(--line2);transition:background .15s;flex:none}
+.pubSw i::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:inset-inline-start .15s}
+.pubSw[aria-pressed="true"]{color:var(--greenInk);border-color:currentColor}
+.pubSw[aria-pressed="true"] i{background:var(--green)}
+.pubSw[aria-pressed="true"] i::after{inset-inline-start:14px}
+.c-status .st{margin-top:4px}
+.warnTxt{color:var(--orInk,#7A3A0C)!important;font-weight:700}
+.repTools{align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:none;padding:0 12px;min-height:40px;font:700 13px inherit;font-family:inherit;color:var(--ink2);cursor:pointer;border-inline-start:1px solid var(--line)}
+.seg button:first-child{border-inline-start:0}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--card)}
+.repH{font-size:15px;margin:18px 0 8px;color:var(--navy2)}
+.stat small{display:block;font-size:12px;color:var(--mut);font-weight:700}
+.stat .neg,.stmt .neg{color:var(--red)}.stmt .pos{color:var(--greenInk)}
+.tblWrap{overflow-x:auto}
+.sumCell{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;min-width:84px}
+.sumCell b{font-size:18px}.sumCell span{font-size:12px;color:var(--mut)}
+.chartBox{--s1:#2a78d6;--s2:#eb6834}
+.chartBox .legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink2);margin-bottom:6px}
+.chartBox .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+.chartBox .legend i.s1{background:var(--s1)}.chartBox .legend i.s2{background:var(--s2)}
+.chartScroll{position:relative;overflow-x:auto}
+.flow{display:block;max-width:none}
+.flow .s1{fill:var(--s1)}.flow .s2{fill:var(--s2)}
+.flow .gl{stroke:var(--line);stroke-width:1}
+.flow .ax{fill:var(--mut);font:11px Montserrat,sans-serif}
+.flow .hit{fill:transparent}
+.flow .col:hover .hit{fill:var(--blue50)}
+.chartScroll .tip{position:absolute;transform:translateX(-50%);pointer-events:none;background:var(--navy2);color:var(--card);font-size:12px;font-weight:700;padding:5px 9px;border-radius:8px;white-space:nowrap}
+.tableView{margin-top:8px;font-size:13px}
+.scFoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.scFoot small{color:var(--orInk,#7A3A0C);font-weight:700;font-size:12px}
 .li .dot{position:absolute;inset-inline-start:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--or)}
 .thumb{position:relative;width:64px;height:48px;border-radius:8px;border:1px solid var(--line);background:var(--phBg);overflow:hidden}
 .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
@@ -210,9 +250,12 @@ textarea.paste{width:100%;min-height:110px;border:1px solid var(--line2);border-
 @media(max-width:860px){
   .li.hd{display:none}
   .li{grid-template-columns:64px 1fr auto;gap:4px 12px;padding:10px 14px}
-  .li>.thumb{grid-row:span 3}
+  .li>.thumb{grid-row:span 6}
   .li .id{display:none}
-  .li>.c-dept,.li>.c-price,.li>.c-opts{grid-column:2}
+  .li>.c-dept,.li>.c-price,.li>.c-buy,.li>.c-margin,.li>.c-opts{grid-column:2}
+  .li>.c-price,.li>.c-buy,.li>.c-margin{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+  .li .mLbl{display:inline;font-style:normal;font-size:11.5px;color:var(--mut);font-weight:700;min-width:58px}
+  .li .c-margin>span{display:flex;gap:6px;align-items:baseline}
   .li>.c-status{grid-column:3;grid-row:1}
   .pr{grid-template-columns:70px 1fr;gap:4px 10px}
   .pr.hd{display:none}
@@ -325,8 +368,10 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
 /* dark: follows the device unless the moon/sun button picked one (shared with the shop) */
 @media (prefers-color-scheme: dark){ :root:not([data-theme=light]){--navy:#9CCBF5;--navy2:#EEF4FA;--blue:#6FB3EC;--blue50:#14304A;--blue100:#1F4566;--or2:#F29A5E;--or50:#2E1C10;--green:#3CB49F;--green50:#0F2E2A;--greenInk:#9FE0D3;--red:#F07A6C;--red50:#3A1916;--redInk:#F8B4AB;--amber:#E8B54A;--amber50:#2E2410;--amberInk:#F2D58F;--purple:#C3A6EA;--purple50:#2A1F3A;--indigo:#AAB4F2;--indigo50:#1E2342;--chip:#1E3043;--chipInk:#B9C9D7;--faint:#7D93A8;--ink:#E4ECF3;--ink2:#B9C9D7;--mut:#93A8BB;--line:#24384C;--line2:#33506A;--paper:#0B1622;--card:#122233;--card2:#16293D;--fill:#1D5D99;--fill2:#174E82;--phBg:linear-gradient(145deg,#E9EFF4,#DCE6EE);--veil:rgba(11,22,34,.72);--shc:0,0,0;--shadow:0 12px 32px rgba(0,0,0,.4);color-scheme:dark}
 :root:not([data-theme=light]) .bar img,:root:not([data-theme=light]) .gateCard img{background:#fff;padding:3px 7px}
+:root:not([data-theme=light]) .chartBox{--s1:#3987e5;--s2:#d95926}
 :root:not([data-theme=light]) .bigThumb,:root:not([data-theme=light]) .thumb{color:#5C7A96} }
 :root[data-theme=dark]{--navy:#9CCBF5;--navy2:#EEF4FA;--blue:#6FB3EC;--blue50:#14304A;--blue100:#1F4566;--or2:#F29A5E;--or50:#2E1C10;--green:#3CB49F;--green50:#0F2E2A;--greenInk:#9FE0D3;--red:#F07A6C;--red50:#3A1916;--redInk:#F8B4AB;--amber:#E8B54A;--amber50:#2E2410;--amberInk:#F2D58F;--purple:#C3A6EA;--purple50:#2A1F3A;--indigo:#AAB4F2;--indigo50:#1E2342;--chip:#1E3043;--chipInk:#B9C9D7;--faint:#7D93A8;--ink:#E4ECF3;--ink2:#B9C9D7;--mut:#93A8BB;--line:#24384C;--line2:#33506A;--paper:#0B1622;--card:#122233;--card2:#16293D;--fill:#1D5D99;--fill2:#174E82;--phBg:linear-gradient(145deg,#E9EFF4,#DCE6EE);--veil:rgba(11,22,34,.72);--shc:0,0,0;--shadow:0 12px 32px rgba(0,0,0,.4);color-scheme:dark}
+:root[data-theme=dark] .chartBox{--s1:#3987e5;--s2:#d95926}
 :root[data-theme=dark] .bar img,:root[data-theme=dark] .gateCard img{background:#fff;padding:3px 7px}
 :root[data-theme=dark] .bigThumb,:root[data-theme=dark] .thumb{color:#5C7A96}
 .themeBtn{width:40px;padding:0}
@@ -334,7 +379,9 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
 .bar{view-transition-name:bar}.tabs{view-transition-name:tabs}
 @media(max-width:860px){
   .tools input,.tools select,.field input,.field select,.field textarea,.inp{font-size:16px}
-  .tools select{flex:1 1 140px}
+  .tools select{flex:1 1 140px;min-width:0;max-width:100%}
+  .pubSw>span{display:none}
+  .pubSw{padding:4px 6px}
   .tools label.btn{flex:1 1 100%}
   .btn.sm{min-height:44px}
   .sc .ord button{width:44px;height:44px}
@@ -359,6 +406,8 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
   <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M4 9h16M4 14.5h16M10 9v11.5"/></symbol>
   <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9.5L5.5 4h13L20 9.5M4 9.5h16M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0M5 11.5V20h14v-8.5M10 20v-5h4v5"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6.5h11v9.5H3zM14 9.5h3.8l3.2 3.3v3.2h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V7M17 16v-8"/></symbol>
   <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12H6.2zM9 8V6a3 3 0 0 1 6 0v2"/></symbol>
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
@@ -414,6 +463,7 @@ table.stmt tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(-
     <a class="tab" href="#/products" data-tab="products"><svg class="ic"><use href="#i-list"/></svg><span data-t="tProducts"></span></a>
     <a class="tab" href="#/stores" data-tab="stores"><svg class="ic"><use href="#i-store"/></svg><span data-t="tStores"></span></a>
     <a class="tab" href="#/orders" data-tab="orders"><svg class="ic"><use href="#i-bag"/></svg><span data-t="tOrders"></span><b class="n" id="dueN" hidden></b></a>
+    <a class="tab" href="#/reports" data-tab="reports"><svg class="ic"><use href="#i-chart"/></svg><span data-t="tReports"></span></a>
     <a class="tab" href="#/kits" data-tab="kits"><svg class="ic"><use href="#i-box"/></svg><span data-t="tKits"></span></a>
     <a class="tab" href="#/banners" data-tab="banners"><svg class="ic"><use href="#i-flag"/></svg><span data-t="tBanners"></span></a>
     <a class="tab" href="#/settings" data-tab="settings"><svg class="ic"><use href="#i-gear"/></svg><span data-t="tSettings"></span></a>
@@ -462,11 +512,23 @@ const T = {
   ar: {
     _title:'لوحة متجر سليم', title:'لوحة إدارة المتجر', gateT:'لوحة إدارة متجر سليم', gateP:'اكتب رمز الدخول.', gateLbl:'رمز الدخول', unlock:'دخول',
     wrong:'الرمز غلط.', wait:'محاولات كثيرة. انتظر {s} ثانية.', sheetWrong:'الرمز صحيح هنا، بس الشيت رفضه: {e}', lang:'English',
-    openShop:'فتح المتجر', lock:'قفل', tProducts:'المنتجات', tStores:'المتاجر', tOrders:'الطلبات', tKits:'الأطقم', tBanners:'البانرات', tSettings:'الإعدادات', tBulk:'رفع جماعي', tPhotos:'الصور', tPublish:'النشر والربط',
+    openShop:'فتح المتجر', lock:'قفل', tProducts:'المنتجات', tStores:'المتاجر', tOrders:'الطلبات', tReports:'التقارير',
+    repT:'التقارير', repP:'الطلبات الداخلة والطالعة لأي فترة: العدد، المبيعات، كلفة الشراء، الربح، العمولة والتوصيل.', repLocal:'التقارير تقرأ الطلبات من Google Sheet. بدون ربطه، افتح نسخة من تبويب Orders (ملف CSV أو Excel منزّل من الشيت).',
+    repOpen:'افتح ملف الطلبات', repLoaded:'{n} طلب', repBadFile:'هذا مو ملف طلبات: لازم يكون بيه عمود id و created_at.',
+    rPeriod:'الفترة', rp:{ thisMonth:'هذا الشهر', lastMonth:'الشهر الماضي', last7:'آخر 7 أيام', last30:'آخر 30 يوم', thisYear:'هذي السنة', custom:'فترة مخصصة' }, rFrom:'من', rTo:'إلى', rXlsx:'نزّل Excel',
+    rFlow:'حركة الطلبات', rIn:'وصلت', rOut:'توصّلت', rOpen:'مفتوحة', rCancelled:'ملغية', rDays:'معدل أيام التوصيل', rFlowT:'الطلبات اللي وصلت واللي توصّلت', rAsTable:'اعرضها كجدول',
+    rStatusP:'حالة الطلبات اللي وصلت بهذي الفترة.', rMoney:'الفلوس (من الطلبات المتوصّلة)', rSales:'المبيعات', rCost:'كلفة الشراء', rMargin:'الربح الصافي', rDelivery:'أجور التوصيل', rAov:'معدل قيمة الطلب',
+    rCoverage:'سعر الشراء معروف لـ {p}% من المبيعات بس. الربح محسوب على هذا الجزء.', rByVendor:'حسب المورّد', rByProduct:'أكثر المنتجات مبيعاً', rByProvince:'حسب المحافظة', rProvince:'المحافظة', rPieces:'قطع', rNone:'ماكو طلبات بهذي الفترة.', rTop:'أعلى 20 من {n}.',
+    oDelivery:'أجرة التوصيل (د.ع)', oDeliveryP:'إذا القطعة كبيرة وكلّف التوصيل أكثر، عدّلها هنا.', lCost:'سعر الشراء', tKits:'الأطقم', tBanners:'البانرات', tSettings:'الإعدادات', tBulk:'رفع جماعي', tPhotos:'الصور', tPublish:'النشر والربط',
     modeLocal:'مسودة محلية', modeSheet:'مربوط بالشيت',
     prodT:'المنتجات', prodP:'اضغط على أي منتج حتى تعدّله.', add:'منتج جديد', search:'ابحث بالاسم أو الرقم…',
     allDepts:'كل الأقسام', allStatus:'كل الحالات', allPhotos:'كل الصور', allStores:'كل المتاجر', noStore:'بدون متجر', withPhoto:'صورة مرفوعة', placeholder:'صورة Bing مؤقتة', changedOnly:'المعدّلة فقط',
-    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة', hStore:'الموردون · الكلفة',
+    shown:'{n} من {t} منتج', hPhoto:'الصورة', hName:'المنتج', hDept:'القسم', hPrice:'السعر', hOpts:'الخيارات', hStatus:'الحالة', hStore:'الموردون · العمولة', hSell:'سعر البيع', hBuy:'سعر الشراء', hMargin:'الربح الصافي', lowest:'أقل {p}',
+    readyF:'الجاهزية', readyAll:'كل المنتجات', readyYes:'جاهزة (صورتنا + مورّد)', readyNo:'مؤقتة (ناقصها صورة أو مورّد)',
+    published:'منشور', unpublished:'مخفي', doPub:'انشره بالمتجر', doUnpub:'اخفيه من المتجر', offByStore:'مخفي لأن موردينه مو منشورين',
+    pubShown:'انشر المعروضة', unpubShown:'اخفِ المعروضة', pubReady:'اعرض منتجاتنا بس', pubNone:'ماكو شي يتغير.',
+    pubOne:'انتشر: {n}', unpubOne:'انخفى: {n}', pubAsk:'تنشر {n} منتج؟', unpubAsk:'تخفي {n} منتج من المتجر؟', pubDone:'انتشر {n} منتج', unpubDone:'انخفى {n} منتج',
+    pubReadyAsk:'المتجر يعرض بس المنتجات الجاهزة ({r}: صورتنا + مورّد).\nينتشر {a} ويختفي {b} منتج مؤقت. تكمل؟', pubReadyDone:'انتشر {a} وانخفى {b}',
     st:{available:'متوفر', out:'غير متوفر', hidden:'مخفي'}, oRent:'إيجار', oRefill:'شهري', oB2b:'عيادات', perMonth:'/شهر', noPrice:'—',
     edT:'تعديل منتج', newT:'منتج جديد', photo:'الصورة', upload:'رفع صورة', link:'رابط صورة', removePhoto:'حذف الصورة', linkAsk:'الصق رابط الصورة (يبدأ بـ https://)',
     dropHere:'اسحب صورة هنا', bingTag:'Bing — مؤقتة', ownTag:'مرفوعة', pendingTag:'جديدة — تنحفظ مع المنتج',
@@ -483,7 +545,9 @@ const T = {
     // stores
     storesT:'المتاجر الشريكة', storesP:'المتاجر اللي تجهّز المنتجات. لكل متجر نسبة عمولة، وتكدر تبدّلها لأي منتج من صفحة المنتج.',
     sLogo:'الشعار', sLogoP:'يظهر بصفحة المتجر وبجانب منتجاته. يفضّل خلفية بيضاء.', sAboutEn:'نبذة بالإنكليزي (تظهر للزبائن)', sAboutAr:'نبذة بالعربي (تظهر للزبائن)', sPublic:'شوف صفحته بالمتجر',
-    addStore:'متجر جديد', storeT:'متجر شريك', sId:'المعرّف (بالإنكليزي، بدون مسافات)', sEn:'الاسم بالإنكليزي', sAr:'الاسم بالعربي', sArea:'المنطقة', sPhone:'الهاتف / واتساب', sContact:'الشخص المسؤول', sNotes:'ملاحظات', sComm:'نسبة العمولة', sOn:'فعّال',
+    addStore:'متجر جديد', storeT:'متجر شريك', sId:'المعرّف (بالإنكليزي، بدون مسافات)', sEn:'الاسم بالإنكليزي', sAr:'الاسم بالعربي', sArea:'المنطقة', sPhone:'الهاتف / واتساب', sContact:'الشخص المسؤول', sNotes:'ملاحظات', sComm:'نسبة العمولة', sFreeShort:'توصيل مجاني', sHiddenN:'{n} منتج مخفي بسببه', sUnpubAsk:'تخفي «{s}» من المتجر؟ يختفي وياه {n} منتج ما عنده مورّد منشور غيره.', sPubDone:'«{s}» منشور. رجع {n} منتج.', sUnpubDone:'«{s}» مخفي. اختفى {n} منتج.',
+    sOn:'منشور بالمتجر', sOnP:'إذا ما منشور: يختفي من المتجر هو وكل منتج ما عنده مورّد منشور غيره.', sFree:'توصيل مجاني لكل منتجاته', sFreeP:'ما تنحسب أجرة التوصيل على منتجات هذا المتجر.',
+    dlvT:'التوصيل', dlvLarge:'قطعة كبيرة (ممكن الأجرة تكون أكثر)', dlvFree:'توصيل مجاني لهذا المنتج', dlvP:'أجرة التوصيل {f} د.ع لكل طلب. الطلب يصير توصيله مجاني إذا كل منتجاته مجانية التوصيل.', dlvStoreFree:'متجره الافتراضي ({s}) توصيله مجاني.',
     sProducts:'{n} منتج', sOverrides:'{n} بعمولة خاصة', sShow:'شوف منتجاته', sPrivate:'العمولة والهاتف والملاحظات خاصة — ما تنشر ويا المتجر.',
     sDelAsk:'تحذف «{n}»؟ منتجاته ({c}) راح تصير بدون متجر.', eId:'معرّف بالإنكليزي بدون مسافات، وما مكرر', noStores:'ماكو متاجر بعد. أضف أول متجر شريك.',
     // orders
@@ -508,7 +572,7 @@ const T = {
     setContact:'رقم مركز الاتصال', setContactP:'الطلبات والأسئلة توصل لهذا الرقم على واتساب. الزبون يشوفه بأسفل كل صفحة وبعد ما يرسل الطلب.', cWa:'رقم واتساب الطلبات', cPhone:'رقم الاتصال للزبائن', cPhoneP:'(اختياري. فارغ = نفس رقم الواتساب)',
     themeDark:'الوضع الليلي', themeLight:'الوضع النهاري',
     setT:'إعدادات المتجر', setP:'شنو يظهر بالمتجر وشلون يشتغل.', saveSet:'احفظ الإعدادات', setSaved:'انحفظت الإعدادات',
-    setDel:'التوصيل', setDelP:'شركة التوصيل توصّل الطلبات لكل محافظات العراق، والزبون يختار محافظته بالطلب. هذا الوعد يظهر بالرئيسية وبصفحة كل منتج.', dTEn:'الوعد بالإنكليزي', dTAr:'الوعد بالعربي', dNEn:'ملاحظة بالإنكليزي', dNAr:'ملاحظة بالعربي', dFee:'رسوم التوصيل (د.ع)', dFeeP:'فارغ = ما تنضاف للمجموع',
+    setDel:'التوصيل', setDelP:'شركة التوصيل توصّل الطلبات لكل محافظات العراق، والزبون يختار محافظته بالطلب. هذا الوعد يظهر بالرئيسية وبصفحة كل منتج.', dTEn:'الوعد بالإنكليزي', dTAr:'الوعد بالعربي', dNEn:'ملاحظة بالإنكليزي', dNAr:'ملاحظة بالعربي', dFee:'أجرة التوصيل (د.ع)', dFeeP:'أجرة واحدة لكل طلب. فارغ = ما تنضاف', dLargeEn:'تنبيه المواد الكبيرة بالإنكليزي', dLargeAr:'تنبيه المواد الكبيرة بالعربي',
     setPay:'طرق الدفع', setPayP:'اللي تختاره يظهر للزبون ويختار منه بالطلب.',
     setRent:'الإيجار', setRentP:'تشغيل وإطفاء الإيجار للمتجر كله. لما يطفى، المنتجات تنباع شراء بس.', rMin:'أقل مدة (شهر)', rDEn:'التأمين بالإنكليزي', rDAr:'التأمين بالعربي', rIEn:'يشمل بالإنكليزي', rIAr:'يشمل بالعربي',
     setNurse:'اسأل الممرضة', setNurseP:'زر يفتح واتساب على رقم الاستشارات.', nNum:'رقم واتساب (مثلاً 9647701234567)', eNum:'رقم بصيغة دولية، بدون + ', setFinder:'أداة «ساعدني أختار»', setFinderP:'سؤال واحد يقترح أطقم وأقسام.',
@@ -551,11 +615,23 @@ const T = {
   en: {
     _title:'Saleem Store admin', title:'Store admin', gateT:'Saleem Store admin', gateP:'Enter the access code.', gateLbl:'Access code', unlock:'Unlock',
     wrong:'Wrong code.', wait:'Too many attempts. Wait {s} seconds.', sheetWrong:'Code accepted here, but the Sheet refused it: {e}', lang:'العربية',
-    openShop:'Open shop', lock:'Lock', tProducts:'Products', tStores:'Stores', tOrders:'Orders', tKits:'Kits', tBanners:'Banners', tSettings:'Settings', tBulk:'Bulk upload', tPhotos:'Photos', tPublish:'Publish & connect',
+    openShop:'Open shop', lock:'Lock', tProducts:'Products', tStores:'Stores', tOrders:'Orders', tReports:'Reports',
+    repT:'Reports', repP:'Orders coming in and going out for any period: counts, sales, buying cost, margin, commission and delivery.', repLocal:'Reports read orders from the Google Sheet. Without it, open a copy of its Orders tab (a CSV or Excel file downloaded from the Sheet).',
+    repOpen:'Open an orders file', repLoaded:'{n} orders', repBadFile:'This isn’t an orders file: it needs id and created_at columns.',
+    rPeriod:'Period', rp:{ thisMonth:'This month', lastMonth:'Last month', last7:'Last 7 days', last30:'Last 30 days', thisYear:'This year', custom:'Custom' }, rFrom:'From', rTo:'To', rXlsx:'Download Excel',
+    rFlow:'Order flow', rIn:'Received', rOut:'Delivered', rOpen:'Open', rCancelled:'Cancelled', rDays:'Avg. days to deliver', rFlowT:'Orders received and delivered', rAsTable:'Show as a table',
+    rStatusP:'Where the orders received in this period stand now.', rMoney:'Money (from delivered orders)', rSales:'Sales', rCost:'Buying cost', rMargin:'Net margin', rDelivery:'Delivery fees', rAov:'Avg. order value',
+    rCoverage:'The buying price is known for only {p}% of sales. The margin is worked out on that part.', rByVendor:'By vendor', rByProduct:'Best-selling items', rByProvince:'By province', rProvince:'Province', rPieces:'Pieces', rNone:'No orders in this period.', rTop:'Top 20 of {n}.',
+    oDelivery:'Delivery fee (IQD)', oDeliveryP:'If a large item cost more to deliver, correct it here.', lCost:'Buying', tKits:'Kits', tBanners:'Banners', tSettings:'Settings', tBulk:'Bulk upload', tPhotos:'Photos', tPublish:'Publish & connect',
     modeLocal:'Local draft', modeSheet:'Connected to Sheet',
     prodT:'Products', prodP:'Click any product to edit it.', add:'New product', search:'Search by name or number…',
     allDepts:'All departments', allStatus:'Any status', allPhotos:'Any photo', allStores:'All stores', noStore:'No store', withPhoto:'Photo uploaded', placeholder:'Bing placeholder', changedOnly:'Changed only',
-    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status', hStore:'Vendors · cost',
+    shown:'{n} of {t} products', hPhoto:'Photo', hName:'Product', hDept:'Department', hPrice:'Price', hOpts:'Options', hStatus:'Status', hStore:'Vendors · commission', hSell:'Selling', hBuy:'Buying', hMargin:'Net margin', lowest:'lowest {p}',
+    readyF:'Readiness', readyAll:'All items', readyYes:'Ready (our photo + a vendor)', readyNo:'Placeholders (no photo or vendor)',
+    published:'Published', unpublished:'Hidden', doPub:'Publish in the shop', doUnpub:'Hide from the shop', offByStore:'Hidden: none of its vendors is published',
+    pubShown:'Publish shown', unpubShown:'Hide shown', pubReady:'Show only our items', pubNone:'Nothing to change.',
+    pubOne:'Published: {n}', unpubOne:'Hidden: {n}', pubAsk:'Publish {n} items?', unpubAsk:'Hide {n} items from the shop?', pubDone:'Published {n} items', unpubDone:'Hid {n} items',
+    pubReadyAsk:'The shop will show only ready items ({r}: our photo and a vendor).\nThis publishes {a} and hides {b} placeholder items. Go ahead?', pubReadyDone:'Published {a}, hid {b}',
     st:{available:'Available', out:'Out of stock', hidden:'Hidden'}, oRent:'Rent', oRefill:'Monthly', oB2b:'Clinic', perMonth:'/mo', noPrice:'—',
     edT:'Edit product', newT:'New product', photo:'Photo', upload:'Upload photo', link:'Photo link', removePhoto:'Remove photo', linkAsk:'Paste the photo link (starts with https://)',
     dropHere:'Drop a photo here', bingTag:'Bing — placeholder', ownTag:'Uploaded', pendingTag:'New — saved with the product',
@@ -571,7 +647,9 @@ const T = {
     savedLocal:'Saved to the draft', savedSheet:'Saved to the Sheet', deleted:'Deleted',
     storesT:'Partner stores', storesP:'The stores that supply the products. Each has a commission %, and any product can override it on its own page.',
     sLogo:'Logo', sLogoP:'Shown on the store’s page and next to its products. A white background works best.', sAboutEn:'About, in English (customers see this)', sAboutAr:'About, in Arabic (customers see this)', sPublic:'See its page in the shop',
-    addStore:'New store', storeT:'Partner store', sId:'ID (English, no spaces)', sEn:'Name in English', sAr:'Name in Arabic', sArea:'Area', sPhone:'Phone / WhatsApp', sContact:'Contact person', sNotes:'Notes', sComm:'Commission', sOn:'Active',
+    addStore:'New store', storeT:'Partner store', sId:'ID (English, no spaces)', sEn:'Name in English', sAr:'Name in Arabic', sArea:'Area', sPhone:'Phone / WhatsApp', sContact:'Contact person', sNotes:'Notes', sComm:'Commission', sFreeShort:'free delivery', sHiddenN:'{n} items hidden because of it', sUnpubAsk:'Hide “{s}” from the shop? {n} items that have no other published vendor go with it.', sPubDone:'“{s}” published. {n} items are back.', sUnpubDone:'“{s}” hidden. {n} items went with it.',
+    sOn:'Published in the shop', sOnP:'When it’s unpublished, the store and every item it’s the only published vendor of disappear from the shop.', sFree:'Free delivery on all its items', sFreeP:'No delivery fee on this store’s items.',
+    dlvT:'Delivery', dlvLarge:'Large item (delivery may cost more)', dlvFree:'Free delivery on this item', dlvP:'Delivery is {f} IQD per order. An order delivers free when every item in it does.', dlvStoreFree:'Its default store ({s}) delivers free.',
     sProducts:'{n} products', sOverrides:'{n} with their own %', sShow:'See its products', sPrivate:'Commission, phone and notes are private — never published with the shop.',
     sDelAsk:'Delete “{n}”? Its {c} products will have no store.', eId:'An English id with no spaces, not already used', noStores:'No stores yet. Add the first partner store.',
     ordersT:'Orders & commission', ordersP:'Every order sent from the shop lands here, with commission per store.', ordersLocal:'Logging orders needs the Google Sheet connected (Publish & connect tab). Without it, orders arrive on WhatsApp only — each message carries an order number.',
@@ -592,7 +670,7 @@ const T = {
     setContact:'Call centre number', setContactP:'Orders and questions go to this number on WhatsApp. Customers see it at the bottom of every page and after they send an order.', cWa:'WhatsApp number for orders', cPhone:'Number customers can call', cPhoneP:'(optional. Empty = the WhatsApp number)',
     themeDark:'Dark mode', themeLight:'Light mode',
     setT:'Store settings', setP:'What the shop shows and how it works.', saveSet:'Save settings', setSaved:'Settings saved',
-    setDel:'Delivery', setDelP:'The delivery company delivers to every province in Iraq; the customer picks their province in the order. This promise shows on the home page and every product.', dTEn:'Promise in English', dTAr:'Promise in Arabic', dNEn:'Note in English', dNAr:'Note in Arabic', dFee:'Delivery fee (IQD)', dFeeP:'Empty = not added to the total',
+    setDel:'Delivery', setDelP:'The delivery company delivers to every province in Iraq; the customer picks their province in the order. This promise shows on the home page and every product.', dTEn:'Promise in English', dTAr:'Promise in Arabic', dNEn:'Note in English', dNAr:'Note in Arabic', dFee:'Delivery fee (IQD)', dFeeP:'One fee per order. Empty = none', dLargeEn:'Large-item notice in English', dLargeAr:'Large-item notice in Arabic',
     setPay:'Payment methods', setPayP:'The ones you switch on are shown, and the customer picks one in the order.',
     setRent:'Rentals', setRentP:'Switches renting on or off for the whole shop. Off, products are sold to buy only.', rMin:'Minimum period (months)', rDEn:'Deposit in English', rDAr:'Deposit in Arabic', rIEn:'Includes, English', rIAr:'Includes, Arabic',
     setNurse:'Ask our nurse', setNurseP:'A button that opens WhatsApp on the advice line.', nNum:'WhatsApp number (e.g. 9647701234567)', eNum:'International format, no +', setFinder:'“Help me choose” finder', setFinderP:'One question that suggests kits and departments.',
@@ -662,7 +740,7 @@ let backend = ls.get('backend', '') || C.config.catalogUrl || '';
 let session = null;          // { code, at }
 let products = [], stores = [], settings = PUB.settings, kits = [], banners = [];
 let orders = null, ordersMonth = new Date().toISOString().slice(0, 7), ordersFilter = '';
-let filters = { q:'', dept:'', status:'', photo:'', store:'', changed:false };
+let filters = { q:'', dept:'', status:'', photo:'', store:'', ready:'', changed:false };
 let plan = null, planShow = 'changes', planMissing = 'keep';
 let pendingPhotos = [];
 let photoFilter = 'all';
@@ -732,7 +810,7 @@ async function api(action, body){
   return j;
 }
 
-const fullStore = s => Object.assign({ id: '', en: '', ar: '', area: '', on: true, commission: 0, phone: '', contact: '', notes: '', logo: '', aboutEn: '', aboutAr: '' }, s, { commission: C.pct(s.commission) ?? 0 });
+const fullStore = s => Object.assign({ id: '', en: '', ar: '', area: '', on: true, freeDelivery: false, commission: 0, phone: '', contact: '', notes: '', logo: '', aboutEn: '', aboutAr: '' }, s, { commission: C.pct(s.commission) ?? 0 });
 function useSite(site){ const s = C.cleanSite(site); settings = s.settings; kits = s.kits; banners = s.banners; }
 async function loadAll(){
   orders = null;
@@ -915,7 +993,7 @@ window.addEventListener('hashchange', () => {
   else render();
 });
 
-const VIEWS = { products: viewProducts, stores: viewStores, orders: viewOrders, kits: viewKits, banners: viewBanners, settings: viewSettings, bulk: viewBulk, photos: viewPhotos, publish: viewPublish };
+const VIEWS = { products: viewProducts, stores: viewStores, orders: viewOrders, reports: viewReports, kits: viewKits, banners: viewBanners, settings: viewSettings, bulk: viewBulk, photos: viewPhotos, publish: viewPublish };
 function render(){
   const r = (location.hash.match(/^#\/(\w+)/) || [])[1] || 'products';
   $$('.tab').forEach(a => a.dataset.tab === r ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
@@ -946,35 +1024,68 @@ function viewProducts(){
       <select id="fstore" aria-label="${esc(t('store'))}">${opt('', t('allStores'), filters.store)}${opt('-', t('noStore'), filters.store)}${stores.map(s => opt(s.id, L(s), filters.store)).join('')}</select>
       <select id="fstatus" aria-label="${esc(t('status'))}">${opt('', t('allStatus'), filters.status)}${C.STATUSES.map(s => opt(s, t('st')[s], filters.status)).join('')}</select>
       <select id="fphoto" aria-label="${esc(t('photo'))}">${opt('', t('allPhotos'), filters.photo)}${opt('own', t('withPhoto'), filters.photo)}${opt('web', t('placeholder'), filters.photo)}</select>
+      <select id="fready" aria-label="${esc(t('readyF'))}">${opt('', t('readyAll'), filters.ready)}${opt('ready', t('readyYes'), filters.ready)}${opt('placeholder', t('readyNo'), filters.ready)}</select>
       ${sheetMode() ? '' : `<label class="btn"><input type="checkbox" id="fchanged" ${filters.changed ? 'checked' : ''}> ${t('changedOnly')}</label>`}
     </div>
-    <p class="count" id="count"></p><div class="list" id="list"></div>`;
+    <div class="pubBar"><p class="count" id="count"></p><span class="sp"></span>
+      <button class="btn sm" type="button" data-pub-shown="1">${icon('i-check')}<span>${t('pubShown')}</span></button>
+      <button class="btn sm" type="button" data-pub-shown="0">${icon('i-x')}<span>${t('unpubShown')}</span></button>
+      <button class="btn sm navy" type="button" data-pub-ready>${t('pubReady')}</button></div>
+    <div class="list" id="list"></div>`;
 }
+// "ready": one of our own photos and at least one vendor; everything else is still a placeholder
+const isReady = p => !!p.img && p.offers.length > 0;
+// published = not hidden; an item can still be out of the shop because all its vendors are unpublished
+const offByStores = p => p.status !== 'hidden' && !C.inShop(p, stores);
+const marginOf = p => { const c = (p.offers[0] || {}).cost; if(!p.price || !c) return null; const m = p.price - c; return { m, pc: Math.round(m / p.price * 1000) / 10 }; };
 function filtered(){
   const q = LIB.norm(filters.q), pub = new Map(PUB.products.map(p => [p.id, p]));
   return products.filter(p => (!q || String(p.id) === q || LIB.norm(p.en + ' ' + p.ar).includes(q))
     && (!filters.dept || p.dept === filters.dept) && (!filters.status || p.status === filters.status)
     && (!filters.photo || (filters.photo === 'own') === !!p.img)
     && (!filters.store || (filters.store === '-' ? !p.stores.length : p.stores.includes(filters.store)))
+    && (!filters.ready || (filters.ready === 'ready') === isReady(p))
     && (!filters.changed || !pub.has(p.id) || !same(pub.get(p.id), p)));
 }
 function paintList(){
   const list = filtered(), pub = new Map(PUB.products.map(p => [p.id, p]));
   $('#count').textContent = t('shown', { n: list.length, t: products.length });
-  $('#list').innerHTML = `<div class="li hd"><span>${t('hPhoto')}</span><span>#</span><span>${t('hName')}</span><span>${t('hDept')}</span><span>${t('hPrice')}</span><span>${t('hStore')}</span><span>${t('hStatus')}</span></div>` +
+  $('#list').innerHTML = `<div class="li hd"><span>${t('hPhoto')}</span><span>#</span><span>${t('hName')}</span><span>${t('hDept')}</span><span>${t('hSell')}</span><span>${t('hBuy')}</span><span>${t('hMargin')}</span><span>${t('hStore')}</span><span>${t('hStatus')}</span></div>` +
     list.slice(0, 400).map(p => {
-      const changed = !sheetMode() && (!pub.has(p.id) || !same(pub.get(p.id), p)), s = subOf(p), st = storeById(p.store), pc = effPct(p);
+      const changed = !sheetMode() && (!pub.has(p.id) || !same(pub.get(p.id), p)), s = subOf(p), st = storeById(p.store), pc = effPct(p), mg = marginOf(p);
       return `<div class="li" data-edit="${p.id}" tabindex="0" role="button">${changed ? '<i class="dot"></i>' : ''}${thumb(p, 160)}<span class="id">#${p.id}</span>
         <span><b>${esc(pName(p))}</b><small>${esc(lang === 'ar' ? p.en : p.ar)}</small></span>
         <span class="c-dept"><small>${esc(L(DEPT[p.dept]) || p.dept)} › ${esc(L(s) || p.sub)}</small><span class="chips">${p.rent ? `<span class="chip c-rent">${t('oRent')}</span>` : ''}${p.refill ? `<span class="chip c-refill">${t('oRefill')}</span>` : ''}${p.b2b ? `<span class="chip c-b2b">${t('oB2b')}</span>` : ''}</span></span>
-        <span class="c-price price">${p.price ? iqd(p.price) : p.rentPrice ? '' : `<span class="muted">${t('noPrice')}</span>`}${p.rentPrice ? `<small>${iqd(p.rentPrice)} ${t('perMonth')}</small>` : ''}</span>
-        <span class="c-opts"><small>${st ? esc(L(st)) + (p.stores.length > 1 ? ` <b dir="ltr">${t('moreV', { n: p.stores.length - 1 })}</b>` : '') : `<span class="muted">${t('noStore')}</span>`}${pc != null && st ? ` · <b class="mono" dir="ltr">${pc}%</b>${p.commission != null ? ' ✎' : ''}` : ''}${p.offers[0] && p.offers[0].cost ? `<br><span>${t('costShort', { p: `<bdi class="mono">${iqd(p.offers[0].cost)}</bdi>` })}</span>` : ''}</small></span>
-        <span class="c-status"><span class="st st-${p.status}">${t('st')[p.status]}</span></span></div>`;
+        <span class="c-price price"><i class="mLbl">${t('hSell')}</i>${p.price ? iqd(p.price) : p.rentPrice ? '' : `<span class="muted">${t('noPrice')}</span>`}${p.rentPrice ? `<small>${iqd(p.rentPrice)} ${t('perMonth')}</small>` : ''}</span>
+        <span class="c-buy price"><i class="mLbl">${t('hBuy')}</i>${p.offers[0] && p.offers[0].cost ? iqd(p.offers[0].cost) : '<span class="muted">—</span>'}${p.offers.filter(o => o.cost).length > 1 ? `<small>${t('lowest', { p: iqd(Math.min(...p.offers.filter(o => o.cost).map(o => o.cost))) })}</small>` : ''}</span>
+        <span class="c-margin price"><i class="mLbl">${t('hMargin')}</i>${mg ? `<span class="${mg.m < 0 ? 'neg' : 'pos'}"><bdi dir="ltr">${iqd(mg.m)}</bdi><small dir="ltr">${mg.pc}%</small></span>` : '<span class="muted">—</span>'}</span>
+        <span class="c-opts"><small>${st ? esc(L(st)) + (p.stores.length > 1 ? ` <b dir="ltr">${t('moreV', { n: p.stores.length - 1 })}</b>` : '') : `<span class="muted">${t('noStore')}</span>`}${pc != null && st ? ` · <b class="mono" dir="ltr">${pc}%</b>${p.commission != null ? ' ✎' : ''}` : ''}</small></span>
+        <span class="c-status"><button type="button" class="pubSw" data-pub="${p.id}" aria-pressed="${p.status !== 'hidden'}" aria-label="${esc(t('published'))}" title="${esc(t(p.status === 'hidden' ? 'doPub' : 'doUnpub'))}"><i></i><span>${t(p.status === 'hidden' ? 'unpublished' : 'published')}</span></button>
+          ${p.status === 'out' ? `<span class="st st-out">${t('st').out}</span>` : ''}${offByStores(p) ? `<small class="warnTxt">${t('offByStore')}</small>` : ''}</span></div>`;
     }).join('');
 }
 document.addEventListener('input', e => { if(e.target.id === 'fq'){ filters.q = e.target.value; paintList(); } });
+// publish / unpublish: one item, the items shown, or "only our own items"
+const setPublished = (p, on) => Object.assign({}, p, { status: on ? (p.status === 'hidden' ? 'available' : p.status) : 'hidden' });
+async function publishList(list, msg){
+  if(!list.length){ toast(t('pubNone')); return; }
+  try{ busy(t('working')); await commit(list); busy(); render(); toast(msg); }catch(x){ fail(x); }
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-pub],[data-pub-shown],[data-pub-ready]'); if(!b) return;
+  if(b.dataset.pub){ const p = products.find(x => x.id === +b.dataset.pub); const on = p.status === 'hidden'; await publishList([setPublished(p, on)], t(on ? 'pubOne' : 'unpubOne', { n: pName(p) })); return; }
+  if(b.dataset.pubShown != null){
+    const on = b.dataset.pubShown === '1', list = filtered().filter(p => (p.status === 'hidden') === on);
+    if(list.length && !confirm(t(on ? 'pubAsk' : 'unpubAsk', { n: list.length }))) return;
+    await publishList(list.map(p => setPublished(p, on)), t(on ? 'pubDone' : 'unpubDone', { n: list.length })); return;
+  }
+  const up = products.filter(p => isReady(p) && p.status === 'hidden'), down = products.filter(p => !isReady(p) && p.status !== 'hidden');
+  if(!up.length && !down.length){ toast(t('pubNone')); return; }
+  if(!confirm(t('pubReadyAsk', { a: up.length, b: down.length, r: products.filter(isReady).length }))) return;
+  await publishList([...up.map(p => setPublished(p, true)), ...down.map(p => setPublished(p, false))], t('pubReadyDone', { a: up.length, b: down.length }));
+});
 document.addEventListener('change', e => {
-  const id = e.target.id, map = { fdept: 'dept', fstatus: 'status', fphoto: 'photo', fstore: 'store' };
+  const id = e.target.id, map = { fdept: 'dept', fstatus: 'status', fphoto: 'photo', fstore: 'store', fready: 'ready' };
   if(map[id]) filters[map[id]] = e.target.value;
   else if(id === 'fchanged') filters.changed = e.target.checked;
   else return;
@@ -1017,6 +1128,10 @@ function openEditor(id, keep){
         <label><input type="checkbox" name="rent" ${p.rent ? 'checked' : ''}>${t('rent')}</label>
         <label><input type="checkbox" name="refill" ${p.refill ? 'checked' : ''}>${t('refill')}</label>
         <label><input type="checkbox" name="b2b" ${p.b2b ? 'checked' : ''}>${t('b2b')}</label></div></fieldset>
+      <fieldset><legend>${t('dlvT')}</legend><div class="checks">
+        <label><input type="checkbox" name="large" ${p.large ? 'checked' : ''}>${t('dlvLarge')}</label>
+        <label><input type="checkbox" name="freeDelivery" ${p.freeDelivery ? 'checked' : ''}>${t('dlvFree')}</label></div>
+        <p class="lead" style="margin:6px 0 0;font-size:12px">${t('dlvP', { f: settings.delivery.feeIqd ? iqd(settings.delivery.feeIqd) : '—' })}${st && st.freeDelivery ? ' ' + t('dlvStoreFree', { s: esc(L(st)) }) : ''}</p></fieldset>
       <fieldset><legend>${t('services')}</legend><div class="checks">${C.SERVICES.map(s => `<label><input type="checkbox" name="svc" value="${s}" ${p.services.includes(s) ? 'checked' : ''}>${t('svc')[s]}</label>`).join('')}</div></fieldset>
       <label class="field"><span>${t('whyEn')}</span><textarea name="whyEn" dir="ltr">${esc(p.whyEn)}</textarea></label>
       <label class="field"><span>${t('whyAr')}</span><textarea name="whyAr" dir="rtl">${esc(p.whyAr)}</textarea></label>
@@ -1046,7 +1161,7 @@ function readForm(){
   const g = n => f.elements[n];
   editing.offers = [...f.querySelectorAll('.offerRow')].map(r => ({ store: r.querySelector('[name=ostore]').value, cost: r.querySelector('[name=ocost]').value.trim() }));
   Object.assign(editing, { en: g('en').value.trim(), ar: g('ar').value.trim(), dept: g('dept').value, sub: g('sub').value,
-    status: g('status').value, tier: +g('tier').value, rent: g('rent').checked, refill: g('refill').checked, b2b: g('b2b').checked,
+    status: g('status').value, tier: +g('tier').value, rent: g('rent').checked, refill: g('refill').checked, b2b: g('b2b').checked, large: g('large').checked, freeDelivery: g('freeDelivery').checked,
     services: [...f.querySelectorAll('[name=svc]:checked')].map(x => x.value), whyEn: g('whyEn').value, whyAr: g('whyAr').value,
     _raw: { price: g('price').value, rentPrice: g('rentPrice').value, deposit: g('deposit').value, commission: g('commission').value } });
 }
@@ -1086,6 +1201,7 @@ document.addEventListener('submit', async e => {
   catch(x){ fail(x); }
 });
 document.addEventListener('click', async e => {
+  if(e.target.closest('[data-pub]')) return;                  // the publish switch inside a row
   const el = e.target.closest('[data-edit],[data-new],[data-del],[data-pick-one],[data-link],[data-unphoto]');
   if(!el) return;
   if(el.matches('[data-edit]')) openEditor(+el.dataset.edit);
@@ -1149,7 +1265,9 @@ function viewStores(){
       return `<div class="sc ${s.on ? '' : 'off'}" data-store="${esc(s.id)}" tabindex="0" role="button"><div class="scHead">${s.logo ? `<img class="scLogo" src="${esc(s.logo)}" alt="">` : ''}<h3>${esc(L(s))}</h3></div>
         <div class="meta">${s.area ? esc(s.area) + ' · ' : ''}<span class="mono">${esc(s.id)}</span>${s.on ? '' : ` · <span class="st st-hidden">${t('off')}</span>`}</div>
         <div class="big">${s.commission}%<small> ${t('sComm')}</small></div>
-        <div class="meta">${t('sProducts', { n })}${o ? ' · ' + t('sOverrides', { n: o }) : ''}</div></div>`; }).join('')}</div>`
+        <div class="meta">${t('sProducts', { n })}${o ? ' · ' + t('sOverrides', { n: o }) : ''}${s.freeDelivery ? ' · ' + t('sFreeShort') : ''}</div>
+        <div class="scFoot"><button type="button" class="pubSw" data-store-pub="${esc(s.id)}" aria-pressed="${s.on}"><i></i><span>${t(s.on ? 'published' : 'unpublished')}</span></button>
+          ${s.on ? '' : `<small>${t('sHiddenN', { n: products.filter(p => p.stores.includes(s.id) && !C.inShop(p, stores)).length })}</small>`}</div></div>`; }).join('')}</div>`
       : `<div class="panel"><p class="lead" style="margin:0">${t('noStores')}</p></div>`}`;
 }
 // copies what's typed into the open store form, so a logo change doesn't lose it
@@ -1157,7 +1275,7 @@ function readStore(){
   const f = $('#storeForm'); if(!f || !editStore) return;
   const e = f.elements;
   Object.assign(editStore, { en: e.en.value, ar: e.ar.value, area: e.area.value, commission: e.commission.value, phone: e.phone.value, contact: e.contact.value,
-    notes: e.notes.value, on: e.on.checked, aboutEn: e.aboutEn.value, aboutAr: e.aboutAr.value });
+    notes: e.notes.value, on: e.on.checked, freeDelivery: e.freeDelivery.checked, aboutEn: e.aboutEn.value, aboutAr: e.aboutAr.value });
   if(editStore._new) editStore.id = e.sid.value;
 }
 function storeEditor(s, keep){
@@ -1177,6 +1295,8 @@ function storeEditor(s, keep){
       <label class="field"><span>${t('sContact')}</span><input name="contact" value="${esc(x.contact)}"></label>
       <label class="field" style="align-self:end">${sw('on', x.on, t('sOn'))}</label>
     </div>
+    <p class="lead" style="margin:-4px 0 10px;font-size:12px">${t('sOnP')}</p>
+    <div class="field">${sw('freeDelivery', x.freeDelivery, t('sFree'))}<p class="lead" style="margin:4px 0 0;font-size:12px">${t('sFreeP')}</p></div>
     <div class="grid2">
       <label class="field"><span>${t('sAboutEn')}</span><textarea name="aboutEn" dir="ltr" maxlength="600">${esc(x.aboutEn)}</textarea></label>
       <label class="field"><span>${t('sAboutAr')}</span><textarea name="aboutAr" dir="rtl" maxlength="600">${esc(x.aboutAr)}</textarea></label>
@@ -1193,6 +1313,14 @@ document.addEventListener('input', e => {
   if(e.target.closest('#storeForm') && e.target.name === 'sid' && editStore) editStore._idTyped = true;
 });
 document.addEventListener('click', async e => {
+  const sp = e.target.closest('[data-store-pub]');
+  if(sp){
+    const s = storeById(sp.dataset.storePub), on = !s.on;
+    const hit = products.filter(p => p.stores.includes(s.id) && C.inShop(p, stores) !== C.inShop(p, stores.map(x => x.id === s.id ? Object.assign({}, x, { on }) : x))).length;
+    if(!on && !confirm(t('sUnpubAsk', { s: L(s), n: hit }))) return;
+    try{ busy(t('working')); await commitStores(stores.map(x => x.id === s.id ? Object.assign({}, x, { on }) : x)); busy(); render(); toast(t(on ? 'sPubDone' : 'sUnpubDone', { s: L(s), n: hit })); }catch(err){ fail(err); }
+    return;
+  }
   const x = e.target.closest('[data-store-new],[data-store],[data-store-del],[data-store-products]');
   if(!x) return;
   if(x.matches('[data-store-new]')) storeEditor(null);
@@ -1215,7 +1343,7 @@ document.addEventListener('submit', async e => {
   if(pc == null || Number.isNaN(pc)) bad.push('commission');
   $$('#storeForm [data-f]').forEach(el => el.classList.toggle('bad', bad.includes(el.dataset.f)));
   if(bad.length) return;
-  const rec = fullStore({ id, en: f.en.value.trim(), ar: f.ar.value.trim(), area: f.area.value.trim(), commission: pc, phone: f.phone.value.trim(), contact: f.contact.value.trim(), notes: f.notes.value, on: f.on.checked,
+  const rec = fullStore({ id, en: f.en.value.trim(), ar: f.ar.value.trim(), area: f.area.value.trim(), commission: pc, phone: f.phone.value.trim(), contact: f.contact.value.trim(), notes: f.notes.value, on: f.on.checked, freeDelivery: f.freeDelivery.checked,
     logo: x.logo || '', aboutEn: f.aboutEn.value.trim(), aboutAr: f.aboutAr.value.trim() });
   if(!rec.en && !rec.ar) rec.en = id;
   const list = x._new ? stores.concat(rec) : stores.map(s => s.id === id ? rec : s);
@@ -1224,12 +1352,178 @@ document.addEventListener('submit', async e => {
 });
 
 /* ═══════════════════════════════════════════════════════════
+   REPORTS — orders coming in and going out, over any period
+   ═══════════════════════════════════════════════════════════ */
+// orders come from the Sheet; without it, staff can open an export of the Orders tab (CSV or Excel)
+let fileOrders = null, fileOrdersName = '', rep = { period: 'thisMonth', from: '', to: '' };
+const repOrders = () => sheetMode() ? orders : fileOrders;
+const day = v => String(v || '').slice(0, 10);
+const doneDay = o => day(o.status === 'delivered' && o.updated_at ? o.updated_at : o.created_at);
+const provinceOfOrder = o => String(o.area || '').split(' · ')[0].trim() || '—';
+function periodRange(){
+  const now = new Date(), iso = d => d.toISOString().slice(0, 10), y = now.getFullYear(), m = now.getMonth();
+  const back = n => { const d = new Date(now); d.setDate(d.getDate() - n + 1); return iso(d); };
+  switch(rep.period){
+    case 'last7': return [back(7), iso(now)];
+    case 'last30': return [back(30), iso(now)];
+    case 'lastMonth': return [iso(new Date(Date.UTC(y, m - 1, 1))), iso(new Date(Date.UTC(y, m, 0)))];
+    case 'thisYear': return [y + '-01-01', iso(now)];
+    case 'custom': return [rep.from || iso(now), rep.to || rep.from || iso(now)].sort();
+    default: return [iso(new Date(Date.UTC(y, m, 1))), iso(now)];
+  }
+}
+// one line's buying cost and margin, when we know what the vendor charged
+const lineCost = l => l.cost && l.total != null ? l.cost * l.qty : null;
+function report(list, from, to){
+  const inR = d => d >= from && d <= to;
+  const received = list.filter(o => inR(day(o.created_at)));
+  const delivered = list.filter(o => o.status === 'delivered' && inR(doneDay(o)));
+  const r = { received: received.length, delivered: delivered.length, cancelled: received.filter(o => o.status === 'cancelled').length,
+    open: received.filter(o => ['new', 'confirmed', 'onway'].includes(o.status)).length,
+    status: Object.fromEntries(['new', 'confirmed', 'onway', 'delivered', 'cancelled'].map(k => [k, received.filter(o => o.status === k).length])),
+    sales: 0, delivery: 0, cost: 0, costed: 0, commission: 0, pieces: 0, days: [], vendors: new Map(), products: new Map(), provinces: new Map(), payments: new Map() };
+  delivered.forEach(o => {
+    r.delivery += Number(o.delivery_iqd) || 0;
+    const d0 = new Date(o.created_at), d1 = new Date(o.updated_at || o.created_at);
+    if(o.updated_at && d1 >= d0) r.days.push((d1 - d0) / 86400000);
+    const seen = new Set();
+    (o.lines || []).forEach(l => {
+      const total = l.total || 0, c = lineCost(l);
+      r.sales += total; r.pieces += l.qty || 0; r.commission += l.commission || 0;
+      if(c != null){ r.cost += c; r.costed += total; }
+      const vk = l.store || '', v = r.vendors.get(vk) || { name: l.storeName || (storeById(vk) ? L(storeById(vk)) : ''), orders: 0, pieces: 0, sales: 0, cost: 0, costed: 0, commission: 0 };
+      if(!seen.has(vk)){ v.orders++; seen.add(vk); }
+      v.pieces += l.qty || 0; v.sales += total; v.commission += l.commission || 0; if(c != null){ v.cost += c; v.costed += total; }
+      r.vendors.set(vk, v);
+      const pk = String(l.id), pr = r.products.get(pk) || { id: l.id, name: l.name, qty: 0, sales: 0, cost: 0, costed: 0 };
+      pr.qty += l.qty || 0; pr.sales += total; if(c != null){ pr.cost += c; pr.costed += total; }
+      r.products.set(pk, pr);
+    });
+  });
+  received.forEach(o => {
+    const k = provinceOfOrder(o), v = r.provinces.get(k) || { name: k, received: 0, delivered: 0, sales: 0 };
+    v.received++; r.provinces.set(k, v);
+    const pm = r.payments.get(o.payment || '') || 0; r.payments.set(o.payment || '', pm + 1);
+  });
+  delivered.forEach(o => { const v = r.provinces.get(provinceOfOrder(o)) || { name: provinceOfOrder(o), received: 0, delivered: 0, sales: 0 };
+    v.delivered++; v.sales += (o.lines || []).reduce((a, l) => a + (l.total || 0), 0); r.provinces.set(v.name, v); });
+  r.margin = r.costed - r.cost;
+  r.marginPct = r.costed ? Math.round(r.margin / r.costed * 1000) / 10 : null;
+  r.coverage = r.sales ? Math.round(r.costed / r.sales * 100) : 0;
+  r.aov = delivered.length ? Math.round((r.sales + r.delivery) / delivered.length) : 0;
+  r.avgDays = r.days.length ? Math.round(r.days.reduce((a, b) => a + b, 0) / r.days.length * 10) / 10 : null;
+  // in and out over time: by day, or by month for long periods
+  const span = (new Date(to) - new Date(from)) / 86400000, byMonth = span > 62, key = d => byMonth ? d.slice(0, 7) : d;
+  const buckets = new Map();
+  for(let d = new Date(from + 'T00:00:00Z'); d <= new Date(to + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + 1)) buckets.set(key(d.toISOString().slice(0, 10)), { inN: 0, outN: 0 });
+  received.forEach(o => { const b = buckets.get(key(day(o.created_at))); if(b) b.inN++; });
+  delivered.forEach(o => { const b = buckets.get(key(doneDay(o))); if(b) b.outN++; });
+  r.series = [...buckets].map(([k, v]) => Object.assign({ k }, v)); r.byMonth = byMonth;
+  r.list = { received, delivered };
+  return r;
+}
+const mPct = (m, base) => base ? Math.round(m / base * 1000) / 10 + '%' : '—';
+const marginCell = (m, base) => base ? `<span class="${m < 0 ? 'neg' : 'pos'}"><bdi dir="ltr">${iqd(m)}</bdi> <small dir="ltr">${mPct(m, base)}</small></span>` : '<span class="muted">—</span>';
+// grouped bars, one axis: orders received and delivered in each day or month
+function flowChart(r){
+  const S = r.series, W = Math.max(680, S.length * 26), H = 180, pad = { l: 28, r: 6, t: 10, b: 24 }, max = Math.max(1, ...S.map(x => Math.max(x.inN, x.outN)));
+  const step = Math.max(1, Math.ceil(max / 4)), top = step * Math.ceil(max / step), cw = (W - pad.l - pad.r) / S.length, bw = Math.max(3, Math.min(12, cw / 2 - 3));
+  const y = v => pad.t + (H - pad.t - pad.b) * (1 - v / top);
+  const grid = []; for(let v = 0; v <= top; v += step) grid.push(`<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" class="gl"/><text x="${pad.l - 6}" y="${y(v) + 4}" class="ax" text-anchor="end">${v}</text>`);
+  const every = Math.ceil(S.length / 10), lab = k => r.byMonth ? k : k.slice(8) + '/' + k.slice(5, 7);
+  const bar = (x, v, cls) => { const h = Math.max(0, y(0) - y(v)); return v ? `<path class="${cls}" d="M${x},${y(0)}v${-Math.max(0, h - 3)}q0,-3 3,-3h${bw - 6 > 0 ? bw - 6 : 0}q3,0 3,3v${Math.max(0, h - 3)}z"/>` : ''; };
+  const cols = S.map((d, i) => { const x0 = pad.l + i * cw + cw / 2 - bw - 1;
+    return `<g class="col" data-tip="${esc(lab(d.k))} · ${esc(t('rIn'))}: ${d.inN} · ${esc(t('rOut'))}: ${d.outN}"><rect class="hit" x="${pad.l + i * cw}" y="${pad.t}" width="${cw}" height="${H - pad.t - pad.b}"/>${bar(x0, d.inN, 's1')}${bar(x0 + bw + 2, d.outN, 's2')}
+      ${i % every === 0 ? `<text x="${pad.l + i * cw + cw / 2}" y="${H - 6}" class="ax" text-anchor="middle">${esc(lab(d.k))}</text>` : ''}</g>`; }).join('');
+  return `<div class="chartBox"><div class="legend"><span><i class="s1"></i>${t('rIn')}</span><span><i class="s2"></i>${t('rOut')}</span></div>
+    <div class="chartScroll" dir="ltr"><svg class="flow" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(t('rFlowT'))}">${grid.join('')}${cols}</svg><div class="tip" hidden></div></div>
+    <details class="tableView"><summary>${t('rAsTable')}</summary><table class="stmt"><thead><tr><th>${t(r.byMonth ? 'month' : 'hDate')}</th><th>${t('rIn')}</th><th>${t('rOut')}</th></tr></thead>
+      <tbody>${S.map(d => `<tr><td class="mono">${d.k}</td><td class="n">${d.inN}</td><td class="n">${d.outN}</td></tr>`).join('')}</tbody></table></details></div>`;
+}
+document.addEventListener('mousemove', e => {
+  const box = e.target.closest('.chartScroll'); if(!box) return;
+  const tip = box.querySelector('.tip'), col = e.target.closest('.col');
+  if(!col){ tip.hidden = true; return; }
+  const b = box.getBoundingClientRect(); tip.textContent = col.dataset.tip; tip.hidden = false;
+  tip.style.left = Math.min(b.width - 10, Math.max(10, e.clientX - b.left + box.scrollLeft)) + 'px'; tip.style.top = (e.clientY - b.top - 40) + 'px';
+});
+document.addEventListener('mouseout', e => { const box = e.target.closest('.chartScroll'); if(box && !box.contains(e.relatedTarget)) box.querySelector('.tip').hidden = true; });
+function viewReports(){
+  const head = `<div class="head"><div><h1>${t('repT')}</h1><p>${t('repP')}</p></div>${sheetMode() ? `<button class="btn" type="button" data-orders-refresh>${t('refresh')}</button>` : ''}</div>`;
+  const list = repOrders();
+  const fileBox = sheetMode() ? '' : `<div class="note info" style="display:block">${icon('i-info')} ${t('repLocal')}
+      <div class="row" style="margin-top:10px"><button class="btn sm navy" type="button" data-rep-file>${icon('i-up')}${t('repOpen')}</button>${fileOrders ? `<span class="muted mono" style="font-size:12px">${esc(fileOrdersName)} · ${t('repLoaded', { n: fileOrders.length })}</span>` : ''}</div></div>`;
+  if(!list) return head + fileBox + (sheetMode() ? `<div class="panel"><p class="lead" style="margin:0">${t('working')}</p></div>` : '');
+  const [from, to] = periodRange(), r = report(list, from, to);
+  const P = ['thisMonth', 'lastMonth', 'last7', 'last30', 'thisYear', 'custom'];
+  const tile = (v, label, sub) => `<div><b>${v}</b><span>${label}</span>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  const vendors = [...r.vendors.values()].sort((a, b) => b.sales - a.sales), prods = [...r.products.values()].sort((a, b) => b.sales - a.sales);
+  const provs = [...r.provinces.values()].sort((a, b) => b.received - a.received);
+  return head + fileBox + `
+    <div class="tools repTools"><div class="seg" role="group" aria-label="${esc(t('rPeriod'))}">${P.map(k => `<button type="button" data-rep-period="${k}" aria-pressed="${rep.period === k}">${t('rp')[k]}</button>`).join('')}</div>
+      ${rep.period === 'custom' ? `<label class="monthSel"><b>${t('rFrom')}</b><input type="date" class="inp" id="rFrom" value="${from}"></label><label class="monthSel"><b>${t('rTo')}</b><input type="date" class="inp" id="rTo" value="${to}"></label>` : `<span class="muted mono" style="font-size:12.5px">${from} → ${to}</span>`}
+      <span class="sp"></span><button class="btn" type="button" data-rep-xlsx ${r.received || r.delivered ? '' : 'disabled'}>${icon('i-down')}${t('rXlsx')}</button></div>
+    <h2 class="repH">${t('rFlow')}</h2>
+    <div class="stat">${tile(r.received, t('rIn'))}${tile(r.delivered, t('rOut'))}${tile(r.open, t('rOpen'))}${tile(r.cancelled, t('rCancelled'), r.received ? mPct(r.cancelled, r.received) : '')}
+      ${tile(r.avgDays == null ? '—' : r.avgDays, t('rDays'))}</div>
+    <section class="panel"><h2>${t('rFlowT')}</h2>${r.series.length ? flowChart(r) : ''}
+      <div class="sum" style="margin-top:12px">${['new', 'confirmed', 'onway', 'delivered', 'cancelled'].map(k => `<div class="sumCell"><b>${r.status[k]}</b><span>${t('ost')[k]}</span></div>`).join('')}</div>
+      <p class="lead" style="margin:6px 0 0;font-size:12px">${t('rStatusP')}</p></section>
+    <h2 class="repH">${t('rMoney')}</h2>
+    <div class="stat">${tile(iqd(r.sales) || '0', t('rSales'))}${tile(iqd(r.cost) || '0', t('rCost'))}${tile(r.costed ? `<bdi class="${r.margin < 0 ? 'neg' : ''}">${iqd(r.margin)}</bdi>` : '—', t('rMargin'), r.marginPct != null ? `<bdi dir="ltr">${r.marginPct}%</bdi>` : '')}
+      ${tile(iqd(r.commission) || '0', t('oComm'))}${tile(iqd(r.delivery) || '0', t('rDelivery'))}${tile(iqd(r.aov) || '—', t('rAov'))}</div>
+    ${r.sales && r.coverage < 100 ? `<p class="note warn">${icon('i-info')}<span>${t('rCoverage', { p: r.coverage })}</span></p>` : ''}
+    <section class="panel"><h2>${icon('i-store')}${t('rByVendor')}</h2>${vendors.length ? `<div class="tblWrap"><table class="stmt"><thead><tr><th>${t('stmtStore')}</th><th>${t('stmtOrders')}</th><th>${t('rPieces')}</th><th>${t('rSales')}</th><th>${t('rCost')}</th><th>${t('rMargin')}</th><th>${t('stmtComm')}</th></tr></thead>
+      <tbody>${vendors.map(v => `<tr><td>${esc(v.name || t('unassigned'))}</td><td class="n">${v.orders}</td><td class="n">${v.pieces}</td><td class="n">${iqd(v.sales)}</td><td class="n">${v.costed ? iqd(v.cost) : '—'}</td><td class="n">${marginCell(v.costed - v.cost, v.costed)}</td><td class="n">${iqd(v.commission) || '0'}</td></tr>`).join('')}</tbody></table></div>` : `<p class="lead" style="margin:0">${t('rNone')}</p>`}</section>
+    <section class="panel"><h2>${icon('i-list')}${t('rByProduct')}</h2>${prods.length ? `<div class="tblWrap"><table class="stmt"><thead><tr><th>${t('lProd')}</th><th>${t('lQty')}</th><th>${t('rSales')}</th><th>${t('rMargin')}</th></tr></thead>
+      <tbody>${prods.slice(0, 20).map(v => `<tr><td>${esc(v.name)} <small class="muted mono">#${v.id}</small></td><td class="n">${v.qty}</td><td class="n">${iqd(v.sales)}</td><td class="n">${marginCell(v.costed - v.cost, v.costed)}</td></tr>`).join('')}</tbody></table></div>${prods.length > 20 ? `<p class="lead" style="margin:8px 0 0;font-size:12px">${t('rTop', { n: prods.length })}</p>` : ''}` : `<p class="lead" style="margin:0">${t('rNone')}</p>`}</section>
+    <section class="panel"><h2>${icon('i-truck')}${t('rByProvince')}</h2>${provs.length ? `<div class="tblWrap"><table class="stmt"><thead><tr><th>${t('rProvince')}</th><th>${t('rIn')}</th><th>${t('rOut')}</th><th>${t('rSales')}</th></tr></thead>
+      <tbody>${provs.map(v => { const pv = C.PROVINCES.find(x => x.en === v.name); return `<tr><td>${esc(pv ? L(pv) : v.name)}</td><td class="n">${v.received}</td><td class="n">${v.delivered}</td><td class="n">${iqd(v.sales) || '0'}</td></tr>`; }).join('')}</tbody></table></div>` : `<p class="lead" style="margin:0">${t('rNone')}</p>`}
+      ${r.payments.size ? `<p class="lead" style="margin:10px 0 0;font-size:12.5px"><b>${t('oPay')}:</b> ${[...r.payments].sort((a, b) => b[1] - a[1]).map(([k, n]) => { const m = C.PAYMENTS.find(x => x.key === k); return esc(m ? L(m) : k || '—') + ' ' + n; }).join(' · ')}</p>` : ''}</section>`;
+}
+function readOrderRows(rows){
+  const head = rows[0].map(h => String(h).trim().toLowerCase());
+  if(!head.includes('id') || !head.includes('created_at')) throw new Error(t('repBadFile'));
+  return rows.slice(1).filter(r => r[head.indexOf('id')]).map(r => {
+    const o = {}; head.forEach((h, i) => { o[h] = r[i] == null ? '' : String(r[i]); });
+    try{ o.lines = JSON.parse(o.lines_json || '[]'); }catch(e){ o.lines = []; }
+    return o;
+  });
+}
+document.addEventListener('click', async e => {
+  const x = e.target.closest('[data-rep-period],[data-rep-file],[data-rep-xlsx]'); if(!x) return;
+  if(x.dataset.repPeriod){ rep.period = x.dataset.repPeriod; render(); }
+  else if(x.matches('[data-rep-file]')){
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.csv,.xlsx';
+    inp.onchange = async () => { const f = inp.files[0]; if(!f) return;
+      try{ const rows = /\.xlsx$/i.test(f.name) ? await LIB.xlsxRead(await f.arrayBuffer()) : LIB.csvParse(await f.text()); fileOrders = readOrderRows(rows); fileOrdersName = f.name; render(); }
+      catch(err){ toast(err.message, true); } };
+    inp.click();
+  }
+  else {
+    const [from, to] = periodRange(), r = report(repOrders(), from, to);
+    const sum = [[t('rPeriod'), from + ' → ' + to], [t('rIn'), r.received], [t('rOut'), r.delivered], [t('rOpen'), r.open], [t('rCancelled'), r.cancelled], [t('rDays'), r.avgDays ?? ''],
+      [t('rSales'), r.sales], [t('rCost'), r.cost], [t('rMargin'), r.margin], ['%', r.marginPct ?? ''], [t('oComm'), r.commission], [t('rDelivery'), r.delivery], [t('rAov'), r.aov]];
+    const vend = [['store', 'orders', 'pieces', 'sales_iqd', 'cost_iqd', 'margin_iqd', 'margin_pct', 'commission_iqd'],
+      ...[...r.vendors.values()].map(v => [v.name || t('unassigned'), v.orders, v.pieces, v.sales, v.costed ? v.cost : '', v.costed ? v.costed - v.cost : '', v.costed ? mPct(v.costed - v.cost, v.costed) : '', v.commission])];
+    const prod = [['product_id', 'product', 'qty', 'sales_iqd', 'cost_iqd', 'margin_iqd'], ...[...r.products.values()].sort((a, b) => b.sales - a.sales).map(v => [v.id, v.name, v.qty, v.sales, v.costed ? v.cost : '', v.costed ? v.costed - v.cost : ''])];
+    const prov = [['province', 'received', 'delivered', 'sales_iqd'], ...[...r.provinces.values()].map(v => [v.name, v.received, v.delivered, v.sales])];
+    const ol = [['order', 'created', 'status', 'customer', 'phone', 'province', 'items_iqd', 'delivery_iqd', 'cost_iqd', 'commission_iqd'],
+      ...[...new Set([...r.list.received, ...r.list.delivered])].map(o => [o.id, day(o.created_at), o.status, o.name, o.phone, provinceOfOrder(o), o.est_total_iqd, o.delivery_iqd || '', o.cost_iqd || '', o.commission_iqd])];
+    download(LIB.xlsxWrite([{ name: 'Summary', rows: sum, widths: [28, 24] }, { name: 'By vendor', rows: vend, widths: [26, 8, 8, 14, 14, 14, 10, 14] },
+      { name: 'By product', rows: prod, widths: [10, 40, 8, 14, 14, 14] }, { name: 'By province', rows: prov, widths: [18, 10, 10, 14] }, { name: 'Orders', rows: ol, widths: [12, 12, 11, 22, 14, 16, 12, 12, 12, 12] }]),
+      `saleem-report-${from}-to-${to}.xlsx`);
+  }
+});
+document.addEventListener('change', e => { if(e.target.id === 'rFrom' || e.target.id === 'rTo'){ rep[e.target.id === 'rFrom' ? 'from' : 'to'] = e.target.value; render(); } });
+
+/* ═══════════════════════════════════════════════════════════
    ORDERS — logged by the shop when the Sheet is connected
    ═══════════════════════════════════════════════════════════ */
 let editOrder = null;
 async function loadOrders(quiet){
   if(!sheetMode()) return;
-  try{ if(!quiet) busy(t('working')); orders = (await api('orders')).orders; busy(); paintDue(); if(/#\/orders/.test(location.hash)) render(); }
+  try{ if(!quiet) busy(t('working')); orders = (await api('orders')).orders; busy(); paintDue(); if(/#\/(orders|reports)/.test(location.hash)) render(); }
   catch(x){ if(quiet) console.warn(x); else fail(x); }
 }
 const today = () => new Date().toISOString().slice(0, 10);
@@ -1286,10 +1580,11 @@ function orderEditor(o){
       <dt>${t('hDate')}</dt><dd class="mono">${esc(String(x.created_at).replace('T', ' ').slice(0, 16))}</dd></dl>
     <label class="field"><span>${t('status')}</span><select name="status">${['new', 'confirmed', 'onway', 'delivered', 'cancelled'].map(s => opt(s, t('ost')[s], x.status)).join('')}</select></label>
     <b>${t('oLines')}</b>
-    <div style="overflow-x:auto"><table class="lines"><thead><tr><th>${t('lProd')}</th><th>${t('lStore')}</th><th>${t('lQty')}</th><th>${t('lUnit')}</th><th>${t('lOff')}</th><th>${t('lTotal')}</th><th>${t('lPct')}</th><th>${t('lComm')}</th></tr></thead><tbody>
+    <div style="overflow-x:auto"><table class="lines"><thead><tr><th>${t('lProd')}</th><th>${t('lStore')}</th><th>${t('lQty')}</th><th>${t('lUnit')}</th><th>${t('lOff')}</th><th>${t('lTotal')}</th><th>${t('lPct')}</th><th>${t('lComm')}</th><th>${t('lCost')}</th></tr></thead><tbody>
       ${x.lines.map((l, i) => `<tr data-ol="${i}"><td>${esc(l.name)} <small class="muted mono">#${l.id}</small></td><td><small>${esc(l.storeName || '—')}</small></td><td class="mono">${l.qty}× <small>${t('modes')[l.mode] || l.mode}</small></td>
         <td><input class="inp mono" name="unit${i}" inputmode="numeric" value="${l.unit ?? ''}" dir="ltr"></td><td class="mono">${l.off ? l.off + '%' : ''}</td><td class="mono" data-tot>${iqd(l.total) || '—'}</td>
-        <td><input class="inp mono" name="pct${i}" inputmode="decimal" value="${l.pct ?? 0}" dir="ltr"></td><td class="mono" data-com>${iqd(l.commission) || '0'}</td></tr>`).join('')}</tbody></table></div>
+        <td><input class="inp mono" name="pct${i}" inputmode="decimal" value="${l.pct ?? 0}" dir="ltr"></td><td class="mono" data-com>${iqd(l.commission) || '0'}</td><td class="mono">${l.cost ? iqd(l.cost) : '—'}</td></tr>`).join('')}</tbody></table></div>
+    <label class="field" style="margin-top:12px;max-width:280px"><span>${t('oDelivery')}</span><input class="inp mono" name="delivery" inputmode="numeric" dir="ltr" value="${esc(x.delivery_iqd ?? '')}"><small class="lead" style="font-size:12px">${t('oDeliveryP')}</small></label>
     <label class="field" style="margin-top:12px"><span>${t('staffNote')}</span><textarea name="staff_note">${esc(x.staff_note || '')}</textarea></label>
   </form>`, `<button class="btn navy" type="submit" form="orderForm">${icon('i-check')}${t('save')}</button><button class="btn" type="button" data-close>${t('cancel')}</button>`);
 }
@@ -1309,7 +1604,7 @@ document.addEventListener('submit', async e => {
   const lines = x.lines.map((l, i) => { const u = parsePrice(f['unit' + i].value), pc = parsePct(f['pct' + i].value); return { unit: Number.isNaN(u) ? l.unit : u, pct: Number.isNaN(pc) || pc == null ? l.pct : pc }; });
   try{
     busy(t('working'));
-    const r = await api('updateOrder', { id: x.id, patch: { status: f.status.value, staff_note: f.staff_note.value, lines } });
+    const r = await api('updateOrder', { id: x.id, patch: { status: f.status.value, staff_note: f.staff_note.value, lines, delivery: f.delivery.value } });
     orders = orders.map(o => o.id === x.id ? r.order : o); busy(); closeEditor(); paintDue(); render(); toast(t('oSaved'));
   }catch(err){ fail(err); }
 });
@@ -1499,7 +1794,8 @@ function viewSettings(){
     ${sec('contact', null, t('setContact'), t('setContactP'), `<div class="grid2"><label class="field" data-f="contact"><span>${t('cWa')}</span><input name="contact.whatsapp" value="${esc(s.contact.whatsapp)}" inputmode="tel" dir="ltr" class="mono" placeholder="9647701234567"><em class="err">${t('eNum')}</em></label>
       ${f('contact.phone', t('cPhone') + ` <i>${t('cPhoneP')}</i>`, s.contact.phone, 'inputmode="tel" dir="ltr" placeholder="+964 770 123 4567"')}</div>`)}
     ${sec('delivery', s.delivery.on, t('setDel'), t('setDelP'), `<div class="grid2">${f('delivery.en', t('dTEn'), s.delivery.en, 'dir="ltr"')}${f('delivery.ar', t('dTAr'), s.delivery.ar, 'dir="rtl"')}${f('delivery.noteEn', t('dNEn'), s.delivery.noteEn, 'dir="ltr"')}${f('delivery.noteAr', t('dNAr'), s.delivery.noteAr, 'dir="rtl"')}
-      ${f('delivery.feeIqd', t('dFee') + ` <i>${t('dFeeP')}</i>`, s.delivery.feeIqd, 'inputmode="numeric" dir="ltr"')}</div>`)}
+      ${f('delivery.feeIqd', t('dFee') + ` <i>${t('dFeeP')}</i>`, s.delivery.feeIqd, 'inputmode="numeric" dir="ltr"')}<span></span>
+      ${f('delivery.largeEn', t('dLargeEn'), s.delivery.largeEn, 'dir="ltr"')}${f('delivery.largeAr', t('dLargeAr'), s.delivery.largeAr, 'dir="rtl"')}</div>`)}
     ${sec('payments', null, t('setPay'), t('setPayP'), `<div class="checks">${C.PAYMENTS.map(m => `<label><input type="checkbox" name="pay.${m.key}" ${s.payments[m.key] ? 'checked' : ''}>${esc(L(m))}</label>`).join('')}</div>`)}
     ${sec('rentals', s.rentals.on, t('setRent'), t('setRentP'), `<div class="grid2">${f('rentals.minMonths', t('rMin'), s.rentals.minMonths, 'type="number" min="1" max="24"')}<span></span>${f('rentals.depositEn', t('rDEn'), s.rentals.depositEn, 'dir="ltr"')}${f('rentals.depositAr', t('rDAr'), s.rentals.depositAr, 'dir="rtl"')}${f('rentals.includedEn', t('rIEn'), s.rentals.includedEn, 'dir="ltr"')}${f('rentals.includedAr', t('rIAr'), s.rentals.includedAr, 'dir="rtl"')}</div>`)}
     ${sec('nurse', s.nurse.on, t('setNurse'), t('setNurseP'), `<div class="grid2"><label class="field" data-f="nurse"><span>${t('nNum')}</span><input name="nurse.whatsapp" value="${esc(s.nurse.whatsapp)}" inputmode="tel" dir="ltr" class="mono"><em class="err">${t('eNum')}</em></label></div>`)}
@@ -1534,7 +1830,7 @@ document.addEventListener('submit', async e => {
   if(badBiz){ f.elements['contact.whatsapp'].focus(); return; }
   if(bad){ f.elements['nurse.whatsapp'].focus(); return; }
   const next = JSON.parse(JSON.stringify(settings));
-  Object.assign(next.delivery, { on: c('delivery.on'), en: v('delivery.en'), ar: v('delivery.ar'), noteEn: v('delivery.noteEn'), noteAr: v('delivery.noteAr'), feeIqd: v('delivery.feeIqd') });
+  Object.assign(next.delivery, { on: c('delivery.on'), en: v('delivery.en'), ar: v('delivery.ar'), noteEn: v('delivery.noteEn'), noteAr: v('delivery.noteAr'), feeIqd: v('delivery.feeIqd'), largeEn: v('delivery.largeEn'), largeAr: v('delivery.largeAr') });
   C.PAYMENTS.forEach(m => { next.payments[m.key] = c('pay.' + m.key); });
   Object.assign(next.rentals, { on: c('rentals.on'), minMonths: v('rentals.minMonths'), depositEn: v('rentals.depositEn'), depositAr: v('rentals.depositAr'), includedEn: v('rentals.includedEn'), includedAr: v('rentals.includedAr') });
   Object.assign(next.nurse, { on: c('nurse.on'), whatsapp: nurse });

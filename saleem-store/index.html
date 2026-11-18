@@ -276,6 +276,7 @@ html[lang=ar] .price{font-family:Cairo,sans-serif}
 .line .ph img{padding:6px}
 .line .ph .fb .ic{width:28px;height:28px}
 .line h3{font-size:14.5px}
+.line h3 a{display:inline-block;padding:8px 0;margin:-8px 0}
 .line .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
 .line .sel{height:44px;font-size:13.5px}
 .line .stepper{height:46px;width:132px}
@@ -668,6 +669,11 @@ html.vt .view{animation:none}
 .cVend{display:flex;align-items:center;gap:4px;margin-top:4px;color:var(--mut);font-size:12.5px;font-weight:700;min-width:0}
 .cVend .ic{width:14px;height:14px;flex:none}
 .cVend span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlv{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;color:var(--navy2);font-size:14px}
+.dlv .ic{flex:none;width:18px;height:18px;margin-top:2px;color:var(--green)}
+.dlv small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px;line-height:1.5}
+.bdg.free{color:var(--green)}
+.freeTxt{color:var(--green);font-weight:800}
 .cVend b{flex:none;font-size:11.5px;color:var(--navy);background:var(--paper);border-radius:6px;padding:0 5px}
 .soldByRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:10px}
 .soldByRow .lbl{margin:0;font-size:12.5px;color:var(--mut);font-weight:800;width:100%}
@@ -890,6 +896,7 @@ const T = {
     kitsTitle:'أطقم رعاية جاهزة', kitsSub:'مجموعة مستلزمات لحالة وحدة، اخترناها حسب خبرة فريق سليم. تكدر تعدّلها بعد ما تضيفها.',
     kitItems:'{n} منتج', kitFrom:'من {p}', kitAdd:'أضف الطقم كامل للطلب', kitAddN:'أضف {n} منتجات للطلب', kitPick:'شيل العلامة عن اللي عندك من قبل.', kitNone:'اختار منتج واحد على الأقل', kitAdded:'انضاف الطقم لطلبك', kitAlready:'هذا الطقم بطلبك من قبل', kitInOrder:'الطقم بطلبك. شوف الطلب', kitInclude:'ضيف {p}', kitOut:'غير متوفر حالياً، ما راح ينضاف', kitIncl:'شنو بالطقم',
     rentTerms:'شروط الإيجار', rentMin:'أقل مدة: {n} شهر', rentDeposit:'التأمين: {p} يرجعلك بعد الإرجاع', rentIncl:'يشمل: {s}',
+    rentDel:'الإيجار يشمل: {s}', bFree:'توصيل مجاني', freeDel:'مجاني', msgLarge:'(قطعة كبيرة: ممكن تزيد الأجرة)',
     soldBy:'يجهّزه', share:'شارك', shareMsg:'شوف هذا بمتجر سليم: {p}', copied:'انتسخ الرابط',
     bulkT:'خصم الكميات', bulkLine:'{n} قطعة أو أكثر: خصم {p}٪',
     clinicBox:'أطلب لعيادة أو مركز أو منظمة',
@@ -960,6 +967,7 @@ const T = {
     kitsTitle:'Ready-made care kits', kitsSub:'A set of supplies for one situation, chosen from Saleem’s care experience. You can change it once it’s in your order.',
     kitItems:'{n} items', kitFrom:'from {p}', kitAdd:'Add the whole kit to my order', kitAddN:'Add {n} items to my order', kitPick:'Untick anything you already have.', kitNone:'Tick at least one item', kitAdded:'Kit added to your order', kitAlready:'This kit is already in your order', kitInOrder:'The kit is in your order. View it', kitInclude:'Include {p}', kitOut:'Out of stock right now, so it won’t be added', kitIncl:'What’s in the kit',
     rentTerms:'Rental terms', rentMin:'Minimum: {n} month(s)', rentDeposit:'Deposit: {p}, returned when it comes back', rentIncl:'Includes: {s}',
+    rentDel:'Renting includes: {s}', bFree:'Free delivery', freeDel:'Free', msgLarge:'(large item: the fee may be higher)',
     soldBy:'Supplied by', share:'Share', shareMsg:'Have a look at this on Saleem Store: {p}', copied:'Link copied',
     bulkT:'Bulk pricing', bulkLine:'{n}+ pieces: {p}% off',
     clinicBox:'I’m ordering for a clinic, centre or organisation',
@@ -983,7 +991,8 @@ function setCatalog(cat){
   DEPTS = cat.departments.filter(d => d.key !== 'clinic' || clinicsOn());
   DEPT = Object.fromEntries(DEPTS.map(d => [d.key, d]));
   // a product pointing at a department or section that no longer exists can't be shown
-  PRODUCTS = cat.products.filter(p => DEPT[p.dept] && DEPT[p.dept].subs.some(s => s.key === p.sub) && (!p.b2b || clinicsOn()));
+  // unpublished items, and items whose partner stores are all unpublished, aren't shown
+  PRODUCTS = cat.products.filter(p => DEPT[p.dept] && DEPT[p.dept].subs.some(s => s.key === p.sub) && (!p.b2b || clinicsOn()) && CAT.inShop(p, SITE.stores));
   BYID = new Map(PRODUCTS.map(p => [String(p.id), p]));
   RETAIL = PRODUCTS.filter(p => !p.b2b);
   STORES = new Map(SITE.stores.filter(x => x.on).map(x => [x.id, x]));
@@ -1063,6 +1072,8 @@ const payments = () => CAT.PAYMENTS.filter(m => S.payments[m.key]);
 // every partner store that sells it, the default (the one orders go to) first
 const storesOf = p => (p.stores || []).map(id => STORES.get(id)).filter(Boolean);
 const storeOf = p => storesOf(p)[0];
+// on a card there's room for the name only: "التقنيات الحديثة (M-Tech)" → "التقنيات الحديثة"
+const shortName = st => { const n = L(st), s = n.replace(/\s*\([^)]*\)\s*$/, ''); return s || n; };
 const linePrice = (p, mode, qty) => CAT.linePrice(p, mode, qty, S);
 const kitById = id => KITS.find(k => k.id === id);
 
@@ -1078,12 +1089,21 @@ document.addEventListener('error', e => {
   if(e.target.tagName === 'IMG'){ const ph = e.target.closest('.ph'); if(ph) ph.classList.add('noimg'); }
 }, true);
 
+// delivery for this one item, as it would be on its own
+const itemDelivery = p => CAT.deliveryFor([{ p, mode: 'buy' }], SITE);
+function deliveryLine(p){
+  const d = itemDelivery(p);
+  if(p.b2b || !(d.fee || d.free)) return '';
+  const rentNote = p.rent && rentOn() && !d.free ? `<small>${esc(t('rentDel', { s: LF(S.rentals, 'included') }))}</small>` : '';
+  return `<p class="dlv">${icon('i-truck')}<span>${d.free ? `<b>${t('freeDel')}</b>` : `${t('deliveryFee')}: <b>${fmtIqd(d.fee)}</b>`}${d.large ? `<small>${esc(LF(S.delivery, 'large'))}</small>` : ''}${rentNote}</span></p>`;
+}
 function badges(p){
   let b = '';
   if(isOut(p)) b += `<span class="bdg out">${t('bOut')}</span>`;
   if(p.b2b)    b += `<span class="bdg quote" title="${esc(t('mQuote')[0])}">${icon('i-quote')}<span>${t('bQuote')}</span></span>`;
   if(p.rent && rentOn() && !p.b2b) b += `<span class="bdg rent" title="${esc(t('rentT'))}">${icon('i-rent')}<span>${t('bRent')}</span></span>`;
   if(p.refill && !p.b2b) b += `<span class="bdg refill" title="${esc(t('refillT'))}">${icon('i-refill')}<span>${t('bRefill')}</span></span>`;
+  if(!p.b2b && itemDelivery(p).free) b += `<span class="bdg free">${icon('i-truck')}<span>${t('bFree')}</span></span>`;
   return b ? `<div class="badges">${b}</div>` : '';
 }
 
@@ -1117,7 +1137,7 @@ function card(p, want){
   const mode = fixedMode(p, want);
   return `<article class="card" data-card="${p.id}" data-mode="${mode}">
     <a href="#/p/${p.id}">${badges(p)}${photo(p, 400)}
-      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${S.showStore && storeOf(p) ? `<span class="cVend">${icon('i-store')}<span>${esc(L(storeOf(p)))}</span>${storesOf(p).length > 1 ? `<b>+${storesOf(p).length - 1}</b>` : ''}</span>` : ''}${priceLine(p, mode)}</div></a>
+      <div class="cBody"><small>${esc(L(subOf(p)))}</small><h3>${esc(pName(p))}</h3>${S.showStore && storeOf(p) ? `<span class="cVend">${icon('i-store')}<span>${esc(shortName(storeOf(p)))}</span>${storesOf(p).length > 1 ? `<b>+${storesOf(p).length - 1}</b>` : ''}</span>` : ''}${priceLine(p, mode)}</div></a>
     <div class="cFoot">${addControl(p, mode)}</div></article>`;
 }
 
@@ -1601,6 +1621,7 @@ function viewProduct(p){
         <h1>${esc(pName(p))}</h1><p class="alt" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(lang === 'ar' ? p.en : p.ar)}</p>
         ${badges(p)}${S.showStore && st ? `<div class="soldByRow"><span class="lbl">${t('soldBy')}</span>${storesOf(p).map(v => `<a class="soldBy" href="#/v/${encodeURIComponent(v.id)}">${v.logo ? `<img src="${esc(v.logo)}" alt="">` : icon('i-store')}<b>${esc(L(v))}</b>${icon('i-chev', 'ic flip')}</a>`).join('')}</div>` : ''}
         ${modes.length === 1 && unitPrice(p, modes[0]) ? `<p class="price big">${fmtIqd(unitPrice(p, modes[0]))}</p>` : ''}
+        ${deliveryLine(p)}
         ${modes.length > 1 ? `<span class="lbl" id="howLbl">${t('how2')}</span><div class="opts" role="radiogroup" aria-labelledby="howLbl">${modes.map(opt).join('')}</div>` : (p.b2b ? `<div class="note">${icon('i-quote')}<span>${t('clinicNote')}</span></div>` : '')}
         ${tiers.length ? `<div class="tiersNote"><b>${t('bulkT')}:</b> ${tiers.map(x => t('bulkLine', {n: x.min, p: x.pct})).join(' · ')}</div>` : ''}
         ${isOut(p) ? `<div class="note out">${icon('i-x')}<span>${t('outNote')}</span></div><a class="btn wa block" href="${wa(t('askOut', {p: pName(p)}))}" target="_blank" rel="noopener">${icon('i-chat')}${t('askAvail')}</a>` : `
@@ -1729,8 +1750,8 @@ function rerenderTrack(){ if(parse().parts[0] === 'track'){ const y = window.scr
 function totals(){
   let sub = 0, off = 0, priced = 0;
   cart.forEach(l => { const p = BYID.get(l.id), lp = linePrice(p, l.mode, l.qty); if(!lp) return; priced++; sub += lp.unit * l.qty; off += lp.unit * l.qty - lp.total; });
-  const fee = S.delivery.on && S.delivery.feeIqd && cart.length ? S.delivery.feeIqd : 0;
-  return { sub, off, fee, total: sub - off + fee, priced, all: priced === cart.length };
+  const dl = CAT.deliveryFor(cart.map(l => ({ p: BYID.get(l.id), mode: l.mode })), SITE), fee = dl.fee;
+  return { sub, off, fee, free: dl.free, large: dl.large, total: sub - off + fee, priced, all: priced === cart.length };
 }
 const sentTime = () => new Date(sent.at).toLocaleTimeString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB', {hour:'numeric', minute:'2-digit'});
 function viewSent(){
@@ -1769,8 +1790,8 @@ function viewOrder(){
       <div class="sum"><span>${t('total')}</span><span>${pieces() === cart.length ? t('totalN', {n: num(cart.length)}) : t('totalNQ', {n: num(cart.length), q: num(pieces())})}</span></div>
       ${tt.priced ? `${tt.off || tt.fee ? `<div class="sum small"><span>${t('subtotal')}</span><span>${fmtIqd(tt.sub)}</span></div>` : ''}
         ${tt.off ? `<div class="sum small"><span>${t('bulkOff')}</span><span>−${fmtIqd(tt.off)}</span></div>` : ''}
-        ${tt.fee ? `<div class="sum small"><span>${t('deliveryFee')}</span><span>${fmtIqd(tt.fee)}</span></div>` : ''}
-        <div class="sum est"><span>${t('estimate')}</span><span>${fmtIqd(tt.total)}</span></div><p class="estNote">${t(tt.all ? 'estAll' : 'estPartial')}</p>` : ''}
+        ${tt.fee ? `<div class="sum small"><span>${t('deliveryFee')}${tt.large ? ' *' : ''}</span><span>${fmtIqd(tt.fee)}</span></div>` : tt.free ? `<div class="sum small"><span>${t('deliveryFee')}</span><span class="freeTxt">${t('freeDel')}</span></div>` : ''}
+        <div class="sum est"><span>${t('estimate')}</span><span>${fmtIqd(tt.total)}</span></div><p class="estNote">${tt.large ? `* ${esc(LF(S.delivery, 'large'))} ` : ''}${t(tt.all ? 'estAll' : 'estPartial')}</p>` : ''}
       ${S.delivery.on ? `<div class="facts"><div class="fact">${icon('i-truck')}<span><b>${esc(L(S.delivery))}</b> · ${esc(LF(S.delivery, 'note'))}</span></div></div>` : ''}
     </section>
     <form class="panel" id="orderForm" novalidate><h2>${t('details')}</h2><p>${t('detailsP')}</p>
@@ -1857,7 +1878,8 @@ function buildMessage(no, updates){
     lines.push(`• ${l.qty} × ${pName(p)} — ${modeLabel(l.mode)}${lp ? ' — ' + fmtIqd(lp.total) + (lp.off ? ` (−${lp.off}%)` : '') : ''} [#${p.id}${st ? ' · ' + L(st) : ''}]`); });
   const tt = totals();
   if(tt.priced){
-    if(tt.fee) lines.push(t('msgDelivery') + ': ' + fmtIqd(tt.fee));
+    if(tt.fee) lines.push(t('msgDelivery') + ': ' + fmtIqd(tt.fee) + (tt.large ? ' ' + t('msgLarge') : ''));
+    else if(tt.free) lines.push(t('msgDelivery') + ': ' + t('freeDel'));
     lines.push(t('msgTotal') + ': ' + fmtIqd(tt.total));
   }
   if(remind) lines.push('', '⏰ ' + t('msgRemind', {d: S.reminders.days}));

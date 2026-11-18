@@ -7,6 +7,54 @@ has to do (redeploy the Sheet script, re-publish, change a setting).
 The shop footer and the admin header show the version that's running. The single-file previews
 are named after it (`Saleem_Store_v0.001.html`), and so is the admin's update zip.
 
+## v0.004 (18 Nov 2026)
+
+**Admin**
+- **Reports tab** covers orders coming in and going out for any period:
+  - received, delivered, open, cancelled, average days to deliver
+  - a received-vs-delivered chart
+  - sales, buying cost, net margin (IQD and %), commission, delivery fees, average order value
+  - tables by vendor, best-selling item and province
+  - Excel download
+  - Without the Sheet connected, it reads a CSV/Excel copy of the Orders tab.
+- **Products list:** separate **Selling** and **Buying** columns, plus **Net margin** showing
+  IQD and % of the selling price in one column (red when it's a loss). The buying price is the
+  default vendor's; the lowest offer shows under it when there are several.
+- **Publish / hide:**
+  - a switch on every product in the list and on every store card;
+  - hiding a store hides every item that has no other published vendor (the list flags them);
+  - **Publish shown** / **Hide shown** act on the current filters;
+  - a **Readiness** filter (our photo + a vendor vs. placeholders);
+  - **Show only our items** publishes the ready items and hides every placeholder in one step.
+- **Delivery toggles:**
+  - product editor: **Large item** and **Free delivery on this item**;
+  - store editor: **Free delivery on all its items**;
+  - Settings: the large-item notice in both languages;
+  - Bulk upload: `large` and `free_delivery` columns.
+- **Orders:** staff can correct an order's delivery fee, and each line shows its buying price.
+
+**Shop**
+- **Delivery fee:** 5,000 IQD per order, shown on product pages, in the basket total and in the
+  WhatsApp message.
+  - Large items show a notice that delivery may cost more, and the message flags it.
+  - An order delivers free when all its items are waived. Free items get a "Free delivery"
+    badge.
+  - Rentals include delivery and pickup, so they don't add the fee.
+- **Visibility:** hidden items, and items whose stores are all unpublished, are gone from the
+  shop, its search and its vendor pages.
+- **Phone review fixes:**
+  - vendor names on cards no longer break in Arabic ("التقنيات الحديثة (M-Tech)" shows as its
+    name);
+  - basket item names are easier to tap;
+  - the admin products list no longer makes phones zoom out.
+
+**Google Sheet:**
+- the Products tab gains `large` and `free_delivery`, and the Stores tab gains `free_delivery`;
+- the public read drops items whose stores are all unpublished;
+- each order logs `delivery_iqd` and `cost_iqd` (older Orders tabs get the headings added).
+
+**Paste in the new `Code.gs` and deploy a new version.**
+
 ## v0.003 (14 Nov 2026)
 
 **Several vendors per product, each with our buying price**

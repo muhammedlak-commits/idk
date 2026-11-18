@@ -63,7 +63,15 @@ Everything below is set in **admin → Settings / Kits / Banners**:
 - **Delivery across Iraq**: the delivery note says every province, and the order form asks for the customer's province (it goes into the WhatsApp message and the Orders tab).
 
 - **Banners**: the home page carousel. Each banner has an image (or a colour), a title, text and a button in both languages. The whole banner is one link (a department, a kit, a product, rentals, the finder, WhatsApp, or any web address). Optional start and end dates let you schedule offers.
-- **Delivery promise**: "Delivered in 1–2 days", shown on the home page, every product and the order page. An optional delivery fee is added to the estimated total.
+- **Delivery promise**: "Delivered in 1–2 days", shown on the home page, every product and the order page.
+- **Delivery fee**: one flat fee per order (5,000 IQD to start), shown on every product page,
+  added to the estimated total and written into the WhatsApp message.
+  - An item marked **large** carries a notice that delivery may cost more; the notice text is
+    in Settings, and staff can correct an order's fee in the Orders tab.
+  - **Free delivery** can be switched on for one item (product editor) or for every item of a
+    store (store editor). An order delivers free when every item in it does.
+  - Rentals don't count toward the fee, because delivery and pickup are part of the rent.
+    Clinic quotes are priced separately.
 - **Payment methods**: cash on delivery, ZainCash, Qi Card, FastPay, card on delivery. Each is switched on or off; the customer picks one, and it goes into the order message.
 - **Rentals**: one switch for the whole shop. When off, no rent option, badge, filter or rentals page appears anywhere. Rental terms (minimum period, deposit, what's included) and a per-product deposit are shown on rentable items.
 - **Ask our nurse**: a WhatsApp button on its own number, plus the **Help me choose** finder: one question that suggests kits and departments.
@@ -111,13 +119,30 @@ Delivery is done by the delivery company. Saleem earns a percentage on each part
   - mark orders confirmed, out for delivery, delivered or cancelled (the customer sees this on the tracking page)
   - see commission per store for any month (delivered orders only)
   - download the statement as CSV
+  - correct the delivery fee on an order, and see each line's buying price
+- **Reports tab**: orders coming in and going out for any period (this month, last month, the
+  last 7 or 30 days, this year, or custom dates):
+  - received, delivered, open and cancelled orders, and the average days to deliver
+  - a chart of orders received and delivered per day (per month for long periods)
+  - from delivered orders: sales, buying cost, net margin and %, commission, delivery fees and
+    average order value
+  - tables by vendor, best-selling items and province, and a payment-method count
+  - **Download Excel** for all of it
+  - Reads the Sheet's orders. Without the Sheet, open a CSV/Excel copy of its Orders tab.
+- **Publishing**: every product has a Published/Hidden switch in the list, and every store has
+  one on its card. Hiding a store also hides every item that has no other published vendor.
+  In the products list:
+  - **Publish shown** / **Hide shown** work on whatever the filters show
+  - the **Readiness** filter separates ready items (our own photo and a vendor) from placeholders
+  - **Show only our items** publishes every ready item and hides every placeholder in one go
 - **Refill reminders**: these show up in the Orders tab on the day they're due. **Send reminder** opens WhatsApp to the customer with a link that refills their basket in one tap (`#/reorder/…`).
 
 ## The admin portal (`admin.html`)
 
 Behind a 6-digit code (**335500**). It uses the shop's look, including dark mode (the moon/sun button; the choice is shared with the shop). Besides Stores, Orders, Kits, Banners and Settings (above), these tabs:
 
-- **Products:** search and filter all products; click one to edit names, department,
+- **Products:** the list shows each item's selling price, buying price (default vendor) and
+  net margin with its % of the selling price. Search and filter all products; click one to edit names, department,
   prices, rent/refill/clinic, services, status, descriptions and photo. You can add new
   products and delete them.
 - **Bulk upload:** download every product as Excel (with dropdowns plus Departments and
